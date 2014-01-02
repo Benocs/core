@@ -1,0 +1,45 @@
+RefactoringTool: Warnings/messages while refactoring:
+[11/1860]
+RefactoringTool: ### In file daemon/core/service.py ###
+RefactoringTool: Line 369: You should use
+'operator.mul(coreapi.CONF_DATA_TYPE_BOOL,
+                                            len(servicelist))' here.
+RefactoringTool: Line 371: You should use 'operator.mul('0', len(servicelist))'
+here.
+RefactoringTool: Line 402: You should use
+'operator.mul(coreapi.CONF_DATA_TYPE_STRING,
+                                     len(svc.keys))' here.
+RefactoringTool: ### In file daemon/core/emane/commeffect.py ###
+RefactoringTool: Line 80: You should use a for loop here
+RefactoringTool: ### In file daemon/core/emane/emane.py ###
+RefactoringTool: Line 417: You should use a for loop here
+RefactoringTool: ### In file daemon/core/emane/ieee80211abg.py ###
+RefactoringTool: Line 113: You should use a for loop here
+RefactoringTool: ### In file daemon/core/emane/rfpipe.py ###
+RefactoringTool: Line 100: You should use a for loop here
+RefactoringTool: ### In file daemon/core/emane/universal.py ###
+RefactoringTool: Line 109: You should use a for loop here
+RefactoringTool: ### In file daemon/core/netns/vif.py ###
+RefactoringTool: Line 14: absolute and local imports together
+RefactoringTool: ### In file daemon/core/netns/vnode.py ###
+RefactoringTool: Line 14: absolute and local imports together
+RefactoringTool: There were 19 errors:
+RefactoringTool: Can't parse daemon/core/coreobj.py: ParseError: bad input: type=3, value=u'"%s: %s"', context=(u' ', (166, 18))
+RefactoringTool: Can't parse daemon/core/session.py: ParseError: bad input: type=1, value=u'msg', context=(u' ', (508, 14))
+RefactoringTool: Can't parse daemon/core/misc/LatLongUTMconversion.py: ParseError: bad input: type=1, value=u'z', context=(u' ', (214, 10))
+RefactoringTool: Can't parse daemon/core/misc/event.py: ParseError: bad input: type=1, value=u'delta', context=(u' ', (132, 14))
+RefactoringTool: Can't parse daemon/core/services/security.py: ParseError: bad input: type=3, value=u'"Error opening VPN client configuration template (%s): %s"', context=(u' ', (39, 18))
+RefactoringTool: Can't parse daemon/core/xen/xen.py: ParseError: bad input: type=3, value=u'"%s: %s"', context=(u' ', (578, 18))
+RefactoringTool: Can't parse daemon/examples/findcore.py: ParseError: bad input: type=3, value=u'"%8s  %s"', context=(u' ', (74, 14))
+RefactoringTool: Can't parse daemon/examples/stopsession.py: ParseError: bad input: type=3, value=u'"sessions:"', context=(u' ', (40, 14))
+RefactoringTool: Can't parse daemon/examples/netns/distributed.py: ParseError: bad input: type=3, value=u'"connecting to slave at %s:%d"', context=(u' ', (80, 10))
+RefactoringTool: Can't parse daemon/examples/netns/emane80211.py: ParseError: bad input: type=3, value=u'"creating EMANE WLAN wlan1"', context= (u' ', (68, 10))
+RefactoringTool: Can't parse daemon/examples/netns/howmanynodes.py: ParseError: bad input: type=3, value=u'"Testing how many network namespace nodes this machine can create."', context=(u' ', (117, 10))
+RefactoringTool: Can't parse daemon/examples/netns/iperf-performance-chain.py: ParseError: bad input: type=3, value=u'"creating %d nodes"', con text=(u' ', (68, 10))
+RefactoringTool: Can't parse daemon/examples/netns/ospfmanetmdrtest.py: ParseError: bad input: type=1, value=u'msg', context=(u' ', (165, 14))
+RefactoringTool: Can't parse daemon/examples/netns/switch.py: ParseError: bad input: type=3, value=u'"creating %d nodes with addresses from %s"', context=(u' ', (61, 10))
+RefactoringTool: Can't parse daemon/examples/netns/wlanemanetests.py: ParseError: bad input: type=1, value=u'msg', context=(u' ', (106, 14))
+RefactoringTool: Can't parse daemon/ns3/corens3/obj.py: ParseError: bad input: type=3, value=u'"Could not locate the ns-3 Python bindings!"', context=(u' ', (26, 10))
+RefactoringTool: Can't parse daemon/ns3/examples/ns3lte.py: ParseError: bad input: type=3, value=u'"shutting down session"', context=(u' ', (104, 10))
+RefactoringTool: Can't parse daemon/ns3/examples/ns3wifi.py: ParseError: bad input: type=3, value=u'"\\nsession ="', context=(u' ', (122, 10))
+RefactoringTool: Can't parse daemon/ns3/examples/ns3wifirandomwalk.py: ParseError: bad input: type=3, value=u'"\\nsession ="', context=(u' ', (131, 10))
