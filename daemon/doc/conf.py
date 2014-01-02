@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'CORE Python modules'
-copyright = '2012, core-dev'
+project = u'CORE Python modules'
+copyright = u'2012, core-dev'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -178,8 +178,8 @@ htmlhelp_basename = 'COREpythondoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'index.tex', 'CORE Python Documentation',
-   'core-dev', 'manual'),
+  ('index', 'index.tex', u'CORE Python Documentation',
+   u'core-dev', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -211,18 +211,18 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'core-python', 'CORE Python Documentation',
-     ['core-dev'], 1)
+    ('index', 'core-python', u'CORE Python Documentation',
+     [u'core-dev'], 1)
 ]
 
 
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = 'CORE Python'
-epub_author = 'core-dev'
-epub_publisher = 'core-dev'
-epub_copyright = '2012, core-dev'
+epub_title = u'CORE Python'
+epub_author = u'core-dev'
+epub_publisher = u'core-dev'
+epub_copyright = u'2012, core-dev'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

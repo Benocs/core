@@ -59,12 +59,12 @@ esac
 SHELL=/bin/sh
 export SHELL
 
-export LIBDIR="/usr/local/lib/core"
-export SBINDIR="/usr/local/sbin"
+export LIBDIR="/usr/lib/core"
+export SBINDIR="/usr/sbin"
 # eval is used here to expand "~" to user's home dir
 if [ x$CONFDIR = x ]; then export CONFDIR=`eval "echo ${HOME}/.core"` ; fi
 export CORE_STATE_DIR="/var"
-export CORE_DATA_DIR="/usr/local/share/core"
+export CORE_DATA_DIR="/usr/share/core"
 export CORE_USER=`id -u -n`
 export CORE_START_DIR=$PWD
 

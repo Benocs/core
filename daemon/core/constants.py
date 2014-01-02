@@ -2,9 +2,9 @@
 COREDPY_VERSION		= "4.6"
 CORE_STATE_DIR		= "/var"
 CORE_CONF_DIR		= "/etc/core"
-CORE_DATA_DIR		= "/usr/local/share/core"
-CORE_LIB_DIR		= "/usr/local/lib/core"
-CORE_SBIN_DIR		= "/usr/local/sbin"
+CORE_DATA_DIR		= "/usr/share/core"
+CORE_LIB_DIR		= "/usr/lib/core"
+CORE_SBIN_DIR		= "/usr/sbin"
 
 BRCTL_BIN               = "/sbin/brctl"
 SYSCTL_BIN              = "/sbin/sysctl"
