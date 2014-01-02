@@ -35,7 +35,8 @@ class VnodeClient(object):
         self._addr = {}
 
     def warn(self, msg):
-        print >> sys.stderr, "%s: %s" % (self.name, msg)
+        #print("%s: %s" % (self.name, msg), file=sys.stderr)
+        pass
 
     def connected(self):
         if USE_VCMD_MODULE:

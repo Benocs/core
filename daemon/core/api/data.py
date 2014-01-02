@@ -11,7 +11,7 @@ different message and TLV types (these constants are also found in coreapi.h)
 '''
 
 def enumdict(d):
-    for k, v in d.items():
+    for k, v in list(d.items()):
         exec("%s = %s" % (v, k), globals())
 
 # Constants

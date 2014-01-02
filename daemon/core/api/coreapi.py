@@ -468,7 +468,7 @@ class CoreMessage(object):
     def __str__(self):
         tmp = "%s <msgtype = %s, flags = %s>" % \
               (self.__class__.__name__, self.typestr(), self.flagstr())
-        for k, v in self.tlvdata.items():
+        for k, v in list(self.tlvdata.items()):
             if k in self.tlvcls.tlvtypemap:
                 tlvtype = self.tlvcls.tlvtypemap[k]
             else:

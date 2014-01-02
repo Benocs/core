@@ -65,7 +65,7 @@ def main():
     add_to_server(session)
 
     # EMANE WLAN
-    print "creating EMANE WLAN wlan1"
+    print("creating EMANE WLAN wlan1")
     wlan = session.addobj(cls = pycore.nodes.EmaneNode, name = "wlan1")
     wlan.setposition(x=80,y=50)
     names = EmaneIeee80211abgModel.getnames()
@@ -75,9 +75,9 @@ def main():
     session.emane.setconfig(wlan.objid, EmaneIeee80211abgModel._name, values)
     services_str = "zebra|OSPFv3MDR|vtysh|IPForward"
 
-    print "creating %d nodes with addresses from %s" % \
-          (options.numnodes, prefix)
-    for i in xrange(1, options.numnodes + 1):
+    print(("creating %d nodes with addresses from %s" % \
+          (options.numnodes, prefix)))
+    for i in range(1, options.numnodes + 1):
         tmp = session.addobj(cls = pycore.nodes.CoreNode, name = "n%d" % i,
                              objid=i)
         tmp.newnetif(wlan, ["%s/%s" % (prefix.addr(i), prefix.prefixlen)])
@@ -92,7 +92,7 @@ def main():
     # start a shell on node 1
     n[1].term("bash")
 
-    print "elapsed time: %s" % (datetime.datetime.now() - start)
+    print(("elapsed time: %s" % (datetime.datetime.now() - start)))
 
 if __name__ == "__main__" or __name__ == "__builtin__":
     main()

@@ -414,8 +414,8 @@ class Emane(ConfigurableManager):
         platform_names.remove('platform_id_start')
 
         # append all platform options (except starting id) to doc
-        list(map( lambda n: plat.appendChild(self.xmlparam(doc, n, \
-                        self.emane_config.valueof(n, values))), platform_names))
+        list([plat.appendChild(self.xmlparam(doc, n, \
+                        self.emane_config.valueof(n, values))) for n in platform_names])
 
         nemid = int(self.emane_config.valueof("nem_id_start",  values))
         # assume self._objslock is already held here

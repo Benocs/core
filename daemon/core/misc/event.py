@@ -129,7 +129,7 @@ def example():
 
     def msg(arg):
         delta = time.time() - loop.start
-        print delta, 'arg:', arg
+        print((delta, 'arg:', arg))
 
     def repeat(interval, count):
         count -= 1

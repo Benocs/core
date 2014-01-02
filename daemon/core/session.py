@@ -108,8 +108,8 @@ class Session(object):
     def atexit(cls):
         while cls.__sessions:
             s = cls.__sessions.pop()
-            print >> sys.stderr, "WARNING: automatically shutting down " \
-                "non-persistent session %s" % s.sessionid
+            #print(("WARNING: automatically shutting down " \
+            #    "non-persistent session %s" % s.sessionid), file = sys.stderr)
             s.shutdown()
 
     def __del__(self):
@@ -160,8 +160,7 @@ class Session(object):
             try:
                 self._handlers.remove(handler)
             except KeyError:
-                raise ValueError, \
-                    "Handler %s not associated with this session" % handler
+                raise ValueError("Handler %s not associated with this session" % handler)
             num_handlers = len(self._handlers)
         if num_handlers == 0:
             # shut down this session unless we are instantiating, running,
@@ -181,7 +180,7 @@ class Session(object):
                     isinstance(msg, coreapi.CoreLinkMessage):
                 try:
                     handler.sendall(msg.rawmsg)
-                except Exception, e:
+                except Exception as e:
                     self.warn("sendall() error: %s" % e)
         self._handlerslock.release()
 
@@ -194,7 +193,7 @@ class Session(object):
                 continue
             try:
                 handler.sendall(data)
-            except Exception, e:
+            except Exception as e:
                 self.warn("sendall() error: %s" % e)
         self._handlerslock.release()
         
@@ -243,7 +242,7 @@ class Session(object):
                     replies.append(msg)
                 else:
                     self.broadcastraw(None, msg)
-            except Exception, e:
+            except Exception as e:
                 self.warn("Error sending Event Message: %s" % e)
             # also inform slave servers
             tmp = self.broker.handlerawmsg(msg)
@@ -262,7 +261,7 @@ class Session(object):
             f = open(os.path.join(self.sessiondir, "state"), "w")
             f.write("%d %s\n" % (state, coreapi.state_name(state)))
             f.close()
-        except Exception, e:
+        except Exception as e:
             self.warn("Error writing state file: %s" % e)
 
     def runhook(self, state, hooks=None):
@@ -278,13 +277,13 @@ class Session(object):
                 f = open(os.path.join(self.sessiondir, filename), "w")
                 f.write(data)
                 f.close()
-            except Exception, e:
+            except Exception as e:
                 self.warn("Error writing hook '%s': %s" % (filename, e))
             self.info("Running hook %s for state %s" % (filename, state))
             try:
                 check_call(["/bin/sh", filename], cwd=self.sessiondir,
                            env=self.getenviron())
-            except Exception, e:
+            except Exception as e:
                 self.warn("Error running hook '%s' for state %s: %s" % 
                           (filename, state, e))
             
@@ -359,14 +358,14 @@ class Session(object):
                 uid = pwd.getpwnam(user).pw_uid
                 gid = os.stat(self.sessiondir).st_gid
                 os.chown(self.sessiondir, uid, gid)
-            except Exception, e:
+            except Exception as e:
                 self.warn("Failed to set permission on %s: %s" % (self.sessiondir, e)) 
         self.user = user
 
     def objs(self):
         ''' Return iterator over the emulation object dictionary.
         '''
-        return self._objs.itervalues()
+        return iter(list(self._objs.values()))
         
     def getobjid(self):
         ''' Return a unique, random object id.
@@ -387,7 +386,7 @@ class Session(object):
         if obj.objid in self._objs:
             self._objslock.release()
             obj.shutdown()
-            raise KeyError, "non-unique object id %s for %s" % (obj.objid, obj)
+            raise KeyError("non-unique object id %s for %s" % (obj.objid, obj))
         self._objs[obj.objid] = obj
         self._objslock.release()
         return obj
@@ -396,7 +395,7 @@ class Session(object):
         ''' Get an emulation object.
         '''
         if objid not in self._objs:
-            raise KeyError, "unknown object id %s" % (objid)
+            raise KeyError("unknown object id %s" % (objid))
         return self._objs[objid]
         
     def objbyname(self, name):
@@ -406,7 +405,7 @@ class Session(object):
             for obj in self.objs():
                 if hasattr(obj, "name") and obj.name == name:
                     return obj
-        raise KeyError, "unknown object with name %s" % (name)
+        raise KeyError("unknown object with name %s" % (name))
 
     def delobj(self, objid):
         ''' Remove an emulation object.
@@ -449,7 +448,7 @@ class Session(object):
                     o = self._objs[objid]
                     f.write("%s %s %s %s\n" % (objid, o.name, o.apitype, type(o)))
             f.close()
-        except Exception, e:
+        except Exception as e:
             self.warn("Error writing nodes file: %s" % e)
 
     def addconfobj(self, objname, type, callback):
@@ -458,7 +457,7 @@ class Session(object):
             Message. The callback is invoked when receiving a Configure Message.
         '''
         if type not in coreapi.reg_tlvs:
-            raise Exception, "invalid configuration object type"
+            raise Exception("invalid configuration object type")
         self._confobjslock.acquire()
         self._confobjs[objname] = (type, callback)
         self._confobjslock.release()
@@ -505,14 +504,14 @@ class Session(object):
     def info(self, msg):
         ''' Utility method for writing output to stdout.
         '''
-        print msg
+        print(msg)
         sys.stdout.flush()
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr.
         '''
-        print >> sys.stderr, msg
-        sys.stderr.flush()
+        #print(msg, file = sys.stderr, flush = True)
+        pass
 
     def dumpsession(self):
         ''' Debug print this session.
@@ -710,7 +709,7 @@ class Session(object):
                                                          tlvdata)
                     try:
                         handler.request.sendall(reply)
-                    except Exception, e:
+                    except Exception as e:
                         self.warn("sendall() error: %s" % e)
                     del handler.nodestatusreq[nodenum]
         self.updatectrlifhosts()
@@ -1057,8 +1056,7 @@ class SessionConfig(ConfigurableManager, Configurable):
         servers.remove("localhost")
         servers.insert(0, "localhost") # master always gets first prefix
         # create list of "server1:ctrlnet1 server2:ctrlnet2 ..."
-        controlnets = map(lambda(x): "%s:%s" % (x[0],x[1]),
-                          zip(servers, controlnets))
+        controlnets = ["%s:%s" % (x[0],x[1]) for x in zip(servers, controlnets)]
         values[idx] = "controlnet=%s" % (' '.join(controlnets))
         values_str = '|'.join(values)
         msg.tlvdata[coreapi.CORE_TLV_CONF_VALUES] = values_str
@@ -1081,13 +1079,13 @@ class SessionMetaData(ConfigurableManager):
             try:
                 (key, value) = kv.split('=', 1)
             except ValueError:
-                raise ValueError, "invalid key in metdata: %s" % kv
+                raise ValueError("invalid key in metdata: %s" % kv)
             self.additem(key, value)
         return None
     
     def configure_request(self, msg, typeflags = coreapi.CONF_TYPE_FLAGS_NONE):
         nodenum = msg.gettlv(coreapi.CORE_TLV_CONF_NODE)
-        values_str = "|".join(map(lambda(k,v): "%s=%s" % (k,v), self.items()))
+        values_str = "|".join(["%s=%s" % (k_v[0],k_v[1]) for k_v in list(self.items())])
         return self.toconfmsg(0, nodenum, typeflags, values_str)
 
     def toconfmsg(self, flags, nodenum, typeflags, values_str):
@@ -1099,8 +1097,7 @@ class SessionMetaData(ConfigurableManager):
                                             self._name)
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_TYPE,
                                             typeflags)
-        datatypes = tuple( map(lambda(k,v): coreapi.CONF_DATA_TYPE_STRING,
-                               self.items()) )
+        datatypes = tuple( [coreapi.CONF_DATA_TYPE_STRING for k_v1 in list(self.items())] )
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_DATA_TYPES,
                                             datatypes)
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_VALUES,
@@ -1112,6 +1109,6 @@ class SessionMetaData(ConfigurableManager):
         self.configs[key] = value
     
     def items(self):
-        return self.configs.iteritems()
+        return iter(list(self.configs.items()))
 
 atexit.register(Session.atexit)

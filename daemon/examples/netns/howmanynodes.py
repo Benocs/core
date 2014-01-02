@@ -114,17 +114,17 @@ def main():
     start = datetime.datetime.now()
     prefix = ipaddr.IPv4Prefix("10.83.0.0/16")
 
-    print "Testing how many network namespace nodes this machine can create."
-    print " - %s" % linuxversion()
+    print("Testing how many network namespace nodes this machine can create.")
+    print((" - %s" % linuxversion()))
     mem = memfree()
-    print " - %.02f GB total memory (%.02f GB swap)" % \
-            (mem['total']/GBD, mem['stotal']/GBD)
-    print " - using IPv4 network prefix %s" % prefix
-    print " - using wait time of %s" % options.waittime
-    print " - using %d nodes per bridge" % options.bridges
-    print " - will retry %d times on failure" % options.retries
-    print " - adding these services to each node: %s" % options.services
-    print " "
+    print((" - %.02f GB total memory (%.02f GB swap)" % \
+            (mem['total']/GBD, mem['stotal']/GBD)))
+    print((" - using IPv4 network prefix %s" % prefix))
+    print((" - using wait time of %s" % options.waittime))
+    print((" - using %d nodes per bridge" % options.bridges))
+    print((" - will retry %d times on failure" % options.retries))
+    print((" - adding these services to each node: %s" % options.services))
+    print(" ")
 
     lfp = None
     if options.logfile is not None:
@@ -138,7 +138,7 @@ def main():
     session = pycore.Session(persistent=True)
     switch = session.addobj(cls = pycore.nodes.SwitchNode)
     switchlist.append(switch)
-    print "Added bridge %s (%d)." % (switch.brname, len(switchlist))
+    print(("Added bridge %s (%d)." % (switch.brname, len(switchlist))))
 
     i = 0
     retry_count = options.retries
@@ -149,11 +149,11 @@ def main():
             if options.bridges > 0 and switch.numnetif() >= options.bridges:
                 switch = session.addobj(cls = pycore.nodes.SwitchNode)
                 switchlist.append(switch)
-                print "\nAdded bridge %s (%d) for node %d." % \
-                       (switch.brname, len(switchlist), i)
-        except Exception, e:
-            print "At %d bridges (%d nodes) caught exception:\n%s\n" % \
-                    (len(switchlist), i-1, e)
+                print(("\nAdded bridge %s (%d) for node %d." % \
+                       (switch.brname, len(switchlist), i)))
+        except Exception as e:
+            print(("At %d bridges (%d nodes) caught exception:\n%s\n" % \
+                    (len(switchlist), i-1, e)))
             break
         # create a node
         try:
@@ -166,11 +166,11 @@ def main():
                 n.boot()
             nodelist.append(n)
             if i % 25 == 0:
-                print "\n%s nodes created " % i,
+                #print("\n%s nodes created " % i, end=' ')
                 mem = memfree()
                 free = mem['free'] + mem['buff'] + mem['cached']
                 swap = mem['stotal'] - mem['sfree']
-                print "(%.02f/%.02f GB free/swap)" % (free/GBD , swap/GBD),
+                #print("(%.02f/%.02f GB free/swap)" % (free/GBD , swap/GBD), end=' ')
                 if lfp:
                     lfp.write("%d," % i)
                     lfp.write("%s\n" % ','.join(str(mem[x]) for x in MEMKEYS))
@@ -179,21 +179,21 @@ def main():
                 sys.stdout.write(".")
             sys.stdout.flush()
             time.sleep(options.waittime)
-        except Exception, e:
-            print "At %d nodes caught exception:\n" % i, e
+        except Exception as e:
+            print(("At %d nodes caught exception:\n" % i, e))
             if retry_count > 0:
-                print "\nWill retry creating node %d." % i
+                print(("\nWill retry creating node %d." % i))
                 shutil.rmtree(n.nodedir, ignore_errors = True)
                 retry_count -= 1
                 i -= 1
                 time.sleep(options.waittime)
                 continue
             else:
-                print "Stopping at %d nodes!" % i
+                print(("Stopping at %d nodes!" % i))
                 break
 
         if i == options.numnodes:
-            print "Stopping at %d nodes due to numnodes option." % i
+            print(("Stopping at %d nodes due to numnodes option." % i))
             break
         # node creation was successful at this point
         retry_count = options.retries
@@ -202,8 +202,8 @@ def main():
         lfp.flush()
         lfp.close()
 
-    print "elapsed time: %s" % (datetime.datetime.now() - start)
-    print "Use the core-cleanup script to remove nodes and bridges."
+    print(("elapsed time: %s" % (datetime.datetime.now() - start)))
+    print("Use the core-cleanup script to remove nodes and bridges.")
 
 if __name__ == "__main__":
     main()

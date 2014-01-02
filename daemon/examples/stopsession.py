@@ -37,7 +37,7 @@ def main():
             data = sock.recv(msglen)
         msg = coreapi.CoreMessage(msgflags, hdr, data)
         sessions = msg.gettlv(coreapi.CORE_TLV_SESS_NUMBER)
-        print "sessions:",  sessions
+        print(("sessions:",  sessions))
 
     sock.close()
 

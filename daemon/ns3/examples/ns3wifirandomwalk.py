@@ -68,7 +68,7 @@ def wifisession(opt):
     prefix = ipaddr.IPv4Prefix("10.0.0.0/16")
     services_str = "zebra|OSPFv3MDR|vtysh|IPForward"
     nodes = []
-    for i in xrange(1, opt.numnodes + 1):
+    for i in range(1, opt.numnodes + 1):
         node = session.addnode(name = "n%d" % i)
         node.newnetif(wifi, ["%s/%s" % (prefix.addr(i), prefix.prefixlen)])
         nodes.append(node)
@@ -128,4 +128,4 @@ def main():
 
 if __name__ == "__main__" or __name__ == "__builtin__":
     session = main()
-    print "\nsession =", session
+    print(("\nsession =", session))

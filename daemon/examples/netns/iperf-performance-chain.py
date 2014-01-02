@@ -65,10 +65,10 @@ def main():
 
     session = pycore.Session(persistent=True)
     add_to_server(session)
-    print "creating %d nodes"  % options.numnodes
+    print(("creating %d nodes"  % options.numnodes))
     left = None
     prefix = None
-    for i in xrange(1, options.numnodes + 1):
+    for i in range(1, options.numnodes + 1):
         tmp = session.addobj(cls = pycore.nodes.CoreNode, name = "n%d" % i,
                              objid=i)
         if left:
@@ -84,12 +84,11 @@ def main():
         n.append(tmp)
         left = right
     
-    prefixes = map(lambda(x): ipaddr.IPv4Prefix("10.83.%d.0/24" % x),
-                   xrange(1, options.numnodes + 1))
+    prefixes = [ipaddr.IPv4Prefix("10.83.%d.0/24" % x) for x in range(1, options.numnodes + 1)]
                    
     # set up static routing in the chain
-    for i in xrange(1, options.numnodes + 1):
-        for j in xrange(1, options.numnodes + 1):
+    for i in range(1, options.numnodes + 1):
+        for j in range(1, options.numnodes + 1):
             if j < i - 1:
                 gw = prefixes[i-2].addr(1)
             elif j > i:
@@ -102,7 +101,7 @@ def main():
             n[i].cmd([IP_BIN, "route", "add", str(net), "via", str(gw)])
 
 
-    print "elapsed time: %s" % (datetime.datetime.now() - start)
+    print(("elapsed time: %s" % (datetime.datetime.now() - start)))
 
 if __name__ == "__main__" or __name__ == "__builtin__":
     main()

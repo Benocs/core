@@ -75,7 +75,7 @@ def getcputimes(line):
     # assume columns are:
     # cpu# user nice sys idle iowait irq softirq steal guest (man 5 proc)
     items = line.split()
-    (user, nice, sys, idle) = map(lambda(x): int(x), items[1:5])
+    (user, nice, sys, idle) = [int(x) for x in items[1:5]]
     return [user, nice, sys, idle]
 
 def calculatecpu(timesa, timesb):
@@ -103,13 +103,12 @@ class Cmd(object):
     
     def info(self,  msg):
         ''' Utility method for writing output to stdout.'''
-        print msg
+        print(msg)
         sys.stdout.flush()
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        print >> sys.stderr, "XXX %s:" % self.node.name,  msg
-        sys.stderr.flush()
+        #print("XXX %s:" % self.node.name,  msg, file = sys.stderr, flush = True)
         
     def run(self):
         ''' This is the primary method used for running this command. '''
@@ -216,7 +215,7 @@ class PingCmd(Cmd):
             stats = stats_str.split('/')
             avg_latency = float(stats[1])
             mdev = float(stats[3].split(' ')[0])
-        except Exception, e:
+        except Exception as e:
             self.warn("ping parsing exception: %s" % e)
         return (avg_latency, mdev)
 
@@ -243,7 +242,7 @@ class IperfCmd(ClientServerCmd):
         lines = self.out.readlines()
         try:
             bps = int(lines[-1].split(',')[-1].strip('\n'))
-        except Exception, e:
+        except Exception as e:
             self.warn("iperf parsing exception: %s" % e)
             bps = 0
         return bps
@@ -341,14 +340,13 @@ class Experiment(object):
     
     def info(self,  msg):
         ''' Utility method for writing output to stdout. '''
-        print msg
+        print(msg)
         sys.stdout.flush()
         self.log(msg)
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        print >> sys.stderr, msg
-        sys.stderr.flush()
+        #print(msg, file = sys.stderr, flush = True)
         self.log(msg)
     
     def logbegin(self):
@@ -377,7 +375,7 @@ class Experiment(object):
         ''' Write to the log file, if any. '''
         if not self.logfp:
             return
-        print >> self.logfp,  msg
+        #print(msg, file=self.logfp)
 
     def reset(self):
         ''' Prepare for another experiment run.
@@ -400,7 +398,7 @@ class Experiment(object):
         self.net = self.session.addobj(cls = pycore.nodes.WlanNode,
                                        name = "wlan1")
         prev = None
-        for i in xrange(1, numnodes + 1):
+        for i in range(1, numnodes + 1):
             addr = "%s/%s" % (prefix.addr(i), 32)
             tmp = self.session.addobj(cls = pycore.nodes.CoreNode, objid = i,
                                       name = "n%d" % i)
@@ -432,7 +430,7 @@ class Experiment(object):
                                        objid = numnodes + 1, name = "wlan1")
         self.net.verbose = verbose
         #self.session.emane.addobj(self.net)
-        for i in xrange(1, numnodes + 1):
+        for i in range(1, numnodes + 1):
             addr = "%s/%s" % (prefix.addr(i), 32)
             tmp = self.session.addobj(cls = pycore.nodes.CoreNode, objid = i,
                                       name = "n%d" % i)
@@ -451,7 +449,7 @@ class Experiment(object):
         self.info("waiting %s sec (TAP bring-up)" % 2)
         time.sleep(2)
 
-        for i in xrange(1, numnodes + 1):
+        for i in range(1, numnodes + 1):
             tmp = self.nodes[i-1]
             self.session.services.bootnodeservices(tmp)
             self.staticroutes(i, prefix, numnodes)
@@ -488,7 +486,7 @@ class Experiment(object):
                 self.warn("failed to add interface route: %s" % cmd)
 
         # add static routes to all other nodes via left/right neighbors
-        for j in xrange(1, numnodes + 1):
+        for j in range(1, numnodes + 1):
             if abs(j - i) < 2:
                 continue
             addr = "%s" % prefix.addr(j)
@@ -506,7 +504,7 @@ class Experiment(object):
         '''
         service = emaneeventservice.EventService()
         e = emaneeventpathloss.EventPathloss(1)
-        for i in xrange(1, numnodes + 1):
+        for i in range(1, numnodes + 1):
             rxnem = i
             # inform rxnem that it can hear node to the left with 10dB noise
             txnem = rxnem - 1

@@ -37,7 +37,7 @@ def ltesession(opt):
     '''
     session = Ns3Session(persistent=True, duration=opt.duration)
     lte = session.addobj(cls=Ns3LteNet, name="wlan1")
-    lte.setsubchannels(range(25), range(50, 100))
+    lte.setsubchannels(list(range(25)), list(range(50, 100)))
     if opt.verbose:
         ascii = ns.network.AsciiTraceHelper()
         stream = ascii.CreateFileStream('/tmp/ns3lte.tr')
@@ -49,7 +49,7 @@ def ltesession(opt):
     prefix = ipaddr.IPv4Prefix("10.0.0.0/16")
     mobb = None
     nodes = []
-    for i in xrange(1, opt.numnodes + 1):
+    for i in range(1, opt.numnodes + 1):
         node = session.addnode(name = "n%d" % i)
         mob = ns.mobility.ConstantPositionMobilityModel()
         mob.SetPosition( ns.core.Vector3D(10.0 * i, 0.0, 0.0) )
@@ -101,9 +101,9 @@ def main():
     return ltesession(opt)
 
 def cleanup():
-    print "shutting down session"
+    print("shutting down session")
     session.shutdown()
-    print "joining simulator thread (please kill it)"
+    print("joining simulator thread (please kill it)")
     session.thread.join()
 
 if __name__ == "__main__":

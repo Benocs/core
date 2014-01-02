@@ -110,8 +110,8 @@ class EmaneIeee80211abgModel(EmaneModel):
         phynames = names[len(self._confmatrix_mac):]
 
         # append all MAC options to macdoc
-        list(map( lambda n: mac.appendChild(e.xmlparam(macdoc, n, \
-                                       self.valueof(n, values))), macnames))
+        list([mac.appendChild(e.xmlparam(macdoc, n, \
+                                       self.valueof(n, values))) for n in macnames])
         e.xmlwrite(macdoc, self.macxmlname(ifc))
 
         phydoc = EmaneUniversalModel.getphydoc(e, self, values, phynames)

@@ -20,7 +20,7 @@ from core.emane.nodes import EmaneNode
 
 try:
     import parted
-except ImportError, e:
+except ImportError as e:
     #print "Failed to load parted Python module required by Xen support."
     #print "Error was:", e
     raise ImportError
@@ -30,12 +30,12 @@ import crypt
 import subprocess
 try:
     import fsimage
-except ImportError, e:
+except ImportError as e:
     # fix for fsimage under Ubuntu
     sys.path.append("/usr/lib/xen-default/lib/python")
     try:
         import fsimage
-    except ImportError, e:
+    except ImportError as e:
         #print "Failed to load fsimage Python module required by Xen support."
         #print "Error was:", e
         raise ImportError
@@ -193,7 +193,7 @@ class XenNode(PyCoreNode):
                 os.makedirs(self.mountdir)
             self.tmpnodedir = True
         else:
-            raise Exception, "Xen PVM node requires a temporary nodedir"
+            raise Exception("Xen PVM node requires a temporary nodedir")
             self.tmpnodedir = False
         self.bootsh = bootsh
         if start:
@@ -214,7 +214,7 @@ class XenNode(PyCoreNode):
         self.lock.acquire()
         try:
             if self.up:
-                raise Exception, "already up"
+                raise Exception("already up")
             self.createlogicalvolume()
             self.createpartitions()
             persistdev = self.createfilesystems()
@@ -235,7 +235,7 @@ class XenNode(PyCoreNode):
 
         self.lock.acquire()
         if not self.up:
-            raise Exception, "Can't boot VM without initialized disk"
+            raise Exception("Can't boot VM without initialized disk")
 
         if self.booted:
             self.lock.release()
@@ -317,7 +317,7 @@ class XenNode(PyCoreNode):
         ''' Create a logical volume for this Xen domU. Called from startup().
         '''
         if os.path.exists(self.lvpath):
-            raise Exception, "LVM volume already exists"
+            raise Exception("LVM volume already exists")
         mutecheck_call([LVCREATE_PATH, '--size', self.disksize,
                         '--name', self.lvname, self.vgname])
 
@@ -369,12 +369,12 @@ class XenNode(PyCoreNode):
         if iso:
             try:
                 fs = fsimage.open(self.isofile, 0)
-            except IOError, e:
+            except IOError as e:
                 self.warn("Failed to open ISO file: %s (%s)" % (self.isofile,e))
                 return
             try:
                 tardata = fs.open_file(tarname).read();
-            except IOError, e:
+            except IOError as e:
                 self.warn("Failed to open tar file: %s (%s)" % (tarname, e))
                 return
             finally:
@@ -384,7 +384,7 @@ class XenNode(PyCoreNode):
                 f = open(tarname)
                 tardata = f.read()
                 f.close()
-            except IOError, e:
+            except IOError as e:
                 self.warn("Failed to open tar file: %s (%s)" % (tarname, e))
                 return
         p = subprocess.Popen([TAR_PATH, '-C', self.mountdir, '--numeric-owner',
@@ -429,7 +429,7 @@ class XenNode(PyCoreNode):
             dst = os.path.join(self.mountdir, self.etcdir, 'ssh', f)
             shutil.copy(src, dst)
             if f[-3:] != "pub":
-                os.chmod(dst, 0600)
+                os.chmod(dst, 0o600)
 
     def createvm(self):
         ''' Instantiate a *paused* domU VM
@@ -457,25 +457,25 @@ class XenNode(PyCoreNode):
     # from class LxcNode
     def opennodefile(self, filename, mode = "w"):
         self.warn("XEN PVM opennodefile() called")
-        raise Exception, "Can't open VM file with opennodefile()"
+        raise Exception("Can't open VM file with opennodefile()")
 
     # from class LxcNode
     # open a file on a paused Xen node
     def openpausednodefile(self, filename, mode = "w"):
         dirname, basename = os.path.split(filename)
         if not basename:
-            raise ValueError, "no basename for filename: " + filename
+            raise ValueError("no basename for filename: " + filename)
         if dirname and dirname[0] == "/":
             dirname = dirname[1:]
         #dirname = dirname.replace("/", ".")
         dirname = os.path.join(self.nodedir, dirname)
         if not os.path.isdir(dirname):
-            os.makedirs(dirname, mode = 0755)
+            os.makedirs(dirname, mode = 0o755)
         hostfilename = os.path.join(dirname, basename)
         return open(hostfilename, mode)
 
     # from class LxcNode
-    def nodefile(self, filename, contents, mode = 0644):
+    def nodefile(self, filename, contents, mode = 0o644):
         if filename in self.FilesToIgnore:
             #self.warn("XEN PVM nodefile(filename=%s) ignored" % [filename])
             return
@@ -489,12 +489,12 @@ class XenNode(PyCoreNode):
         self.lock.acquire()
         if not self.up:
             self.lock.release()
-            raise Exception, "Can't access VM file as VM disk isn't ready"
+            raise Exception("Can't access VM file as VM disk isn't ready")
             return
 
         if self.booted:
             self.lock.release()
-            raise Exception, "Can't access VM file as VM is already running"
+            raise Exception("Can't access VM file as VM is already running")
             return
 
         try:
@@ -575,13 +575,13 @@ class XenNode(PyCoreNode):
     # from class SimpleLxcNode
     def info(self, msg):
         if self.verbose:
-            print "%s: %s" % (self.name, msg)
+            print(("%s: %s" % (self.name, msg)))
             sys.stdout.flush()
 
     # from class SimpleLxcNode
     def warn(self, msg):
-        print >> sys.stderr, "%s: %s" % (self.name, msg)
-        sys.stderr.flush()
+        #print("%s: %s" % (self.name, msg), file = sys.stderr, flush = True)
+        pass
 
     def mount(self, source, target):
         self.warn("XEN PVM Nodes can't bind-mount filesystems")
@@ -674,8 +674,8 @@ class XenNode(PyCoreNode):
         addr = self.getaddr(self.ifname(ifindex), rescan = True)
         for t in addrtypes:
             if t not in self.valid_deladdrtype:
-                raise ValueError, "addr type must be in: " + \
-                    " ".join(self.valid_deladdrtype)
+                raise ValueError("addr type must be in: " + \
+                    " ".join(self.valid_deladdrtype))
             for a in addr[t]:
                 self.deladdr(ifindex, a)
         # update cached information
@@ -695,17 +695,17 @@ class XenNode(PyCoreNode):
 
         if not self.up:
             self.lock.release()
-            raise Exception, "Can't access add veth as VM disk isn't ready"
+            raise Exception("Can't access add veth as VM disk isn't ready")
             return
 
         if self.booted:
             self.lock.release()
-            raise Exception, "Can't access add veth as VM is already running"
+            raise Exception("Can't access add veth as VM is already running")
             return
 
         try:
             if isinstance(net, EmaneNode):
-                raise Exception, "Xen PVM doesn't yet support Emane nets"
+                raise Exception("Xen PVM doesn't yet support Emane nets")
 
                 # ifindex = self.newtuntap(ifindex = ifindex, ifname = ifname,
                 #                          net = net)
@@ -769,12 +769,12 @@ class XenNode(PyCoreNode):
         self.lock.acquire()
         if not self.up:
             self.lock.release()
-            raise Exception, "Can't access VM file as VM disk isn't ready"
+            raise Exception("Can't access VM file as VM disk isn't ready")
             return
 
         if self.booted:
             self.lock.release()
-            raise Exception, "Can't access VM file as VM is already running"
+            raise Exception("Can't access VM file as VM is already running")
             return
 
         if filename in self.FilesToIgnore:

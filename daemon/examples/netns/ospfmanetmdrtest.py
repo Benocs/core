@@ -78,7 +78,7 @@ ip forwarding
         f.close()
         tmp = self.bootscript()
         if tmp:
-            self.nodefile(self.bootsh, tmp, mode = 0755)
+            self.nodefile(self.bootsh, tmp, mode = 0o755)
 
     def boot(self):
         self.config()
@@ -121,9 +121,9 @@ class Route(object):
     def __init__(self, prefix = None, gw = None, metric = None):
 	try:
             self.prefix = ipaddr.IPv4Prefix(prefix)
-        except Exception, e:
-            raise ValueError, "Invalid prefix given to Route object: %s\n%s" % \
-                     (prefix, e)
+        except Exception as e:
+            raise ValueError("Invalid prefix given to Route object: %s\n%s" % \
+                     (prefix, e))
         self.gw = gw
         self.metric = metric
 
@@ -162,14 +162,13 @@ class ManetExperiment(object):
     
     def info(self,  msg):
         ''' Utility method for writing output to stdout. '''
-        print msg
+        print(msg)
         sys.stdout.flush()
         self.log(msg)
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        print >> sys.stderr, msg
-        sys.stderr.flush()
+        #print(msg, file = sys.stderr, flush = True)
         self.log(msg)
     
     def logbegin(self):
@@ -195,7 +194,7 @@ class ManetExperiment(object):
         """ Write to the log file, if any. """
         if not self.logfp:
             return
-        print >> self.logfp,  msg
+        #print(msg, file=self.logfp)
         
     def logdata(self, nbrs,  mdrs,  lsdbs,  krs,  zrs):
         """ Dump experiment parameters and data to the log file. """
@@ -235,14 +234,14 @@ class ManetExperiment(object):
         self.session = pycore.Session()
         # emulated network
         self.net = self.session.addobj(cls = pycore.nodes.WlanNode)
-        for i in xrange(1, numnodes + 1):
+        for i in range(1, numnodes + 1):
             addr = "%s/%s" % (prefix.addr(i), 32)
             tmp = self.session.addobj(cls = ManetNode, ipaddr = addr, name = "n%d" % i)
             tmp.newnetif(self.net, [addr])
             self.nodes.append(tmp)
         # connect nodes with probability linkprob
-        for i in xrange(numnodes):
-            for j in xrange(i + 1, numnodes):
+        for i in range(numnodes):
+            for j in range(i + 1, numnodes):
                 r = random.random()
                 if r < linkprob:
                     if self.verbose:
@@ -257,7 +256,7 @@ class ManetExperiment(object):
             self.net.link(self.nodes[i].netif(0), self.nodes[j].netif(0))
             self.nodes[i].boot()
         # run the boot.sh script on all nodes to start Quagga
-        for i in xrange(numnodes):
+        for i in range(numnodes):
             self.nodes[i].cmd(["./%s" % self.nodes[i].bootsh])
 
     def compareroutes(self, node, kr, zr):
@@ -357,13 +356,12 @@ class Cmd:
     
     def info(self,  msg):
         ''' Utility method for writing output to stdout.'''
-        print msg
+        print(msg)
         sys.stdout.flush()
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        print >> sys.stderr, "XXX %s:" % self.node.routerid,  msg
-        sys.stderr.flush()
+        #print("XXX %s:" % self.node.routerid, msg, file = sys.stderr, flush = True)
         
     def run(self):
         """ This is the primary method used for running this command. """
@@ -461,7 +459,7 @@ class ZebraRoutes(VtyshCmd):
     args = "show ip route"
     
     def parse(self):
-        for i in xrange(0,3):
+        for i in range(0,3):
             self.out.readline()                   # skip first three lines
         r = []
         prefix = None

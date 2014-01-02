@@ -106,8 +106,8 @@ class EmaneUniversalModel(EmaneModel):
                 phy.appendChild(e.xmlparam(phydoc, old[0], old[2]))
             
         # append all PHY options to phydoc
-        list(map( lambda n: phy.appendChild(e.xmlparam(phydoc, n, \
-                                       mac.valueof(n, values))), phynames))
+        list([phy.appendChild(e.xmlparam(phydoc, n, \
+                                       mac.valueof(n, values))) for n in phynames])
         return phydoc
 
 

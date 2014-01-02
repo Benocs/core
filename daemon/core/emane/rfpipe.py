@@ -97,8 +97,8 @@ class EmaneRfPipeModel(EmaneModel):
             values = list(values)
             values[i] = self.emane074_fixup(values[i], 1000)
         # append MAC options to macdoc
-        list(map( lambda n: mac.appendChild(e.xmlparam(macdoc, n, \
-                                       self.valueof(n, values))), macnames))
+        list([mac.appendChild(e.xmlparam(macdoc, n, \
+                                       self.valueof(n, values))) for n in macnames])
         e.xmlwrite(macdoc, self.macxmlname(ifc))
 
         phydoc = EmaneUniversalModel.getphydoc(e, self, values, phynames)

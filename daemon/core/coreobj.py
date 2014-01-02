@@ -89,9 +89,9 @@ class PyCoreObj(object):
         ''' Iterate over attached network interfaces.
         '''
         if sort:
-            return map(lambda k: self._netif[k], sorted(self._netif.keys()))
+            return [self._netif[k] for k in sorted(self._netif.keys())]
         else:
-            return self._netif.itervalues()
+            return iter(list(self._netif.values()))
 
     def numnetif(self):
         ''' Return the attached interface count.
@@ -163,14 +163,14 @@ class PyCoreObj(object):
             is turned on.
         '''
         if self.verbose:
-            print "%s: %s" % (self.name, msg)
-            sys.stdout.flush()
+            #print(( "%s: %s" % (self.name, msg)), flush = True)
+            pass
 
     def warn(self, msg):
         ''' Utility method for printing warning/error messages
         '''
-        print >> sys.stderr, "%s: %s" % (self.name, msg)
-        sys.stderr.flush()
+        #print(("%s: %s" % (self.name, msg)), file = sys.stderr, flush = True)
+        pass
         
     def exception(self, level, source, text):
         ''' Generate an Exception Message for this session, providing this
@@ -223,12 +223,12 @@ class PyCoreNode(PyCoreObj):
 
     def addnetif(self, netif, ifindex):
         if ifindex in self._netif:
-            raise ValueError, "ifindex %s already exists" % ifindex
+            raise ValueError("ifindex %s already exists" % ifindex)
         self._netif[ifindex] = netif
 
     def delnetif(self, ifindex):
         if ifindex not in self._netif:
-            raise ValueError, "ifindex %s does not exist" % ifindex
+            raise ValueError("ifindex %s does not exist" % ifindex)
         netif = self._netif.pop(ifindex)
         netif.shutdown()
         del netif
@@ -241,12 +241,12 @@ class PyCoreNode(PyCoreObj):
         
     def attachnet(self, ifindex, net):
         if ifindex not in self._netif:
-            raise ValueError, "ifindex %s does not exist" % ifindex
+            raise ValueError("ifindex %s does not exist" % ifindex)
         self._netif[ifindex].attachnet(net)
 
     def detachnet(self, ifindex):
         if ifindex not in self._netif:
-            raise ValueError, "ifindex %s does not exist" % ifindex
+            raise ValueError("ifindex %s does not exist" % ifindex)
         self._netif[ifindex].detachnet()
 
     def setposition(self, x = None, y = None, z = None):
@@ -373,7 +373,7 @@ class PyCoreNetIf(object):
     def __init__(self, node, name, mtu):
         self.node = node
         self.name = name
-        if not isinstance(mtu, (int, long)):
+        if not isinstance(mtu, int):
             raise ValueError
         self.mtu = mtu
         self.net = None

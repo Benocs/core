@@ -71,7 +71,7 @@ def main():
             versions.append((d, ver))
 
     for (d, ver) in versions:
-        print "%8s  %s" % (ver, d)
+        print(("%8s  %s" % (ver, d)))
 
 if __name__ == "__main__":
     main()

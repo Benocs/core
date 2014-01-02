@@ -36,8 +36,8 @@ class VPNClient(CoreService):
         try:
             cfg += open(fname, "rb").read()
         except e:
-            print "Error opening VPN client configuration template (%s): %s" % \
-                    (fname, e)
+            print(("Error opening VPN client configuration template (%s): %s" % \
+                    (fname, e)))
         return cfg
 
 # this line is required to add the above class to the list of available services
@@ -66,8 +66,8 @@ class VPNServer(CoreService):
         try:
             cfg += open(fname, "rb").read()
         except e:
-            print "Error opening VPN server configuration template (%s): %s" % \
-                    (fname, e)
+            print(("Error opening VPN server configuration template (%s): %s" % \
+                    (fname, e)))
         return cfg
 
 addservice(VPNServer)
@@ -95,8 +95,8 @@ class IPsec(CoreService):
         try:
             cfg += open(fname, "rb").read()
         except e:
-            print "Error opening IPsec configuration template (%s): %s" % \
-                    (fname, e)
+            print(("Error opening IPsec configuration template (%s): %s" % \
+                    (fname, e)))
         return cfg
 
 addservice(IPsec)
@@ -121,8 +121,8 @@ class Firewall(CoreService):
         try:
             cfg += open(fname, "rb").read()
         except e:
-            print "Error opening Firewall configuration template (%s): %s" % \
-                    (fname, e)
+            print(("Error opening Firewall configuration template (%s): %s" % \
+                    (fname, e)))
         return cfg
 
 addservice(Firewall)

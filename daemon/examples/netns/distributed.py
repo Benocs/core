@@ -77,7 +77,7 @@ def main():
         port = slaveport[1]
     else:
         port = coreapi.CORE_API_PORT
-    print "connecting to slave at %s:%d" % (slave, port)
+    print(("connecting to slave at %s:%d" % (slave, port)))
     session.broker.addserver(slave, slave, port)
     session.broker.setupserver(slave)
     session.setstate(coreapi.CORE_EVENT_CONFIGURATION_STATE)
@@ -89,9 +89,9 @@ def main():
     switch.setposition(x=80,y=50)
     num_local = options.numnodes / 2
     num_remote = options.numnodes / 2 +  options.numnodes % 2
-    print "creating %d (%d local / %d remote) nodes with addresses from %s" % \
-          (options.numnodes, num_local, num_remote, prefix)
-    for i in xrange(1, num_local + 1):
+    print(("creating %d (%d local / %d remote) nodes with addresses from %s" % \
+          (options.numnodes, num_local, num_remote, prefix)))
+    for i in range(1, num_local + 1):
         tmp = session.addobj(cls = pycore.nodes.CoreNode, name = "n%d" % i,
                              objid=i)
         tmp.newnetif(switch, ["%s/%s" % (prefix.addr(i), prefix.prefixlen)])
@@ -103,7 +103,7 @@ def main():
     session.broker.handlerawmsg(switch.tonodemsg(flags=flags))
 
     # create remote nodes via API
-    for i in xrange(num_local + 1, options.numnodes + 1):
+    for i in range(num_local + 1, options.numnodes + 1):
         tmp = pycore.nodes.CoreNode(session = session, objid = i,
                                     name = "n%d" % i, start=False)
         tmp.setposition(x=150*i,y=150)
@@ -111,7 +111,7 @@ def main():
         session.broker.handlerawmsg(tmp.tonodemsg(flags=flags))
 
     # create remote links via API
-    for i in xrange(num_local + 1, options.numnodes + 1):
+    for i in range(num_local + 1, options.numnodes + 1):
         tlvdata = coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
                                            switch.objid)
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER, i)
@@ -136,10 +136,10 @@ def main():
 
     # TODO: access to remote nodes is currently limited in this script
 
-    print "elapsed time: %s" % (datetime.datetime.now() - start)
+    print(("elapsed time: %s" % (datetime.datetime.now() - start)))
 
-    print "To stop this session, use the 'core-cleanup' script on this server"
-    print "and on the remote slave server."
+    print("To stop this session, use the 'core-cleanup' script on this server")
+    print("and on the remote slave server.")
 
 if __name__ == "__main__" or __name__ == "__builtin__":
     main()

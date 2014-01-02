@@ -77,8 +77,8 @@ class EmaneCommEffectModel(EmaneModel):
         shimnames.remove("filterfile")
 
         # append all shim options (except filterfile) to shimdoc
-        list(map( lambda n: shim.appendChild(e.xmlparam(shimdoc, n, \
-                                       self.valueof(n, values))), shimnames))
+        list([shim.appendChild(e.xmlparam(shimdoc, n, \
+                                       self.valueof(n, values))) for n in shimnames])
         # empty filterfile is not allowed
         ff = self.valueof("filterfile", values)
         if ff.strip() != '':

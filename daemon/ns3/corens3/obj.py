@@ -22,10 +22,10 @@ from core.mobility import WayPointMobility
 
 try:
     import ns.core
-except Exception, e:
-    print "Could not locate the ns-3 Python bindings!"
-    print "Try running again from within the ns-3 './waf shell'\n"
-    raise Exception, e
+except Exception as e:
+    print("Could not locate the ns-3 Python bindings!")
+    print("Try running again from within the ns-3 './waf shell'\n")
+    raise Exception(e)
 import ns.lte
 import ns.mobility
 import ns.network
@@ -190,7 +190,7 @@ class Ns3LteNet(CoreNs3Net):
         (tmp, nodebdev) = self.findns3dev(nodeb)
         (tmp, dev) = self.findns3dev(node)
         if nodebdev is None or dev is None:
-            raise KeyError, "ns-3 device for node not found"
+            raise KeyError("ns-3 device for node not found")
         self.lte.RegisterUeToTheEnb(dev, nodebdev)
         if mob:
             self.lte.AddMobility(dev.GetPhy(), mob)
@@ -222,8 +222,8 @@ class Ns3LteNet(CoreNs3Net):
         #                ns.core.IntegerValue(ns.tap_bridge.TapBridge.USE_LOCAL))
         tap = self.tapbridge.Install(netif.node, ns3dev) 
         #tap.SetMode(ns.tap_bridge.TapBridge.USE_LOCAL)
-        print "using TAP device %s for %s/%s" % \
-            (netif.localname, netif.node.name, netif.name)
+        print(("using TAP device %s for %s/%s" % \
+            (netif.localname, netif.node.name, netif.name)))
         check_call(['tunctl', '-t', netif.localname, '-n'])
         #check_call([IP_BIN, 'link', 'set', 'dev', netif.localname, \
         #    'address', '%s' % netif.hwaddr])
@@ -301,7 +301,7 @@ class Ns3WimaxNet(CoreNs3Net):
         (netif1, ns3dev1) = self.findns3dev(node1)
         (netif2, ns3dev2) = self.findns3dev(node2)
         if not netif1 or not netif2:
-            raise ValueError, "interface not found"
+            raise ValueError("interface not found")
         (addr1, mask1) = self.ipv4netifaddr(netif1)
         (addr2, mask2) = self.ipv4netifaddr(netif2)
         clargs1 = (addr1, mask1, addr2, mask2) + downclass 
@@ -336,12 +336,12 @@ class Ns3Session(Session):
         '''
         def runthread():
             ns.core.Simulator.Stop(ns.core.Seconds(self.duration))
-            print "running ns-3 simulation for %d seconds" % self.duration
+            print(("running ns-3 simulation for %d seconds" % self.duration))
             if vis:
                 try:
                     import visualizer
                 except ImportError:
-                    print "visualizer is not available"
+                    print("visualizer is not available")
                     ns.core.Simulator.Run()
                 else:
                     visualizer.start()
@@ -373,7 +373,7 @@ class Ns3Session(Session):
         ''' Install a ConstantPositionMobilityModel.
         '''
         palloc = ns.mobility.ListPositionAllocator()
-        for i in xrange(self.nodes.GetN()):
+        for i in range(self.nodes.GetN()):
             (x, y, z) = ((100.0 * i) + 50, 200.0, 0.0)
             palloc.Add(ns.core.Vector(x, y, z))
             node = self.nodes.Get(i)
@@ -390,7 +390,7 @@ class Ns3Session(Session):
            - speed is the maximum speed, with node speed randomly chosen
              from [0, speed]
         '''
-        (x, y, z) = map(float, bounds)
+        (x, y, z) = list(map(float, bounds))
         self.mobhelper.SetPositionAllocator("ns3::RandomBoxPositionAllocator",
             "X",
             ns.core.StringValue("ns3::UniformRandomVariable[Min=0|Max=%s]" % x),
@@ -425,7 +425,7 @@ class Ns3Session(Session):
         valid_states = (coreapi.CORE_EVENT_RUNTIME_STATE,
                         coreapi.CORE_EVENT_INSTANTIATION_STATE)
         while self.getstate() in valid_states:
-            for i in xrange(self.nodes.GetN()):
+            for i in range(self.nodes.GetN()):
                 node = self.nodes.Get(i)
                 (x, y, z) = node.getns3position()
                 if (x, y, z) == node.position.get():
@@ -466,7 +466,7 @@ class Ns3Session(Session):
         try:
             f = open(filename)
             f.seek(0,2)
-        except Exception, e:
+        except Exception as e:
             self.warn("mobilitytrace error opening '%s': %s" % (filename, e))
         sleep = 0.001
         kickstart = True
@@ -480,12 +480,12 @@ class Ns3Session(Session):
                     sleep += 0.001
                 continue
             sleep = 0.001
-            items = dict(map(lambda x: x.split('='), line.split()))
+            items = dict([x.split('=') for x in line.split()])
             if verbose:
                 self.info("trace: %s %s %s" % \
                              (items['node'], items['pos'], items['vel']))
-            (x, y, z) = map(float, items['pos'].split(':'))
-            vel = map(float, items['vel'].split(':'))
+            (x, y, z) = list(map(float, items['pos'].split(':')))
+            vel = list(map(float, items['vel'].split(':')))
             node = nodemap[int(items['node'])]
             net.mobility.addwaypoint(time=0, nodenum=node.objid,
                                      x=x, y=y, z=z, speed=vel)
