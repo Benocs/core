@@ -168,7 +168,7 @@ class ManetExperiment(object):
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        #print(msg, file = sys.stderr, flush = True)
+        print(msg, file = sys.stderr, flush = True)
         self.log(msg)
     
     def logbegin(self):
@@ -194,7 +194,7 @@ class ManetExperiment(object):
         """ Write to the log file, if any. """
         if not self.logfp:
             return
-        #print(msg, file=self.logfp)
+        print(msg, file=self.logfp)
         
     def logdata(self, nbrs,  mdrs,  lsdbs,  krs,  zrs):
         """ Dump experiment parameters and data to the log file. """
@@ -361,7 +361,7 @@ class Cmd:
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        #print("XXX %s:" % self.node.routerid, msg, file = sys.stderr, flush = True)
+        print(("XXX %s: %s" % (str(self.node.routerid), msg)), file = sys.stderr, flush = True)
         
     def run(self):
         """ This is the primary method used for running this command. """

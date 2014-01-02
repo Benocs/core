@@ -67,7 +67,7 @@ def main():
 
     test(options.numnodes)
 
-    #print("elapsed time: %s" % (datetime.datetime.now() - start), file=sys.stderr)
+    print(("elapsed time: %s" % str(datetime.datetime.now() - start)), file = sys.stderr)
 
 if __name__ == "__main__":
     main()

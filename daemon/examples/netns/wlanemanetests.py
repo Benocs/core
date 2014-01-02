@@ -108,7 +108,7 @@ class Cmd(object):
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        #print("XXX %s:" % self.node.name,  msg, file = sys.stderr, flush = True)
+        print(("XXX %s: %s" % (self.node.name, msg)), file = sys.stderr, flush = True)
         
     def run(self):
         ''' This is the primary method used for running this command. '''
@@ -346,7 +346,7 @@ class Experiment(object):
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr. '''
-        #print(msg, file = sys.stderr, flush = True)
+        print(msg, file = sys.stderr, flush = True)
         self.log(msg)
     
     def logbegin(self):
@@ -375,7 +375,7 @@ class Experiment(object):
         ''' Write to the log file, if any. '''
         if not self.logfp:
             return
-        #print(msg, file=self.logfp)
+        print(msg, file = self.logfp)
 
     def reset(self):
         ''' Prepare for another experiment run.

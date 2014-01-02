@@ -163,14 +163,12 @@ class PyCoreObj(object):
             is turned on.
         '''
         if self.verbose:
-            #print(( "%s: %s" % (self.name, msg)), flush = True)
-            pass
+            print(("%s: %s" % (self.name, msg)), flush = True)
 
     def warn(self, msg):
         ''' Utility method for printing warning/error messages
         '''
-        #print(("%s: %s" % (self.name, msg)), file = sys.stderr, flush = True)
-        pass
+        print(("%s: %s" % (self.name, msg)), file = sys.stderr, flush = True)
         
     def exception(self, level, source, text):
         ''' Generate an Exception Message for this session, providing this

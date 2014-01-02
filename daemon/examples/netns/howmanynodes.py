@@ -166,11 +166,11 @@ def main():
                 n.boot()
             nodelist.append(n)
             if i % 25 == 0:
-                #print("\n%s nodes created " % i, end=' ')
+                print("\n%s nodes created " % str(i), end=' ')
                 mem = memfree()
                 free = mem['free'] + mem['buff'] + mem['cached']
                 swap = mem['stotal'] - mem['sfree']
-                #print("(%.02f/%.02f GB free/swap)" % (free/GBD , swap/GBD), end=' ')
+                print("(%.02f/%.02f GB free/swap)" % (free/GBD , swap/GBD), end=' ')
                 if lfp:
                     lfp.write("%d," % i)
                     lfp.write("%s\n" % ','.join(str(mem[x]) for x in MEMKEYS))

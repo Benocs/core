@@ -87,11 +87,11 @@ def main():
     start = datetime.datetime.now()
 
     for i in range(options.minnodes, options.maxnodes + 1, options.nodestep):
-        #print("%s node test:" % i, file = sys.stderr)
+        print(("%s node test:" % str(i)), file = sys.stderr)
         test(i, options.testsec)
-        #print("", file = sys.stderr)
+        print("", file = sys.stderr)
 
-    #print("elapsed time: %s" % (datetime.datetime.now() - start), file=sys.stderr)
+    print(("elapsed time: %s" % str(datetime.datetime.now() - start)), file=sys.stderr)
 
 if __name__ == "__main__":
     main()

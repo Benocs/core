@@ -510,8 +510,7 @@ class Session(object):
     def warn(self, msg):
         ''' Utility method for writing output to stderr.
         '''
-        #print(msg, file = sys.stderr, flush = True)
-        pass
+        print(msg, file = sys.stderr, flush = True)
 
     def dumpsession(self):
         ''' Debug print this session.
