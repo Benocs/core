@@ -573,13 +573,14 @@ class CoreBroker(ConfigurableManager):
         if host is None or sock is None:
             return
         # communicate this session's current state to the server
+        print('state: %s' % str(self.session.getstate()))
         tlvdata = coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_TYPE,
                                             self.session.getstate())
         msg = coreapi.CoreEventMessage.pack(0, tlvdata)
         sock.send(msg)
         # send a Configuration message for the broker object and inform the
         # server of its local name
-        tlvdata = ""
+        tlvdata = b""
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_OBJ, "broker")
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_TYPE,
                                             coreapi.CONF_TYPE_FLAGS_UPDATE)
@@ -606,7 +607,7 @@ class CoreBroker(ConfigurableManager):
         cmd = msg.gettlv(coreapi.CORE_TLV_EXEC_CMD)
         res = msg.gettlv(coreapi.CORE_TLV_EXEC_RESULT)
 
-        tlvdata = ""
+        tlvdata = b""
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NODE, nodenum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NUM, execnum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_CMD, cmd)

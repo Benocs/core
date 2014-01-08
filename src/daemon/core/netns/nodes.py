@@ -85,7 +85,7 @@ class PtpNet(LxBrNet):
         ''' Build CORE API TLVs for a point-to-point link. One Link message
             describes this network.
         '''
-        tlvdata = ""
+        tlvdata = b""
         if len(self._netif) != 2:
             return tlvdata
         (if1, if2) = list(self._netif.items())

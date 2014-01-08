@@ -86,11 +86,11 @@ class CoreTlvDataString(CoreTlvData):
         else:
             hdrsiz = CoreTlv.longhdrsiz
         padlen = -(hdrsiz + len(value)) % 4
-        return len(value), value + '\0' * padlen
+        return len(value), bytes(value, encoding = 'utf-8') + (b'\0' * padlen)
 
     @staticmethod
     def unpack(data):
-        return data.rstrip('\0')
+        return data.decode().rstrip('\0')
 
 class CoreTlvDataUint16List(CoreTlvData):
     ''' List of unsigned 16-bit values.
@@ -101,11 +101,11 @@ class CoreTlvDataUint16List(CoreTlvData):
     def pack(values):
         if not isinstance(values, tuple):
             raise ValueError("value not a tuple: %s" % values)
-        data = ""
+        data = b""
         for v in values:
             data += struct.pack("!H", v)
         padlen = -(CoreTlv.hdrsiz + len(data)) % 4
-        return len(data), data + '\0' * padlen
+        return len(data), data + (b'\0' * padlen)
 
     @staticmethod
     def unpack(data):
@@ -430,7 +430,7 @@ class CoreMessage(object):
         ''' Opposite of parsedata(). Return packed TLV data using
         self.tlvdata dict. Used by repack().
         '''
-        tlvdata = ""
+        tlvdata = b""
         keys = sorted(self.tlvdata.keys())
         for k in keys:
             v = self.tlvdata[k]

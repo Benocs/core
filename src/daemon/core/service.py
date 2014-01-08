@@ -406,7 +406,7 @@ class CoreServices(ConfigurableManager):
             possiblevals = None
             groups = None
             
-        tlvdata = ""
+        tlvdata = b""
         if nodenum is not None:
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE,
                                                 nodenum)

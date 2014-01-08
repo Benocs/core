@@ -108,8 +108,8 @@ class Session(object):
     def atexit(cls):
         while cls.__sessions:
             s = cls.__sessions.pop()
-            #print(("WARNING: automatically shutting down " \
-            #    "non-persistent session %s" % s.sessionid), file = sys.stderr)
+            print(("WARNING: automatically shutting down " \
+                "non-persistent session %s" % s.sessionid), file = sys.stderr)
             s.shutdown()
 
     def __del__(self):
@@ -150,6 +150,7 @@ class Session(object):
         if handler.master is True:
             self.master = True
         with self._handlerslock:
+            print('adding handler: %s' % str(handler))
             self._handlers.add(handler)
 
     def disconnect(self, handler):
@@ -232,7 +233,7 @@ class Session(object):
         self.writestate(state)
         self.runhook(state)
         if sendevent:
-            tlvdata = ""
+            tlvdata = b""
             tlvdata += coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_TYPE,
                                                  state)
             msg = coreapi.CoreEventMessage.pack(0, tlvdata)
@@ -492,7 +493,7 @@ class Session(object):
     def confobjs_to_tlvs(self):
         ''' Turn the configuration objects into a list of Register Message TLVs.
         '''
-        tlvdata = ""
+        tlvdata = b""
         self._confobjslock.acquire()
         for objname in self._confobjs:
             (type, callback) = self._confobjs[objname]
@@ -526,7 +527,7 @@ class Session(object):
         '''
         vals = (objid, str(self.sessionid), level, source, time.ctime(), text)
         types = ("NODE", "SESSION", "LEVEL", "SOURCE", "DATE", "TEXT")
-        tlvdata = ""
+        tlvdata = b''
         for (t,v) in zip(types, vals):
             if v is not None:                
                 tlvdata += coreapi.CoreExceptionTlv.pack(
@@ -698,7 +699,7 @@ class Session(object):
                 if handler is None:
                     continue
                 if nodenum in handler.nodestatusreq:
-                    tlvdata = ""
+                    tlvdata = b""
                     tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_NUMBER,
                                                         nodenum)
                     tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_EMUID,
@@ -924,7 +925,7 @@ class Session(object):
         svc_configs = self.services.getallconfigs()
         for (nodenum, svc) in svc_configs:
             opaque = "service:%s" % svc._name
-            tlvdata = ""
+            tlvdata = b""
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE,
                                                 nodenum)
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_OPAQUE,
@@ -1088,7 +1089,7 @@ class SessionMetaData(ConfigurableManager):
         return self.toconfmsg(0, nodenum, typeflags, values_str)
 
     def toconfmsg(self, flags, nodenum, typeflags, values_str):
-        tlvdata = ""
+        tlvdata = b""
         if nodenum is not None:
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE,
                                                 nodenum)

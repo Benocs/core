@@ -53,7 +53,7 @@ class MacAddr(object):
 class IPAddr(object):
     def __init__(self, af, addr):
         # check if (af, addr) is valid
-        if not socket.inet_ntop(af, addr):
+        if not socket.inet_ntop(af, bytes(addr, encoding = 'utf-8')):
             raise ValueError("invalid af/addr")
         self.af = af
         self.addr = addr
@@ -128,6 +128,8 @@ class IPPrefix(object):
             self.prefixlen = int(tmp[1])
         else:
             self.prefixlen = self.addrlen
+        print('socket.inet_pton(%s, %s): %s' % (str(self.af), str(tmp[0]),
+            str(socket.inet_pton(self.af, tmp[0]))))
         self.prefix = socket.inet_pton(self.af, tmp[0])
         if self.addrlen > self.prefixlen:
             addrbits = self.addrlen - self.prefixlen
@@ -139,8 +141,8 @@ class IPPrefix(object):
             self.prefix = self.prefix[:i] + prefix
 
     def __str__(self):
-        return "%s/%s" % (socket.inet_ntop(self.af, self.prefix),
-                          self.prefixlen)
+        return "%s/%s" % (socket.inet_ntop(self.af, bytes(self.prefix, encoding = 'utf-8')),
+                          str(self.prefixlen))
 
     def __eq__(self, other):
         try:
@@ -177,7 +179,7 @@ class IPPrefix(object):
         if tmp == 0 or \
             tmp > (1 << (self.addrlen - self.prefixlen)) - 1 or \
             (self.af == AF_INET and tmp == (1 << (self.addrlen - self.prefixlen)) - 1):
-            raise ValueError("invalid hostid for prefix %s: %s" % (self, hostid))
+            raise ValueError("invalid hostid for prefix %s: %s" % (str(self), str(hostid)))
         addr = ""
         for i in range(-1, -(self.addrlen >> 3) - 1, -1):
             addr = chr(ord(self.prefix[i]) | (tmp & 0xff)) + addr

@@ -205,7 +205,7 @@ class XenConfig(Configurable):
             be passed in.
         '''
         values_str = string.join(values, '|')
-        tlvdata = ""
+        tlvdata = b""
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE, nodenum)
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_OBJ,
                                             cls._name)

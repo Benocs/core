@@ -133,7 +133,7 @@ class MobilityManager(ConfigurableManager):
             eventtype = coreapi.CORE_EVENT_PAUSE
         data = "start=%d" % int(model.lasttime - model.timezero)
         data += " end=%d" % int(model.endtime)
-        tlvdata = ""
+        tlvdata = b""
         tlvdata += coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_NODE,
                                              model.objid)
         tlvdata += coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_TYPE,
