@@ -82,7 +82,7 @@ static PyObject *netns_nsexecvp(PyObject *self, PyObject *args)
   if (pid < 0)
     return PyErr_SetFromErrno(PyExc_OSError);
   else
-    return PyInt_FromLong(pid);
+    return PyLong_FromLong(pid);
 }
 
 static PyObject *netns_nsfork(PyObject *self, PyObject *args)
@@ -100,7 +100,7 @@ static PyObject *netns_nsfork(PyObject *self, PyObject *args)
   if (pid == 0)			/* child */
     PyOS_AfterFork();
 
-  return PyInt_FromLong(pid);
+  return PyLong_FromLong(pid);
 }
 
 static PyMethodDef netns_methods[] = {
@@ -120,13 +120,26 @@ static PyMethodDef netns_methods[] = {
   {NULL, NULL, 0, NULL},
 };
 
-PyMODINIT_FUNC initnetns(void)
+static struct PyModuleDef netns_moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "netns",     /* m_name */
+    "This is a module",  /* m_doc */
+    -1,                  /* m_size */
+    netns_methods,       /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+  };
+
+PyMODINIT_FUNC PyInit_netns(void)
 {
   PyObject *m;
 
-  m = Py_InitModule("netns", netns_methods);
+  //m = Py_InitModule("netns", netns_methods);
+  m = PyModule_Create(&netns_moduledef);
   if (m == NULL)
-    return;
+    return NULL;
 
 #define MODADDINT(x)				\
   do {						\
@@ -142,5 +155,5 @@ PyMODINIT_FUNC initnetns(void)
 
 #undef MODADDINT
 
-  return;
+  return m;
 }

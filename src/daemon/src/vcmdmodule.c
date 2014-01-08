@@ -224,7 +224,7 @@ static void VCmdWait_dealloc(VCmdWait *self)
   pthread_mutex_destroy(&self->_mutex);
   pthread_cond_destroy(&self->_cv);
 
-  self->ob_type->tp_free((PyObject *)self);
+  Py_TYPE(self)->tp_free((PyObject *)self);
 
   return;
 }
@@ -296,7 +296,7 @@ static PyMethodDef VCmdWait_methods[] = {
 };
 
 static PyTypeObject vcmd_VCmdWaitType = {
-  PyObject_HEAD_INIT(NULL)
+  PyVarObject_HEAD_INIT(NULL, sizeof(VCmdWait))
   .tp_name = "vcmd.VCmdWait",
   .tp_basicsize = sizeof(VCmdWait),
   .tp_dealloc = (destructor)VCmdWait_dealloc,
@@ -428,7 +428,7 @@ static void VCmd_dealloc(VCmd *self)
     self->_client = NULL;
   }
 
-  self->ob_type->tp_free((PyObject *)self);
+  Py_TYPE(self)->tp_free((PyObject *)self);
 
   return;
 }
@@ -625,7 +625,7 @@ static PyObject *_VCmd_cmd(VCmd *self, PyObject *args, PyObject *kwds,
 	WARN("fdopen() failed for fd %d", fd);		\
 	break;						\
       }							\
-      obj = PyFile_FromFile(tmp, name, mode, fclose);	\
+      obj = PyFile_FromFd(fd, name, mode, -1, NULL, NULL, NULL, 1);	\
       if (!obj)						\
 	fclose(tmp);					\
     } while(0)
@@ -821,7 +821,7 @@ static PyMethodDef VCmd_methods[] = {
 };
 
 static PyTypeObject vcmd_VCmdType = {
-  PyObject_HEAD_INIT(NULL)
+  PyVarObject_HEAD_INIT(NULL, 0)
   .tp_name = "vcmd.VCmd",
   .tp_basicsize = sizeof(VCmd),
   .tp_dealloc = (destructor)VCmd_dealloc,
@@ -851,19 +851,31 @@ static PyMethodDef vcmd_methods[] = {
   {NULL, NULL, 0, NULL},
 };
 
-PyMODINIT_FUNC initvcmd(void)
+static struct PyModuleDef vcmd_moduledef = {
+  PyModuleDef_HEAD_INIT,
+  "vcmd", /* m_name */
+  "This is a module",  /* m_doc */
+  -1,                  /* m_size */
+  vcmd_methods,        /* m_methods */
+  NULL,                /* m_reload */
+  NULL,                /* m_traverse */
+  NULL,                /* m_clear */
+  NULL,                /* m_free */
+};
+
+PyMODINIT_FUNC PyInit_vcmd(void)
 {
   PyObject *m;
 
   if (PyType_Ready(&vcmd_VCmdType) < 0)
-    return;
+    return NULL;
 
   if (PyType_Ready(&vcmd_VCmdWaitType) < 0)
-    return;
+    return NULL;
 
-  m = Py_InitModule3("vcmd", vcmd_methods, "vcmd module that does stuff...");
+  m = PyModule_Create(&vcmd_moduledef);
   if (!m)
-    return;
+    return NULL;
 
   Py_INCREF(&vcmd_VCmdType);
   PyModule_AddObject(m, "VCmd", (PyObject *)&vcmd_VCmdType);
@@ -871,5 +883,5 @@ PyMODINIT_FUNC initvcmd(void)
   Py_INCREF(&vcmd_VCmdWaitType);
   PyModule_AddObject(m, "VCmdWait", (PyObject *)&vcmd_VCmdWaitType);
 
-  return;
+  return m;
 }
