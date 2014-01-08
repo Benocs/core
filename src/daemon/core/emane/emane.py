@@ -85,7 +85,7 @@ class Emane(ConfigurableManager):
             try:
                 modelfile = "%s" % model.lower()
                 clsname = "Emane%sModel" % model
-                importcmd = "from %s import %s" % (modelfile, clsname)
+                importcmd = "from core.emane.%s import %s" % (modelfile, clsname)
                 exec(importcmd)
             except Exception as e:
                 warntxt = "unable to load the EMANE model '%s'" % modelfile
