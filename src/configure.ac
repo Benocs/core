@@ -106,9 +106,9 @@ AC_SUBST(CORE_STATE_DIR)
 
 # default compiler flags
 # _GNU_SOURCE is defined to get c99 defines for lrint()
-CFLAGS="$CFLAGS -O3 -Werror -Wall -D_GNU_SOURCE"
+CFLAGS="$CFLAGS -O3 -Wall -D_GNU_SOURCE"
 # debug flags
-#CFLAGS="$CFLAGS -g -Werror -Wall -D_GNU_SOURCE"
+#CFLAGS="$CFLAGS -g -Wall -D_GNU_SOURCE"
 
 # Checks for programs.
 AC_PROG_AWK
