@@ -61,6 +61,7 @@ class PyCoreObj(object):
         self.opaque = None
         self.verbose = verbose
         self.position = Position()
+        self.netid = None
 
     def startup(self):
         ''' Each object implements its own startup method.
@@ -117,7 +118,7 @@ class PyCoreObj(object):
         '''
         if self.apitype is None:
             return None
-        tlvdata = ""
+        tlvdata = b""
         (x, y, z) = self.getposition()
         tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_NUMBER,
                                             self.objid)
@@ -132,11 +133,18 @@ class PyCoreObj(object):
             tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_EMUSRV,
                                                 self.server)
 
+        service_list = []
+        for service in self.services:
+          print('adding service: %s' % str(service._name))
+          service_list.extend([service._name, '|'])
+        service_list.pop(-1)
+        tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_SERVICES,
+            ''.join(service_list))
 
         if x is not None:
-            tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_XPOS, x)
+            tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_XPOS, int(x))
         if y is not None:
-            tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_YPOS, y)
+            tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_YPOS, int(y))
         if self.canvas is not None:
             tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_CANVAS,
                                                 self.canvas)
@@ -148,6 +156,11 @@ class PyCoreObj(object):
         if self.opaque is not None:
             tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_OPAQUE,
                                                 self.opaque)
+
+        if self.netid is not None:
+            tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_NETID,
+                                                self.netid)
+
         msg = coreapi.CoreNodeMessage.pack(flags, tlvdata)
         return msg
 
@@ -181,6 +194,12 @@ class PyCoreObj(object):
             elif isinstance(self.objid, str) and self.objid.isdigit():
                 id = int(self.objid)
             self.session.exception(level, source, id, text)
+
+    def setnetid(self, netid):
+      self.netid = netid
+
+    def getnetid(self):
+      return self.netid
 
 
 class PyCoreNode(PyCoreObj):
@@ -269,8 +288,6 @@ class PyCoreNode(PyCoreObj):
                     r += (netif1.net, netif1, netif2),                    
         return r
 
-
-
 class PyCoreNet(PyCoreObj):
     ''' Base class for networks
     '''
@@ -316,7 +333,7 @@ class PyCoreNet(PyCoreObj):
                 if otherobj.objid == self.objid:
                     continue
                 
-            tlvdata = ""
+            tlvdata = b""
             tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
                                                 self.objid)
             tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER,
