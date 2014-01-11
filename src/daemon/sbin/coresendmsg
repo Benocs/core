@@ -183,7 +183,8 @@ def connect_to_session(sock, requested):
     # join the first session (that is not our own connection)
     (tmp, localport) = sock.getsockname()
     sessions = sessstr.split('|')
-    sessions.remove(str(localport))
+    if str(localport) in sessions:
+        sessions.remove(str(localport))
     if len(sessions) == 0:
         print("no sessions to join")
         return False
