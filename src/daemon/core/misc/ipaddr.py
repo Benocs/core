@@ -53,7 +53,11 @@ class MacAddr(object):
 class IPAddr(object):
     def __init__(self, af, addr):
         # check if (af, addr) is valid
-        if not socket.inet_ntop(af, bytes(addr, encoding = 'utf-8')):
+        if not isinstance(addr, bytes):
+            baddr = bytes(addr, encoding = 'utf-8')
+        else:
+            baddr = addr
+        if not socket.inet_ntop(af, baddr):
             raise ValueError("invalid af/addr")
         self.af = af
         self.addr = addr
@@ -134,11 +138,20 @@ class IPPrefix(object):
         if self.addrlen > self.prefixlen:
             addrbits = self.addrlen - self.prefixlen
             netmask = ((1 << self.prefixlen) - 1) << addrbits
-            prefix = ""
+            prefix = 0
             for i in range(-1, -(addrbits >> 3) - 2, -1):
-                prefix = chr(ord(self.prefix[i]) & (netmask & 0xff)) + prefix
+                #print('self.prefix(%s) = self.prefix[:i](%s) + prefix(%s)' %
+                #        (str(self.prefix), str(self.prefix[:i]), str(prefix)))
+                prefix = (self.prefix[i] & (netmask & 0xff)) + prefix
                 netmask >>= 8
-            self.prefix = self.prefix[:i] + prefix
+            #print('i: %d, len(self.prefix): %d' % (i, len(self.prefix)))
+            num_bytes = 0
+            if i == -1:
+              num_bytes = 1
+            else:
+              num_bytes = len(self.prefix) - i
+            self.prefix = self.prefix[:i] + prefix.to_bytes(num_bytes, byteorder = 'big')
+            print('new prefix: %s' % str(self.prefix))
 
     def __str__(self):
         return "%s/%s" % (socket.inet_ntop(self.af, bytes(self.prefix, encoding = 'utf-8')),
@@ -180,13 +193,21 @@ class IPPrefix(object):
             tmp > (1 << (self.addrlen - self.prefixlen)) - 1 or \
             (self.af == AF_INET and tmp == (1 << (self.addrlen - self.prefixlen)) - 1):
             raise ValueError("invalid hostid for prefix %s: %s" % (str(self), str(hostid)))
-        addr = ""
+        addr = 0
         for i in range(-1, -(self.addrlen >> 3) - 1, -1):
-            addr = chr(ord(self.prefix[i]) | (tmp & 0xff)) + addr
+            addr = (self.prefix[i] | (tmp & 0xff)) + addr
             tmp >>= 8
             if not tmp:
                 break
-        addr = self.prefix[:i] + addr
+
+        num_bytes = 0
+        if i == -1:
+            num_bytes = 1
+        else:
+            num_bytes = len(self.prefix) - i
+
+        addr = self.prefix[:i] + addr.to_bytes(num_bytes, byteorder = 'big')
+        print('new address: %s' % str(addr))
         return IPAddr(self.af, addr)
 
     def minaddr(self):
