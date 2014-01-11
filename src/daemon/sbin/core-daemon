@@ -216,7 +216,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         msgtype, msgflags, msglen = coreapi.CoreMessage.unpackhdr(msghdr)
         if msglen == 0:
             self.warn("received message with no data")
-        data = ""
+        data = b""
         while len(data) < msglen:
             data += self.request.recv(msglen - len(data))
             if self.debug:
