@@ -170,13 +170,15 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
     def info(self, msg):
         ''' Utility method for writing output to stdout.
         '''
-        print(msg, flush = True)
+        print(msg)
+        sys.stdout.flush()
 
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr.
         '''
-        print(msg, file = sys.stderr, flush = True)
+        print(msg, file = sys.stderr)
+        sys.stderr.flush()
 
     def register(self):
         ''' Return a Register Message
@@ -1409,10 +1411,11 @@ class CoreServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         self._sessionslock.acquire()
         try:
             for sessionid in self._sessions:
-                print(sessionid)
+                print(sessionid, end = ' ')
         finally:
             self._sessionslock.release()
-        print("", flush = True)
+        print("")
+        sys.stdout.flush()
 
     def setsessionmaster(self, handler):
         ''' Call the setmaster() method for every session. Returns True when
