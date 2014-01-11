@@ -15,3 +15,6 @@ export PYTHON=python3; ./configure --prefix=/usr
 
 make $BUILD_PARALLEL
 su -c "make install" root
+
+mkdir $HOME/.core
+cp files/nodes.conf $HOME/.core/
