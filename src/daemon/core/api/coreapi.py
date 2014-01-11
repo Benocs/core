@@ -86,7 +86,7 @@ class CoreTlvDataString(CoreTlvData):
     @staticmethod
     def pack(value):
         if isinstance(value, bytes):
-						value = value.decode()
+            value = value.decode()
         elif not isinstance(value, str):
             raise ValueError("value not a string: %s" % value)
         if len(value) < 256:
