@@ -289,7 +289,7 @@ class Configurable(object):
         '''
         keys = cls.getnames()
         keyvalues = list(map(lambda a,b: "%s=%s" % (a,b), keys, values))
-        values_str = string.join(keyvalues, '|')
+        values_str = '|'.join(keyvalues)
         tlvdata = b""
         if nodenum is not None:
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE,

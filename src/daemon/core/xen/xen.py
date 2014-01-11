@@ -512,7 +512,7 @@ class XenNode(PyCoreNode):
         return False # XXX
 
     def cmd(self, args, wait = True):
-        cmdAsString = string.join(args, ' ')
+        cmdAsString = ' '.join(args)
         if cmdAsString in self.CmdsToIgnore:
             #self.warn("XEN PVM cmd(args=[%s]) called and ignored" % cmdAsString)
             return 0
@@ -524,7 +524,7 @@ class XenNode(PyCoreNode):
         return 0 
 
     def cmdresult(self, args):
-        cmdAsString = string.join(args, ' ')
+        cmdAsString = ' '.join(args)
         if cmdAsString in self.CmdsToIgnore:
             #self.warn("XEN PVM cmd(args=[%s]) called and ignored" % cmdAsString)
             return (0, "")
@@ -532,12 +532,12 @@ class XenNode(PyCoreNode):
         return (0, "")
 
     def popen(self, args):
-        cmdAsString = string.join(args, ' ')
+        cmdAsString = ' '.join(args)
         self.warn("XEN PVM popen(args=[%s]) called, but not yet implemented" % cmdAsString)
         return
 
     def icmd(self, args):
-        cmdAsString = string.join(args, ' ')
+        cmdAsString = ' '.join(args)
         self.warn("XEN PVM icmd(args=[%s]) called, but not yet implemented" % cmdAsString)
         return
 

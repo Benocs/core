@@ -154,7 +154,7 @@ class IPPrefix(object):
             print('new prefix: %s' % str(self.prefix))
 
     def __str__(self):
-        return "%s/%s" % (socket.inet_ntop(self.af, bytes(self.prefix, encoding = 'utf-8')),
+        return "%s/%s" % (socket.inet_ntop(self.af, self.prefix),
                           str(self.prefixlen))
 
     def __eq__(self, other):

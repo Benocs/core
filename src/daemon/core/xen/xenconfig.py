@@ -204,7 +204,7 @@ class XenConfig(Configurable):
             by the class, but node number, conf type flags, and values must
             be passed in.
         '''
-        values_str = string.join(values, '|')
+        values_str = '|'.join(values)
         tlvdata = b""
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_NODE, nodenum)
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_OBJ,
