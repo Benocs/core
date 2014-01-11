@@ -580,7 +580,8 @@ class XenNode(PyCoreNode):
 
     # from class SimpleLxcNode
     def warn(self, msg):
-        print("%s: %s" % (self.name, msg), file = sys.stderr, flush = True)
+        print("%s: %s" % (self.name, msg), file = sys.stderr)
+        sys.stderr.flush()
 
     def mount(self, source, target):
         self.warn("XEN PVM Nodes can't bind-mount filesystems")
