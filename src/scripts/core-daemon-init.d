@@ -68,7 +68,7 @@ PIDFILE=/var/run/core-daemon.pid
 # the /etc/init.d/functions (RedHat) differs from
 #     /usr/lib/init-functions (Debian)
 if [ $DEB = yes ]; then
-  daemon="start-stop-daemon --start -p ${PIDFILE} --exec /usr/bin/python --"
+  daemon="start-stop-daemon --start -p ${PIDFILE} --exec /usr/bin/python3 --"
   #daemon=start_daemon
   status=status_of_proc
   msg () {
@@ -78,7 +78,7 @@ if [ $DEB = yes ]; then
     echo ""
   }
 else
-  daemon="daemon /usr/bin/python"
+  daemon="daemon /usr/bin/python3"
   status=status
   msg () {
     echo -n $"$@"
