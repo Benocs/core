@@ -177,7 +177,7 @@ class PyCoreObj(object):
         '''
         if self.verbose:
             print(("%s: %s" % (self.name, msg)))
-						sys.stdout.flush()
+            sys.stdout.flush()
 
     def warn(self, msg):
         ''' Utility method for printing warning/error messages
