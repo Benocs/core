@@ -135,9 +135,10 @@ class PyCoreObj(object):
 
         service_list = []
         for service in self.services:
-          print('adding service: %s' % str(service._name))
-          service_list.extend([service._name, '|'])
-        service_list.pop(-1)
+            print('adding service: %s' % str(service._name))
+            service_list.extend([service._name, '|'])
+        if len(service_list) > 0:
+            service_list.pop(-1)
         tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_SERVICES,
             ''.join(service_list))
 
