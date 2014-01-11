@@ -21,7 +21,7 @@ class MacAddr(object):
         self.addr = addr
 
     def __str__(self):
-        return ":".join([("%02x" % ord(x)) for x in self.addr])
+        return ":".join([("%02x" % x) for x in self.addr])
         
     def tolinklocal(self):
         ''' Convert the MAC address to a IPv6 link-local address, using EUI 48
