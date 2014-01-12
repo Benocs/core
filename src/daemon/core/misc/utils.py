@@ -107,9 +107,9 @@ def hexdump(s, bytes_per_word = 2, words_per_line = 8):
     while s:
         line = s[:bytes]
         s = s[bytes:]
-        tmp = [("%02x" * bytes_per_word) % x for x in zip(*[iter(map(ord, line))] * bytes_per_word)]
+        tmp = [("%02x" * bytes_per_word) % x for x in zip(*[iter(line)] * bytes_per_word)]
         if len(line) % 2:
-            tmp.append("%x" % ord(line[-1]))
+            tmp.append("%x" % line[-1])
         dump += "0x%08x: %s\n" % (count, " ".join(tmp))
         count += len(line)
     return dump[:-1]

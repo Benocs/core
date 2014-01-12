@@ -292,6 +292,8 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         try:
             replies = msghandler(msg)
             for reply in replies:
+                if reply is None:
+                    continue
                 if self.debug:
                     msgtype, msgflags, msglen = \
                         coreapi.CoreMessage.unpackhdr(reply)
@@ -1091,6 +1093,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             if msg.flags & coreapi.CORE_API_STR_FLAG and not \
                 msg.flags & coreapi.CORE_API_ADD_FLAG:
                 # status request flag: send list of sessions
+                self.info("status request flag: send list of sessions")
                 return (self.server.tosessionmsg(), )
             # handle ADD or DEL flags
             for sid in sids:

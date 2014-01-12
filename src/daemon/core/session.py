@@ -150,7 +150,6 @@ class Session(object):
         if handler.master is True:
             self.master = True
         with self._handlerslock:
-            print('adding handler: %s' % str(handler))
             self._handlers.add(handler)
 
     def disconnect(self, handler):
