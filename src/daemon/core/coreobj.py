@@ -465,3 +465,62 @@ class PyCoreNetIf(object):
         if self.poshook is not None:
             self.poshook(self, x, y, z)
 
+    def tointerfacemsg(self, flags):
+        ''' Build a CORE API Interface Message for this object. Both nodes and
+            networks can be represented by a Node Message.
+        '''
+        tlvdata = b""
+        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NODE,
+                                            self.node.objid)
+        # find netif index
+        for index, netif in self.node._netif.items():
+          if netif == self:
+            print("netindex: %s" % str(index))
+            tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NUM,
+                                                index)
+            break
+        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NAME,
+                                            self.name)
+
+        for addr in self.addrlist:
+            (ip, sep, mask)  = addr.partition('/')
+            mask = int(mask)
+            if isIPv4Address(ip):
+                family = AF_INET
+                tlvtypeip = coreapi.CORE_TLV_IFACE_IPADDR
+                tlvtypemask = coreapi.CORE_TLV_IFACE_MASK
+            else:
+                family = AF_INET6
+                tlvtypeip = coreapi.CORE_TLV_IFACE_IP6ADDR
+                tlvtypemask = coreapi.CORE_TLV_IFACE_IP6MASK
+            ipl = socket.inet_pton(family, ip)
+            print('IPAddr: %s' % str(IPAddr(af=family, addr=ipl)))
+            tlvdata += coreapi.CoreIfaceTlv.pack(tlvtypeip,
+                                                IPAddr(af=family, addr=ipl))
+            #                                    IPAddr.toint(str(IPAddr(af=family, addr=ipl))))
+            tlvdata += coreapi.CoreIfaceTlv.pack(tlvtypemask, mask)
+
+        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_MACADDR,
+                                            self.hwaddr)
+
+        if (hasattr(self, "net") and self.net is not None
+            and hasattr(self.net, "type") and self.net.type is not None):
+            iface_type = 0
+            if (self.net.type == "wlan"):
+                iface_type = 1
+
+            tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_TYPE,
+                                                iface_type)
+
+        if (hasattr(self, "up") and self.up is not None):
+          tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_STATE,
+                                              int(self.up))
+
+        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_EMUID,
+                                            self.node.objid)
+        if self.node.netid is not None:
+            tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NETID,
+                                                self.node.netid)
+
+        msg = coreapi.CoreIfaceMessage.pack(flags, tlvdata)
+        return msg

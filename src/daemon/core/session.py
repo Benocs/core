@@ -912,6 +912,20 @@ class Session(object):
                 for msg in linkmsgs:
                     replies.append(msg)
                     nl += 1
+
+        ni = 0
+        # send interface messages from interface objects
+        with self._objslock:
+            for obj in self.objs():
+                # if obj has tonodemsg(), the it's a node and thus contains
+                # interfaces. we will now iterate over those interface and push
+                # one API message each.
+                  for ifindex, interface in obj._netif.items():
+                      msg = interface.tointerfacemsg(flags = coreapi.CORE_API_ADD_FLAG)
+                      if msg is not None:
+                          replies.append(msg)
+                          ni += 1
+
         # send model info
         configs = self.mobility.getallconfigs()
         configs += self.emane.getallconfigs()
