@@ -896,13 +896,27 @@ class Session(object):
         '''
         replies = []
         nn = 0
+        ni = 0
         # send node messages for node and network objects
         with self._objslock:
             for obj in self.objs():
+                created_nodemsg = False
                 msg = obj.tonodemsg(flags = coreapi.CORE_API_ADD_FLAG)
                 if msg is not None:
+                    created_nodemsg = True
                     replies.append(msg)
                     nn += 1
+                # send interface messages from interface objects
+                # if obj has tonodemsg(), the it's a node and thus contains
+                # interfaces. we will now iterate over those interface and push
+                # one API message each.
+                if created_nodemsg:
+                    for ifindex, interface in obj._netif.items():
+                        msg = interface.tointerfacemsg(flags = coreapi.CORE_API_ADD_FLAG)
+                        if msg is not None:
+                            replies.append(msg)
+                            ni += 1
+
 
         nl = 0
         # send link messages from net objects
@@ -912,19 +926,6 @@ class Session(object):
                 for msg in linkmsgs:
                     replies.append(msg)
                     nl += 1
-
-        ni = 0
-        # send interface messages from interface objects
-        with self._objslock:
-            for obj in self.objs():
-                # if obj has tonodemsg(), the it's a node and thus contains
-                # interfaces. we will now iterate over those interface and push
-                # one API message each.
-                  for ifindex, interface in obj._netif.items():
-                      msg = interface.tointerfacemsg(flags = coreapi.CORE_API_ADD_FLAG)
-                      if msg is not None:
-                          replies.append(msg)
-                          ni += 1
 
         # send model info
         configs = self.mobility.getallconfigs()
@@ -983,7 +984,7 @@ class Session(object):
         if meta:
             replies.append(meta)
         
-        self.info("informing GUI about %d nodes and %d links" % (nn, nl))
+        self.info("informing GUI about %d nodes, %d interfaces and %d links" % (nn, ni, nl))
         return replies
 
 
