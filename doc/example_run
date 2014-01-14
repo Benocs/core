@@ -1,0 +1,80 @@
+root@core2:~/core_topogen/src# time ./core-api.py --host core0
+adding message handler to session
+adding handler: <common.MsgHandler object at 0x7f4bda23f2d0>
+NOTE: connecting to server at core0:4038
+adding server core0 @ core0:4038
+[DEBUG] Reading from stdin. Specify messages to send. Seperate by newlines:
+
+session flags=str number 0
+
+data(4): ['session', 'flags=str', 'number', '0']
+flags: 0x10
+tlv_name: CORE_TLV_SESS_NUMBER, tlv_value: 0
+tlvdata: b'\x01\x010\x00'
+sending data
+CoreSessionMessage <msgtype = CORE_API_SESS_MSG, flags = 0x0 <>>
+  CORE_TLV_SESS_NUMBER: 43586|38124
+  CORE_TLV_SESS_NAME: untitled|
+  CORE_TLV_SESS_FILE: |
+  CORE_TLV_SESS_NODECOUNT: 2|
+  CORE_TLV_SESS_DATE: Sun Jan 12 16:55:07 2014|Sun Jan 12 17:05:52 2014
+  CORE_TLV_SESS_THUMB: /tmp/pycore.43586/thumb.jpg|
+
+session flags=add,str number 43586
+
+data(4): ['session', 'flags=add,str', 'number', '43586']
+flags: 0x11
+tlv_name: CORE_TLV_SESS_NUMBER, tlv_value: 43586
+tlvdata: b'\x01\x0543586\x00'
+sending data
+CoreNodeMessage <msgtype = CORE_API_NODE_MSG, flags = 0x1 <CORE_API_ADD_FLAG>>
+  CORE_TLV_NODE_XPOS: 156
+  CORE_TLV_NODE_NUMBER: 1
+  CORE_TLV_NODE_TYPE: 0
+  CORE_TLV_NODE_NAME: n1
+  CORE_TLV_NODE_SERVICES: zebra|OSPFv2|OSPFv3|vtysh|IPForward
+  CORE_TLV_NODE_MODEL: router
+  CORE_TLV_NODE_EMUID: 1
+  CORE_TLV_NODE_YPOS: 204
+CoreNodeMessage <msgtype = CORE_API_NODE_MSG, flags = 0x1 <CORE_API_ADD_FLAG>>
+  CORE_TLV_NODE_XPOS: 478
+  CORE_TLV_NODE_NUMBER: 2
+  CORE_TLV_NODE_TYPE: 0
+  CORE_TLV_NODE_NAME: n2
+  CORE_TLV_NODE_SERVICES: zebra|OSPFv2|OSPFv3|vtysh|IPForward
+  CORE_TLV_NODE_MODEL: router
+  CORE_TLV_NODE_EMUID: 2
+  CORE_TLV_NODE_YPOS: 341
+CoreLinkMessage <msgtype = CORE_API_LINK_MSG, flags = 0x1 <CORE_API_ADD_FLAG>>
+  CORE_TLV_LINK_TYPE: 1
+  CORE_TLV_LINK_N1NUMBER: 1
+  CORE_TLV_LINK_N2NUMBER: 2
+  CORE_TLV_LINK_DELAY: 0
+  CORE_TLV_LINK_BW: 0
+  CORE_TLV_LINK_PER: 0.0
+  CORE_TLV_LINK_DUP: 0.0
+  CORE_TLV_LINK_IF2IP6MASK: 64
+  CORE_TLV_LINK_IF2IP6: 2001::2
+  CORE_TLV_LINK_IF1NUM: 0
+  CORE_TLV_LINK_IF1IP4: 10.0.0.1
+  CORE_TLV_LINK_IF1IP4MASK: 24
+  CORE_TLV_LINK_IF1IP6: 2001::1
+  CORE_TLV_LINK_IF1IP6MASK: 64
+  CORE_TLV_LINK_IF2NUM: 0
+  CORE_TLV_LINK_IF2IP4: 10.0.0.2
+  CORE_TLV_LINK_IF2IP4MASK: 24
+CoreConfMessage <msgtype = CORE_API_CONF_MSG, flags = 0x0 <>>
+  CORE_TLV_CONF_OBJ: session
+  CORE_TLV_CONF_TYPE: 2
+  CORE_TLV_CONF_DATA_TYPES: (10, 11, 11, 11, 0)
+  CORE_TLV_CONF_VALUES: controlnet=|enablerj45=1|preservedir=0|enablesdt=0
+  CORE_TLV_CONF_CAPTIONS: Control network|Enable RJ45s|Preserve session dir|Enable SDT3D output
+  CORE_TLV_CONF_POSSIBLE_VALUES: |On,Off|On,Off|On,Off
+  CORE_TLV_CONF_GROUPS: Options:1-4
+CoreConfMessage <msgtype = CORE_API_CONF_MSG, flags = 0x0 <>>
+  CORE_TLV_CONF_OBJ: metadata
+  CORE_TLV_CONF_TYPE: 2
+  CORE_TLV_CONF_DATA_TYPES: (10, 10, 0)
+  CORE_TLV_CONF_VALUES: global_options=interface_names=no ip_addresses=yes ipv6_addresses=yes node_labels=yes link_labels=yes show_api=no background_images=no annotations=yes grid=yes traffic_start=0|canvas c1={name {Canvas1}}
+
+
