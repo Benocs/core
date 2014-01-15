@@ -112,7 +112,7 @@ interface: eth0
 !aggregate: src_host, dst_host, src_port, dst_port, proto, tos
 plugins: nfprobe
 
-! TODO: crawl topology and find nodes with services: nf9-collector || CE
+! TODO: crawl topology and find nodes with services: nf9-collector || CE in same AS
 
 nfprobe_receiver: 10.0.8.2:2055
 nfprobe_version: 9
