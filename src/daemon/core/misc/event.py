@@ -23,11 +23,11 @@ class EventLoop(object):
             self.kwds = kwds
             self.canceled = False
 
-        def __cmp__(self, other):
-            tmp = cmp(self.time, other.time)
-            if tmp == 0:
-                tmp = cmp(self.eventnum, other.eventnum)
-            return tmp
+        def __lt__(self, other):
+            if self.time == other.time:
+                return self.eventnum < other.eventnum
+            else:
+                return self.time < other.time
 
         def run(self):
             if self.canceled:

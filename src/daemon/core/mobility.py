@@ -459,11 +459,11 @@ class WayPointMobility(WirelessModel):
             self.coords = coords
             self.speed = speed
         
-        def __cmp__(self, other):
-            tmp = cmp(self.time, other.time)
-            if tmp == 0:
-                tmp = cmp(self.nodenum, other.nodenum)
-            return tmp
+        def __lt__(self, other):
+            if self.nodenum == other.nodenum:
+              return self.time < other.time
+            else:
+              return self.nodenum < other.nodenum
 
     def __init__(self, session, objid, verbose = False, values = None):
         super(WayPointMobility, self).__init__(session = session, objid = objid,
