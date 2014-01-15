@@ -1,10 +1,30 @@
 #
 # CORE
+#
+# based on:
+#
 # Copyright (c)2010-2012 the Boeing Company.
-# See the LICENSE file included in this distribution.
+# See the LICENSE-BOEING file included in this distribution.
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
+# Copyright (C) 2014 Robert Wuttke <robert@benocs.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
 '''
 ipaddr.py: helper objects for dealing with IPv4/v6 addresses.
 '''
@@ -12,6 +32,10 @@ ipaddr.py: helper objects for dealing with IPv4/v6 addresses.
 import socket
 import struct
 import random
+
+# this is from Python3.3. for now (since we're targeting Python3.2, we use the
+# locally cached version of this (future) module
+from core.misc import ipaddress
 
 AF_INET = socket.AF_INET
 AF_INET6 = socket.AF_INET6
@@ -22,7 +46,7 @@ class MacAddr(object):
 
     def __str__(self):
         return ":".join([("%02x" % x) for x in self.addr])
-        
+
     def tolinklocal(self):
         ''' Convert the MAC address to a IPv6 link-local address, using EUI 48
         to EUI 64 conversion process per RFC 5342.
@@ -53,14 +77,20 @@ class MacAddr(object):
 class IPAddr(object):
     def __init__(self, af, addr):
         # check if (af, addr) is valid
-        if not isinstance(addr, bytes):
-            baddr = bytes(addr, encoding = 'utf-8')
-        else:
-            baddr = addr
-        if not socket.inet_ntop(af, baddr):
+        tmp = None
+        try:
+            if af == AF_INET:
+                tmp = ipaddress.IPv4Address(addr)
+            elif af == AF_INET6:
+                tmp = ipaddress.IPv6Address(addr)
+            else:
+                raise ValueError("invalid af/addr")
+        except:
             raise ValueError("invalid af/addr")
+
         self.af = af
         self.addr = addr
+        self.addr_newstyle = tmp
 
     def isIPv4(self):
         return self.af == AF_INET
@@ -69,28 +99,19 @@ class IPAddr(object):
         return self.af == AF_INET6
 
     def __str__(self):
-        return socket.inet_ntop(self.af, self.addr)
+        return self.addr_newstyle.compressed
 
     def __eq__(self, other):
         try:
-            return other.af == self.af and other.addr == self.addr
+            return self.addr_newstyle == other.addr_newstyle
         except:
             return False
 
     def __add__(self, other):
-        try:
-            carry = int(other)
-        except:
-            return NotImplemented
-        tmp = [ord(x) for x in self.addr]
-        for i in range(len(tmp) - 1, -1, -1):
-            x = tmp[i] + carry
-            tmp[i] = x & 0xff
-            carry = x >> 8
-            if carry == 0:
-                break
-        addr = "".join([chr(x) for x in tmp])
-        return self.__class__(self.af, addr)
+        if self.addr_newstyle.version == 4:
+            return ipaddress.IPv4Address(self.addr_newstyle + other.addr_newstyle)
+        elif self.addr_newstyle.version == 6:
+            return ipaddress.IPv6Address(self.addr_newstyle + other.addr_newstyle)
 
     def __sub__(self, other):
         try:
@@ -107,55 +128,40 @@ class IPAddr(object):
             except Exception as e:
                 pass
         raise e
-    
+
     @staticmethod
     def toint(s):
         ''' convert IPv4 string to 32-bit integer
         '''
-        bin = socket.inet_pton(AF_INET, s)
-        return(struct.unpack('!I', bin)[0])
+        return int(self.addr_newstyle)
 
 class IPPrefix(object):
     def __init__(self, af, prefixstr):
         "prefixstr format: address/prefixlen"
+        print('generating prefix for str: %s' % prefixstr)
+
         tmp = prefixstr.split("/")
         if len(tmp) > 2:
             raise ValueError("invalid prefix: '%s'" % prefixstr)
-        self.af = af
-        if self.af == AF_INET:
-            self.addrlen = 32
-        elif self.af == AF_INET6:
-            self.addrlen = 128
-        else:
-            raise ValueError("invalid address family: '%s'" % self.af)
         if len(tmp) == 2:
             self.prefixlen = int(tmp[1])
         else:
             self.prefixlen = self.addrlen
-        print('socket.inet_pton(%s, %s): %s' % (str(self.af), str(tmp[0]),
-            str(socket.inet_pton(self.af, tmp[0]))))
-        self.prefix = socket.inet_pton(self.af, tmp[0])
-        if self.addrlen > self.prefixlen:
-            addrbits = self.addrlen - self.prefixlen
-            netmask = ((1 << self.prefixlen) - 1) << addrbits
-            prefix = 0
-            for i in range(-1, -(addrbits >> 3) - 2, -1):
-                #print('self.prefix(%s) = self.prefix[:i](%s) + prefix(%s)' %
-                #        (str(self.prefix), str(self.prefix[:i]), str(prefix)))
-                prefix = (self.prefix[i] & (netmask & 0xff)) + prefix
-                netmask >>= 8
-            #print('i: %d, len(self.prefix): %d' % (i, len(self.prefix)))
-            num_bytes = 0
-            if i == -1:
-              num_bytes = 1
-            else:
-              num_bytes = len(self.prefix) - i
-            self.prefix = self.prefix[:i] + prefix.to_bytes(num_bytes, byteorder = 'big')
-            print('new prefix: %s' % str(self.prefix))
+
+        self.af = af
+        if self.af == AF_INET:
+            self.addrlen = 32
+            self.prefix = ipaddress.IPv4Network(prefixstr, strict = False)
+        elif self.af == AF_INET6:
+            self.prefix = ipaddress.IPv6Network(prefixstr, strict = False)
+            self.addrlen = 128
+        else:
+            raise ValueError("invalid address family: '%s'" % self.af)
 
     def __str__(self):
-        return "%s/%s" % (socket.inet_ntop(self.af, self.prefix),
-                          str(self.prefixlen))
+        print("IPADDR: family: %s, prefix: %s, len: %s" % (str(self.af),
+                str(self.prefix), str(self.prefixlen)))
+        return str(self.prefix)
 
     def __eq__(self, other):
         try:
@@ -164,26 +170,6 @@ class IPPrefix(object):
                 other.prefix == self.prefix
         except:
             return False
-
-    def __add__(self, other):
-        try:
-            tmp = int(other)
-        except:
-            return NotImplemented
-        a = IPAddr(self.af, self.prefix) + \
-            (tmp << (self.addrlen - self.prefixlen))
-        prefixstr = "%s/%s" % (a, self.prefixlen)
-        if self.__class__ == IPPrefix:
-            return self.__class__(self.af, prefixstr)
-        else:
-            return self.__class__(prefixstr)
-
-    def __sub__(self, other):
-        try:
-            tmp = -int(other)
-        except:
-            return NotImplemented
-        return self.__add__(tmp)
 
     def addr(self, hostid):
         tmp = int(hostid)
@@ -206,30 +192,25 @@ class IPPrefix(object):
         else:
             num_bytes = len(self.prefix) - i
 
+        print('new address (int): %s' % str(addr))
         addr = self.prefix[:i] + addr.to_bytes(num_bytes, byteorder = 'big')
-        print('new address: %s' % str(addr))
+        print('new address (bytes): %s' % str(addr))
         return IPAddr(self.af, addr)
 
     def minaddr(self):
-        return self.addr(1)
+        return self.prefix.network_address + 1
 
     def maxaddr(self):
-        if self.af == AF_INET:
-            return self.addr((1 << (self.addrlen - self.prefixlen)) - 2)
-        else:
-            return self.addr((1 << (self.addrlen - self.prefixlen)) - 1)
+        return self.prefix.broadcast_address - 1
 
     def numaddr(self):
-        return max(0, (1 << (self.addrlen - self.prefixlen)) - 2)
-        
+        return self.prefix.num_addresses - 2
+
     def prefixstr(self):
-        return "%s" % socket.inet_ntop(self.af, self.prefix)
-    
+        return '%s' % self.prefix
+
     def netmaskstr(self):
-        addrbits = self.addrlen - self.prefixlen
-        netmask = ((1 << self.prefixlen) - 1) << addrbits
-        netmaskbytes = struct.pack("!L",  netmask)
-        return IPAddr(af=AF_INET, addr=netmaskbytes).__str__()
+        return '%s' % self.prefix.netmask
 
 class IPv4Prefix(IPPrefix):
     def __init__(self, prefixstr):
