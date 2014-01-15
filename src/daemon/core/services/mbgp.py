@@ -128,8 +128,8 @@ class MOspfv2(quagga.Ospfv2):
 					for a in ifc.addrlist:
 						if a.find(".") < 0:
 							continue
-						net = IPv4Prefix(a)
-						cfg += "	network %s area 0\n" % net
+						#net = IPv4Prefix(a)
+						cfg += "	network %s area 0\n" % a
 		cfg += "!\n"
 		return cfg
 
