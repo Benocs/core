@@ -500,8 +500,9 @@ class PyCoreNetIf(object):
             #                                    IPAddr.toint(str(IPAddr(af=family, addr=ipl))))
             tlvdata += coreapi.CoreIfaceTlv.pack(tlvtypemask, mask)
 
-        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_MACADDR,
-                                            self.hwaddr)
+        if hasattr(self, "hwaddr") and self.hwaddr is not None:
+            tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_MACADDR,
+                                             self.hwaddr)
 
         if (hasattr(self, "net") and self.net is not None
             and hasattr(self.net, "type") and self.net.type is not None):
