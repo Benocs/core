@@ -481,7 +481,7 @@ class CoreMessage(object):
                 tlvtype = self.tlvcls.tlvtypemap[k]
             else:
                 tlvtype = "tlv type %s" % k
-            tmp += "\n  %s: %s" % (tlvtype, v)
+            tmp += "\n  %s=> %s" % (tlvtype, v)
         return tmp
 
     def nodenumbers(self):
