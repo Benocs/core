@@ -498,6 +498,9 @@ proc loadCfg { cfg } {
 			model {
 			    lappend $object "model $value"
 			}
+			netid {
+			    lappend $object "netid $value"
+			}
 			cpu {
 			    lappend $object "cpu {$value}"
 			}

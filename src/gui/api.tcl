@@ -259,17 +259,17 @@ proc parseNodeMessage { data len flags } {
     array set typenames { 1 num 2 type 3 name 4 ipv4_addr 5 mac_addr \
 			6 ipv6_addr 7 model 8 emulsrv 10 session \
 			32 xpos 33 ypos 34 canv \
-			35 emuid 36 netid 48 lat 49 long 50 alt \
+			35 emuid 36 netid 37 services 48 lat 49 long 50 alt \
 			66 icon 80 opaque }
     array set typesizes { num 4 type 4 name -1 ipv4_addr 4 ipv6_addr 16 \
 			mac_addr 8 model -1 emulsrv -1 session -1 \
 			xpos 2 ypos 2 canv 2 emuid 4 \
-			netid 4 lat 4 long 4 alt 4 \
+			netid 4 services -1 lat 4 long 4 alt 4 \
 			icon -1 opaque -1 }
     array set vals { 	num 0 type 0 name "" ipv4_addr -1 ipv6_addr -1 \
 			mac_addr -1 model "" emulsrv "" session "" \
 			xpos 0 ypos 0 canv "" \
-			emuid -1 netid -1 \
+			emuid -1 netid 0 services "" \
 			lat 0 long 0 alt 0 \
 			icon "" opaque "" }
 
@@ -279,56 +279,69 @@ proc parseNodeMessage { data len flags } {
     # TLV parsing
     #
     while { $current < $len } {
-	# TLV header
-	if { [binary scan $data @${current}cc type length] != 2 } {
-	    puts "TLV header error"
-	    break
-	}
-	set length [expr {$length & 0xFF}]; # convert signed to unsigned
-	if { $length == 0 } {; # prevent endless looping
-	    if { $type == 0 } { puts -nonewline "(extra padding)"; break
-	    } else { puts "Found zero-length TLV for type=$type, dropping.";
-	        break }
-	}
-	set pad [pad_32bit $length]
-	# verbose debugging
-	#puts "tlv type=$type length=$length pad=$pad current=$current"
-	incr current 2
-	
-	if {![info exists typenames($type)] } { ;# unknown TLV type
-	    if { $prmsg } { puts -nonewline "unknown=$type," }
-	    incr current $length
-	    continue
-	}
-	set typename $typenames($type)
-	set size $typesizes($typename)
-	# 32-bit and 64-bit vals pre-padded
-	if { $size == 4 || $size == 8 } { incr current $pad }
-	# read TLV data depending on size
-	switch -exact -- "$size" {
-	2 { binary scan $data @${current}S vals($typename) }
-	4 { binary scan $data @${current}I vals($typename) }
-	8 { binary scan $data @${current}W vals($typename) }
-	16 { binary scan $data @${current}c16 vals($typename) }
-	-1 { binary scan $data @${current}a${length} vals($typename) }
-	}
-	if { $size == -1 } { incr current $pad } ;# string vals post-padded
-	if { $type == 6 } { incr current $pad } ;# 128-bit vals post-padded
-	incr current $length
-	# special handling of data here
-	switch -exact -- "$typename" {
-	ipv4_addr { array set vals [list $typename \
-		[ipv4ToString $vals($typename)] ] }
-	mac_addr { array set vals [list $typename \
-		[macToString $vals($typename)] ] }
-	ipv6_addr { array set vals [list $typename \
-		[ipv6ToString $vals($typename)] ] }
-	xpos { array set vals [list $typename  \
-			[expr { ($vals($typename) * $XSCALE) - $XOFFSET }] ] }
-	ypos { array set vals [list $typename \
-			[expr { ($vals($typename) * $YSCALE) - $YOFFSET }] ] }
-	}
-	if { $prmsg } { puts -nonewline "$typename=$vals($typename)," }
+		#puts "current($current) < len($len)"
+
+		# TLV header
+		if { [binary scan $data @${current}cc type length] != 2 } {
+			puts "TLV header error"
+			break
+		}
+
+		set length [expr {$length & 0xFF}]; # convert signed to unsigned
+		#puts "tlv type=$type length=$length current=$current"
+		if { $length == 0 } { ; # prevent endless looping
+			if { $type == 0 } { puts -nonewline "(extra padding)"; break
+			} else { puts "Found zero-length TLV for type=$type, dropping.";
+				break
+			}
+		}
+
+		set pad [pad_32bit $length]
+		# verbose debugging
+		#puts "tlv type=$type length=$length pad=$pad current=$current"
+		incr current 2
+
+		if {![info exists typenames($type)] } { ;# unknown TLV type
+			if { $prmsg } { puts -nonewline "unknown=$type," }
+			incr current $length
+			#puts "incremented current by length to: $current"
+			continue
+		}
+
+		set typename $typenames($type)
+		set size $typesizes($typename)
+		# 32-bit and 64-bit vals pre-padded
+		if { $size == 4 || $size == 8 } { incr current $pad }
+
+		# read TLV data depending on size
+		switch -exact -- "$size" {
+			2 { binary scan $data @${current}S vals($typename) }
+			4 { binary scan $data @${current}I vals($typename) }
+			8 { binary scan $data @${current}W vals($typename) }
+			16 { binary scan $data @${current}c16 vals($typename) }
+			-1 { binary scan $data @${current}a${length} vals($typename) }
+		}
+
+		if { $size == -1 } { incr current $pad } ;# string vals post-padded
+		if { $type == 6 } { incr current $pad } ;# 128-bit vals post-padded
+
+		incr current $length
+		#puts "parsing node msg. typename: $typename"
+		# special handling of data here
+		switch -exact -- "$typename" {
+			ipv4_addr { array set vals [list $typename \
+				[ipv4ToString $vals($typename)] ] }
+			mac_addr { array set vals [list $typename \
+				[macToString $vals($typename)] ] }
+			ipv6_addr { array set vals [list $typename \
+				[ipv6ToString $vals($typename)] ] }
+			xpos { array set vals [list $typename  \
+					[expr { ($vals($typename) * $XSCALE) - $XOFFSET }] ]
+			}
+			ypos { array set vals [list $typename \
+					[expr { ($vals($typename) * $YSCALE) - $YOFFSET }] ] }
+		}
+		if { $prmsg } { puts -nonewline "$typename=$vals($typename)," }
     }
 
     if { $prmsg } { puts ") "}
@@ -347,11 +360,11 @@ proc parseNodeMessage { data len flags } {
     } else {
 	set exists true
     }
-    
+
     if { $vals(name) == "" } {; # make sure there is a node name
 	set name $node
 	if { $exists } { set name [getNodeName $node] }
-	array set vals [list name $name] 
+	array set vals [list name $name]
     }
     if { $exists } {
 	if { $flags == 1 } {
@@ -503,6 +516,9 @@ proc apiNodeCreate { node vals_ref } {
 	    puts "warning: unknown node type '$model' in Node message!"
 	}
     }
+
+	set netid $vals(netid)
+	setNodeNetId $node $netid
 
     if { $vals(type) == 7 } { ;# RJ45 node - used later to control linking
 	netconfInsertSection $node [list model $vals(model)]
@@ -1755,7 +1771,12 @@ proc sendNodeAddMessage { channel node } {
     } else {
 	set canv ""
     }
-    
+
+    set netid [getNodeNetId $node]
+    if { $netid != "" } {
+        incr len 8
+    }
+
     # services 
     set svc [getNodeServices $node false]
     set svc [join $svc "|"]
@@ -1846,6 +1867,15 @@ proc sendNodeAddMessage { channel node } {
     }
 
     if { $prmsg == 1 } { puts -nonewline "x=$x,y=$y" }
+
+    # netid
+    set netid [getNodeNetId $node]
+    if { $netid != "" } {
+        set netid [format "%u" [expr int($netid)]]
+        set msg [binary format c2sI {0x24 4} 0 $netid]
+        puts -nonewline $channel $msg
+        if { $prmsg == 1 } { puts -nonewline ",netid=$netid" }
+    }
 
     # services
     if { $svc_len > 0 } {

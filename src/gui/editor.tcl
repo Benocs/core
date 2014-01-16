@@ -2264,10 +2264,11 @@ proc nodeEnter { c } {
     set type [nodeType $node]
     set name [getNodeName $node]
     set model [getNodeModel $node]
+    set netid [getNodeNetId $node]
     if { $model != "" } {
-	set line "{$node} $name ($model):"
+	set line "{$node} $name ($model): netid: $netid"
     } else {
-	set line "{$node} $name:"
+	set line "{$node} $name: netid: $netid"
     }
     if { $type != "rj45" && $type != "tunnel" } {
 	foreach ifc [ifcList $node] {
