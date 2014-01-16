@@ -219,7 +219,7 @@ class CoreTlv(object):
             return "unknown tlv type: %s" % str(self.tlvtype)
 
     def __str__(self):
-        return "%s <tlvtype = %s, value = %s>" % \
+        return "%s (tlvtype = %s, value = %s)" % \
                (self.__class__.__name__, self.typestr(), self.value)
 
 class CoreNodeTlv(CoreTlv):
@@ -471,10 +471,10 @@ class CoreMessage(object):
             flag <<= 1
             if not (self.flags & ~(flag - 1)):
                 break
-        return "0x%x <%s>" % (self.flags, " | ".join(msgflags))
+        return "0x%x (%s)" % (self.flags, " | ".join(msgflags))
 
     def __str__(self):
-        tmp = "%s <msgtype = %s, flags = %s>" % \
+        tmp = "%s (msgtype = %s, flags = %s)" % \
               (self.__class__.__name__, self.typestr(), self.flagstr())
         for k, v in list(self.tlvdata.items()):
             if k in self.tlvcls.tlvtypemap:
