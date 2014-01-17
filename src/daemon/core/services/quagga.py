@@ -68,12 +68,14 @@ class Zebra(CoreService):
         cfg = ""
         for ifc in node.netifs():
             cfg += "interface %s\n" % ifc.name
-            # include control interfaces in addressing but not routing daemons
-            if hasattr(ifc, 'control') and ifc.control == True:
-                cfg += "  "
-                cfg += "\n  ".join(map(cls.addrstr, ifc.addrlist))
-                cfg += "\n"
-                continue
+
+            ## include control interfaces in addressing but not routing daemons
+            #if hasattr(ifc, 'control') and ifc.control == True:
+            #    cfg += "  "
+            #    cfg += "\n  ".join(map(cls.addrstr, ifc.addrlist))
+            #    cfg += "\n"
+            #    continue
+
             cfgv4 = ""
             cfgv6 = ""
             want_ipv4 = False
@@ -102,6 +104,8 @@ class Zebra(CoreService):
                 cfg += "\n  ".join(map(cls.addrstr, ipv6list))
                 cfg += "\n"
                 cfg += cfgv6
+            if not want_ipv4 and not want_ipv6:
+                cfg += ifccfg
             cfg += "!\n"
             
         for s in services:
@@ -577,6 +581,7 @@ class Vtysh(CoreService):
     _startindex = 45
     _startup = ("sh quaggaboot.sh vtysh",)
     _shutdown = ()
+    _starttime = 5
 
     @classmethod
     def generateconfig(cls, node, filename, services):

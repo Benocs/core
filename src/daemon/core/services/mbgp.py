@@ -23,6 +23,7 @@ import os
 from core.service import CoreService, addservice
 from core.services import quagga
 from core.misc.ipaddr import IPv4Prefix, IPv6Prefix, isIPv4Address, isIPv6Address
+from core.misc import ipaddress
 
 from core.service import CoreService, addservice
 
@@ -54,27 +55,48 @@ class MBgp(quagga.Bgp):
 
 	@classmethod
 	def generatequaggaconfig(cls, node):
-		#print('CONFIGURING QUAGGA: node: %s, %s' % (str(node), str(dir(node))))
-		print('CONFIGURING QUAGGA: node: %s' % (str(node)))
 
 		cfg = "!\n! BGP configuration\n!\n"
 		cfg += "router bgp %s\n" % node.netid
-		cfg += "	bgp router-id %s\n" % cls.routerid(node)
-		cfg += "	redistribute connected\n"
-		cfg += "	redistribute ospf\n!\n"
+		cfg += "  bgp router-id %s\n" % cls.routerid(node)
+		cfg += "  redistribute connected\n"
+		cfg += "  redistribute ospf\n"
+		cfg += "  redistribute isis\n"
+
+		#cfg += "	redistribute system\n"
+		#cfg += "	redistribute kernel\n"
+		#cfg += "	redistribute connected\n"
+		#cfg += "	redistribute static\n"
+		#cfg += "	redistribute rip\n"
+		#cfg += "	redistribute ripng\n"
+		#cfg += "	redistribute ospf\n"
+		#cfg += "	redistribute ospf6\n"
+		#cfg += "	redistribute isis\n"
+		#cfg += "	redistribute hsls\n"
+		cfg += "!\n"
+		# aggregate networks that are being used for internal transit and access
+		# TODO: find a more generic way. this approach works well for
+		# two-AS-networks. ideally, each network should only aggregate the address
+		# space that it allocates to it's client or the space that is being used by
+		# it's internal routers (i.e., IGP, non-EGP)
+		cfg += "  aggregate-address 172.16.0.0 255.240.0.0 summary-only\n"
+		cfg += "  aggregate-address 192.168.0.0 255.255.0.0 summary-only\n"
+		# don't aggregate networks that are being used for inter-AS routing
+		#cfg += "  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n"
+		cfg += "!\n"
 
 		# find any link on which two different netid's (i.e., AS numbers) are
 		# present and configure a bgp-session between the two corresponding nodes.
 		# on all other interfaces, disable bgp
 		for localnetif in node.netifs():
-			print('\nnetif: %s ' % str(localnetif))
-			print('localnetif net: %s ' % str(localnetif.net))
+			#print('\nnetif: %s ' % str(localnetif))
+			#print('localnetif net: %s ' % str(localnetif.net))
 
 			for idx, net_netif in localnetif.net._netif.items():
-				print('idx: %s, %s' % (str(idx), str(net_netif)))
+				#print('idx: %s, %s' % (str(idx), str(net_netif)))
 				candidate_node = net_netif.node
-				print('candidate node: %s, netid: %s' % (str(candidate_node),
-						str(candidate_node.netid)))
+				#print('candidate node: %s, netid: %s' % (str(candidate_node),
+				#		str(candidate_node.netid)))
 
 				# skip our own interface
 				if localnetif == net_netif.node:
@@ -82,17 +104,16 @@ class MBgp(quagga.Bgp):
 
 				# found at least two different ASes.
 				if not node.netid == net_netif.node.netid:
-					print('found two different ASes: local: %s, remote: %s' %
-							(str(node.netid), str(net_netif.node.netid)))
+					#print('found two different ASes: local: %s, remote: %s' %
+					#		(str(node.netid), str(net_netif.node.netid)))
 
 					# TODO: break after first link with this neighbor is established?
 					for addr in net_netif.addrlist:
 						(ip, sep, mask)  = addr.partition('/')
-						print('configuring BGP neighbor: %s' % str(ip))
+						#print('configuring BGP neighbor: %s' % str(ip))
 
-						cfg += "	neighbor %s remote-as %s\n" % \
+						cfg += "  neighbor %s remote-as %s\n" % \
 								(str(ip), str(net_netif.node.netid))
-						# TODO: break after first link with this neighbor is established?
 
 		return cfg
 
@@ -106,9 +127,10 @@ class MOspfv2(quagga.Ospfv2):
 	def generatequaggaconfig(cls, node):
 		cfg = "!\n! OSPFv2 (for IPv4) configuration\n!\n"
 		cfg += "router ospf\n"
-		cfg += "	router-id %s\n" % cls.routerid(node)
-		cfg += "	redistribute connected\n"
-		cfg += "	redistribute bgp\n!\n"
+		cfg += "  router-id %s\n" % cls.routerid(node)
+		cfg += "  redistribute connected\n"
+		cfg += "  redistribute bgp\n"
+		cfg += "!\n"
 
 		for ifc in node.netifs():
 			if hasattr(ifc, 'control') and ifc.control == True:
@@ -128,10 +150,104 @@ class MOspfv2(quagga.Ospfv2):
 					for a in ifc.addrlist:
 						if a.find(".") < 0:
 							continue
-						#net = IPv4Prefix(a)
-						cfg += "	network %s area 0\n" % a
+						cfg += "  network %s area 0\n" % a
 		cfg += "!\n"
 		return cfg
 
 addservice(MOspfv2)
+
+class ISIS(quagga.QuaggaService):
+	''' The user generated service isisd provides a ISIS
+	'''
+	_name = "ISIS"
+	_startup = ("sh quaggaboot.sh isisd",)
+	_shutdown = ("killall isisd", )
+	_validate = ("pidof isisd", )
+
+	@classmethod
+	def generatequaggaifcconfig(cls,  node,  ifc):
+		added_ifc = False
+
+		cfg = ""
+
+		# find any link on which two equal netid's (i.e., AS numbers) are
+		# present and configure an isis-session on this interface
+		# on all other interfaces, disable isis
+		for idx, net_netif in ifc.net._netif.items():
+
+			# only add each interface once
+			if added_ifc:
+				break
+
+			# skip our own interface
+			if ifc == net_netif:
+				continue
+
+			# found the same AS, enable IGP/ISIS
+			if not added_ifc and node.netid == net_netif.node.netid:
+				#cfg += "interface %s\n" % ifc.name
+				cfg += "  ip router isis 1\n"
+				cfg += "  isis circuit-type level-2-only\n"
+				cfg += "!\n"
+				# only add each interface once
+				added_ifc = True
+
+		return cfg
+
+	@classmethod
+	def generatequaggaconfig(cls, node):
+		cfg = "!\n! ISIS configuration\n!\n"
+		cfg += "log file /tmp/isis-%s.log debugging\n" % cls.routerid(node)
+		cfg += "interface lo\n"
+		cfg += "  ip router isis 1\n"
+		cfg += "!\n"
+
+		cfg += "router isis 1\n"
+		# TODO	loesung aendern damit er nicht die ip vom ctrl netz nimmt...
+		# TODO geht so nur wenn ipv4 adresse vorhanden
+		#cfg += "  net 49.%s.00\n" % cls.bearbeiteipstr(cls.routerid(node))
+		cfg += "  net %s\n" % cls.bearbeiteipstr(cls.routerid(node), str(node.netid))
+		#cfg += " is-type level-2\n!\n"
+		# TODO: redistribution of routes is not yet implemented in quagga
+		#cfg += "  redistribute connected\n"
+		#cfg += "  redistribute bgp\n"
+		cfg += "!\n"
+
+
+		return cfg
+
+	@staticmethod
+	def bearbeiteipstr(ipstr, netid):
+		''' get ip return three middle blocks of isis netid
+		'''
+		"""
+		# isis-is is 12 characters long
+		# it has the format: 49.nnnn.aaaa.bbbb.cccc.00
+		# where nnnn == netid (i.e., same on all routers)
+		#       abc  == routerid (i.e., unique among all routers)
+
+		hexip = hex(int(ipaddress.IPv4Address(ipstr)))[2:]
+		if len(hexip) < 8:
+			hexip = '0%s' % hexip
+
+		netid = str(netid)
+		isisnetidlist = [ '0' for i in range(4 - len(netid)) ]
+		isisnetidlist.append(netid)
+		isisnetid = ''.join(isisnetidlist)
+
+		# 49.1000.
+		#isisid = "49.%s.%s.%s.0000.00" % (isisnetid, hexip[:4], hexip[4:])
+		isisid = "49.%s.%s.%s.0000.00" % (hexip[4:], hexip[:4], hexip[4:])
+		#return isisid
+		"""
+
+		# punkte entfernen
+		temp =	''.join(c for c in ipstr if c not in '.')
+		# laenge auffuellen TODO schauen ob so immer richtig
+		while len(temp) < 12:
+			temp += str(12-len(temp))
+		# punkte an richtiger stelle einfuegen und zurueckliefern
+		return '49.' + temp[:4] + '.' + temp[4:8] + '.' + temp[8:] + '.00'
+
+addservice(ISIS)
 
