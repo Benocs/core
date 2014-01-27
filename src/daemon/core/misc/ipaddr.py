@@ -33,9 +33,7 @@ import socket
 import struct
 import random
 
-# this is from Python3.3. for now (since we're targeting Python3.2, we use the
-# locally cached version of this (future) module
-from core.misc import ipaddress
+import ipaddress
 
 AF_INET = socket.AF_INET
 AF_INET6 = socket.AF_INET6
@@ -140,14 +138,6 @@ class IPPrefix(object):
         "prefixstr format: address/prefixlen"
         print('generating prefix for str: %s' % prefixstr)
 
-        tmp = prefixstr.split("/")
-        if len(tmp) > 2:
-            raise ValueError("invalid prefix: '%s'" % prefixstr)
-        if len(tmp) == 2:
-            self.prefixlen = int(tmp[1])
-        else:
-            self.prefixlen = self.addrlen
-
         self.af = af
         if self.af == AF_INET:
             self.addrlen = 32
@@ -157,6 +147,14 @@ class IPPrefix(object):
             self.addrlen = 128
         else:
             raise ValueError("invalid address family: '%s'" % self.af)
+
+        tmp = prefixstr.split("/")
+        if len(tmp) > 2:
+            raise ValueError("invalid prefix: '%s'" % prefixstr)
+        if len(tmp) == 2:
+            self.prefixlen = int(tmp[1])
+        else:
+            self.prefixlen = self.addrlen
 
     def __str__(self):
         print("IPADDR: family: %s, prefix: %s, len: %s" % (str(self.af),
@@ -179,23 +177,10 @@ class IPPrefix(object):
             tmp > (1 << (self.addrlen - self.prefixlen)) - 1 or \
             (self.af == AF_INET and tmp == (1 << (self.addrlen - self.prefixlen)) - 1):
             raise ValueError("invalid hostid for prefix %s: %s" % (str(self), str(hostid)))
-        addr = 0
-        for i in range(-1, -(self.addrlen >> 3) - 1, -1):
-            addr = (self.prefix[i] | (tmp & 0xff)) + addr
-            tmp >>= 8
-            if not tmp:
-                break
 
-        num_bytes = 0
-        if i == -1:
-            num_bytes = 1
-        else:
-            num_bytes = len(self.prefix) - i
-
-        print('new address (int): %s' % str(addr))
-        addr = self.prefix[:i] + addr.to_bytes(num_bytes, byteorder = 'big')
-        print('new address (bytes): %s' % str(addr))
-        return IPAddr(self.af, addr)
+        addr = IPAddr(self.af, int(self.prefix.network_address) + int(hostid))
+        print('new address: %s' % str(addr))
+        return addr
 
     def minaddr(self):
         return self.prefix.network_address + 1
