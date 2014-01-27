@@ -207,6 +207,9 @@ menu .menubar
 
 .menubar add cascade -label File -underline 0 -menu .menubar.file
 .menubar add cascade -label Edit -underline 0 -menu .menubar.edit
+# added for testing
+.menubar add cascade -label BENOCS -underline 0 -menu .menubar.benocs
+
 .menubar add cascade -label Canvas -underline 0 -menu .menubar.canvas
 .menubar add cascade -label View -underline 0 -menu .menubar.view
 .menubar add cascade -label Tools -underline 0 -menu .menubar.tools
@@ -345,6 +348,14 @@ bind . <Control-j> selectAdjacent
 bind . <Control-f> popupFind
 .menubar.edit add command -label "Clear marker" -command clearMarker
 .menubar.edit add command -label "Preferences..." -command popupPrefs
+
+#
+# Benocs New Testing
+#
+menu .menubar.benocs -tearoff 0
+.menubar.benocs add command -label "Brite" -command doStuff1
+.menubar.benocs add command -label "Build Topology with Brite (Deprecated)" -command doStuff2
+.menubar.benocs add command -label "killall java" -command doStuff3
 
 #
 # Canvas

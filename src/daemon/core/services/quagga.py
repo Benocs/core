@@ -571,6 +571,54 @@ class Babel(QuaggaService):
 
 addservice(Babel)
 
+class ISIS(QuaggaService):
+    ''' The user generated service isisd provides a ISIS!
+    '''
+    _name = "ISIS"
+    _startup = ("sh quaggaboot.sh isisd",)
+    _shutdown = ("killall isisd", )
+    _validate = ("pidof isisd", )
+    _ipv4_routing = True
+    #_ipv6_routing = True 
+    #_startindex = 41
+
+    @classmethod
+    def generatequaggaconfig(cls, node):
+        cfg = "!\n! ISIS configuration\n!\n"
+        cfg += "interface lo\n"
+        cfg += "  ip router isis 1\n!\n"
+        for ifc in node.netifs():
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
+            cfg += "interface %s\n" % ifc.name
+            #cfg += "\n"
+            cfg += " ip router isis 1\n"
+            cfg += " isis circuit-type level-2-only\n!\n"
+            #cfg += "%s" % ', '.join(map(str, ifc))
+        cfg += "router isis 1\n"
+        # TODO  loesung aendern damit er nicht die ip vom ctrl netz nimmt...
+        # TODO geht so nur wenn ipv4 adresse vorhanden
+        temp = ISIS.bearbeiteipstr(cls.routerid(node)) 
+        cfg += " net 49.%s.00\n" % temp
+        #cfg += " is-type level-2\n!\n"
+        cfg += " metric-style wide\n"
+ 
+        return cfg
+
+    @staticmethod
+    def bearbeiteipstr(x):
+        ''' get ip return three middle blocks of isis netid
+        '''
+        # punkte entfernen
+        temp =  ''.join(c for c in x if c not in '.')
+        # laenge auffuellen TODO schauen ob so immer richtig 
+        while len(temp) < 12:
+            temp += str(12-len(temp))
+        # punkte an richtiger stelle einfuegen und zurueckliefern
+        return temp[:4] + '.' + temp[4:8] + '.' + temp[8:]
+
+addservice(ISIS)
+
 
 class Vtysh(CoreService):
     ''' Simple service to run vtysh -b (boot) after all Quagga daemons have
