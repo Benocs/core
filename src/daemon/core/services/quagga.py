@@ -541,14 +541,8 @@ class Bgp(QuaggaService):
             if hasattr(localnetif, 'control') and localnetif.control == True:
                 continue
 
-            if localnetif.localname == 'lo':
-                print('LOOPBACK: localnetif: %s' % (str(localnetif.localname)))
-
             for idx, net_netif in localnetif.net._netif.items():
-                #print('idx: %s, %s' % (str(idx), str(net_netif)))
                 candidate_node = net_netif.node
-                #print('candidate node: %s, netid: %s' % (str(candidate_node),
-                #       str(candidate_node.netid)))
 
                 # skip our own interface
                 if localnetif == net_netif.node:
@@ -556,13 +550,10 @@ class Bgp(QuaggaService):
 
                 # found at least two different ASes.
                 if not node.netid == net_netif.node.netid:
-                    #print('found two different ASes: local: %s, remote: %s' %
-                    #       (str(node.netid), str(net_netif.node.netid)))
 
                     # TODO: break after first link with this neighbor is established?
                     for addr in net_netif.addrlist:
                         (ip, sep, mask)  = addr.partition('/')
-                        #print('configuring BGP neighbor: %s' % str(ip))
 
                         cfg += "  neighbor %s remote-as %s\n" % \
                                 (str(ip), str(net_netif.node.netid))
