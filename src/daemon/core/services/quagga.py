@@ -26,7 +26,7 @@ if os.uname()[0] == "FreeBSD":
     QUAGGA_GROUP="wheel"
 
 class Zebra(CoreService):
-    ''' 
+    '''
     '''
     _name = "zebra"
     _group = "Quagga"
@@ -51,13 +51,13 @@ class Zebra(CoreService):
             return cls.generateVtyshConf(node, services)
         else:
             raise ValueError
-        
+
     @classmethod
     def generateVtyshConf(cls, node, services):
         ''' Returns configuration file text.
         '''
         return "service integrated-vtysh-config"
-            
+
     @classmethod
     def generateQuaggaConf(cls, node, services):
         ''' Returns configuration file text. Other services that depend on zebra
@@ -94,7 +94,7 @@ class Zebra(CoreService):
                     cfgv6 += ifccfg
                 else:
                     cfgv4 += ifccfg
-                
+
             if want_ipv4:
                 ipv4list = [x for x in ifc.addrlist if isIPv4Address(x.split('/')[0])]
                 cfg += "  "
@@ -110,13 +110,13 @@ class Zebra(CoreService):
             if not want_ipv4 and not want_ipv6:
                 cfg += ifccfg
             cfg += "!\n"
-            
+
         for s in services:
             if cls._name not in s._depends:
                 continue
             cfg += s.generatequaggaconfig(node)
         return cfg
-    
+
     @staticmethod
     def addrstr(x):
         ''' helper for mapping IP addresses to zebra config statements
@@ -127,7 +127,7 @@ class Zebra(CoreService):
             return "ipv6 address %s" % x
         else:
             raise Value("invalid address: %s").with_traceback(x)
-            
+
     @classmethod
     def generateQuaggaBoot(cls, node, services):
         ''' Generate a shell script used to boot the Quagga daemons.
@@ -187,7 +187,7 @@ waitforvtyfiles()
             sleep 0.1
             count=$(($count + 1))
         done
-    done 
+    done
 }
 
 bootdaemon()
@@ -221,7 +221,7 @@ bootvtysh()
             vtyfiles="$vtyfiles ${r}d.vty"
         fi
     done
-    
+
     # wait for Quagga daemon vty files to appear before invoking vtysh
     waitforvtyfiles $vtyfiles
 
@@ -255,7 +255,7 @@ class QuaggaService(CoreService):
     _startup = ()
     _shutdown = ()
     _meta = "The config file for this service can be found in the Zebra service."
-    
+
     _ipv4_routing = False
     _ipv6_routing = False
 
@@ -268,10 +268,10 @@ class QuaggaService(CoreService):
                 continue
             for a in ifc.addrlist:
                 if a.find(".") >= 0:
-                    return a .split('/') [0]          
+                    return a .split('/') [0]
         #raise ValueError,  "no IPv4 address found for router ID"
         return "0.0.0.0"
-        
+
     @staticmethod
     def rj45check(ifc):
         ''' Helper to detect whether interface is connected an external RJ45
@@ -350,9 +350,9 @@ class Ospfv2(QuaggaService):
                     continue
                 net = IPv4Prefix(a)
                 cfg += "  network %s area 0\n" % net
-        cfg += "!\n"      
+        cfg += "!\n"
         return cfg
-        
+
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
         return cls.mtucheck(ifc)
@@ -367,7 +367,7 @@ class Ospfv2(QuaggaService):
 #  ip ospf dead-interval 6
 #  ip ospf retransmit-interval 5
 #"""
-        
+
 addservice(Ospfv2)
 
 class Ospfv3(QuaggaService):
@@ -394,7 +394,7 @@ class Ospfv3(QuaggaService):
             if i.mtu < mtu:
                 mtu = i.mtu
         return mtu
-        
+
     @classmethod
     def mtucheck(cls, ifc):
         ''' Helper to detect MTU mismatch and add the appropriate OSPFv3
@@ -427,7 +427,7 @@ class Ospfv3(QuaggaService):
             cfg += "  interface %s area 0.0.0.0\n" % ifc.name
         cfg += "!\n"
         return cfg
-        
+
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
         return cls.mtucheck(ifc)
@@ -545,7 +545,7 @@ router ripng
 addservice(Ripng)
 
 class Babel(QuaggaService):
-    ''' The Babel service provides a loop-avoiding distance-vector routing 
+    ''' The Babel service provides a loop-avoiding distance-vector routing
     protocol for IPv6 and IPv4 with fast convergence properties.
     '''
     _name = "Babel"
@@ -563,7 +563,7 @@ class Babel(QuaggaService):
             cfg += "  network %s\n" % ifc.name
         cfg += "  redistribute static\n  redistribute connected\n"
         return cfg
-        
+
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
         type = "wired"
@@ -693,5 +693,4 @@ class Vtysh(CoreService):
         return ""
 
 addservice(Vtysh)
-
 
