@@ -67,14 +67,14 @@ class Zebra(CoreService):
         # we could verify here that filename == Quagga.conf
         cfg = ""
         for ifc in node.netifs():
-            cfg += "interface %s\n" % ifc.name
-
-            ## include control interfaces in addressing but not routing daemons
-            #if hasattr(ifc, 'control') and ifc.control == True:
+            # do not ever include control interfaces in anything
+            if hasattr(ifc, 'control') and ifc.control == True:
             #    cfg += "  "
             #    cfg += "\n  ".join(map(cls.addrstr, ifc.addrlist))
             #    cfg += "\n"
-            #    continue
+                continue
+
+            cfg += "interface %s\n" % ifc.name
 
             cfgv4 = ""
             cfgv6 = ""
@@ -82,6 +82,9 @@ class Zebra(CoreService):
             want_ipv6 = False
             for s in services:
                 if cls._name not in s._depends:
+                    continue
+                # do not ever include control interfaces in anything
+                if hasattr(ifc, 'control') and ifc.control == True:
                     continue
                 ifccfg = s.generatequaggaifcconfig(node,  ifc)
                 if s._ipv4_routing:
@@ -578,44 +581,98 @@ class ISIS(QuaggaService):
     _startup = ("sh quaggaboot.sh isisd",)
     _shutdown = ("killall isisd", )
     _validate = ("pidof isisd", )
-    _ipv4_routing = True
-    #_ipv6_routing = True 
-    #_startindex = 41
+
+    @classmethod
+    def generatequaggaifcconfig(cls,  node,  ifc):
+        added_ifc = False
+
+        # do not include control interfaces
+        if hasattr(ifc, 'control') and ifc.control == True:
+            return ""
+
+        cfg = ""
+
+        # find any link on which two equal netid's (i.e., AS numbers) are
+        # present and configure an isis-session on this interface
+        # on all other interfaces, disable isis
+        for idx, net_netif in ifc.net._netif.items():
+
+            # only add each interface once
+            if added_ifc:
+                break
+
+            # skip our own interface
+            if ifc == net_netif:
+                continue
+
+            # found the same AS, enable IGP/ISIS
+            if not added_ifc and node.netid == net_netif.node.netid:
+                #cfg += "interface %s\n" % ifc.name
+                cfg += "  ip router isis 1\n"
+                cfg += "  isis circuit-type level-2-only\n"
+                cfg += "  isis network point-to-point\n"
+                cfg += "!\n"
+                # only add each interface once
+                added_ifc = True
+
+        return cfg
+
 
     @classmethod
     def generatequaggaconfig(cls, node):
         cfg = "!\n! ISIS configuration\n!\n"
+        cfg += "log file /tmp/isis-%s.log debugging\n" % cls.routerid(node)
         cfg += "interface lo\n"
-        cfg += "  ip router isis 1\n!\n"
-        for ifc in node.netifs():
-            if hasattr(ifc, 'control') and ifc.control == True:
-                continue
-            cfg += "interface %s\n" % ifc.name
-            #cfg += "\n"
-            cfg += " ip router isis 1\n"
-            cfg += " isis circuit-type level-2-only\n!\n"
-            #cfg += "%s" % ', '.join(map(str, ifc))
+        cfg += " ip router isis 1\n"
+        cfg += " isis network point-to-point\n"
+        cfg += "!\n"
+
         cfg += "router isis 1\n"
+        #cfg += " isis network point-to-point\n"
         # TODO  loesung aendern damit er nicht die ip vom ctrl netz nimmt...
         # TODO geht so nur wenn ipv4 adresse vorhanden
-        temp = ISIS.bearbeiteipstr(cls.routerid(node)) 
-        cfg += " net 49.%s.00\n" % temp
+        #cfg += "  net 49.%s.00\n" % cls.bearbeiteipstr(cls.routerid(node))
+        cfg += "  net %s\n" % cls.bearbeiteipstr(cls.routerid(node), str(node.netid))
         #cfg += " is-type level-2\n!\n"
-        cfg += " metric-style wide\n"
- 
+        # TODO: redistribution of routes is not yet implemented in quagga
+        #cfg += "  redistribute connected\n"
+        #cfg += "  redistribute bgp\n"
+        cfg += "!\n"
+
         return cfg
 
     @staticmethod
-    def bearbeiteipstr(x):
+    def bearbeiteipstr(ipstr, netid):
         ''' get ip return three middle blocks of isis netid
         '''
+        """
+        # isis-is is 12 characters long
+        # it has the format: 49.nnnn.aaaa.bbbb.cccc.00
+        # where nnnn == netid (i.e., same on all routers)
+        #       abc  == routerid (i.e., unique among all routers)
+
+        hexip = hex(int(ipaddress.IPv4Address(ipstr)))[2:]
+        if len(hexip) < 8:
+            hexip = '0%s' % hexip
+
+        netid = str(netid)
+        isisnetidlist = [ '0' for i in range(4 - len(netid)) ]
+        isisnetidlist.append(netid)
+        isisnetid = ''.join(isisnetidlist)
+
+        # 49.1000.
+        #isisid = "49.%s.%s.%s.0000.00" % (isisnetid, hexip[:4], hexip[4:])
+        isisid = "49.%s.%s.%s.0000.00" % (hexip[4:], hexip[:4], hexip[4:])
+        #return isisid
+        """
+
         # punkte entfernen
-        temp =  ''.join(c for c in x if c not in '.')
-        # laenge auffuellen TODO schauen ob so immer richtig 
+        temp =  ''.join(c for c in ipstr if c not in '.')
+        # laenge auffuellen TODO schauen ob so immer richtig
         while len(temp) < 12:
             temp += str(12-len(temp))
         # punkte an richtiger stelle einfuegen und zurueckliefern
-        return temp[:4] + '.' + temp[4:8] + '.' + temp[8:]
+        return '49.' + temp[:4] + '.' + temp[4:8] + '.' + temp[8:] + '.00'
 
 addservice(ISIS)
 
