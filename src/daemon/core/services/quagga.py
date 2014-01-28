@@ -297,8 +297,6 @@ class QuaggaService(CoreService):
     def generatequaggaconfig(cls,  node):
         return ""
 
-
-
 class Ospfv2(QuaggaService):
     ''' The OSPFv2 service provides IPv4 routing for wired networks. It does
         not build its own configuration file but has hooks for adding to the
@@ -337,19 +335,34 @@ class Ospfv2(QuaggaService):
         return ""
 
     @classmethod
-    def generatequaggaconfig(cls,  node):
-        cfg = "router ospf\n"
-        rtrid = cls.routerid(node)
-        cfg += "  router-id %s\n" % rtrid
-        # network 10.0.0.0/24 area 0
+    def generatequaggaconfig(cls, node):
+        cfg = "!\n! OSPFv2 (for IPv4) configuration\n!\n"
+        cfg += "router ospf\n"
+        cfg += "  router-id %s\n" % cls.routerid(node)
+        cfg += "  redistribute connected\n"
+        cfg += "  redistribute bgp\n"
+        cfg += "!\n"
+
         for ifc in node.netifs():
+            # do not include control interfaces
             if hasattr(ifc, 'control') and ifc.control == True:
                 continue
-            for a in ifc.addrlist:
-                if a.find(".") < 0:
+
+            # find any link on which two equal netid's (i.e., AS numbers) are
+            # present and configure an ospf-session on this interface
+            # on all other interfaces, disable ospf
+            for idx, net_netif in ifc.net._netif.items():
+
+                # skip our own interface
+                if ifc == net_netif:
                     continue
-                net = IPv4Prefix(a)
-                cfg += "  network %s area 0\n" % net
+
+                # found the same AS, enable IGP/OSPF
+                if node.netid == net_netif.node.netid:
+                    for a in ifc.addrlist:
+                        if a.find(".") < 0:
+                            continue
+                        cfg += "  network %s area 0\n" % a
         cfg += "!\n"
         return cfg
 
@@ -480,20 +493,76 @@ class Bgp(QuaggaService):
     _startup = ("sh quaggaboot.sh bgpd",)
     _shutdown = ("killall bgpd", )
     _validate = ("pidof bgpd", )
-    _custom_needed = True
+    _custom_needed = False
     _ipv4_routing = True
     _ipv6_routing = True
 
     @classmethod
-    def generatequaggaconfig(cls,  node):
+    def generatequaggaconfig(cls, node):
+
         cfg = "!\n! BGP configuration\n!\n"
-        cfg += "! You should configure the AS number below,\n"
-        cfg += "! along with this router's peers.\n!\n"
-        cfg += "router bgp %s\n" % node.objid
-        rtrid = cls.routerid(node)
-        cfg += "  bgp router-id %s\n" % rtrid
+        cfg += "router bgp %s\n" % node.netid
+        cfg += "  bgp router-id %s\n" % cls.routerid(node)
         cfg += "  redistribute connected\n"
-        cfg += "! neighbor 1.2.3.4 remote-as 555\n!\n"
+        cfg += "  redistribute ospf\n"
+        cfg += "  redistribute isis\n"
+
+        #cfg += "   redistribute system\n"
+        #cfg += "   redistribute kernel\n"
+        #cfg += "   redistribute connected\n"
+        #cfg += "   redistribute static\n"
+        #cfg += "   redistribute rip\n"
+        #cfg += "   redistribute ripng\n"
+        #cfg += "   redistribute ospf\n"
+        #cfg += "   redistribute ospf6\n"
+        #cfg += "   redistribute isis\n"
+        #cfg += "   redistribute hsls\n"
+        cfg += "!\n"
+        # aggregate networks that are being used for internal transit and access
+        # TODO: find a more generic way. this approach works well for
+        # two-AS-networks. ideally, each network should only aggregate the address
+        # space that it allocates to it's client or the space that is being used by
+        # it's internal routers (i.e., IGP, non-EGP)
+        cfg += "  aggregate-address 172.16.0.0 255.240.0.0 summary-only\n"
+        cfg += "  aggregate-address 192.168.0.0 255.255.0.0 summary-only\n"
+        # don't aggregate networks that are being used for inter-AS routing
+        #cfg += "  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n"
+        cfg += "!\n"
+
+        # find any link on which two different netid's (i.e., AS numbers) are
+        # present and configure a bgp-session between the two corresponding nodes.
+        # on all other interfaces, disable bgp
+        for localnetif in node.netifs():
+            #print('\nnetif: %s ' % str(localnetif))
+            #print('localnetif net: %s ' % str(localnetif.net))
+
+            # do not include control interfaces
+            if hasattr(localnetif, 'control') and localnetif.control == True:
+                continue
+
+            for idx, net_netif in localnetif.net._netif.items():
+                #print('idx: %s, %s' % (str(idx), str(net_netif)))
+                candidate_node = net_netif.node
+                #print('candidate node: %s, netid: %s' % (str(candidate_node),
+                #       str(candidate_node.netid)))
+
+                # skip our own interface
+                if localnetif == net_netif.node:
+                    continue
+
+                # found at least two different ASes.
+                if not node.netid == net_netif.node.netid:
+                    #print('found two different ASes: local: %s, remote: %s' %
+                    #       (str(node.netid), str(net_netif.node.netid)))
+
+                    # TODO: break after first link with this neighbor is established?
+                    for addr in net_netif.addrlist:
+                        (ip, sep, mask)  = addr.partition('/')
+                        #print('configuring BGP neighbor: %s' % str(ip))
+
+                        cfg += "  neighbor %s remote-as %s\n" % \
+                                (str(ip), str(net_netif.node.netid))
+
         return cfg
 
 addservice(Bgp)
