@@ -1235,6 +1235,34 @@ proc button3node { c x y button } {
     #
     .button3menu delete 0 end
 
+
+    #
+    # setID 
+    #
+    if { [nodeType $node] == "router" && $oper_mode != "exec" } {
+      .button3menu add command -label "setID" -command "setID"
+      #puts [nodeType $node]
+      
+      # TODO mache feld in config fuer netid.. zugriff ueber setNodeNetId oder so..
+      #setNodeNetId $node 10000
+#      puts [getNodeNetId $node]
+ 
+    
+
+      # starte funktion mit eingabewert / extra fkt
+      #foreach lnode [selectedNodes] {
+      #  if { $lnode != "" } {
+      #    puts [nodeType $lnode]
+      #  }
+      #  #set changed 1
+      #}
+
+ 
+    } else {
+      # router laeuft und id soll nich geaendert werden
+    }
+
+
     #
     # Configure node
     #
@@ -2732,6 +2760,7 @@ proc popupConfigDialog { c } {
 		bind $ctl <Down> "$wi.ifaces.c yview scroll 1 units"
 	    }
         }
+        
     }
     oval {
 	destroy $wi
@@ -2853,6 +2882,24 @@ proc popupConfigDialog { c } {
     }
     } ;# end switch
 
+
+    # netid feld in configure menue
+    # start netid
+    ttk::labelframe $wi.netid -text "NetID"
+    ttk::frame $wi.netid.frame
+
+    ttk::label $wi.netid.frame.label -text "NetID: " -anchor w
+    ttk::entry $wi.netid.frame.entry -width 30 
+    $wi.netid.frame.entry insert 0 [getNodeNetId $target]
+    #$wi.netid.frame.entry configure -validatecommand {testFkt %P}
+    pack $wi.netid.frame.entry -side right
+
+    pack $wi.netid.frame -side top -anchor e
+    pack $wi.netid -side left
+    # end netid
+
+
+
     ttk::frame $wi.butt -borderwidth 6
     # NOTE: plugins.tcl:popupCapabilityConfig may read this command option
     ttk::button $wi.butt.apply -text "Apply" -command \
@@ -2872,6 +2919,7 @@ proc popupConfigDialog { c } {
     bind $wi <Key-Escape> $cancelcmd
 #    bind $wi <Key-Return> "popupConfigApply $wi $object_type $target 0"
 }
+
 
 # toggle the state of the mac address entry, and insert MAC address template
 proc macEntryHelper { wi ifc } {
@@ -2926,6 +2974,10 @@ proc popupConfigApply { wi object_type target phase } {
     # Node
     #
     node {
+        # behandlung von netid
+        set netidvar [$wi.netid.frame.entry get]
+        setNodeNetId $target $netidvar
+
 	set type [nodeType $target]
 	set model [getNodeModel $target]
 	set name [string trim [$wi.ftop.name get]]
