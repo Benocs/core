@@ -172,7 +172,7 @@ proc doStuff1 {} {
   pack $wi.as.line10.label_minBW $wi.as.line10.entry_minBW -side right
   pack $wi.as.line10 -side top -anchor w -padx 4 -pady 4
 
-  pack $wi.as -side top -fill x
+  pack $wi.as -side right -fill x
 
   #
   # Router
@@ -280,7 +280,7 @@ proc doStuff1 {} {
   pack $wi.router.line10.label_minBW $wi.router.line10.entry_minBW -side right
   pack $wi.router.line10 -side top -anchor w -padx 4 -pady 4
 
-  pack $wi.router -side top -fill x
+  pack $wi.router -side right -fill x
 
   #
   # Top Down
@@ -353,7 +353,7 @@ proc doStuff1 {} {
   # TODO hier noch wenn gewuenscht erstellen
   labelframe $wi.bottomup -borderwidth 4 -text "Bottom Up"
 
-  pack $wi.bottomup -side top -fill x
+  pack $wi.bottomup -side right -fill x
 
 
   #
