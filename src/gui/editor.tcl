@@ -1237,33 +1237,6 @@ proc button3node { c x y button } {
 
 
     #
-    # setID 
-    #
-    if { [nodeType $node] == "router" && $oper_mode != "exec" } {
-      .button3menu add command -label "setID" -command "setID"
-      #puts [nodeType $node]
-      
-      # TODO mache feld in config fuer netid.. zugriff ueber setNodeNetId oder so..
-      #setNodeNetId $node 10000
-#      puts [getNodeNetId $node]
- 
-    
-
-      # starte funktion mit eingabewert / extra fkt
-      #foreach lnode [selectedNodes] {
-      #  if { $lnode != "" } {
-      #    puts [nodeType $lnode]
-      #  }
-      #  #set changed 1
-      #}
-
- 
-    } else {
-      # router laeuft und id soll nich geaendert werden
-    }
-
-
-    #
     # Configure node
     #
     if { [nodeType $node] != "pseudo" } {
