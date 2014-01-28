@@ -6,7 +6,7 @@
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
 '''
-quagga.py: defines routing services provided by Quagga. 
+quagga.py: defines routing services provided by Quagga.
 '''
 
 import os
@@ -343,32 +343,34 @@ class Ospfv2(QuaggaService):
         cfg += "  redistribute bgp\n"
         cfg += "!\n"
 
-        for ifc in node.netifs():
-            # do not include control interfaces
-            if hasattr(ifc, 'control') and ifc.control == True:
-                continue
-
-            # find any link on which two equal netid's (i.e., AS numbers) are
-            # present and configure an ospf-session on this interface
-            # on all other interfaces, disable ospf
-            for idx, net_netif in ifc.net._netif.items():
-
-                # skip our own interface
-                if ifc == net_netif:
-                    continue
-
-                # found the same AS, enable IGP/OSPF
-                if node.netid == net_netif.node.netid:
-                    for a in ifc.addrlist:
-                        if a.find(".") < 0:
-                            continue
-                        cfg += "  network %s area 0\n" % a
-        cfg += "!\n"
         return cfg
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
-        return cls.mtucheck(ifc)
+        # do not include control interfaces
+        if hasattr(ifc, 'control') and ifc.control == True:
+            return ""
+
+        cfg = cls.mtucheck(ifc)
+
+        # find any link on which two equal netid's (i.e., AS numbers) are
+        # present and configure an ospf-session on this interface
+        # on all other interfaces, disable ospf
+        for idx, net_netif in ifc.net._netif.items():
+
+            # skip our own interface
+            if ifc == net_netif:
+                continue
+
+            # found the same AS, enable IGP/OSPF
+            if node.netid == net_netif.node.netid:
+                for a in ifc.addrlist:
+                    if a.find(".") < 0:
+                        continue
+                    cfg += "  network %s area 0\n" % a
+        cfg += "!\n"
+        return cfg
+
         #cfg = cls.mtucheck(ifc)
         # external RJ45 connections will use default OSPF timers
         #if cls.rj45check(ifc):
@@ -434,16 +436,18 @@ class Ospfv3(QuaggaService):
         cfg = "router ospf6\n"
         rtrid = cls.routerid(node)
         cfg += "  router-id %s\n" % rtrid
-        for ifc in node.netifs():
-            if hasattr(ifc, 'control') and ifc.control == True:
-                continue
-            cfg += "  interface %s area 0.0.0.0\n" % ifc.name
         cfg += "!\n"
         return cfg
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
-        return cls.mtucheck(ifc)
+        if hasattr(ifc, 'control') and ifc.control == True:
+            return ""
+
+        cfg = cls.mtucheck(ifc)
+        cfg += "  interface %s area 0.0.0.0\n" % ifc.name
+        return cfg
+
         #cfg = cls.mtucheck(ifc)
         # external RJ45 connections will use default OSPF timers
         #if cls.rj45check(ifc):
@@ -523,8 +527,10 @@ class Bgp(QuaggaService):
         # two-AS-networks. ideally, each network should only aggregate the address
         # space that it allocates to it's client or the space that is being used by
         # it's internal routers (i.e., IGP, non-EGP)
-        cfg += "  aggregate-address 172.16.0.0 255.240.0.0 summary-only\n"
-        cfg += "  aggregate-address 192.168.0.0 255.255.0.0 summary-only\n"
+
+        #cfg += "  aggregate-address 172.16.0.0 255.240.0.0 summary-only\n"
+        #cfg += "  aggregate-address 192.168.0.0 255.255.0.0 summary-only\n"
+
         # don't aggregate networks that are being used for inter-AS routing
         #cfg += "  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n"
         cfg += "!\n"
@@ -562,6 +568,40 @@ class Bgp(QuaggaService):
 
                         cfg += "  neighbor %s remote-as %s\n" % \
                                 (str(ip), str(net_netif.node.netid))
+
+        return cfg
+
+    @classmethod
+    def generatequaggaifcconfig(cls,  node,  ifc):
+        if hasattr(ifc, 'control') and ifc.control == True:
+            return ""
+
+        cfg = ""
+        # find any link on which two different netid's (i.e., AS numbers) are
+        # present and configure a bgp-session between the two corresponding nodes.
+        # on all other interfaces, disable bgp
+        for idx, net_netif in ifc.net._netif.items():
+            #print('idx: %s, %s' % (str(idx), str(net_netif)))
+            candidate_node = net_netif.node
+            #print('candidate node: %s, netid: %s' % (str(candidate_node),
+            #       str(candidate_node.netid)))
+
+            # skip our own interface
+            if ifc == net_netif.node:
+                continue
+
+            # found at least two different ASes.
+            if not node.netid == net_netif.node.netid:
+                #print('found two different ASes: local: %s, remote: %s' %
+                #       (str(node.netid), str(net_netif.node.netid)))
+
+                # TODO: break after first link with this neighbor is established?
+                for addr in net_netif.addrlist:
+                    (ip, sep, mask)  = addr.partition('/')
+                    #print('configuring BGP neighbor: %s' % str(ip))
+
+                    cfg += "  neighbor %s remote-as %s\n" % \
+                            (str(ip), str(net_netif.node.netid))
 
         return cfg
 
