@@ -20,6 +20,9 @@ from core.misc.ipaddr import IPv4Prefix, isIPv4Address, isIPv6Address
 from core.api import coreapi
 from core.constants import *
 
+from core.services import service_helpers
+from core.services import service_flags
+
 QUAGGA_USER="root"
 QUAGGA_GROUP="root"
 if os.uname()[0] == "FreeBSD":
@@ -550,15 +553,63 @@ class Bgp(QuaggaService):
 
                 # found at least two different ASes.
                 if not node.netid == net_netif.node.netid:
-
+                    #print('NODE TYPE: %s' % str(node.type))
+                    #if (hasattr(node, 'type') and node.type == "egp_node") and \
+                    #        (hasattr(net_netif.node, 'type') and \
+                    #        net_netif.node.type == "egp_node"):
+                    # TODO: add ibgp peers
+                    # TODO: only add neighbor if neighbor node is a border-router
                     # TODO: break after first link with this neighbor is established?
                     for addr in net_netif.addrlist:
-                        (ip, sep, mask)  = addr.partition('/')
+                        (ip, sep, mask) = addr.partition('/')
 
                         cfg += "  neighbor %s remote-as %s\n" % \
-                                (str(ip), str(net_netif.node.netid))
+                                    (str(ip), str(net_netif.node.netid))
 
+        # TODO: change desc.: add any nfprobe9sink which is on our AS to the list of collectors
+        confstr_list = [cfg]
+        service_helpers.nodewalker(node, node, [], confstr_list,
+                Bgp.nodewalker_callback)
+        cfg = ''.join(confstr_list)
         return cfg
+
+    @staticmethod
+    def nodewalker_callback(startnode, currentnode):
+        result = []
+        if service_flags.Router in startnode.services and \
+                service_flags.Router in currentnode.services and \
+                not startnode == currentnode and \
+                startnode.netid == currentnode.netid:
+
+            # TODO: use loopback-device to connect from startnode to currentnode
+            # TODO: find dst ip, add IBGP-session
+            # TODO: use loopback-address
+            for localnetif in startnode.netifs():
+                print('QUAGGA: startnode interface: %s' % str(localnetif))
+                print('QUAGGA: startnode interface addrs: %s' % str(localnetif.addrlist))
+            for clocalnetif in currentnode.netifs():
+                print('QUAGGA: currentnode interface: %s' % str(clocalnetif))
+                print('QUAGGA: currentnode interface addrs: %s' % str(clocalnetif.addrlist))
+            #for localnetif in node.netifs():
+            #
+            #for addr in net_netif.addrlist:
+            #    (ip, sep, mask) = addr.partition('/')
+            #    result = ["  neighbor %s remote-as %s\n" % \
+            #            (str(ip), str(net_netif.node.netid))]
+            # TODO: FIXME: tmp. see above TODO's about loopback
+            if startnode.numnetif() > 0 and \
+                    len(startnode._netif[0].addrlist) > 0 and \
+                    currentnode.numnetif() > -1 and \
+                    len(currentnode._netif[0].addrlist) > 0:
+                print('QUAGGA: creating IBGP-session: %s ==> %s' %
+                        (startnode._netif[0].addrlist[0],
+                         currentnode._netif[0].addrlist[0]))
+                (ip, sep, mask) = currentnode._netif[0].addrlist[0].partition('/')
+                result = ["  neighbor %s remote-as %s\n" % \
+                        (str(ip), str(currentnode.netid))]
+                if service_flags.EGP in startnode.services:
+                    result.append("  neighbor %s next-hop-self\n" % str(ip))
+        return result
 
 addservice(Bgp)
 
