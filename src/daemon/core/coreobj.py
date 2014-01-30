@@ -83,6 +83,15 @@ class PyCoreObj(object):
         '''
         return self.position.get()
 
+    def ifindex(self, ifname):
+        ''' Returns the interface named ifname, if found.
+            If no interface with that name is found, return None.
+        '''
+        if ifname in self._netif:
+            return self._netif[ifname]
+        else:
+            return None
+
     def ifname(self, ifindex):
         return self.netif(ifindex).name
 
