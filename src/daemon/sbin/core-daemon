@@ -13,6 +13,7 @@ messages and instantiates emulated nodes and networks within the kernel. Various
 message handlers are defined and some support for sending messages.
 '''
 
+import subprocess
 import socketserver, fcntl, struct, sys, threading, time, traceback
 import os, optparse, configparser, gc, shlex, socket, shutil
 import atexit
@@ -969,10 +970,115 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         return ()
 
     def handleifacemsg(self, msg):
-        ''' Interface Message handler
-        '''
-        self.info("ignoring Interface message")
-        return ()
+        ''' Interface Message handler '''
+
+        def read_proc_net_dev(name = '/proc/net/dev'):
+            if not os.path.exists(name):
+                self.info('not os.path.exists(name)')
+                return []
+
+            raw = None
+            with open(name, 'r') as f:
+                raw = f.read()
+
+            if raw is None:
+                self.info('raw is None')
+                return []
+
+            # convert to list of lines and strip header
+            raw = raw.splitlines()[2:]
+
+            # split interface name from counters
+            # also, split counters into individual counters
+            # also, remove leading and trailing whitespaces
+            raw = map(lambda elem: elem.split(), raw)
+            # remove trailing ':' from interface names
+            # and convert result back to a list
+            raw = list(map(lambda elem: list(map(lambda x: x.rstrip(':'), elem)), raw))
+
+            counter_dict = {}
+            list(map(lambda x: counter_dict.update({x[0]: x[1:]}), raw))
+
+            return counter_dict
+
+        replies = []
+        if msg.flags & coreapi.CORE_API_STR_FLAG:
+
+            # now == microseconds since epoch
+            now = int(time.time() * 1000)
+
+            nodenum = msg.gettlv(coreapi.CORE_TLV_IFACE_NODE)
+            ifacenum = msg.gettlv(coreapi.CORE_TLV_IFACE_NUM)
+
+            if ifacenum is None:
+                ifacenum = 0xFFFF
+
+            objs = iter(list())
+            if nodenum == 0:
+                objs = self.session.objs()
+            else:
+                objs = iter([self.session.obj(nodenum)])
+
+            ifcounters = read_proc_net_dev()
+
+            for obj in objs:
+                # skip non-node-nodes (e.g., links, switches, interfaces, ...)
+                if not hasattr(obj, 'tonodemsg') or not hasattr(obj, 'services'):
+                    continue
+
+                sessionid = self.session.shortsessionid()
+
+                ifaces = {}
+                if ifacenum == 0xFFFF:
+                    ifaces = obj._netif
+                else:
+                    iface = obj.netif(ifacenum)
+                    if not iface is None:
+                        ifaces = {ifacenum: iface}
+
+                for ifidx, iface in ifaces.items():
+                    tlvdata = b''
+
+                    if hasattr(iface, 'control') and iface.control == True:
+                        continue
+
+                    name = "n%s.%s.%s" % (obj.objid, ifidx, sessionid)
+                    localname = "n%s.%s.%s" % (obj.objid, iface.name, sessionid)
+                    if localname in ifcounters:
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NODE,
+                                obj.objid)
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NUM,
+                                ifidx)
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NAME,
+                                iface.name)
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_STATE,
+                                iface.up)
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_TIMESTAMP,
+                                int(now))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_BYTESIN,
+                                int(ifcounters[localname][0]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_PACKETSIN,
+                                int(ifcounters[localname][1]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_ERRORSIN,
+                                int(ifcounters[localname][2]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_DROPIN,
+                                int(ifcounters[localname][3]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_MCASTIN,
+                                int(ifcounters[localname][7]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_BYTESOUT,
+                                int(ifcounters[localname][8]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_PACKETSOUT,
+                                int(ifcounters[localname][9]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_ERRORSOUT,
+                                int(ifcounters[localname][10]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_DROPOUT,
+                                int(ifcounters[localname][11]))
+                        tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_MCASTOUT,
+                                int(ifcounters[localname][15]))
+
+                        replies.append(coreapi.CoreIfaceMessage.pack(
+                                coreapi.CORE_API_STR_FLAG, tlvdata))
+        return replies
 
     def handleeventmsg(self, msg):
         ''' Event Message handler
