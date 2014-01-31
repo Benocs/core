@@ -63,6 +63,10 @@ class PyCoreObj(object):
         self.position = Position()
         self.netid = None
 
+    def __str__(self):
+        return "%s: id: %s, name: %s" % (str(self.__class__), str(self.objid),
+                str(self.name))
+
     def startup(self):
         ''' Each object implements its own startup method.
         '''
