@@ -5,6 +5,22 @@
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
+# Copyright (C) 2014 Robert Wuttke <robert@benocs.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
 '''
 data.py: constant definitions for the CORE API, enumerating the
 different message and TLV types (these constants are also found in coreapi.h)
@@ -32,7 +48,8 @@ message_types = {
     0x08: "CORE_API_EVENT_MSG",
     0x09: "CORE_API_SESS_MSG",
     0x0A: "CORE_API_EXCP_MSG",
-    0x0B: "CORE_API_MSG_MAX",
+    0x0B: "CORE_API_MSG",
+    0x0C: "CORE_API_MSG_MAX",
 }
 
 enumdict(message_types)
@@ -247,8 +264,23 @@ iface_tlvs = {
     0x09: "CORE_TLV_IFACE_TYPE",
     CORE_TLV_NODE_SESSION: "CORE_TLV_IFACE_SESSION",
     0x0B: "CORE_TLV_IFACE_STATE",
+    # EMUID: 0x23
     CORE_TLV_NODE_EMUID: "CORE_TLV_IFACE_EMUID",
+    # NETID: 0x24
     CORE_TLV_NODE_NETID: "CORE_TLV_IFACE_NETID",
+    # uint64_t: microseconds since epoch
+    0x30: "CORE_TLV_IFACE_TIMESTAMP",
+    # all counters use uint64_t
+    0x31: "CORE_TLV_IFACE_BYTESIN",
+    0x32: "CORE_TLV_IFACE_PACKETSIN",
+    0x33: "CORE_TLV_IFACE_ERRORSIN",
+    0x34: "CORE_TLV_IFACE_DROPIN",
+    0x35: "CORE_TLV_IFACE_MCASTIN",
+    0x36: "CORE_TLV_IFACE_BYTESOUT",
+    0x37: "CORE_TLV_IFACE_PACKETSOUT",
+    0x38: "CORE_TLV_IFACE_ERRORSOUT",
+    0x39: "CORE_TLV_IFACE_DROPOUT",
+    0x3A: "CORE_TLV_IFACE_MCASTOUT",
 }
 
 enumdict(iface_tlvs)
