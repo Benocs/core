@@ -352,6 +352,17 @@ class CoreIfaceTlv(CoreTlv):
         CORE_TLV_IFACE_STATE: CoreTlvDataUint16,
         CORE_TLV_IFACE_EMUID: CoreTlvDataUint32,
         CORE_TLV_IFACE_NETID: CoreTlvDataUint32,
+        CORE_TLV_IFACE_TIMESTAMP: CoreTlvDataUint64,
+        CORE_TLV_IFACE_BYTESIN: CoreTlvDataUint64,
+        CORE_TLV_IFACE_PACKETSIN: CoreTlvDataUint64,
+        CORE_TLV_IFACE_ERRORSIN: CoreTlvDataUint64,
+        CORE_TLV_IFACE_DROPIN: CoreTlvDataUint64,
+        CORE_TLV_IFACE_MCASTIN: CoreTlvDataUint64,
+        CORE_TLV_IFACE_BYTESOUT: CoreTlvDataUint64,
+        CORE_TLV_IFACE_PACKETSOUT: CoreTlvDataUint64,
+        CORE_TLV_IFACE_ERRORSOUT: CoreTlvDataUint64,
+        CORE_TLV_IFACE_DROPOUT: CoreTlvDataUint64,
+        CORE_TLV_IFACE_MCASTOUT: CoreTlvDataUint64,
     }
 
 class CoreEventTlv(CoreTlv):
