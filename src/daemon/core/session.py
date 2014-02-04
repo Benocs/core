@@ -945,7 +945,7 @@ class Session(object):
                                                 nodenum)
             tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_OPAQUE,
                                                 opaque)
-            tmp = coreapi.CoreConfMessage(flags=0, hdr="", data=tlvdata)
+            tmp = coreapi.CoreConfMessage(flags=0, hdr=b"", data=tlvdata)
             replies.append(self.services.configure_request(tmp))
             for (filename, data) in self.services.getallfiles(svc):
                 flags = coreapi.CORE_API_ADD_FLAG
@@ -974,7 +974,7 @@ class Session(object):
                 replies.append(coreapi.CoreFileMessage.pack(flags, tlvdata))
 
         # send meta data
-        tmp = coreapi.CoreConfMessage(flags=0, hdr="", data="")
+        tmp = coreapi.CoreConfMessage(flags=0, hdr=b"", data=b"")
         opts = self.options.configure_request(tmp,
                                     typeflags = coreapi.CONF_TYPE_FLAGS_UPDATE)
         if opts:

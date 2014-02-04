@@ -54,7 +54,6 @@ class CoreTlvDataObj(CoreTlvData):
 
     @classmethod
     def unpack(cls, data):
-        #return cls.newobj(struct.unpack(cls.datafmt, data)[0].decode())
         return cls.newobj(struct.unpack(cls.datafmt, data)[0])
 
     @staticmethod
@@ -413,6 +412,10 @@ class CoreMessage(object):
     tlvcls = CoreTlv
 
     def __init__(self, flags, hdr, data):
+        if not isinstance(hdr, bytes):
+          hdr = bytes(hdr, encoding = 'utf-8')
+        if not isinstance(data, bytes):
+          data = bytes(data, encoding = 'utf-8')
         self.rawmsg = hdr + data
         self.flags = flags
         self.tlvdata = {}
