@@ -3538,10 +3538,10 @@ proc rearrange { mode } {
 
 	# durch anpassen von $optimier werden links
 	#   unterschiedlich oft aktuallisiert. verhindert ruckeln
-	if {[llength $objects] > 16} {
-		set optimier 3
+	if {[llength $objects] > 20} {
+		set optimier 50
 	} else {
-		set optimier 30
+		set optimier 500
 	}
  
 	#hier paar ms rausholen durch spaeteres updaten der links
@@ -3554,7 +3554,7 @@ proc rearrange { mode } {
 	}
 
         # loesche alle need_redraw tags der links auf dem canvas
-	.c dtag link need_redraw
+	#.c dtag link need_redraw
 
         # dadurch bleibt canvas bedienbar
 	
@@ -3564,6 +3564,14 @@ proc rearrange { mode } {
 
     rearrange_off
     .bottom.mbuf config -text ""
+
+    # abschließend bei mausklick die links neu zeichnen da durch
+    #   optimierung links nicht mehr richtig liegen
+    foreach link [.c find withtag "link && need_redraw"] {
+            redrawLink [lindex [.c gettags $link] 1]
+    }
+    
+    .c dtag link need_redraw
 }
 
 proc rearrange_off { } {
