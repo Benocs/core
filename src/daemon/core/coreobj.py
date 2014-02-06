@@ -14,6 +14,7 @@ import sys, threading, os, shutil
 
 from core.api import coreapi
 from core.misc.ipaddr import *
+from core.constants import *
 
 class Position(object):
     ''' Helper class for Cartesian coordinate position
@@ -234,10 +235,48 @@ class PyCoreNode(PyCoreObj):
 
     def nodeid(self):
         return self.objid
-        
+
     def addservice(self,  service):
         if service is not None:
             self.services.append(service)
+
+    def getLoopbackIPv4(self):
+        if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
+                len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
+                'loopback_net_per_netid' in CONFIGS['ipaddrs']:
+            print('found configuration entry for loopback devices: %s. each netid gets a /%s' %
+                    (str(CONFIGS['ipaddrs']['loopback_net']),
+                    str(CONFIGS['ipaddrs']['loopback_net_per_netid'])))
+        else:
+            return None
+
+        # loopback_net_per_netid
+        global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
+        global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
+        try:
+            global_prefixlen = int(global_prefixlen)
+        except ValueError:
+            return None
+        # local means per netid (e.g., AS)
+        try:
+            local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+        except ValueError:
+            return None
+
+        if hasattr(self, 'netid') and not self.netid is None:
+            netid = self.netid
+        else:
+            netid = 0
+
+        global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
+
+        baseprefix = IPv4Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
+        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_prefix = IPv4Prefix('%s/%d' % (target_network_baseaddr, local_prefixlen))
+
+        nodeid = NetIDNodeMap.register_node(self.nodeid(), netid)
+        addr = target_network_prefix.addr(nodeid)
+        return addr
 
     def makenodedir(self):
         if self.nodedir is None:
@@ -247,7 +286,7 @@ class PyCoreNode(PyCoreObj):
             self.tmpnodedir = True
         else:
             self.tmpnodedir = False
-    
+
     def rmnodedir(self):
         if hasattr(self.session.options, 'preservedir'):
             if self.session.options.preservedir == '1':
