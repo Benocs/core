@@ -33,7 +33,7 @@ class Zebra(CoreService):
     '''
     _name = "zebra"
     _group = "Quagga"
-    _depends = ("vtysh", )
+    _depends = ("vtysh", "LoopbackAddress")
     _dirs = ("/usr/local/etc/quagga",  "/var/run/quagga")
     _configs = ("/usr/local/etc/quagga/Quagga.conf",
                 "quaggaboot.sh","/usr/local/etc/quagga/vtysh.conf")
@@ -263,14 +263,7 @@ class QuaggaService(CoreService):
     def routerid(node):
         ''' Helper to return the first IPv4 address of a node as its router ID.
         '''
-        for ifc in node.netifs():
-            if hasattr(ifc, 'control') and ifc.control == True:
-                continue
-            for a in ifc.addrlist:
-                if a.find(".") >= 0:
-                    return a .split('/') [0]
-        #raise ValueError,  "no IPv4 address found for router ID"
-        return "0.0.0.0"
+        return str(node.getLoopbackIPv4())
 
     @staticmethod
     def rj45check(ifc):
@@ -371,18 +364,6 @@ class Ospfv2(QuaggaService):
         cfg += "!\n"
         return cfg
 
-        #cfg = cls.mtucheck(ifc)
-        # external RJ45 connections will use default OSPF timers
-        #if cls.rj45check(ifc):
-        #    return cfg
-        #cfg += cls.ptpcheck(ifc)
-
-        #return cfg + """\
-#  ip ospf hello-interval 2
-#  ip ospf dead-interval 6
-#  ip ospf retransmit-interval 5
-#"""
-
 addservice(Ospfv2)
 
 class Ospfv3(QuaggaService):
@@ -448,18 +429,6 @@ class Ospfv3(QuaggaService):
         cfg += "  interface %s area 0.0.0.0\n" % ifc.name
         return cfg
 
-        #cfg = cls.mtucheck(ifc)
-        # external RJ45 connections will use default OSPF timers
-        #if cls.rj45check(ifc):
-        #    return cfg
-        #cfg += cls.ptpcheck(ifc)
-
-        #return cfg + """\
-#  ipv6 ospf6 hello-interval 2
-#  ipv6 ospf6 dead-interval 6
-#  ipv6 ospf6 retransmit-interval 5
-#"""
-
 addservice(Ospfv3)
 
 class Ospfv3mdr(Ospfv3):
@@ -511,16 +480,6 @@ class Bgp(QuaggaService):
         cfg += "  redistribute ospf\n"
         cfg += "  redistribute isis\n"
 
-        #cfg += "   redistribute system\n"
-        #cfg += "   redistribute kernel\n"
-        #cfg += "   redistribute connected\n"
-        #cfg += "   redistribute static\n"
-        #cfg += "   redistribute rip\n"
-        #cfg += "   redistribute ripng\n"
-        #cfg += "   redistribute ospf\n"
-        #cfg += "   redistribute ospf6\n"
-        #cfg += "   redistribute isis\n"
-        #cfg += "   redistribute hsls\n"
         cfg += "!\n"
         # aggregate networks that are being used for internal transit and access
         # TODO: find a more generic way. this approach works well for
@@ -537,7 +496,6 @@ class Bgp(QuaggaService):
 
         # find any link on which two different netid's (i.e., AS numbers) are
         # present and configure a bgp-session between the two corresponding nodes.
-        # on all other interfaces, disable bgp
         for localnetif in node.netifs():
 
             # do not include control interfaces
@@ -551,22 +509,21 @@ class Bgp(QuaggaService):
                 if localnetif == net_netif.node:
                     continue
 
-                # found at least two different ASes.
+                # found two different ASes.
                 if not node.netid == net_netif.node.netid:
-                    #print('NODE TYPE: %s' % str(node.type))
-                    #if (hasattr(node, 'type') and node.type == "egp_node") and \
-                    #        (hasattr(net_netif.node, 'type') and \
-                    #        net_netif.node.type == "egp_node"):
-                    # TODO: add ibgp peers
-                    # TODO: only add neighbor if neighbor node is a border-router
-                    # TODO: break after first link with this neighbor is established?
-                    for addr in net_netif.addrlist:
-                        (ip, sep, mask) = addr.partition('/')
+                    if (hasattr(node, 'type') and node.type == "egp_node") and \
+                            (hasattr(net_netif.node, 'type') and \
+                            net_netif.node.type == "egp_node"):
+                        for local_node_addr in localnetif.addrlist:
+                            for remote_node_addr in net_netif.addrlist:
+                                #local_node_addr = node.getLoopbackIPv4()
+                                #remote_node_addr = net_netif.node.getLoopbackIPv4()
+                                cfg += "  neighbor %s remote-as %s\n" % \
+                                        (str(remote_node_addr.split('/')[0]), str(net_netif.node.netid))
+                                cfg += "  neighbor %s update-source %s\n" % \
+                                        (str(remote_node_addr.split('/')[0]), str(local_node_addr))
 
-                        cfg += "  neighbor %s remote-as %s\n" % \
-                                    (str(ip), str(net_netif.node.netid))
-
-        # TODO: change desc.: add any nfprobe9sink which is on our AS to the list of collectors
+        # configure IBGP connections
         confstr_list = [cfg]
         service_helpers.nodewalker(node, node, [], confstr_list,
                 Bgp.nodewalker_callback)
@@ -581,34 +538,15 @@ class Bgp(QuaggaService):
                 not startnode == currentnode and \
                 startnode.netid == currentnode.netid:
 
-            # TODO: use loopback-device to connect from startnode to currentnode
-            # TODO: find dst ip, add IBGP-session
-            # TODO: use loopback-address
-            for localnetif in startnode.netifs():
-                print('QUAGGA: startnode interface: %s' % str(localnetif))
-                print('QUAGGA: startnode interface addrs: %s' % str(localnetif.addrlist))
-            for clocalnetif in currentnode.netifs():
-                print('QUAGGA: currentnode interface: %s' % str(clocalnetif))
-                print('QUAGGA: currentnode interface addrs: %s' % str(clocalnetif.addrlist))
-            #for localnetif in node.netifs():
-            #
-            #for addr in net_netif.addrlist:
-            #    (ip, sep, mask) = addr.partition('/')
-            #    result = ["  neighbor %s remote-as %s\n" % \
-            #            (str(ip), str(net_netif.node.netid))]
-            # TODO: FIXME: tmp. see above TODO's about loopback
-            if startnode.numnetif() > 0 and \
-                    len(startnode._netif[0].addrlist) > 0 and \
-                    currentnode.numnetif() > -1 and \
-                    len(currentnode._netif[0].addrlist) > 0:
-                print('QUAGGA: creating IBGP-session: %s ==> %s' %
-                        (startnode._netif[0].addrlist[0],
-                         currentnode._netif[0].addrlist[0]))
-                (ip, sep, mask) = currentnode._netif[0].addrlist[0].partition('/')
-                result = ["  neighbor %s remote-as %s\n" % \
-                        (str(ip), str(currentnode.netid))]
-                if service_flags.EGP in startnode.services:
-                    result.append("  neighbor %s next-hop-self\n" % str(ip))
+            startnode_addr = startnode.getLoopbackIPv4()
+            currentnode_addr = currentnode.getLoopbackIPv4()
+            result = ["  neighbor %s remote-as %s\n" % \
+                    (str(currentnode_addr), str(currentnode.netid)),
+                    "  neighbor %s update-source %s\n" % \
+                    (str(currentnode_addr), str(startnode_addr))
+                    ]
+            if service_flags.EGP in startnode.services:
+                result.append("  neighbor %s next-hop-self\n" % str(currentnode_addr))
         return result
 
 addservice(Bgp)
