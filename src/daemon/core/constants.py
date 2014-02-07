@@ -17,9 +17,10 @@ VIMAGE_BIN              = "no/vimage"
 QUAGGA_STATE_DIR        = "/var/run/quagga"
 MOUNT_BIN               = "/bin/mount"
 UMOUNT_BIN              = "/bin/umount"
-
+UNIONFS_BIN             = "/usr/bin/unionfs-fuse"
 
 config_files = ['ipaddrs.conf']
+
 CONFIGS = {}
 from os.path import exists, expanduser, join
 # since this is the core-daemon, user should always expand to /root/
@@ -29,7 +30,6 @@ for configfile in config_files:
     fullpath = join(dotcore, configfile)
     configname = configfile[:configfile.rfind('.conf')]
     if exists(fullpath):
-        #CONFIGS[configname] = {}
         localconfig = {}
         with open(fullpath, 'r') as f:
             for line in f:
