@@ -449,7 +449,7 @@ class XenNode(PyCoreNode):
         mutecheck_call(args)
 
     # from class LxcNode
-    def privatedir(self, path):
+    def privatedir(self, path, mount_type = None):
         #self.warn("XEN PVM privatedir() called")
         # Do nothing, Xen PVM nodes are fully private
         pass
@@ -583,7 +583,7 @@ class XenNode(PyCoreNode):
         print("%s: %s" % (self.name, msg), file = sys.stderr)
         sys.stderr.flush()
 
-    def mount(self, source, target):
+    def mount(self, source, target, mount_type = None):
         self.warn("XEN PVM Nodes can't bind-mount filesystems")
 
     def umount(self, target):

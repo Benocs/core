@@ -135,14 +135,58 @@ class SimpleLxcNode(PyCoreNode):
     def boot(self):
         pass
 
-    def mount(self, source, target):
+    def mount(self, source, target, mount_type = None):
         source = os.path.abspath(source)
-        self.info("mounting %s at %s" % (source, target))
+        self.info("nodedir: %s" % self.nodedir)
+        if mount_type is None:
+            self.warn(('not specifying a mount_type is deprecated. change your code. '
+                    'falling back to using bind-mounts'))
+            self.info('mounting %s at %s using bind-mounts' % (source, target))
+            mount_type = 'bind'
+        else:
+            if mount_type == 'bind':
+                self.info('mounting %s at %s using bind-mounts' % (source, target))
+            elif mount_type == 'union':
+                self.info('mounting %s at %s using union-mounts' % (source, target))
+            elif mount_type == 'none':
+                self.info('only create %s. do not mount anything' % target)
+            else:
+                self.warn('unknown mount_type specified: %s. falling back to using bind-mounts' % \
+                        str(mount_type))
+                self.info('mounting %s at %s using bind-mounts' % (source, target))
+                mount_type = 'bind'
+
         try:
-            shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
-                (target, MOUNT_BIN, source, target)
+            if mount_type == 'bind':
+                shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
+                    (target, MOUNT_BIN, source, target)
+                self.info('assembled bindcmd: %s' % shcmd)
+            elif mount_type == 'union':
+                self.info('mounting. src: %s -> target: %s' % (source, target))
+
+                host_dirs = os.path.join(self.nodedir, 'host_dirs')
+                self.info('host_dirs: %s' % host_dirs)
+
+                bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
+                self.info('bound_host_dir: %s' % bound_host_dir)
+
+                shcmd = ("mkdir -p '%s' && mkdir -p '%s' && "
+                        "%s -n --bind '%s' '%s' && "
+                        "%s -o cow,max_files=32768 -o allow_other,use_ino,suid,dev,nonempty "
+                        "%s=RW:%s=RO %s") % \
+                        (bound_host_dir, target,
+                        MOUNT_BIN, target, bound_host_dir,
+                        UNIONFS_BIN, source, bound_host_dir, target)
+                self.info('assembled unionfscmd: %s' % shcmd)
+            elif mount_type == 'none':
+                shcmd = ("mkdir -p '%s'" % target)
+            else:
+                raise ValueError
             self.shcmd(shcmd)
-            self._mounts.append((source, target))
+            if not mount_type == 'none':
+                if mount_type == 'union':
+                    self._mounts.append((target, bound_host_dir))
+                self._mounts.append((source, target))
         except:
             self.warn("mounting failed for %s at %s" % (source, target))
 
@@ -355,7 +399,7 @@ class LxcNode(SimpleLxcNode):
             self.rmnodedir()
             self.lock.release()
 
-    def privatedir(self, path):
+    def privatedir(self, path, mount_type = None):
         if path[0] != "/":
             raise ValueError("path not fully qualified: " + path)
         hostpath = os.path.join(self.nodedir, path[1:].replace("/", "."))
@@ -365,7 +409,7 @@ class LxcNode(SimpleLxcNode):
             pass
         except Exception as e:
             raise Exception(e)
-        self.mount(hostpath, path)
+        self.mount(hostpath, path, mount_type)
 
     def hostfilename(self, filename):
         ''' Return the name of a node's file on the host filesystem.

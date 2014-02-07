@@ -211,9 +211,8 @@ class PhysicalNode(PyCoreNode):
                        start = False)
         self.adoptnetif(netif, ifindex, hwaddr, addrlist)
         return ifindex
-        
-        
-    def privatedir(self, path):
+
+    def privatedir(self, path, mount_type = None):
         if path[0] != "/":
             raise ValueError("path not fully qualified: " + path)
         hostpath = os.path.join(self.nodedir, path[1:].replace("/", "."))
@@ -223,18 +222,75 @@ class PhysicalNode(PyCoreNode):
             pass
         except Exception as e:
             raise Exception(e)
-        self.mount(hostpath, path)
+        self.mount(hostpath, path, mount_type)
 
-    def mount(self, source, target):
+    def mount(self, source, target, mount_type = None):
         source = os.path.abspath(source)
-        self.info("mounting %s at %s" % (source, target))
+        self.info("nodedir: %s" % self.nodedir)
+        if mount_type is None:
+            self.warn(('not specifying a mount_type is deprecated. change your code. '
+                    'falling back to using bind-mounts'))
+            self.info('mounting %s at %s using bind-mounts' % (source, target))
+            mount_type = 'bind'
+        else:
+            if mount_type == 'bind':
+                self.info('mounting %s at %s using bind-mounts' % (source, target))
+            elif mount_type == 'union':
+                self.info('mounting %s at %s using union-mounts' % (source, target))
+            elif mount_type == 'none':
+                self.info('only create %s. do not mount anything' % target)
+            else:
+                self.warn('unknown mount_type specified: %s. falling back to using bind-mounts' % \
+                        str(mount_type))
+                self.info('mounting %s at %s using bind-mounts' % (source, target))
+                mount_type = 'bind'
+
         try:
-            os.makedirs(target)
-        except OSError:
-            pass
-        try:
-            self.cmd([MOUNT_BIN, "--bind", source, target])
-            self._mounts.append((source, target))
+            if mount_type == 'bind':
+                try:
+                    os.makedirs(target)
+                except OSError:
+                    pass
+                cmd = [MOUNT_BIN, '--bind', source, target]
+                self.info('assembled bindcmd: %s' % cmd)
+            elif mount_type == 'union':
+                self.info('mounting. src: %s -> target: %s' % (source, target))
+
+                host_dirs = os.path.join(self.nodedir, 'host_dirs')
+                self.info('host_dirs: %s' % host_dirs)
+
+                bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
+                self.info('bound_host_dir: %s' % bound_host_dir)
+
+                try:
+                    os.makedirs(bound_host_dir)
+                except OSError:
+                    pass
+                try:
+                    os.makedirs(target)
+                except OSError:
+                    pass
+
+
+                cmd = [MOUNT_BIN, '--bind', target, bound_host_dir]
+                self.info('assembled unionfscmd - bind part: %s' % cmd)
+                self.cmd(cmd)
+                cmd = [UNIONFS_BIN, '-o', 'cow,max_files=32768', '-o',
+                        'allow_other,use_ino,suid,dev,nonempty',
+                        '%s=RW:%s=RO' % (source, bound_host_dir), target]
+                self.info('assembled unionfscmd: %s' % cmd)
+            elif mount_type == 'none':
+                try:
+                    os.makedirs(target)
+                except OSError:
+                    pass
+            else:
+                raise ValueError
+            self.cmd(cmd)
+            if not mount_type == 'none':
+                if mount_type == 'union':
+                    self._mounts.append((target, bound_host_dir))
+                self._mounts.append((source, target))
         except:
             self.warn("mounting failed for %s at %s" % (source, target))
 

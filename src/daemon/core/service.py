@@ -234,17 +234,27 @@ class CoreServices(ConfigurableManager):
         if node.verbose:
             node.info("starting service %s (%s)" % (s._name, s._startindex))
         for d in s._dirs:
+            if isinstance(d, tuple):
+                self.info('using union mounts')
+            elif isinstance(d, str):
+                self.warn(('service "%s" uses deprecated method of specifying '
+                    'private directories. instead of using plain strings, use '
+                    'a tuple: (<privatedir>, <mount_type>). with mount_type = '
+                    '["bind", "union"]') % str(s._name))
+                d = (d, "bind")
+            else:
+                raise ValueError
             try:
-                node.privatedir(d)
+                node.privatedir(d[0], d[1])
             except Exception as  e:
                 node.warn("Error making node %s dir %s: %s" % \
-                          (node.name,  d,  e))
+                          (node.name,  d[0],  e))
         for filename in s.getconfigfilenames(node.objid, services): 
             cfg = s.generateconfig(node,  filename, services)
             node.nodefile(filename,  cfg)
         for cmd in s.getstartup(node, services):
             try:
-                # NOTE: this wait=False can be problematic!
+                # TODO: FIXME: XXX: NOTE: this wait=False can be problematic!
                 node.cmd(shlex.split(cmd),  wait = False)
             except Exception as e:
                 node.warn("error starting command %s: %s" % (cmd, e))
@@ -256,8 +266,18 @@ class CoreServices(ConfigurableManager):
         if node.verbose:
             node.info("starting service %s (%s)(custom)" % (s._name, s._startindex))
         for d in s._dirs:
+            if isinstance(d, tuple):
+                self.info('using union mounts')
+            elif isinstance(d, str):
+                self.warn(('service "%s" uses deprecated method of specifying '
+                    'private directories. instead of using plain strings, use '
+                    'a tuple: (<privatedir>, <mount_type>). with mount_type = '
+                    '["bind", "union"]') % str(s._name))
+                d = (d, "bind")
+            else:
+                raise ValueError
             try:
-                node.privatedir(d)
+                node.privatedir(d[0], d[1])
             except Exception as  e:
                 node.warn("Error making node %s dir %s: %s" % \
                           (node.name,  d,  e))
