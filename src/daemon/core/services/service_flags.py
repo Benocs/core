@@ -45,3 +45,7 @@ class Router(ServiceFlag):
 
 addservice(Router)
 
+class DNSResolver(ServiceFlag):
+    _name = "DNSResolver"
+
+addservice(DNSResolver)
