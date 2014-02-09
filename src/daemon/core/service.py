@@ -235,13 +235,13 @@ class CoreServices(ConfigurableManager):
             node.info("starting service %s (%s)" % (s._name, s._startindex))
         for d in s._dirs:
             if isinstance(d, tuple):
-                self.info('using union mounts')
+                pass
             elif isinstance(d, str):
                 self.warn(('service "%s" uses deprecated method of specifying '
                     'private directories. instead of using plain strings, use '
                     'a tuple: (<privatedir>, <mount_type>). with mount_type = '
                     '["bind", "union"]') % str(s._name))
-                d = (d, "bind")
+                d = (d, "union")
             else:
                 raise ValueError
             try:
@@ -267,13 +267,13 @@ class CoreServices(ConfigurableManager):
             node.info("starting service %s (%s)(custom)" % (s._name, s._startindex))
         for d in s._dirs:
             if isinstance(d, tuple):
-                self.info('using union mounts')
+                pass
             elif isinstance(d, str):
                 self.warn(('service "%s" uses deprecated method of specifying '
                     'private directories. instead of using plain strings, use '
                     'a tuple: (<privatedir>, <mount_type>). with mount_type = '
                     '["bind", "union"]') % str(s._name))
-                d = (d, "bind")
+                d = (d, "union")
             else:
                 raise ValueError
             try:
