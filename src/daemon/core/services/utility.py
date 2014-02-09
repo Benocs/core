@@ -12,7 +12,7 @@ utility.py: defines miscellaneous utility services.
 import os
 
 from core.service import CoreService, addservice
-from core.misc.ipaddr import IPv4Prefix, IPv6Prefix
+from core.misc.ipaddr import IPv4Prefix, IPv6Prefix, IPv4Addr
 from core.misc.utils import *
 from core.constants import *
 
@@ -302,13 +302,15 @@ ddns-update-style none;
         ''' Generate a subnet declaration block given an IPv4 prefix string
             for inclusion in the dhcpd3 config file.
         '''
+        # IPv6 not supported in v4 dhcpd
         if x.find(":") >= 0:
             return ""
         else:
             addr = x.split("/")[0]
             net = IPv4Prefix(x)
-            # divide the address space in half
-            rangelow = net.addr(net.numaddr() / 2)
+            # divide the address space in half TODO: why divide in half? addr+1 sounds so much better
+            #rangelow = net.addr(net.numaddr() / 2)
+            rangelow = net.addr(IPv4Addr(addr) + 1)
             rangehigh = net.maxaddr()
             return """
 subnet %s netmask %s {
