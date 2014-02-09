@@ -237,8 +237,6 @@ class PhysicalNode(PyCoreNode):
                 self.info('mounting %s at %s using bind-mounts' % (source, target))
             elif mount_type == 'union':
                 self.info('mounting %s at %s using union-mounts' % (source, target))
-            elif mount_type == 'none':
-                self.info('only create %s. do not mount anything' % target)
             else:
                 self.warn('unknown mount_type specified: %s. falling back to using bind-mounts' % \
                         str(mount_type))
@@ -279,18 +277,12 @@ class PhysicalNode(PyCoreNode):
                         'allow_other,use_ino,suid,dev,nonempty',
                         '%s=RW:%s=RO' % (source, bound_host_dir), target]
                 self.info('assembled unionfscmd: %s' % cmd)
-            elif mount_type == 'none':
-                try:
-                    os.makedirs(target)
-                except OSError:
-                    pass
             else:
                 raise ValueError
             self.cmd(cmd)
-            if not mount_type == 'none':
-                if mount_type == 'union':
-                    self._mounts.append((target, bound_host_dir))
-                self._mounts.append((source, target))
+            if mount_type == 'union':
+                self._mounts.append((target, bound_host_dir))
+            self._mounts.append((source, target))
         except:
             self.warn("mounting failed for %s at %s" % (source, target))
 
