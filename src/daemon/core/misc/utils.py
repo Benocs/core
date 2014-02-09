@@ -242,3 +242,21 @@ def readfileintodict(filename, d):
             d[key] = value.strip()
         except ValueError:
             pass
+
+def touch(fname, times=None, ns=None, dir_fd=None):
+    """ from question
+            http://stackoverflow.com/questions/1158076/implement-touch-using-python
+        based on answer
+            http://stackoverflow.com/a/1160227
+        by
+            http://stackoverflow.com/users/20713
+    """
+    if os.path.exists(fname):
+        flag = os.O_APPEND
+        with os.open(fname, os.O_APPEND, dir_fd=dir_fd) as f:
+            os.utime(f.fileno() if os.utime in os.supports_fd else fname,
+                    times=times, ns=ns, dir_fd=dir_fd)
+    else:
+        with open(fname, 'w') as f:
+            f.write('')
+
