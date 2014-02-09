@@ -106,10 +106,21 @@ class IPAddr(object):
             return False
 
     def __add__(self, other):
-        if self.addr_newstyle.version == 4:
-            return ipaddress.IPv4Address(self.addr_newstyle + other.addr_newstyle)
-        elif self.addr_newstyle.version == 6:
-            return ipaddress.IPv6Address(self.addr_newstyle + other.addr_newstyle)
+        if not self.__class__ == other.__class:
+            raise ValueError
+        if isinstance(other, IPAddr):
+            if self.addr_newstyle.version == 4:
+                return IPAddr(AF_INET,
+                        str(ipaddress.IPv4Address(self.addr_newstyle + other.addr_newstyle)))
+            elif self.addr_newstyle.version == 6:
+                return IPAddr(AF_INET6,
+                        str(ipaddress.IPv64Address(self.addr_newstyle + other.addr_newstyle)))
+        elif isinstance(other, ipaddress.IPv4Address):
+            return IPAddr(AF_INET, str(ipaddress.IPv4Address(self.addr_newstyle + other)))
+        elif isinstance(other, ipaddress.IPv6Address):
+            return IPAddr(AF_INET6, str(ipaddress.IPv64Address(self.addr_newstyle + other)))
+        else:
+            raise ValueError
 
     def __sub__(self, other):
         try:
@@ -132,6 +143,14 @@ class IPAddr(object):
         ''' convert IPv4 string to 32-bit integer
         '''
         return int(self.addr_newstyle)
+
+class IPv4Addr(IPAddr):
+    def __init__(self, addr):
+        super().__init__(AF_INET, addr)
+
+class IPv6Addr(IPAddr):
+    def __init__(self, addr):
+        super().__init__(AF_INET6, addr)
 
 class IPPrefix(object):
     def __init__(self, af, prefixstr):
