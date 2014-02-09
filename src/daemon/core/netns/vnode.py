@@ -6,6 +6,22 @@
 # authors: Tom Goff <thomas.goff@boeing.com>
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+# Copyright (C) 2014 Robert Wuttke <robert@benocs.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
 '''
 vnode.py: PyCoreNode and LxcNode classes that implement the network namespace
 virtual node.
@@ -140,55 +156,64 @@ class SimpleLxcNode(PyCoreNode):
         self.info("nodedir: %s" % self.nodedir)
         if mount_type is None:
             self.warn(('not specifying a mount_type is deprecated. change your code. '
-                    'falling back to using bind-mounts'))
-            self.info('mounting %s at %s using bind-mounts' % (source, target))
-            mount_type = 'bind'
+                    'falling back to using union-mounts'))
+            self.info('mounting %s at %s using union-mounts' % (source, target))
+            mount_type = 'union'
         else:
             if mount_type == 'bind':
                 self.info('mounting %s at %s using bind-mounts' % (source, target))
             elif mount_type == 'union':
                 self.info('mounting %s at %s using union-mounts' % (source, target))
-            elif mount_type == 'none':
-                self.info('only create %s. do not mount anything' % target)
             else:
-                self.warn('unknown mount_type specified: %s. falling back to using bind-mounts' % \
+                self.warn('unknown mount_type specified: %s. falling back to using union-mounts' % \
                         str(mount_type))
-                self.info('mounting %s at %s using bind-mounts' % (source, target))
-                mount_type = 'bind'
+                self.info('mounting %s at %s using union-mounts' % (source, target))
+                mount_type = 'union'
 
         try:
             if mount_type == 'bind':
+                #TODO: don't mount if it is already mounted for bind mounts
+                #if os.path.exists(source):
+                #    self.info('source dir already exists: %s' % source)
+                #    return
+
                 shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
                     (target, MOUNT_BIN, source, target)
                 self.info('assembled bindcmd: %s' % shcmd)
             elif mount_type == 'union':
-                self.info('mounting. src: %s -> target: %s' % (source, target))
-
-                host_dirs = os.path.join(self.nodedir, 'host_dirs')
+                host_dirs = os.path.join(self.nodedir, '../host_dirs')
                 self.info('host_dirs: %s' % host_dirs)
 
                 bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
                 self.info('bound_host_dir: %s' % bound_host_dir)
 
-                shcmd = ("mkdir -p '%s' && mkdir -p '%s' && "
-                        "%s -n --bind '%s' '%s' && "
-                        "%s -o cow,max_files=32768 -o allow_other,use_ino,suid,dev,nonempty "
-                        "%s=RW:%s=RO %s") % \
-                        (bound_host_dir, target,
-                        MOUNT_BIN, target, bound_host_dir,
-                        UNIONFS_BIN, source, bound_host_dir, target)
+                # don't mount if it is already mounted
+                if os.path.exists('%s.%s' % (source, 'mounted')):
+                    self.info('source dir already mounted: %s' % source)
+                    return
+                else:
+                    touch('%s.%s' % (source, 'mounted'))
+
+                shcmditems = []
+                shcmditems.append("mkdir -p '%s' && mkdir -p '%s' && " %
+                        (bound_host_dir, target))
+                if not os.path.exists(bound_host_dir):
+                    shcmditems.append("rsync -avhP '%s/' '%s/' && " %
+                            (target, bound_host_dir))
+                shcmditems.extend([("%s -o cow,max_files=32768 "
+                        "-o allow_other,use_ino,suid,dev,nonempty "
+                        "%s=RW:%s=RO %s") % (UNIONFS_BIN, source,
+                        bound_host_dir, target)])
+                shcmd = ''.join(shcmditems)
                 self.info('assembled unionfscmd: %s' % shcmd)
-            elif mount_type == 'none':
-                shcmd = ("mkdir -p '%s'" % target)
             else:
                 raise ValueError
             self.shcmd(shcmd)
-            if not mount_type == 'none':
-                if mount_type == 'union':
-                    self._mounts.append((target, bound_host_dir))
-                self._mounts.append((source, target))
-        except:
-            self.warn("mounting failed for %s at %s" % (source, target))
+            if mount_type == 'union':
+                self._mounts.append((target, bound_host_dir))
+            self._mounts.append((source, target))
+        except Exception as e:
+            self.warn("mounting failed for %s at %s. reason: %s" % (source, target, e))
 
     def umount(self, target):
         self.info("unmounting '%s'" % target)
