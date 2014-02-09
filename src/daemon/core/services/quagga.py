@@ -23,8 +23,8 @@ from core.constants import *
 from core.services import service_helpers
 from core.services import service_flags
 
-QUAGGA_USER="root"
-QUAGGA_GROUP="root"
+QUAGGA_USER="quagga"
+QUAGGA_GROUP="quagga"
 if os.uname()[0] == "FreeBSD":
     QUAGGA_GROUP="wheel"
 
@@ -494,6 +494,37 @@ class Bgp(QuaggaService):
         #cfg += "  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n"
         #cfg += "!\n"
 
+        # aggregate AS-local loopback addresses
+        if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
+                len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
+                'loopback_net_per_netid' in CONFIGS['ipaddrs']:
+            # loopback_net_per_netid
+            global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
+            global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
+            try:
+                global_prefixlen = int(global_prefixlen)
+            except ValueError:
+                return None
+            # local means per netid (e.g., AS)
+            try:
+                local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+            except ValueError:
+                return None
+
+            if hasattr(node, 'netid') and not node.netid is None:
+                netid = node.netid
+            else:
+                netid = 0
+
+            global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
+
+            baseprefix = IPv4Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
+            target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+            target_network_prefix = IPv4Prefix('%s/%d' % (target_network_baseaddr, local_prefixlen))
+            cfg += "  aggregate-address %s %s summary-only\n" % (str(target_network_baseaddr), target_network_prefix.netmaskstr())
+            cfg += "!\n"
+
+
         # find any link on which two different netid's (i.e., AS numbers) are
         # present and configure a bgp-session between the two corresponding nodes.
         for localnetif in node.netifs():
@@ -526,7 +557,7 @@ class Bgp(QuaggaService):
         # configure IBGP connections
         confstr_list = [cfg]
         service_helpers.nodewalker(node, node, [], confstr_list,
-                Bgp.nodewalker_callback)
+                cls.nodewalker_callback)
         cfg = ''.join(confstr_list)
         return cfg
 
@@ -645,8 +676,9 @@ class ISIS(QuaggaService):
 
         cfg = ""
 
-        # find any link on which two equal netid's (i.e., AS numbers) are
-        # present and configure an isis-session on this interface
+        # find any link on which two equal netid's (e.g., AS numbers) are
+        # present and on which two routers are present.
+        # then configure an isis-session on this interface
         # on all other interfaces, disable isis
         for idx, net_netif in ifc.net._netif.items():
 
@@ -658,9 +690,12 @@ class ISIS(QuaggaService):
             if ifc == net_netif:
                 continue
 
+            # other end of link is not router. don't send ISIS hellos
+            if not service_flags.Router in net_netif.node.services:
+                continue
+
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
-                #cfg += "interface %s\n" % ifc.name
                 cfg += "  ip router isis 1\n"
                 cfg += "  isis circuit-type level-2-only\n"
                 cfg += "  isis network point-to-point\n"
@@ -677,19 +712,10 @@ class ISIS(QuaggaService):
         cfg += "log file /tmp/isis-%s.log debugging\n" % cls.routerid(node)
         cfg += "interface lo\n"
         cfg += " ip router isis 1\n"
-        cfg += " isis network point-to-point\n"
         cfg += "!\n"
 
         cfg += "router isis 1\n"
-        #cfg += " isis network point-to-point\n"
-        # TODO  loesung aendern damit er nicht die ip vom ctrl netz nimmt...
-        # TODO geht so nur wenn ipv4 adresse vorhanden
-        #cfg += "  net 49.%s.00\n" % cls.bearbeiteipstr(cls.routerid(node))
         cfg += "  net %s\n" % cls.bearbeiteipstr(cls.routerid(node), str(node.netid))
-        #cfg += " is-type level-2\n!\n"
-        # TODO: redistribution of routes is not yet implemented in quagga
-        #cfg += "  redistribute connected\n"
-        #cfg += "  redistribute bgp\n"
         cfg += "!\n"
 
         return cfg
