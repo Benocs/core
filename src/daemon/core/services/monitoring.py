@@ -28,11 +28,11 @@ from core.services import utility
 
 from core.services import service_helpers
 
-class MonitoringService(utility.UtilService):
-        ''' Parent class for monitoring services.
-        '''
-        _name = "MonitoringProcess"
-        #_group = "Monitoring"
+class MonitoringService(CoreService):
+        """ Parent class for monitoring services """
+
+        _name = "Monitoring Service"
+        _group = "Monitoring"
         _depends = ()
         _dirs = ()
         _configs = ()
@@ -45,7 +45,7 @@ class MonitoringService(utility.UtilService):
                 return ""
 
 class NetFlow9ProbeService(MonitoringService):
-    _name = "netflow9probe"
+    _name = "NetFlow9Probe"
     _configs = ("startnetflow9probe.sh", "stopnetflow9probe.sh",
             "pmacctd_netflow9probe.conf")
     _dirs = ()
@@ -165,6 +165,7 @@ class NetFlow9SinkService(MonitoringService):
     """ dummy service marking nodes that implement a NetFlow9 collector.
             this is used by NetFlow9ProbeService to find collectors
     """
-    _name = "netflow9sink"
+    _name = "NetFlow9Sink"
+    _group = "Service Flags"
 
 addservice(NetFlow9SinkService)
