@@ -49,3 +49,13 @@ class DNSResolver(ServiceFlag):
     _name = "DNSResolver"
 
 addservice(DNSResolver)
+
+class DNSASRootServer(ServiceFlag):
+    _name = "DNSASRootServer"
+
+addservice(DNSASRootServer)
+
+class DNSRootServer(ServiceFlag):
+    _name = "DNSRootServer"
+
+addservice(DNSRootServer)
