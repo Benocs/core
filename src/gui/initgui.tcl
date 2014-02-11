@@ -420,6 +420,8 @@ menu .menubar.tools -tearoff 0
 .menubar.tools add command -label "Traffic..." -command popupTrafficDialog
 # Boeing
 #
+.menubar.tools add command -label "AS numbers..." -underline 0 \
+	-command { popupASConfig }
 .menubar.tools add command -label "IP addresses..." -underline 0 \
 	-command { popupAddressConfig }
 .menubar.tools add command -label "MAC addresses..." -underline 0 \

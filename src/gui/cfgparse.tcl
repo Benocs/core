@@ -1130,7 +1130,7 @@ proc initDefaultPrefs {} {
     array set g_prefs [list gui_canvas_refpt	"$DEFAULT_REFPT"]
     if { $tcl_platform(os) == "FreeBSD" } { set shell "/usr/local/bin/bash"
     } else { set shell "bash" }
-    array set g_prefs [list shell $shell] 
+    array set g_prefs [list shell 	$shell] 
     array set g_prefs [list gui_text_editor	[get_text_editor true]]
     array set g_prefs [list gui_term_prog	[get_term_prog true]]
     setDefaultAddrs ipv4
@@ -1148,6 +1148,7 @@ proc initDefaultPrefs {} {
 	gui_canvas_scale	150.0
 	gui_num_canvases	1
 	gui_3d_path		"/usr/local/bin/sdt3d.sh"
+	gui_asid_standard	0
     }
     # add new preferences above; keep this at the end of the file
 }

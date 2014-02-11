@@ -655,6 +655,12 @@ proc newLink { lnode1 lnode2 } {
     global curcanvas
     global systype
 
+	puts "NODE1"
+	puts [nodeType $lnode1]
+	puts "NODE2"
+	puts [nodeType $lnode2]
+
+
     if { [nodeType $lnode1] == "lanswitch" && \
 	[nodeType $lnode2] != "router" && \
 	[nodeType $lnode2] != "lanswitch" } { set regular no }
@@ -700,6 +706,8 @@ proc newLink { lnode1 lnode2 } {
     # pick new interface names or use names from global hint
     set do_auto_addressing 1
     global g_newLink_ifhints
+
+
     if { [info exists g_newLink_ifhints] && $g_newLink_ifhints != "" } {
 	set ifname1 [lindex $g_newLink_ifhints 0]
 	set ifname2 [lindex $g_newLink_ifhints 1]
@@ -719,6 +727,7 @@ proc newLink { lnode1 lnode2 } {
     set ipv4_addr2 [getIfcIPv4addr $lnode2 $ifname2]
     set ipv6_addr2 [getIfcIPv6addr $lnode2 $ifname2]
 
+
     lappend $link "nodes {$lnode1 $lnode2}"
     # parameters for links to wlan are based on wlan parameters
     if { [nodeType $lnode1] == "wlan" } {
@@ -730,7 +739,7 @@ proc newLink { lnode1 lnode2 } {
 	}
 	set ipv4_addr1 [getIfcIPv4addr $lnode1 wireless]
 	if { $ipv4_addr1 == "" } { ;# allocate WLAN address now
-	    setIfcIPv4addr $lnode1 wireless "[findFreeIPv4Net 32].0/32"
+	    setIfcIPv4addr $lnode1 wireless "[findFreeIPv4Net $lnode1 32].0/32"
 	}
 	set ipv6_addr1 [getIfcIPv6addr $lnode1 wireless]
 	if { $ipv6_addr1 == "" } {
@@ -750,6 +759,7 @@ proc newLink { lnode1 lnode2 } {
 	    if { $ipv6_addr2 == "" } { autoIPv6addr $lnode2 $ifname2 }
 	}
     # tunnels also excluded from link settings
+    # hier test auf eines lanswitch oder beide link element mit interface "e"
     } elseif { ([nodeType $lnode1] == "lanswitch" || \
 	[nodeType $lnode2] == "lanswitch" || \
 	[string first eth "$ifname1 $ifname2"] != -1) && \
@@ -768,6 +778,7 @@ proc newLink { lnode1 lnode2 } {
 	 [nodeType $lnode1] != "wlan" &&
 	[[typemodel $lnode1].layer] == "NETWORK" } {
 	if { $ipv4_addr1 == "" && $do_auto_addressing } {
+	puts "1 NETWORK!"
 	    autoIPv4addr $lnode1 $ifname1
 	}
 	if { $ipv6_addr1 == "" && $do_auto_addressing } {
@@ -779,6 +790,7 @@ proc newLink { lnode1 lnode2 } {
 	 [nodeType $lnode1] != "wlan" &&
 	[[typemodel $lnode2].layer] == "NETWORK" } {
 	if { $ipv4_addr2 == "" && $do_auto_addressing } {
+	puts "2 NETWORK!!!"
 	    autoIPv4addr $lnode2 $ifname2 
 	}
 	if { $ipv6_addr2 == "" && $do_auto_addressing } {
