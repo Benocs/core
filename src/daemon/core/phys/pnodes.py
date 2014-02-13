@@ -313,4 +313,6 @@ class PhysicalNode(PyCoreNode):
         f.close()
         self.info("created nodefile: '%s'; mode: 0%o" % (f.name, mode))
 
-        
+    def chmod(self, filename, mode = 0o644):
+        if os.path.exists(filename):
+            os.chmod(filename, mode)

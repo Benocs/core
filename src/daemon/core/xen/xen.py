@@ -459,6 +459,11 @@ class XenNode(PyCoreNode):
         self.warn("XEN PVM opennodefile() called")
         raise Exception("Can't open VM file with opennodefile()")
 
+    def chmod(self, filename, mode = 0o644):
+        self.warn("XEN PVM chmod() called")
+        raise Exception("Can't chmod VM file with chmod()")
+
+
     # from class LxcNode
     # open a file on a paused Xen node
     def openpausednodefile(self, filename, mode = "w"):

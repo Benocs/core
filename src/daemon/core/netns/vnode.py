@@ -461,7 +461,13 @@ class LxcNode(SimpleLxcNode):
         os.chmod(f.name, mode)
         f.close()
         self.info("created nodefile: '%s'; mode: 0%o" % (f.name, mode))
-        
+
+    def chmod(self, filename, mode = 0o644):
+        filename = self.hostfilename(filename)
+        if os.path.exists(filename):
+            print("chmodding file: %s to mode: 0%o" % (f.name, mode))
+            os.chmod(filename, mode)
+
     def nodefilecopy(self, filename, srcfilename, mode = None):
         ''' Copy a file to a node, following symlinks and preserving metadata.
         Change file mode if specified.
