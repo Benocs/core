@@ -691,8 +691,8 @@ class ISIS(QuaggaService):
                 continue
 
             # other end of link is not router. don't send ISIS hellos
-            if not service_flags.Router in net_netif.node.services:
-                continue
+            #if not service_flags.Router in net_netif.node.services:
+            #    continue
 
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
