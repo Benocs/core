@@ -57,7 +57,7 @@ class PhysicalNode(PyCoreNode):
             return
         self.lock.acquire()
         while self._mounts:
-            source, target = self._mounts.pop(-1)
+            source, target, mount_type = self._mounts.pop(-1)
             self.umount(target)
         for netif in self.netifs():
             netif.shutdown()
@@ -233,17 +233,6 @@ class PhysicalNode(PyCoreNode):
             source = os.path.join(source, target[1:])
         self.info('new  source, target: %s -> %s' % (source, target))
 
-        #for mount in self._mounts.append((source, target))
-        already_mounted = False
-        for s, t in self._mounts:
-            if target == t:
-                already_mounted = True
-                break
-
-        if already_mounted:
-            self.info('directory %s already mounted.' % target)
-            return
-
         ### tmp. mv to config ###
         def getDefaultMountType(target):
             defaultmounts = {
@@ -284,6 +273,29 @@ class PhysicalNode(PyCoreNode):
 
             return mount_type
         ### /tmp ###
+
+        #for mount in self._mounts.append((source, target, mount_type))
+        already_mounted = False
+        for s, t, mt in self._mounts:
+            if target == t:
+                if mt == mount_type or \
+                        (mount_type is None and mt == getDefaultMountType(target)):
+                    already_mounted = True
+                    break
+                elif mt == 'bind':
+                    self.warn('mt: %s, mount_type: %s, default: %s' % (str(mt), str(mount_type),
+                            str(getDefaultMountType(target))))
+                    self.info(('mount type collision on directory: "%s".\n'
+                            '  the same directory is being requested with '
+                            'different mount types while already being mounted using '
+                            'bind-mounts.  remounting using union-mount...') % target)
+                    self.umount(target)
+                    already_mounted = False
+                    break
+
+        if already_mounted:
+            self.info('directory %s already mounted.' % target)
+            return
 
         source = os.path.abspath(source)
         self.info("nodedir: %s" % self.nodedir)
@@ -327,8 +339,8 @@ class PhysicalNode(PyCoreNode):
                 raise ValueError
             self.shcmd(shcmd)
             if mount_type == 'union':
-                self._mounts.append((target, bound_host_dir))
-            self._mounts.append((source, target))
+                self._mounts.append((target, bound_host_dir, mount_type))
+            self._mounts.append((source, target, mount_type))
         except Exception as e:
             self.warn("mounting failed for %s at %s. reason: %s" % (source, target, e))
 
