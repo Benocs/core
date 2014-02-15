@@ -152,31 +152,83 @@ class SimpleLxcNode(PyCoreNode):
         pass
 
     def mount(self, source, target, mount_type = None):
+
+        # we only mount top-level directories. strip any sub-dirs from paths
+        self.info('orig source, target: %s -> %s' % (source, target))
+        if target.count('/') > 1:
+            source = source[:source.find(target)]
+            target = target[:target[1:].find('/')+1]
+            source = os.path.join(source, target[1:])
+        self.info('new  source, target: %s -> %s' % (source, target))
+
+        #for mount in self._mounts.append((source, target))
+        already_mounted = False
+        for s, t in self._mounts:
+            if target == t:
+                already_mounted = True
+                break
+
+        if already_mounted:
+            self.info('directory %s already mounted.' % target)
+            return
+
+        ### tmp. mv to config ###
+        def getDefaultMountType(target):
+            defaultmounts = {
+                # fallback to default if no specified directory matches
+                '*': 'union',
+                '/bin': 'union',
+                '/boot': 'union',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/dev': 'bind',
+                '/etc': 'union',
+                '/home': 'bind',
+                '/lib': 'union',
+                '/lib64': 'union',
+                '/media': 'bind',
+                '/mnt': 'bind',
+                # TODO: opt: bind or union
+                '/opt': 'bind',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/proc': 'bind',
+                '/root': 'bind',
+                '/run': 'bind',
+                '/sbin': 'union',
+                '/srv': 'bind',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/sys': 'bind',
+                '/tmp': 'bind',
+                '/usr': 'union',
+                '/var': 'bind'
+                }
+
+            mount_type = None
+            for key in defaultmounts.keys():
+                if target.startswith(key):
+                    mount_type = defaultmounts[key]
+                    break
+            if mount_type is None:
+                mount_type = defaultmounts['*']
+
+            return mount_type
+        ### /tmp ###
+
         source = os.path.abspath(source)
         self.info("nodedir: %s" % self.nodedir)
         if mount_type is None:
-            self.warn(('not specifying a mount_type is deprecated. change your code. '
-                    'falling back to using union-mounts'))
-            self.info('mounting %s at %s using union-mounts' % (source, target))
-            mount_type = 'union'
+            mount_type = getDefaultMountType(target)
+            self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
         else:
             if mount_type == 'bind':
                 self.info('mounting %s at %s using bind-mounts' % (source, target))
             elif mount_type == 'union':
                 self.info('mounting %s at %s using union-mounts' % (source, target))
             else:
-                self.warn('unknown mount_type specified: %s. falling back to using union-mounts' % \
-                        str(mount_type))
-                self.info('mounting %s at %s using union-mounts' % (source, target))
-                mount_type = 'union'
+                mount_type = getDefaultMountType(target)
+                self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
 
         try:
             if mount_type == 'bind':
-                #TODO: don't mount if it is already mounted for bind mounts
-                #if os.path.exists(source):
-                #    self.info('source dir already exists: %s' % source)
-                #    return
-
                 shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
                     (target, MOUNT_BIN, source, target)
                 self.info('assembled bindcmd: %s' % shcmd)
@@ -186,13 +238,6 @@ class SimpleLxcNode(PyCoreNode):
 
                 bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
                 self.info('bound_host_dir: %s' % bound_host_dir)
-
-                # don't mount if it is already mounted
-                if os.path.exists('%s.%s' % (source, 'mounted')):
-                    self.info('source dir already mounted: %s' % source)
-                    return
-                else:
-                    touch('%s.%s' % (source, 'mounted'))
 
                 shcmditems = []
                 shcmditems.append("mkdir -p '%s' && mkdir -p '%s' && " %
@@ -425,11 +470,13 @@ class LxcNode(SimpleLxcNode):
             self.lock.release()
 
     def privatedir(self, path, mount_type = None):
-        if path[0] != "/":
+        if not os.path.isabs(path):
             raise ValueError("path not fully qualified: " + path)
-        hostpath = os.path.join(self.nodedir, path[1:].replace("/", "."))
+        #hostpath = os.path.join(self.nodedir, path[1:].replace("/", "."))
+        hostpath = os.path.join(self.nodedir, path.lstrip('/'))
         try:
-            os.mkdir(hostpath)
+            os.makedirs(hostpath, exist_ok = True)
+            #os.mkdir(hostpath)
         except OSError:
             pass
         except Exception as e:
@@ -442,9 +489,9 @@ class LxcNode(SimpleLxcNode):
         dirname, basename = os.path.split(filename)
         if not basename:
             raise ValueError("no basename for filename: " + filename)
-        if dirname and dirname[0] == "/":
-            dirname = dirname[1:]
-        dirname = dirname.replace("/", ".")
+        if dirname and os.path.isabs(dirname):
+            dirname = dirname.lstrip('/')
+        #dirname = dirname.replace("/", ".")
         dirname = os.path.join(self.nodedir, dirname)
         return os.path.join(dirname, basename)
 
@@ -477,5 +524,17 @@ class LxcNode(SimpleLxcNode):
         if mode is not None:
             os.chmod(hostfilename, mode)
         self.info("copied nodefile: '%s'; mode: %s" % (hostfilename, mode))
-        
+
+    def nodefilelink(self, srcfilename, filename, hard = True):
+        ''' Create a link within the node to point to a file '''
+
+        print('nodefilelink: srcfilename: %s, filename: %s, hard: %s' % (str(srcfilename),
+                str(filename), str(hard)))
+        hostfilename = self.hostfilename(filename)
+        print('  hostfilename: %s' % (str(hostfilename)))
+        if hard:
+            os.link(srcfilename, hostfilename)
+        else:
+            os.symlink(srcfilename, hostfilename)
+        self.info("created link : '%s' -> '%s'" % (srcfilename, hostfilename))
 

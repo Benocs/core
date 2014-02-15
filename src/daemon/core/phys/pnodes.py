@@ -225,66 +225,112 @@ class PhysicalNode(PyCoreNode):
         self.mount(hostpath, path, mount_type)
 
     def mount(self, source, target, mount_type = None):
+        # we only mount top-level directories. strip any sub-dirs from paths
+        self.info('orig source, target: %s -> %s' % (source, target))
+        if target.count('/') > 1:
+            source = source[:source.find(target)]
+            target = target[:target[1:].find('/')+1]
+            source = os.path.join(source, target[1:])
+        self.info('new  source, target: %s -> %s' % (source, target))
+
+        #for mount in self._mounts.append((source, target))
+        already_mounted = False
+        for s, t in self._mounts:
+            if target == t:
+                already_mounted = True
+                break
+
+        if already_mounted:
+            self.info('directory %s already mounted.' % target)
+            return
+
+        ### tmp. mv to config ###
+        def getDefaultMountType(target):
+            defaultmounts = {
+                # fallback to default if no specified directory matches
+                '*': 'union',
+                '/bin': 'union',
+                '/boot': 'union',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/dev': 'bind',
+                '/etc': 'union',
+                '/home': 'bind',
+                '/lib': 'union',
+                '/lib64': 'union',
+                '/media': 'bind',
+                '/mnt': 'bind',
+                # TODO: opt: bind or union
+                '/opt': 'bind',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/proc': 'bind',
+                '/root': 'bind',
+                '/run': 'bind',
+                '/sbin': 'union',
+                '/srv': 'bind',
+                # TODO: introduce third mount-type for dev, proc, et al?
+                '/sys': 'bind',
+                '/tmp': 'bind',
+                '/usr': 'union',
+                '/var': 'bind'
+                }
+
+            mount_type = None
+            for key in defaultmounts.keys():
+                if target.startswith(key):
+                    mount_type = defaultmounts[key]
+                    break
+            if mount_type is None:
+                mount_type = defaultmounts['*']
+
+            return mount_type
+        ### /tmp ###
+
         source = os.path.abspath(source)
         self.info("nodedir: %s" % self.nodedir)
         if mount_type is None:
-            self.warn(('not specifying a mount_type is deprecated. change your code. '
-                    'falling back to using bind-mounts'))
-            self.info('mounting %s at %s using bind-mounts' % (source, target))
-            mount_type = 'bind'
+            mount_type = getDefaultMountType(target)
+            self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
         else:
             if mount_type == 'bind':
                 self.info('mounting %s at %s using bind-mounts' % (source, target))
             elif mount_type == 'union':
                 self.info('mounting %s at %s using union-mounts' % (source, target))
             else:
-                self.warn('unknown mount_type specified: %s. falling back to using bind-mounts' % \
-                        str(mount_type))
-                self.info('mounting %s at %s using bind-mounts' % (source, target))
-                mount_type = 'bind'
+                mount_type = getDefaultMountType(target)
+                self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
 
         try:
             if mount_type == 'bind':
-                try:
-                    os.makedirs(target)
-                except OSError:
-                    pass
-                cmd = [MOUNT_BIN, '--bind', source, target]
-                self.info('assembled bindcmd: %s' % cmd)
+                shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
+                    (target, MOUNT_BIN, source, target)
+                self.info('assembled bindcmd: %s' % shcmd)
             elif mount_type == 'union':
-                self.info('mounting. src: %s -> target: %s' % (source, target))
-
-                host_dirs = os.path.join(self.nodedir, 'host_dirs')
+                host_dirs = os.path.join(self.nodedir, '../host_dirs')
                 self.info('host_dirs: %s' % host_dirs)
 
                 bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
                 self.info('bound_host_dir: %s' % bound_host_dir)
 
-                try:
-                    os.makedirs(bound_host_dir)
-                except OSError:
-                    pass
-                try:
-                    os.makedirs(target)
-                except OSError:
-                    pass
-
-
-                cmd = [MOUNT_BIN, '--bind', target, bound_host_dir]
-                self.info('assembled unionfscmd - bind part: %s' % cmd)
-                self.cmd(cmd)
-                cmd = [UNIONFS_BIN, '-o', 'cow,max_files=32768', '-o',
-                        'allow_other,use_ino,suid,dev,nonempty',
-                        '%s=RW:%s=RO' % (source, bound_host_dir), target]
-                self.info('assembled unionfscmd: %s' % cmd)
+                shcmditems = []
+                shcmditems.append("mkdir -p '%s' && mkdir -p '%s' && " %
+                        (bound_host_dir, target))
+                if not os.path.exists(bound_host_dir):
+                    shcmditems.append("rsync -avhP '%s/' '%s/' && " %
+                            (target, bound_host_dir))
+                shcmditems.extend([("%s -o cow,max_files=32768 "
+                        "-o allow_other,use_ino,suid,dev,nonempty "
+                        "%s=RW:%s=RO %s") % (UNIONFS_BIN, source,
+                        bound_host_dir, target)])
+                shcmd = ''.join(shcmditems)
+                self.info('assembled unionfscmd: %s' % shcmd)
             else:
                 raise ValueError
-            self.cmd(cmd)
+            self.shcmd(shcmd)
             if mount_type == 'union':
                 self._mounts.append((target, bound_host_dir))
             self._mounts.append((source, target))
-        except:
-            self.warn("mounting failed for %s at %s" % (source, target))
+        except Exception as e:
+            self.warn("mounting failed for %s at %s. reason: %s" % (source, target, e))
 
     def umount(self, target):
         self.info("unmounting '%s'" % target)
