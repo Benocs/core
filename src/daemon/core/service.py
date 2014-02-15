@@ -241,11 +241,13 @@ class CoreServices(ConfigurableManager):
                     'private directories. instead of using plain strings, use '
                     'a tuple: (<privatedir>, <mount_type>). with mount_type = '
                     '["bind", "union"]') % str(s._name))
-                d = (d, "union")
+                d = (d, None)
             else:
                 raise ValueError
             try:
                 node.privatedir(d[0], d[1])
+                if hasattr(s, 'populateDirectory'):
+                    s.populateDirectory(node, d, services)
             except Exception as  e:
                 node.warn("Error making node %s dir %s: %s" % \
                           (node.name,  d[0],  e))
@@ -255,7 +257,7 @@ class CoreServices(ConfigurableManager):
         for cmd in s.getstartup(node, services):
             try:
                 # TODO: FIXME: XXX: NOTE: this wait=False can be problematic!
-                node.cmd(shlex.split(cmd),  wait = False)
+                node.cmd(shlex.split(cmd), wait = False)
             except Exception as e:
                 node.warn("error starting command %s: %s" % (cmd, e))
 
