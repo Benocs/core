@@ -225,6 +225,9 @@ class PhysicalNode(PyCoreNode):
         self.mount(hostpath, path, mount_type)
 
     def mount(self, source, target, mount_type = None):
+        self.info('received mount request. type: %s, source, target: %s -> %s' % (str(mount_type),
+                source, target))
+
         # we only mount top-level directories. strip any sub-dirs from paths
         self.info('orig source, target: %s -> %s' % (source, target))
         if target.count('/') > 1:
