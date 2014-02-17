@@ -21,9 +21,13 @@ import os
 from core.service import CoreService, addservice
 from core.misc.utils import *
 
-from core.services import utility
+class BaseWebService(CoreService):
+    _name = "WebService"
+    _group = "Utility"
+    _depends = ()
 
-class Lighttpd(BaseContentService):
+
+class Lighttpd(BaseWebService):
     _name = "Lighttpd"
     _configs = ("/etc/lighttpd/lighttpd.conf",)
     _dirs = (("/etc/lighttpd", "union"), ("/var/www", "bind"),
@@ -44,13 +48,6 @@ class Lighttpd(BaseContentService):
     def generateLighttpdConf(cls, node, filename):
         # TODO: for now, only return default config
         return cls.generateDefaultLighttpdConf()
-
-    @classmethod
-    def populateDirectory(cls, node, directory, services):
-        print('populateDirectory: %s ' % str(directory))
-        if directory == cls._dirs[1]:
-            ContentServerContent.getFiles(node)
-
 
     @staticmethod
     def generateDefaultLighttpdConf():
