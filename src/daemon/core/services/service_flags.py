@@ -60,3 +60,7 @@ class DNSRootServer(ServiceFlag):
 
 addservice(DNSRootServer)
 
+class HTTPClient(ServiceFlag):
+    _name = "HTTPClient"
+
+addservice(HTTPClient)
