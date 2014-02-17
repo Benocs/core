@@ -275,7 +275,7 @@ class CoreServices(ConfigurableManager):
                     'private directories. instead of using plain strings, use '
                     'a tuple: (<privatedir>, <mount_type>). with mount_type = '
                     '["bind", "union"]') % str(s._name))
-                d = (d, "union")
+                d = (d, None)
             else:
                 raise ValueError
             try:
