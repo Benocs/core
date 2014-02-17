@@ -34,9 +34,9 @@ class Zebra(CoreService):
     _name = "zebra"
     _group = "Quagga"
     _depends = ("vtysh", "LoopbackAddress")
-    _dirs = ("/usr/local/etc/quagga",  "/var/run/quagga")
-    _configs = ("/usr/local/etc/quagga/Quagga.conf",
-                "quaggaboot.sh","/usr/local/etc/quagga/vtysh.conf")
+    _dirs = ("/etc/quagga",  "/var/run/quagga")
+    _configs = ("/etc/quagga/Quagga.conf",
+                "quaggaboot.sh","/etc/quagga/vtysh.conf")
     _startindex = 35
     _startup = ("sh quaggaboot.sh zebra",)
     _shutdown = ("killall zebra", )
@@ -162,19 +162,6 @@ searchforprog()
     echo $ret
 }
 
-confcheck()
-{
-    CONF_DIR=`dirname $QUAGGA_CONF`
-    # if /etc/quagga exists, point /etc/quagga/Quagga.conf -> CONF_DIR
-    if [ "$CONF_DIR" != "/etc/quagga" ] && [ -d /etc/quagga ] && [ ! -e /etc/quagga/Quagga.conf ]; then
-        ln -s $CONF_DIR/Quagga.conf /etc/quagga/Quagga.conf
-    fi
-    # if /etc/quagga exists, point /etc/quagga/vtysh.conf -> CONF_DIR
-    if [ "$CONF_DIR" != "/etc/quagga" ] && [ -d /etc/quagga ] && [ ! -e /etc/quagga/vtysh.conf ]; then
-        ln -s $CONF_DIR/vtysh.conf /etc/quagga/vtysh.conf
-    fi
-}
-
 waitforvtyfiles()
 {
     for f in "$@"; do
@@ -228,7 +215,6 @@ bootvtysh()
     $QUAGGA_BIN_DIR/vtysh -b
 }
 
-confcheck
 if [ "x$1" = "x" ]; then
     echo "ERROR: missing the name of the Quagga daemon to boot"
     exit 1
