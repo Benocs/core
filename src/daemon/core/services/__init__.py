@@ -5,4 +5,4 @@ __all__ is automatically loaded by the main core module.
 """
 __all__ = ["quagga", "nrl", "xorp", "bird", "utility", "security", "ucarp",
            "monitoring", "service_flags", "router_services", "misc",
-           "web_services"]
+           "web_services", "dns_services"]
