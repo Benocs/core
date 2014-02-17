@@ -558,6 +558,8 @@ proc exit {} {
 
     # save user preferences
     savePrefsFile
+    # save briteConf stuff
+    writeBriteConf
     
     exit.real
 }

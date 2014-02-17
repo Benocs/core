@@ -203,8 +203,13 @@ set mac_byte5 0
 set g_mrulist {}
 initDefaultPrefs
 
+
 # testing vars Prefs
+# nach muster. erst standardwerte laden, dann mit
+# 
+#  gespeicehrten werten ueberschreiben
 initTestingPrefs
+loadBriteConf
 
 loadDotFile
 loadPluginsConf
