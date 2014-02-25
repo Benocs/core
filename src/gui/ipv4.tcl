@@ -466,7 +466,7 @@ proc autoIPv4addr { node iface } {
 	#   und fall wenn router an schon bestehendes switchnetz
 	#   angeschlossen wird
 	#puts "hinverbunden zu"
-	#puts $node
+	#puts $node 
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
 		#puts "LINKFALL1"
@@ -476,7 +476,8 @@ proc autoIPv4addr { node iface } {
 	} else {
                 set ipnet [findFreeIPv4Net $node 24]
                 setIfcIPv4addr $node $iface "$ipnet/30"
-	}
+	
+}
 
 	set tempAS 999
     } else {
