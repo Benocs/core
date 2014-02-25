@@ -481,17 +481,21 @@ proc autoIPv4addr { node iface } {
     # peer has an IPv4 address, allocate a new address on the same network
     if { $peer_ip4addrs != "" } {
 	# behandelt diejenige seite der links an die man hinverbindet
+	#   und fall wenn router an schon bestehendes switchnetz
+	#   angeschlossen wird
 	#puts "hinverbunden zu"
-	#puts $node
+	#puts $node 
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
+		#puts "LINKFALL1"
 		# hier sind addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
 	} else {
                 set ipnet [findFreeIPv4Net $node 24]
                 setIfcIPv4addr $node $iface "$ipnet/30"
-	}
+	
+}
 
 	set tempAS 999
     } else {
@@ -500,6 +504,7 @@ proc autoIPv4addr { node iface } {
 	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
+		#puts "LINKFALL2"
 		# hier sind keine addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"

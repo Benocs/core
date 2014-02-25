@@ -49,41 +49,277 @@
 # RESULT
 #   * ipnet -- returns the free IPv6 network address in the form "a $i". 
 #****
- 
-proc findFreeIPv6Net { mask } {
-    global g_prefs node_list
 
-    set ipnets {}
-    foreach node $node_list {
-	foreach ifc [ifcList $node] {
-	    set ipparts [split [getIfcIPv6addr $node $ifc] :]
-	    set endidx [expr {[lsearch $ipparts {}] - 1}]
-	    if {$endidx < 0 } { set endidx end }
-	    set ipnet [lrange $ipparts 0 $endidx]
-	    if {[lsearch $ipnets $ipnet] == -1} {
-		lappend ipnets $ipnet
-	    }
-	}
+proc findFreeIPv6Net { quarknode mask } {
+    global g_prefs node_list tempAS
+
+# alle 63er sammeln und  alle 54er sammeln
+# -> 7tes und 8tes byte von allen nodes sammeln
+
+  set ipnetsv6 {}
+
+  foreach node $node_list {
+    foreach ifc [ifcList $node] {
+      # get complete ipv6
+      set ipnetv6 [lrange [split [getIfcIPv6addr $node $ifc] ":/"] 0 8]
+      if {[lsearch $ipnetsv6 $ipnetv6] == -1} {
+
+        lappend ipnetsv6 $ipnetv6
+      }
     }
-    # include mobility newlinks in search
-    foreach newlink [.c find withtag "newlink"] {
-        set ipnet [lrange [split [lindex [.c gettags $newlink] 5] :] 0 3]
-	lappend ipnets $ipnet
+  }
+
+
+  set ipnetsv63rds {}
+
+  foreach node $node_list {
+    foreach ifc [ifcList $node] {
+      # get only 3rd element of every ipv6
+      set ipnetv63rd [lrange [split [getIfcIPv6addr $node $ifc] :] 3 3]
+      if {[lsearch $ipnetsv63rds $ipnetv63rd] == -1 || [llength [lsearch -all -inline $ipnetsv63rds $ipnetv63rd]] == 1} {
+
+        lappend ipnetsv63rds $ipnetv63rd
+      }
     }
-    if {![info exists g_prefs(gui_ipv6_addr)]} { setDefaultAddrs ipv6 }
-    set newnet [split $g_prefs(gui_ipv6_addr) :]
-    set endidx [expr {[lsearch $newnet {}] - 1}]
-    if {$endidx < 0 } { set endidx end }
-    set newnet [lrange $newnet 0 $endidx]
-    
-    for { set i 0 } { $i <= 9999 } { incr i } {
-	if {[lsearch $ipnets "$newnet $i"] == -1} {
-	    set newnetcolon [join $newnet :]
-	    set ipnet "$newnetcolon:$i"
-	    return $ipnet
-	}
+  }
+
+
+  # aufruf von buildInterfaceID
+  buildInterfaceID $quarknode
+
+  # asid von quarknode wie bei ipv4
+  set i [getASiD $quarknode]
+  # von zu ASip abhandeln
+  if { [info exists tempAS] } {
+    if { $tempAS != 999 } {
+      set i $tempAS
     }
+  }
+
+  set startv6 0
+
+  for {set j $startv6 } { $j < 65535} { incr j 2 } {
+
+    # pruefen ob >nicht< schon vorhanden
+    # TODO da hier nur 3tes element getestet sollte noch
+    #    komplette ipv6 auf existenz getestet werden
+    set ls_r [lsearch -all -inline $ipnetsv63rds [expr 0x$j]]
+
+    if { [llength $ls_r] == 0 || [llength $ls_r] == 1 } {
+      # entweder noch nicht oder erst einmal vorhanden
+      set as [string toupper [format %x $i]]
+
+      set subnet [string toupper [format %x $j]]
+
+      set ipnet "FDAA:$as:AAAA:$subnet:[buildInterfaceID $quarknode]"
+
+      return $ipnet
+    }
+
+  }
+
 }
+
+
+# hier werden die letzten 64bit erzeugt
+#   parameter: 
+#   return: hintere 64bit in der form: >N<ode< >I<nterface
+#            NNNN:NNFF:FEII:IIII
+proc buildInterfaceID { cur_node } {
+
+  global node_list
+
+  # einfacher zaehler welcher knoten -> davon abgeleitet die mac bestimmen
+  set zaehler1 0
+  set zaehler2 0
+  set nodenr 0
+  set ifcnr 0
+
+  foreach node $node_list {
+
+      # soll XX:XX:XX:00:00:00 x ausmachen
+      incr zaehler1 
+    
+      if { $node == $cur_node } {
+        foreach ifc [ifcList $node] {
+          # soll 00:00:00:XX:XX:XX x ausmachen
+          incr zaehler2
+
+        }
+        set ifcnr $zaehler2
+        set nodenr $zaehler1
+        break
+      }
+  }
+
+
+  # hier hintere bytes -> steigen bei anzahl der interfaces
+  # TODO auch lsb2 betrachte
+  set lsb0 0
+  set lsb1 0
+  set lsb2 0
+
+  for { set z2 0 } { $z2 < $zaehler2 } { incr z2 } {
+    set lsb1 $z2
+   
+    for { set var1 0 } { $var1 < 255 && $z2 < $zaehler2 } { incr var1 } {
+      set lsb0 $var1
+
+      # TODO wie war das gemeint. wie bei werten unter 16 fuehrende 0
+      incr z2
+    }
+  }
+
+  if { $lsb0 < 15 } {
+    set ipv6_0_0 "0[format %x $lsb0]"
+  } else {
+    set ipv6_0_0 "[format %x $lsb0]"
+  }
+
+
+  if { $lsb1 < 15 } {
+    set ipv6_0_1 "0[format %x $lsb1]"
+  } else {
+    set ipv6_0_1 "[format %x $lsb1]"
+  }
+
+  set ipv6_0 "00:$ipv6_0_1$ipv6_0_0" 
+
+
+  # hier vordere bytes nach selben muster
+  #   wie hintere bytes -> steigen bei anzahl der nodes
+  # TODO auch lsb5 behandeln
+  set lsb3 0
+  set lsb4 0
+  set lsb5 0
+
+  for { set z1 0 } { $z1 < $zaehler1 } { incr z1 } {
+    set lsb4 $z1
+    #puts "$lsb1:$lsb0"
+    for { set var2 0 } { $var2 < 255 && $z1 < $zaehler1 } { incr var2 } {
+      set lsb3 $var2
+
+      incr z1
+    }
+  }
+
+
+  if { $lsb3 < 15 } {
+    set ipv6_1_0 "0[format %x $lsb3]"
+  } else {
+    set ipv6_1_0 "[format %x $lsb3]"
+  }
+
+
+
+  if { $lsb4 < 15 } {
+    set ipv6_1_1 "0[format %x $lsb4]"
+  } else {
+    set ipv6_1_1 "[format %x $lsb4]"
+  }
+
+  set ipv6_1 "00$ipv6_1_1:$ipv6_1_0" 
+
+  set temp "$ipv6_1" 
+  append temp "FF:FE$ipv6_0"
+  return $temp
+
+}
+
+#****f* ipv6.tcl/findFreeIPv6NetLink
+# NAME
+#   findFreeIPv6Net -- find free IPv6 network for links to switch
+# SYNOPSIS
+#   set ipnet [findFreeIPv4NetLink $mask]
+# FUNCTION
+#   Finds a free IPv6 network. Network is concidered to be free
+#   if there are no simulated nodes attached to it. 
+# INPUTS
+#   * mask -- this parameter is left unused for now
+# RESULT
+#   * ipnet -- returns the free IPv6 network address in the form "a $i". 
+#****
+proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
+  global g_prefs node_list tempAS
+
+
+  set ipnetsv6 {}
+
+  foreach node $node_list {
+    foreach ifc [ifcList $node] {
+      # get complete ipv6
+      set ipnetv6 [lrange [split [getIfcIPv6addr $node $ifc] ":/"] 0 8]
+      if {[lsearch $ipnetsv6 $ipnetv6] == -1} {
+
+        lappend ipnetsv6 $ipnetv6
+      }
+    }
+  }
+
+
+  set ipnetsv63rds {}
+
+  foreach node $node_list {
+    foreach ifc [ifcList $node] {
+      # get only 3rd element of every ipv6
+      set ipnetv63rd [lrange [split [getIfcIPv6addr $node $ifc] :] 3 3]
+      if {[lsearch $ipnetsv63rds $ipnetv63rd] == -1 || [llength [lsearch -all -inline $ipnetsv63rds $ipnetv63rd]] == 1} {
+
+        lappend ipnetsv63rds $ipnetv63rd
+      }
+    }
+  }
+
+
+  # langfristig eine getASiD fuer v4 und eine fuer v6
+  #   in richtiger syntax
+  set i [getASiD $linkNode]
+
+  if { 0 == [llength $ip6AmSwitchNetzAddressen] } {
+    # fall neues 56er
+    # solange 56er netz runterzaehlen bis freies entdeckt
+    set zahl1 65280
+
+    # von FF00 runter in subnetbits bis freies subnet gefunden
+    for { set j $zahl1 } { $j > 0 } { set j [expr $j - 256] } {
+
+      # decimal j in hex -> treffer von ipnetsv63rds in ls_r speichern als HEX
+      set ls_r [lsearch -all -inline $ipnetsv63rds [format %x $j]]
+      # noch nicht vorhanden -> == 0
+      if { [llength $ls_r] == 0 } {
+        
+        set as [string toupper [format %x $i]]
+        
+
+        set subnet [string toupper [format %x $j]]
+
+        # interface komponente von buildInterfaceID ist hier immer 0
+        set ipnet "FDAA:$as:AAAA:$subnet:[buildInterfaceID $linkNode]"
+        
+        return $ipnet
+
+      }
+      
+    }
+
+  } else {
+    # es gibt bereits 56er an peers
+    # 56er uebernehmen und hintere 64bit nach schema
+
+    # momentane subnetID der peers -> konkret
+    #   des letzten in der liste
+    set subnetID [lrange [split [lindex $ip6AmSwitchNetzAddressen end] :] 3 3]
+
+    set as [string toupper [format %x $i]]
+
+    set ipnet "FDAA:$as:AAAA:$subnetID:[buildInterfaceID $linkNode]"
+
+    return $ipnet
+
+  }
+
+}
+
 
 #****f* ipv6.tcl/autoIPv6addr 
 # NAME
@@ -99,10 +335,12 @@ proc findFreeIPv6Net { mask } {
 #   * iface -- the interface to witch a new, automatilacy generated, IPv6  
 #     address will be assigned
 #****
-
 proc autoIPv6addr { node iface } {
     set peer_ip6addrs {}
-    set netmaskbits 64 ;# default
+    set netmaskbits 63 ;# default
+
+    global tempAS
+
     setIfcIPv6addr $node $iface ""
 
     set peer_node [logicalPeerByIfc $node $iface]
@@ -153,18 +391,33 @@ proc autoIPv6addr { node iface } {
 	    set targetbyte 1
 	}
     }
+
     # peer has an IPv6 address, allocate a new address on the same network
     if { $peer_ip6addrs != "" } {
-	set net [ipv6ToNet [lindex $peer_ip6addrs 0] 64]
-	set ipaddr $net\::$targetbyte
-	while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
-	    incr targetbyte
-	    set ipaddr $net\::$targetbyte
-	}
-	setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
+	
+        if { [[typemodel $peer_node].layer] == "LINK" } {
+                # hier sind addressen in $peer_ip4addrs
+                set ipnet [findFreeIPv6NetLink $node 24 $peer_ip6addrs]
+                setIfcIPv6addr $node $iface "$ipnet/54"
+        } else {
+                set ipnet [findFreeIPv6Net $node 24]
+                setIfcIPv6addr $node $iface "$ipnet/63"
+        }
+
+	set tempAS 999
     } else {
-	set ipnet [findFreeIPv6Net 64]
-	setIfcIPv6addr $node $iface "${ipnet}::$targetbyte/$netmaskbits"
+
+        if { [[typemodel $peer_node].layer] == "LINK" } {
+                # hier sind keine addressen in $peer_ip4addrs
+                set ipnet [findFreeIPv6NetLink $node 24 $peer_ip6addrs]
+                setIfcIPv6addr $node $iface "$ipnet/54"
+        } else {
+                set ipnet [findFreeIPv6Net $node 24]
+                setIfcIPv6addr $node $iface "$ipnet/63"
+                #setNodeNetId $peer_node [getASiD $node]
+        }
+
+	set tempAS [getASiD $node]
     }
 }
 
@@ -180,7 +433,7 @@ proc autoIPv6addr { node iface } {
 #   * node_id -- default gateway is provided for this node 
 #   * iface -- the interface on witch we search for a new default gateway
 #****
-
+#TODO schauen ob das mit autoIPv6addr interferiert
 proc autoIPv6defaultroute { node iface } {
     if { [[typemodel $node].layer] != "NETWORK" } {
 	#
@@ -237,7 +490,7 @@ proc autoIPv6defaultroute { node iface } {
 #   * valid -- function returns 0 if the input string is not in the form
 #     of a valid IP address, 1 otherwise
 #****
-
+# TODO schaut nur die syntax an.. nicht etwa ieee vorgaben
 proc checkIPv6Addr { str } {
     set doublec false
     set wordlist [split $str :]
@@ -404,7 +657,7 @@ proc expandIPv6 { ip } {
 # Boeing
 # ***** ipv6.tcl/ipv6ToNet
 # NAME
-#  ipv6ToNet -- convert IPv6 address a.b.c.d to a.b.c 
+#  ipv6ToNet -- convert IPv6 address a:b:c:d:e:f:g:h to a:b:c:d 
 # ****
 
 proc ipv6ToNet { ip mask } {
@@ -413,6 +666,9 @@ proc ipv6ToNet { ip mask } {
 	set ipv6parts [lrange $ipv6nums 0 [expr [llength $ipv6nums] - 3]]
     	return [join $ipv6parts :]
 }
+
+
+
 
 # 
 # Boeing
@@ -452,7 +708,7 @@ proc autoIPv6wlanaddr { node } {
 
 proc getDefaultIPv6Addrs { } {
     global g_prefs
-    return [list "2001::" "2002::" "a::"]
+    return [list "FC00::" "FD00::" "2001::" "2002::" "a::"]
 }
 
 proc ipv6List { node wantmask } {

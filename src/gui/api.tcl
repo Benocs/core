@@ -1729,6 +1729,7 @@ proc sendNodePosMessage { channel node nodeid x y wlanid force } {
 }
 
 # build a new node
+# wird fuer jeden node aufgerufen wenn die session gestartet wird
 proc sendNodeAddMessage { channel node } {
     global showAPI CORE_DATA_DIR
     set prmsg $showAPI
@@ -1737,6 +1738,8 @@ proc sendNodeAddMessage { channel node } {
     set ipv6 0
     set macstr ""
     set wireless 0
+
+
 
     # type, name
     set type [getNodeTypeAPI $node]
@@ -1818,6 +1821,7 @@ proc sendNodeAddMessage { channel node } {
 	set msg [binary format c2sI {0x4 4} 0 $ipv4]
 	puts -nonewline $channel $msg
     }
+
 
     # MAC address
     if { $macstr != "" } {
@@ -2089,6 +2093,7 @@ proc sendLinkMessage { channel link type } {
 
 # helper to get IPv4, IPv6, MAC address and increment length
 # also prints TLV-style addresses if showAPI is true
+# wird aufgerufen pro node bei start der session
 proc getIfcAddrs { node ifc ipv4p ipv6p macp ipv4maskp ipv6maskp lenp } {
     global showAPI
     upvar $ipv4p ipv4
@@ -3195,7 +3200,7 @@ proc macToString { mac_num } {
     set r {}
     set i [llength $mac_bytes]
     while { $i > 0 } { lappend r [lindex $mac_bytes [incr i -1]] }
-    
+   
     return [join $r :]
 }
 
