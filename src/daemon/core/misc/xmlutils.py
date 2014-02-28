@@ -11,7 +11,7 @@ the main public interface here.
 '''
 import os, pwd
 from xml.dom.minidom import parse, Document, Node
-from core import pycore
+from core.netns import nodes
 from core.api import coreapi
 
 def addelementsfromlist(dom, parent, iterable, name, attr_name):
@@ -33,6 +33,13 @@ def addtextelementsfromlist(dom, parent, iterable, name, attrs):
     ''' XML helper to iterate through a list and add items to parent using tags
     of the given name, attributes specified in the attrs tuple, and having the 
     text of the item within the tags.
+    Example: addtextelementsfromlist(dom, parent, ('a','b','c'), "letter",
+                                     (('show','True'),))
+    <parent>
+      <letter show="True">a</letter>
+      <letter show="True">b</letter>
+      <letter show="True">c</letter>
+    </parent>
     '''
     for item in iterable:
         element = dom.createElement(name)
@@ -40,6 +47,28 @@ def addtextelementsfromlist(dom, parent, iterable, name, attrs):
             element.setAttribute(k, v)
         parent.appendChild(element)
         txt = dom.createTextNode(item)
+        element.appendChild(txt)
+
+def addtextelementsfromtuples(dom, parent, iterable, attrs=()):
+    ''' XML helper to iterate through a list of tuples and add items to
+    parent using tags named for the first tuple element,
+    attributes specified in the attrs tuple, and having the
+    text of second tuple element.
+    Example: addtextelementsfromtuples(dom, parent,
+                 (('first','a'),('second','b'),('third','c')),
+                 (('show','True'),))
+    <parent>
+      <first show="True">a</first>
+      <second show="True">b</second>
+      <third show="True">c</third>
+    </parent>
+    '''
+    for name, value in iterable:
+        element = dom.createElement(name)
+        for k,v in attrs:
+            element.setAttribute(k, v)
+        parent.appendChild(element)
+        txt = dom.createTextNode(value)
         element.appendChild(txt)
 
 def gettextelementstolist(parent):
@@ -113,19 +142,22 @@ def getparamssetattrs(dom, param_names, target):
             setattr(target, param_name, str(value))
 
 def xmltypetonodeclass(session, type):
-    ''' Helper to convert from a type string to a class name in pycore.nodes.*.
+    ''' Helper to convert from a type string to a class name in nodes.*.
     '''
-    if hasattr(pycore.nodes, type):
-        return eval("pycore.nodes.%s" % type)
+    if hasattr(nodes, type):
+        return eval("nodes.%s" % type)
     else:
         return None
 
 class CoreDocumentParser(object):
-    def __init__(self, session, filename):
+    def __init__(self, session, filename, start=False,
+                 nodecls=nodes.CoreNode):
         self.session = session
         self.verbose = self.session.getcfgitembool('verbose', False)
         self.filename = filename
         self.dom = parse(filename)
+        self.start = start
+        self.nodecls = nodecls
         
         #self.scenario = getoneelement(self.dom, "Scenario")
         self.np = getoneelement(self.dom, "NetworkPlan")
@@ -139,6 +171,7 @@ class CoreDocumentParser(object):
         # link parameters parsed in parsenets(), applied in parsenodes()
         self.linkparams = {}
         
+        self.parsedefaultservices()
         self.parsenets()
         self.parsenodes()
         self.parseservices()
@@ -197,7 +230,7 @@ class CoreDocumentParser(object):
                           (name, type))
                 continue
             n = self.session.addobj(cls = nodecls, objid = id, name = name,
-                                    start = False)
+                                    start = self.start)
             if name in self.coords:
                 x, y, z = self.coords[name]
                 n.setposition(x, y, z)
@@ -207,27 +240,40 @@ class CoreDocumentParser(object):
             # links between two nets (e.g. switch-switch)
             for ifc in net.getElementsByTagName("interface"):
                 netid = str(ifc.getAttribute("net"))
-                linkednets.append((n, netid))
+                ifcname = str(ifc.getAttribute("name"))
+                linkednets.append((n, netid, ifcname))
             self.parsemodels(net, n)
         # link networks together now that they all have been parsed
-        for (n, netid) in linkednets:
+        for (n, netid, ifcname) in linkednets:
             try:
                 n2 = n.session.objbyname(netid)
             except KeyError:
                 n.warn("skipping net %s interface: unknown net %s" % \
                           (n.name, netid))
                 continue
-            n.linknet(n2)
+            upstream = False
+            netif = n.getlinknetif(n2)
+            if netif is None:
+                netif = n2.linknet(n)
+            else:
+                netif.swapparams('_params_up')
+                upstream = True
+            key = (n2.name,  ifcname)
+            if key in self.linkparams:
+                for (k, v) in self.linkparams[key]:
+                    netif.setparam(k, v)
+            if upstream:
+                netif.swapparams('_params_up')
     
     def parsenodes(self):
         for node in self.np.getElementsByTagName("Node"):
             id, name, type = self.getcommonattributes(node)
             if type == "rj45":
-                nodecls = pycore.nodes.RJ45Node
+                nodecls = nodes.RJ45Node
             else:
-                nodecls = pycore.nodes.CoreNode
+                nodecls = self.nodecls
             n = self.session.addobj(cls = nodecls, objid = id, name = name,
-                                    start = False)
+                                    start = self.start)
             if name in self.coords:
                 x, y, z = self.coords[name]
                 n.setposition(x, y, z)
@@ -335,6 +381,21 @@ class CoreDocumentParser(object):
             value = int(value)
         return (key, value)
     
+    def parsedefaultservices(self):
+        ''' Prior to parsing nodes, use session.services manager to store
+        default services for node types
+        '''
+        for node in self.sp.getElementsByTagName("Node"):
+            type = node.getAttribute("type")
+            if type == '':
+                continue # node-specific service config
+            services = []
+            for service in node.getElementsByTagName("Service"):
+                services.append(str(service.getAttribute("name")))
+            self.session.services.defaultservices[type] = services
+            self.session.info("default services for type %s set to %s" % \
+                              (type, services))
+
     def parseservices(self):
         ''' After node objects exist, parse service customizations and add them
         to the nodes.
@@ -343,6 +404,8 @@ class CoreDocumentParser(object):
         # parse services and store configs into session.services.configs
         for node in self.sp.getElementsByTagName("Node"):
             name = node.getAttribute("name")
+            if name == '':
+                continue # node type without name
             n = self.session.objbyname(name)
             if n is None:
                 self.warn("skipping service config for unknown node '%s'" % \
@@ -355,6 +418,15 @@ class CoreDocumentParser(object):
                         svclists[n.objid] += "|" + svcname
                     else:
                         svclists[n.objid] = svcname
+        # nodes in NetworkPlan but not in ServicePlan use the
+        # default services for their type
+        for node in self.np.getElementsByTagName("Node"):
+            id, name, type = self.getcommonattributes(node)
+            if id in svclists:
+                continue # custom config exists
+            else:
+                svclists[int(id)] = None # use defaults
+
         # associate nodes with services
         for objid in sorted(svclists.keys()):
             n = self.session.obj(objid)
@@ -482,6 +554,7 @@ class CoreDocumentWriter(Document):
 
     def populatefromsession(self):
         self.session.emane.setup() # not during runtime?
+        self.adddefaultservices()
         self.addnets()
         self.addnodes()
         self.addmetadata()
@@ -502,7 +575,7 @@ class CoreDocumentWriter(Document):
         '''
         with self.session._objslock:
             for net in self.session.objs():
-                if not isinstance(net, pycore.nodes.PyCoreNet):
+                if not isinstance(net, nodes.PyCoreNet):
                     continue
                 self.addnet(net)
 
@@ -533,15 +606,27 @@ class CoreDocumentWriter(Document):
         parameters. TODO: Interface parameters should be moved to the model
         construct, then this separate method shouldn't be required.
         '''
-        if not hasattr(netif, "node") or netif.node is None:
-            return
         params = netif.getparams()
         if len(params) == 0:
             return
         model = self.createElement("model")
         model.setAttribute("name", "netem")
         model.setAttribute("netif", netif.name)
-        model.setAttribute("peer", netif.node.name)
+        if hasattr(netif, "node") and netif.node is not None:
+            model.setAttribute("peer", netif.node.name)
+        # link between switches uses one veth interface
+        elif hasattr(netif, "othernet") and netif.othernet is not None:
+            if netif.othernet.name == n.getAttribute("name"):
+                model.setAttribute("peer", netif.net.name)
+            else:
+                model.setAttribute("peer", netif.othernet.name)
+                model.setAttribute("netif", netif.localname)
+            # hack used for upstream parameters for link between switches
+            # (see LxBrNet.linknet())
+            if netif.othernet.objid == int(n.getAttribute("id")):
+                netif.swapparams('_params_up')
+                params = netif.getparams()
+                netif.swapparams('_params_up')
         has_params = False
         for k, v in params:
             # default netem parameters are 0 or None
@@ -580,7 +665,7 @@ class CoreDocumentWriter(Document):
         '''
         with self.session._objslock:
             for node in self.session.objs():
-                if not isinstance(node, pycore.nodes.PyCoreNode):
+                if not isinstance(node, nodes.PyCoreNode):
                     continue
                 self.addnode(node)
 
@@ -631,12 +716,13 @@ class CoreDocumentWriter(Document):
         for ifc in net.netifs(sort=True):
             if not hasattr(ifc, "othernet") or not ifc.othernet:
                 continue
-            if net.objid == ifc.net.objid:
-                continue
             i = self.createElement("interface")
             n.appendChild(i)
-            i.setAttribute("name", ifc.name)
-            if ifc.net:
+            if net.objid == ifc.net.objid:
+                i.setAttribute("name", ifc.localname)
+                i.setAttribute("net", ifc.othernet.name)
+            else:
+                i.setAttribute("name", ifc.name)
                 i.setAttribute("net", ifc.net.name)
 
     def addposition(self, node):
@@ -663,6 +749,19 @@ class CoreDocumentWriter(Document):
             coordstxt += ",%s" % z
         coords = self.createTextNode(coordstxt)
         pt.appendChild(coords)
+
+    def adddefaultservices(self):
+        ''' Add default services and node types to the ServicePlan.
+        '''
+        for type in self.session.services.defaultservices:
+            defaults = self.session.services.getdefaultservices(type)
+            spn = self.createElement("Node")
+            spn.setAttribute("type", type)
+            self.sp.appendChild(spn)
+            for svc in defaults:
+                s = self.createElement("Service")
+                spn.appendChild(s)
+                s.setAttribute("name", str(svc._name))
 
     def addservices(self, node):
         ''' Add services and their customizations to the ServicePlan.
@@ -763,10 +862,15 @@ class CoreDocumentWriter(Document):
             addtextparamtoparent(self, meta, k, v)
             #addparamtoparent(self, meta, k, v)
 
-def opensessionxml(session, filename):
+def opensessionxml(session, filename, start=False, nodecls=nodes.CoreNode):
     ''' Import a session from the EmulationScript XML format.
     '''
-    doc = CoreDocumentParser(session, filename)
+    doc = CoreDocumentParser(session, filename, start, nodecls)
+    if start:
+        session.name = os.path.basename(filename)
+        session.filename = filename
+        session.node_count = str(session.getnodecount())
+        session.instantiate()
 
 def savesessionxml(session, filename):
     ''' Export a session to the EmulationScript XML format.

@@ -100,6 +100,22 @@ def mutedetach(*args, **kwds):
     kwds["stderr"] = subprocess.STDOUT
     return subprocess.Popen(*args, **kwds).pid
 
+def cmdresult(args):
+    ''' Execute a command on the host and return a tuple containing the
+        exit status and result string. stderr output
+        is folded into the stdout result string.
+    '''
+    cmdid = subprocess.Popen(args, stdin = subprocess.PIPE,
+                             stdout = subprocess.PIPE,
+                             stderr = subprocess.PIPE)
+    cmdid.stdin.close()
+    result = cmdid.stdout.read()
+    result += cmdid.stderr.read()
+    cmdid.stdout.close()
+    cmdid.stderr.close()
+    status = cmdid.wait()
+    return (status, result)
+
 def hexdump(s, bytes_per_word = 2, words_per_line = 8):
     dump = ""
     count = 0
@@ -227,6 +243,18 @@ def daemonize(rootdir = "/", umask = 0, close_fds = False, dontclose = (),
                 os.close(fd)
             except:
                 pass
+
+def checkforkernelmodule(name):
+    ''' Return a string if a Linux kernel module is loaded, None otherwise.
+    The string is the line from /proc/modules containing the module name,
+    memory size (bytes), number of loaded instances, dependencies, state,
+    and kernel memory offset.
+    '''
+    with open('/proc/modules', 'r') as f:
+        for line in f:
+            if line[:len(name)] == name:
+                return line
+    return None
 
 def readfileintodict(filename, d):
     ''' Read key=value pairs from a file, into a dict.
