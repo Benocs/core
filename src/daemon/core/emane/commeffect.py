@@ -21,14 +21,7 @@ try:
     import emaneeventservice
     import emaneeventcommeffect
 except Exception as e:
-    pass 
-
-def z(x):
-    ''' Helper to use 0 for None values. '''
-    if x is None:
-        return 0
-    else:
-        return x
+    pass
 
 class EmaneCommEffectModel(EmaneModel):
     def __init__(self, session, objid = None, verbose = False):
@@ -82,7 +75,7 @@ class EmaneCommEffectModel(EmaneModel):
         # empty filterfile is not allowed
         ff = self.valueof("filterfile", values)
         if ff.strip() != '':
-            shim.appendChild(e.xmlparam(shimdoc, "filterfile", ff))        
+            shim.appendChild(e.xmlparam(shimdoc, "filterfile", ff))
         e.xmlwrite(shimdoc, self.shimxmlname(ifc))
 
         nemdoc = e.xmldoc("nem")
@@ -97,6 +90,15 @@ class EmaneCommEffectModel(EmaneModel):
         ''' Generate CommEffect events when a Link Message is received having
         link parameters.
         '''
+        def z(x):
+            ''' Helper to use 0 for None values. '''
+            if type(x) is str:
+                x = float(x)
+            if x is None:
+                return 0
+            else:
+                return int(x)
+
         service = self.session.emane.service
         if service is None:
             self.session.warn("%s: EMANE event service unavailable" % \
@@ -106,6 +108,7 @@ class EmaneCommEffectModel(EmaneModel):
             self.session.warn("%s: missing NEM information" % self._name)
             return
         # TODO: batch these into multiple events per transmission
+        # TODO: may want to split out seconds portion of delay and jitter
         event = emaneeventcommeffect.EventCommEffect(1)
         index = 0
         e = self.session.obj(self.objid)

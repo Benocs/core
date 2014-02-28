@@ -73,7 +73,7 @@ class EmaneUniversalModel(EmaneModel):
         ("antennatype", coreapi.CONF_DATA_TYPE_STRING, 'omnidirectional',
          'omnidirectional,unidirectional','antenna type'),
         ]
-        
+
     # parameters that require unit conversion for 0.7.4
     _update_ver074 = ("bandwidth", "frequency", "frequencyofinterest")
     # parameters that should be removed for 0.7.4
@@ -81,7 +81,7 @@ class EmaneUniversalModel(EmaneModel):
                       "antennaprofilemanifesturi",
                       "frequencyofinterestfilterenable")
 
-    
+
     @classmethod
     def getphydoc(cls, e, mac, values, phynames):
         phydoc = e.xmldoc("phy")
@@ -104,7 +104,7 @@ class EmaneUniversalModel(EmaneModel):
             # insert old options with their default values
             for old in cls._confmatrix_ver074:
                 phy.appendChild(e.xmlparam(phydoc, old[0], old[2]))
-            
+
         # append all PHY options to phydoc
         list([phy.appendChild(e.xmlparam(phydoc, n, \
                                        mac.valueof(n, values))) for n in phynames])

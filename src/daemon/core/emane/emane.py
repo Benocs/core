@@ -15,6 +15,7 @@ from xml.dom.minidom import parseString, Document
 from core.constants import *
 from core.api import coreapi
 from core.misc.ipaddr import MacAddr
+from core.misc.xmlutils import addtextelementsfromtuples
 from core.conf import ConfigurableManager, Configurable
 from core.mobility import WirelessModel
 from core.emane.nodes import EmaneNode
@@ -33,7 +34,8 @@ class Emane(ConfigurableManager):
     _type = coreapi.CORE_TLV_REG_EMULSRV
     _hwaddr_prefix = "02:02"
     (SUCCESS, NOT_NEEDED, NOT_READY) = (0, 1, 2)
-    
+    EVENTCFGVAR = 'LIBEMANEEVENTSERVICECONFIG'
+
     def __init__(self, session):
         ConfigurableManager.__init__(self, session)
         self.verbose = self.session.getcfgitembool('verbose', False)
@@ -51,11 +53,7 @@ class Emane(ConfigurableManager):
         self.emane_config = EmaneGlobalModel(session, None, self.verbose)
         session.broker.handlers += (self.handledistributed, )
         self.loadmodels()
-        # this allows the event service Python bindings to be absent
-        try:
-            self.service = emaneeventservice.EventService()
-        except:
-            self.service = None
+        self.initeventservice()
         self.doeventloop = False
         self.eventmonthread = None
         # EMANE 0.7.4 support -- to be removed when 0.7.4 support is deprecated
@@ -69,7 +67,29 @@ class Emane(ConfigurableManager):
             self.emane074 = True
         except Exception:
             pass
-        
+
+    def initeventservice(self, filename=None):
+        ''' (Re-)initialize the EMANE Event service. The multicast group and/or
+        port may be configured, and can be changed via XML config file and an
+        environment variable pointing to that file.
+        '''
+        if hasattr(self, 'service'):
+            del self.service
+        self.service = None
+        if filename is not None:
+            tmp = os.getenv(self.EVENTCFGVAR)
+            os.environ.update( {self.EVENTCFGVAR: filename} )
+        rc = True
+        try:
+            self.service = emaneeventservice.EventService()
+        except:
+            self.service = None
+            rc = False
+        if filename is not None:
+            os.environ.pop(self.EVENTCFGVAR)
+            if tmp is not None:
+                os.environ.update( {self.EVENTCFGVAR: tmp} )
+        return rc
 
     def loadmodels(self):
         ''' dynamically load EMANE models that were specified in the config file
@@ -113,7 +133,7 @@ class Emane(ConfigurableManager):
                 (obj.objid, obj))
         self._objs[obj.objid] = obj
         self._objslock.release()
-        
+
     def getmodels(self, n):
         ''' Used with XML export; see ConfigurableManager.getmodels()
         '''
@@ -221,7 +241,7 @@ class Emane(ConfigurableManager):
         self._objslock.release()
 
     def handledistributed(self, msg):
-        ''' Broker handler for processing CORE API messages as they are 
+        ''' Broker handler for processing CORE API messages as they are
             received. This is used to snoop the Link add messages to get NEM
             counts of NEMs that exist on other servers.
         '''
@@ -310,6 +330,7 @@ class Emane(ConfigurableManager):
         self.buildplatformxml()
         self.buildnemxml()
         self.buildtransportxml()
+        self.buildeventservicexml()
 
     def xmldoc(self, doctype):
         ''' Returns an XML xml.minidom.Document with a DOCTYPE tag set to the
@@ -356,7 +377,7 @@ class Emane(ConfigurableManager):
         '''
         for n in self._objs:
             self.setnodemodel(n)
-            
+
     def setnodemodel(self, n):
         emanenode = self._objs[n]
         if n not in self.configs:
@@ -389,7 +410,7 @@ class Emane(ConfigurableManager):
             else:
                 emanenode = None
         return (emanenode, netif)
-    
+
     def numnems(self):
         ''' Return the number of NEMs emulated locally.
         '''
@@ -422,7 +443,7 @@ class Emane(ConfigurableManager):
         for n in sorted(self._objs.keys()):
             emanenode = self._objs[n]
             nems = emanenode.buildplatformxmlentry(doc)
-            for netif in sorted(nems, key=lambda n: n.node.objid):            
+            for netif in sorted(nems, key=lambda n: n.node.objid):
                 # set ID, endpoints here
                 nementry = nems[netif]
                 nementry.setAttribute("id", "%d" % nemid)
@@ -469,6 +490,44 @@ class Emane(ConfigurableManager):
         except Exception as e:
             self.info("error running emanegentransportxml: %s" % e)
 
+    def buildeventservicexml(self):
+        ''' Build the libemaneeventservice.xml file if event service options
+            were changed in the global config.
+        '''
+        defaults = self.emane_config.getdefaultvalues()
+        values = self.getconfig(None, "emane",
+                                self.emane_config.getdefaultvalues())[1]
+        need_xml = False
+        keys = ('eventservicegroup', 'eventservicedevice')
+        for k in keys:
+            a = self.emane_config.valueof(k, defaults)
+            b = self.emane_config.valueof(k, values)
+            if a != b:
+                need_xml = True
+
+        if not need_xml:
+            # reset to using default config
+            self.initeventservice()
+            return
+
+        try:
+            group, port = self.emane_config.valueof('eventservicegroup',
+                                                        values).split(':')
+        except ValueError:
+            self.warn("invalid eventservicegroup in EMANE config")
+            return
+        dev = self.emane_config.valueof('eventservicedevice', values)
+
+        doc = self.xmldoc("emaneeventmsgsvc")
+        es = doc.getElementsByTagName("emaneeventmsgsvc").pop()
+        kvs = ( ('group', group), ('port', port), ('device', dev),
+                ('mcloop', '1'),  ('ttl', '32') )
+        addtextelementsfromtuples(doc, es, kvs)
+        filename = 'libemaneeventservice.xml'
+        self.xmlwrite(doc, filename)
+        pathname = os.path.join(self.session.sessiondir, filename)
+        self.initeventservice(filename=pathname)
+
     def startdaemons(self):
         ''' Start the appropriate EMANE daemons. The transport daemon will
             bind to the TAP interfaces.
@@ -501,7 +560,7 @@ class Emane(ConfigurableManager):
         transcmd = ["emanetransportd", "-d", "--logl", loglevel, "-f", \
                     os.path.join(path, "emanetransportd.log")]
         if realtime:
-            transcmd += "-r", 
+            transcmd += "-r",
         files = os.listdir(path)
         for file in files:
             if file[-3:] == "xml" and file[:15] == "transportdaemon":
@@ -533,7 +592,7 @@ class Emane(ConfigurableManager):
            if self.verbose:
                self.info("Emane.installnetifs() for node %d" % n)
            emanenode.installnetifs()
-    
+
     def deinstallnetifs(self):
         ''' Uninstall TUN/TAP virtual interfaces.
         '''
@@ -546,7 +605,7 @@ class Emane(ConfigurableManager):
         '''
         r = self.emane_config.configure_emane(session, msg)
 
-        # extra logic to start slave Emane object after nemid has been 
+        # extra logic to start slave Emane object after nemid has been
         # configured from the master
         conftype = msg.gettlv(coreapi.CORE_TLV_CONF_TYPE)
         if conftype == coreapi.CONF_TYPE_FLAGS_UPDATE and \
@@ -567,7 +626,7 @@ class Emane(ConfigurableManager):
         # this support must be explicitly turned on; by default, CORE will
         # generate the EMANE events when nodes are moved
         return self.session.getcfgitembool('emane_event_monitor', False)
-        
+
     def starteventmonitor(self):
         ''' Start monitoring EMANE location events if configured to do so.
         '''
@@ -598,8 +657,7 @@ class Emane(ConfigurableManager):
         if self.service is not None:
             self.service.breakloop()
             # reset the service, otherwise nextEvent won't work
-            del self.service
-            self.service = emaneeventservice.EventService()
+            self.initeventservice()
         if self.eventmonthread is not None:
             self.eventmonthread.join()
             self.eventmonthread = None
@@ -707,8 +765,8 @@ class EmaneModel(WirelessModel):
 
     @classmethod
     def emane074_fixup(cls, value, div=1.0):
-        ''' Helper for converting 0.8.1 and newer values to EMANE 0.7.4 
-        compatible values. 
+        ''' Helper for converting 0.8.1 and newer values to EMANE 0.7.4
+        compatible values.
         NOTE: This should be removed when support for 0.7.4 has been
         deprecated.
         '''
@@ -725,7 +783,7 @@ class EmaneModel(WirelessModel):
         ''' Build the necessary nem, mac, and phy XMLs in the given path.
         '''
         raise NotImplementedError
-        
+
     def buildplatformxmlnementry(self, doc, n, ifc):
         ''' Build the NEM definition that goes into the platform.xml file.
         This returns an XML element that will be added to the <platform/> element.
@@ -798,10 +856,10 @@ class EmaneModel(WirelessModel):
         ''' Return the string name for the PHY XML file, e.g. 'n3rfpipephy.xml'
         '''
         return "%sphy.xml" % self.basename(ifc)
-    
+
     def update(self, moved, moved_netifs):
         ''' invoked from MobilityModel when nodes are moved; this causes
-            EMANE location events to be generated for the nodes in the moved 
+            EMANE location events to be generated for the nodes in the moved
             list, making EmaneModels compatible with Ns2ScriptedMobility
         '''
         try:
@@ -809,7 +867,7 @@ class EmaneModel(WirelessModel):
         except KeyError:
             return
         wlan.setnempositions(moved_netifs)
-        
+
     def linkconfig(self, netif, bw = None, delay = None,
                 loss = None, duplicate = None, jitter = None, netif2 = None):
         ''' Invoked when a Link Message is received. Default is unimplemented.
@@ -828,29 +886,29 @@ class EmaneGlobalModel(EmaneModel):
     _name = "emane"
     _confmatrix_platform = [
         ("otamanagerchannelenable", coreapi.CONF_DATA_TYPE_BOOL, '0',
-         'on,off', 'enable OTA Manager channel'), 
+         'on,off', 'enable OTA Manager channel'),
         ("otamanagergroup", coreapi.CONF_DATA_TYPE_STRING, '224.1.2.8:45702',
-         '', 'OTA Manager group'), 
+         '', 'OTA Manager group'),
         ("otamanagerdevice", coreapi.CONF_DATA_TYPE_STRING, 'lo',
-         '', 'OTA Manager device'), 
+         '', 'OTA Manager device'),
         ("eventservicegroup", coreapi.CONF_DATA_TYPE_STRING, '224.1.2.8:45703',
-         '', 'Event Service group'), 
+         '', 'Event Service group'),
         ("eventservicedevice", coreapi.CONF_DATA_TYPE_STRING, 'lo',
-         '', 'Event Service device'), 
+         '', 'Event Service device'),
         ("platform_id_start", coreapi.CONF_DATA_TYPE_INT32, '1',
          '', 'starting Platform ID'),
         ("debugportenable", coreapi.CONF_DATA_TYPE_BOOL, '0',
-         'on,off', 'enable debug port'), 
+         'on,off', 'enable debug port'),
         ("debugport", coreapi.CONF_DATA_TYPE_UINT16, '47000',
-         '', 'debug port number'), 
+         '', 'debug port number'),
     ]
     _confmatrix_nem = [
         ("transportendpoint", coreapi.CONF_DATA_TYPE_STRING, 'localhost',
-         '', 'Transport endpoint address (port is automatic)'), 
+         '', 'Transport endpoint address (port is automatic)'),
         ("platformendpoint", coreapi.CONF_DATA_TYPE_STRING, 'localhost',
-         '', 'Platform endpoint address (port is automatic)'), 
+         '', 'Platform endpoint address (port is automatic)'),
         ("nem_id_start", coreapi.CONF_DATA_TYPE_INT32, '1',
-         '', 'starting NEM ID'), 
+         '', 'starting NEM ID'),
         ]
     _confmatrix = _confmatrix_platform + _confmatrix_nem
     _confgroups = "Platform Attributes:1-%d|NEM Parameters:%d-%d" % \

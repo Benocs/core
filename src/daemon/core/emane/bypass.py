@@ -27,7 +27,7 @@ class EmaneBypassModel(EmaneModel):
     ]
 
     # value groupings
-    _confgroups = "Bypass Parameters:1-1" 
+    _confgroups = "Bypass Parameters:1-1"
 
     def buildnemxmlfiles(self, e, ifc):
         ''' Build the necessary nem, mac, and phy XMLs in the given path.

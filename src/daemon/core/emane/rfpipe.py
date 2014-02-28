@@ -31,15 +31,15 @@ class EmaneRfPipeModel(EmaneModel):
     _confmatrix_mac = [
         ("enablepromiscuousmode", coreapi.CONF_DATA_TYPE_BOOL, '0',
          'True,False', 'enable promiscuous mode'),
-        ("datarate", coreapi.CONF_DATA_TYPE_UINT32, '1M', 
+        ("datarate", coreapi.CONF_DATA_TYPE_UINT32, '1M',
          '', 'data rate (bps)'),
-        ("jitter", coreapi.CONF_DATA_TYPE_FLOAT, '0.0', 
+        ("jitter", coreapi.CONF_DATA_TYPE_FLOAT, '0.0',
          '', 'transmission jitter (usec)'),
-        ("delay", coreapi.CONF_DATA_TYPE_FLOAT, '0.0', 
+        ("delay", coreapi.CONF_DATA_TYPE_FLOAT, '0.0',
          '', 'transmission delay (usec)'),
-        ("flowcontrolenable", coreapi.CONF_DATA_TYPE_BOOL, '0', 
+        ("flowcontrolenable", coreapi.CONF_DATA_TYPE_BOOL, '0',
          'On,Off', 'enable traffic flow control'),
-        ("flowcontroltokens", coreapi.CONF_DATA_TYPE_UINT16, '10', 
+        ("flowcontroltokens", coreapi.CONF_DATA_TYPE_UINT16, '10',
          '', 'number of flow control tokens'),
         ("enabletighttiming", coreapi.CONF_DATA_TYPE_BOOL, '0',
          'On,Off', 'enable tight timing for pkt delay'),
@@ -49,9 +49,9 @@ class EmaneRfPipeModel(EmaneModel):
         ("transmissioncontrolmap", coreapi.CONF_DATA_TYPE_STRING, '',
          '', 'tx control map (nem:rate:freq:tx_dBm)'),
     ]
-    
+
     # PHY parameters from Universal PHY
-    _confmatrix_phy = EmaneUniversalModel._confmatrix 
+    _confmatrix_phy = EmaneUniversalModel._confmatrix
 
     _confmatrix = _confmatrix_mac + _confmatrix_phy
 

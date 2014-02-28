@@ -46,9 +46,9 @@ class EmaneIeee80211abgModel(EmaneModel):
         ("pcrcurveuri", coreapi.CONF_DATA_TYPE_STRING,
          '/usr/share/emane/models/ieee80211abg/xml/ieee80211pcr.xml',
          '', 'SINR/PCR curve file'),
-        ("flowcontrolenable", coreapi.CONF_DATA_TYPE_BOOL, '0', 
+        ("flowcontrolenable", coreapi.CONF_DATA_TYPE_BOOL, '0',
          'On,Off', 'enable traffic flow control'),
-        ("flowcontroltokens", coreapi.CONF_DATA_TYPE_UINT16, '10', 
+        ("flowcontroltokens", coreapi.CONF_DATA_TYPE_UINT16, '10',
          '', 'number of flow control tokens'),
         ("queuesize", coreapi.CONF_DATA_TYPE_STRING, '0:255 1:255 2:255 3:255',
          '', 'queue size (0-4:size)'),
@@ -64,7 +64,7 @@ class EmaneIeee80211abgModel(EmaneModel):
          '', 'retry limit (0-4:numretries)'),
     ]
     # PHY parameters from Universal PHY
-    _confmatrix_phy = EmaneUniversalModel._confmatrix 
+    _confmatrix_phy = EmaneUniversalModel._confmatrix
 
     _confmatrix = _confmatrix_mac + _confmatrix_phy
     # value groupings
