@@ -28,10 +28,10 @@ def addelementsfromlist(dom, parent, iterable, name, attr_name):
         element = dom.createElement(name)
         element.setAttribute(attr_name, item)
         parent.appendChild(element)
-        
+
 def addtextelementsfromlist(dom, parent, iterable, name, attrs):
     ''' XML helper to iterate through a list and add items to parent using tags
-    of the given name, attributes specified in the attrs tuple, and having the 
+    of the given name, attributes specified in the attrs tuple, and having the
     text of the item within the tags.
     Example: addtextelementsfromlist(dom, parent, ('a','b','c'), "letter",
                                      (('show','True'),))
@@ -100,7 +100,7 @@ def addparamtoparent(dom, parent, name, value):
     p.setAttribute("name", name)
     p.setAttribute("value", "%s" % value)
     return p
-    
+
 def addtextparamtoparent(dom, parent, name, value):
     ''' XML helper to add a <param name="name">value</param> tag to the parent
     element, when value is not None.
@@ -113,23 +113,23 @@ def addtextparamtoparent(dom, parent, name, value):
     txt = dom.createTextNode(value)
     p.appendChild(txt)
     return p
- 
+
 def getoneelement(dom, name):
     e = dom.getElementsByTagName(name)
     if len(e) == 0:
         return None
     return e[0]
-    
+
 def gettextchild(dom):
     # this could be improved to skip XML comments
     child = dom.firstChild
     if child is not None and child.nodeType == Node.TEXT_NODE:
         return str(child.nodeValue)
     return None
-    
+
 def getparamssetattrs(dom, param_names, target):
     ''' XML helper to get <param name="name" value="value"/> tags and set
-    the attribute in the target object. String type is used. Target object 
+    the attribute in the target object. String type is used. Target object
     attribute is unchanged if the XML attribute is not present.
     '''
     params = dom.getElementsByTagName("param")
@@ -158,7 +158,7 @@ class CoreDocumentParser(object):
         self.dom = parse(filename)
         self.start = start
         self.nodecls = nodecls
-        
+
         #self.scenario = getoneelement(self.dom, "Scenario")
         self.np = getoneelement(self.dom, "NetworkPlan")
         if self.np is None:
@@ -166,23 +166,23 @@ class CoreDocumentParser(object):
         self.mp = getoneelement(self.dom, "MotionPlan")
         self.sp = getoneelement(self.dom, "ServicePlan")
         self.meta = getoneelement(self.dom, "CoreMetaData")
-        
+
         self.coords = self.getmotiondict(self.mp)
         # link parameters parsed in parsenets(), applied in parsenodes()
         self.linkparams = {}
-        
+
         self.parsedefaultservices()
         self.parsenets()
         self.parsenodes()
         self.parseservices()
         self.parsemeta()
 
-        
+
     def warn(self, msg):
         if self.session:
             warnstr = "XML parsing '%s':" % (self.filename)
             self.session.warn("%s %s" % (warnstr, msg))
-        
+
     def getmotiondict(self, mp):
         ''' Parse a MotionPlan into a dict with node names for keys and coordinates
         for values.
@@ -213,13 +213,13 @@ class CoreDocumentParser(object):
 
     @staticmethod
     def getcommonattributes(obj):
-        ''' Helper to return tuple of attributes common to nodes and nets. 
+        ''' Helper to return tuple of attributes common to nodes and nets.
         '''
         id = int(obj.getAttribute("id"))
         name = str(obj.getAttribute("name"))
         type = str(obj.getAttribute("type"))
         return(id, name, type)
-        
+
     def parsenets(self):
         linkednets = []
         for net in self.np.getElementsByTagName("NetworkDefinition"):
@@ -264,7 +264,7 @@ class CoreDocumentParser(object):
                     netif.setparam(k, v)
             if upstream:
                 netif.swapparams('_params_up')
-    
+
     def parsenodes(self):
         for node in self.np.getElementsByTagName("Node"):
             id, name, type = self.getcommonattributes(node)
@@ -283,7 +283,7 @@ class CoreDocumentParser(object):
                 n.canvas = int(n.canvas)
             for ifc in node.getElementsByTagName("interface"):
                 self.parseinterface(n, ifc)
-    
+
     def parseinterface(self, n, ifc):
         '''  Parse a interface block such as:
         <interface name="eth0" net="37278">
@@ -319,7 +319,7 @@ class CoreDocumentParser(object):
             netif = n.netif(i)
             for (k, v) in self.linkparams[key]:
                 netif.setparam(k, v)
-    
+
     def parsemodels(self, dom, obj):
         ''' Mobility/wireless model config is stored in a ConfigurableManager's
         config dict.
@@ -327,7 +327,7 @@ class CoreDocumentParser(object):
         nodenum = int(dom.getAttribute("id"))
         for model in dom.getElementsByTagName("model"):
             self.parsemodel(model, obj, nodenum)
-    
+
     def parsemodel(self, model, obj, nodenum):
         ''' Mobility/wireless model config is stored in a ConfigurableManager's
         config dict.
@@ -338,7 +338,7 @@ class CoreDocumentParser(object):
         type = model.getAttribute("type")
         # convert child text nodes into key=value pairs
         kvs = gettextelementstolist(model)
-            
+
         mgr = self.session.mobility
         # TODO: the session.confobj() mechanism could be more generic;
         #       it only allows registering Conf Message callbacks, but here
@@ -354,7 +354,7 @@ class CoreDocumentParser(object):
         # TODO: assign other config managers here
         if mgr:
             mgr.setconfig_keyvalues(nodenum, name, kvs)
-        
+
     def parsenetem(self, model, obj, kvs):
         ''' Determine interface and invoke setparam() using the parsed
         (key, value) pairs.
@@ -371,7 +371,7 @@ class CoreDocumentParser(object):
             self.warn("error parsing link parameters for '%s' on '%s'" % \
                       (ifname, peer))
         self.linkparams[key] = kvs
-    
+
     @staticmethod
     def numericvalue(keyvalue):
         (key, value) = keyvalue
@@ -380,7 +380,7 @@ class CoreDocumentParser(object):
         else:
             value = int(value)
         return (key, value)
-    
+
     def parsedefaultservices(self):
         ''' Prior to parsing nodes, use session.services manager to store
         default services for node types
@@ -433,7 +433,7 @@ class CoreDocumentParser(object):
             self.session.services.addservicestonode(node=n, nodetype=n.type,
                                                 services_str=svclists[objid],
                                                 verbose=self.verbose)
-                
+
     def parseservice(self, service, n):
         ''' Use session.services manager to store service customizations before
         they are added to a node.
@@ -455,7 +455,7 @@ class CoreDocumentParser(object):
             dirs.append(dirname)
         if len(dirs):
             values.append("dirs=%s" % dirs)
-        
+
         startup = []
         shutdown = []
         validate = []
@@ -476,7 +476,7 @@ class CoreDocumentParser(object):
             values.append("cmddown=%s" % shutdown)
         if len(validate):
             values.append("cmdval=%s" % validate)
-            
+
         files = []
         for file in service.getElementsByTagName("File"):
             filename = file.getAttribute("name")
@@ -492,7 +492,7 @@ class CoreDocumentParser(object):
             return True
         self.session.services.setcustomservice(n.objid, svc, values)
         return True
-    
+
     def parsehooks(self, hooks):
         ''' Parse hook scripts from XML into session._hooks.
         '''
@@ -505,7 +505,7 @@ class CoreDocumentParser(object):
             type = "hook:%s" % state
             self.session.sethook(type, filename=filename,
                                  srcname=None, data=data)
-        
+
     def parsemeta(self):
         opt = getoneelement(self.meta, "SessionOptions")
         if opt:
@@ -526,7 +526,7 @@ class CoreDocumentParser(object):
                 if v == '':
                     v = gettextchild(param)
                 self.session.metadata.additem(k, v)
-                
+
 
 class CoreDocumentWriter(Document):
     ''' Utility class for writing a CoreSession to XML. The init method builds
@@ -549,7 +549,7 @@ class CoreDocumentWriter(Document):
         self.scenario.appendChild(self.mp)
         self.scenario.appendChild(self.sp)
         self.scenario.appendChild(self.meta)
-        
+
         self.populatefromsession()
 
     def populatefromsession(self):
@@ -558,7 +558,7 @@ class CoreDocumentWriter(Document):
         self.addnets()
         self.addnodes()
         self.addmetadata()
-            
+
     def writexml(self, filename):
         self.session.info("saving session XML file %s" % filename)
         f = open(filename, "w")
@@ -569,7 +569,7 @@ class CoreDocumentWriter(Document):
             uid = pwd.getpwnam(self.session.user).pw_uid
             gid = os.stat(self.session.sessiondir).st_gid
             os.chown(filename, uid, gid)
-            
+
     def addnets(self):
         ''' Add PyCoreNet objects as NetworkDefinition XML elements.
         '''
@@ -594,13 +594,13 @@ class CoreDocumentWriter(Document):
             n.setAttribute("key", "%s" % net.grekey)
         # link parameters
         for netif in net.netifs(sort=True):
-            self.addnetem(n, netif)        
+            self.addnetem(n, netif)
         # wireless/mobility models
         modelconfigs = net.session.mobility.getmodels(net)
         modelconfigs += net.session.emane.getmodels(net)
         self.addmodels(n, modelconfigs)
         self.addposition(net)
-        
+
     def addnetem(self, n, netif):
         ''' Similar to addmodels(); used for writing netem link effects
         parameters. TODO: Interface parameters should be moved to the model
@@ -640,7 +640,7 @@ class CoreDocumentWriter(Document):
             has_params = True
         if has_params:
             n.appendChild(model)
-        
+
     def addmodels(self, n, configs):
         ''' Add models from a list of model-class, config values tuples.
         '''
@@ -683,7 +683,7 @@ class CoreDocumentWriter(Document):
         addparamtoparent(self, n, "icon", node.icon)
         addparamtoparent(self, n, "canvas", node.canvas)
         self.addservices(node)
-        
+
     def addinterfaces(self, n, node):
         ''' Add PyCoreNetIfs to node XML elements.
         '''
@@ -735,12 +735,12 @@ class CoreDocumentWriter(Document):
         mpn = self.createElement("Node")
         mpn.setAttribute("name", node.name)
         self.mp.appendChild(mpn)
-        
+
         #   <motion type="stationary">
         motion = self.createElement("motion")
         motion.setAttribute("type", "stationary")
         mpn.appendChild(motion)
-        
+
         #       <point>$X$,$Y$,$Z$</point>
         pt = self.createElement("point")
         motion.appendChild(pt)
@@ -787,7 +787,7 @@ class CoreDocumentWriter(Document):
                 continue
             s.setAttribute("custom", str(svc._custom))
             addelementsfromlist(self, s, svc._dirs, "Directory", "name")
-            
+
             for fn in svc._configs:
                 if len(fn) == 0:
                     continue
@@ -802,7 +802,7 @@ class CoreDocumentWriter(Document):
                     continue
                 txt = self.createTextNode(data)
                 f.appendChild(txt)
-                    
+
             addtextelementsfromlist(self, s, svc._startup, "Command",
                                     (("type","start"),))
             addtextelementsfromlist(self, s, svc._shutdown, "Command",
@@ -825,7 +825,7 @@ class CoreDocumentWriter(Document):
             # a.setAttribute("type", )
             atxt = self.createTextNode("%s" % addr)
             a.appendChild(atxt)
-            
+
     def addhooks(self):
         ''' Add hook script XML elements to the metadata tag.
         '''
@@ -840,7 +840,7 @@ class CoreDocumentWriter(Document):
                 hooks.appendChild(hook)
         if hooks.hasChildNodes():
             self.meta.appendChild(hooks)
-            
+
     def addmetadata(self):
         ''' Add CORE-specific session meta-data XML elements.
         '''

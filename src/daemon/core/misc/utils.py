@@ -48,7 +48,7 @@ def maketuple(obj):
         return tuple(obj)
     else:
         return (obj,)
-        
+
 def maketuplefromstr(s, type):
     s.replace('\\', '\\\\')
     return ast.literal_eval(s)
@@ -159,7 +159,7 @@ def filedemunge(pathname, header):
     lines = lines[:start] + lines[end:]
     f.write("".join(lines))
     f.close()
-    
+
 def expandcorepath(pathname, session=None, node=None):
     ''' Expand a file path given session information.
     '''
@@ -172,7 +172,7 @@ def expandcorepath(pathname, session=None, node=None):
         pathname = pathname.replace('%NODE%', str(node.objid))
         pathname = pathname.replace('%NODENAME%', node.name)
     return pathname
-  
+
 def sysctldevname(devname):
     ''' Translate a device name to the name used with sysctl.
     '''
