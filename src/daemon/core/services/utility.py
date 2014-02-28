@@ -6,7 +6,7 @@
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
 '''
-utility.py: defines miscellaneous utility services. 
+utility.py: defines miscellaneous utility services.
 '''
 
 import os
@@ -37,7 +37,7 @@ class IPForwardService(UtilService):
     _configs = ("ipforward.sh", )
     _startindex = 5
     _startup = ("sh ipforward.sh", )
-    
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         if os.uname()[0] == "Linux":
@@ -94,7 +94,7 @@ class DefaultRouteService(UtilService):
             cfg += "\n".join(map(cls.addrstr, ifc.addrlist))
             cfg += "\n"
         return cfg
-        
+
     @staticmethod
     def addrstr(x):
         if x.find(":") >= 0:
@@ -113,7 +113,7 @@ class DefaultRouteService(UtilService):
             else:
                 raise Exception("unknown platform")
             return "%s %s" % (rtcmd, net.minaddr())
-        
+
 addservice(DefaultRouteService)
 
 class DefaultMulticastRouteService(UtilService):
@@ -141,7 +141,7 @@ class DefaultMulticastRouteService(UtilService):
             cfg += "\n"
             break
         return cfg
-        
+
 addservice(DefaultMulticastRouteService)
 
 class StaticRouteService(UtilService):
@@ -162,7 +162,7 @@ class StaticRouteService(UtilService):
             cfg += "\n".join(map(cls.routestr, ifc.addrlist))
             cfg += "\n"
         return cfg
-        
+
     @staticmethod
     def routestr(x):
         if x.find(":") >= 0:
@@ -197,7 +197,7 @@ class SshService(UtilService):
     _startup = ("sh startsshd.sh",)
     _shutdown = ("killall sshd",)
     _validate = ()
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Use a startup script for launching sshd in order to wait for host
@@ -270,7 +270,7 @@ class DhcpService(UtilService):
     _startup = ("dhcpd",)
     _shutdown = ("killall dhcpd",)
     _validate = ("pidof dhcpd",)
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Generate a dhcpd config file using the network address of
@@ -296,7 +296,7 @@ ddns-update-style none;
             cfg += "\n".join(map(cls.subnetentry, ifc.addrlist))
             cfg += "\n"
         return cfg
-        
+
     @staticmethod
     def subnetentry(x):
         ''' Generate a subnet declaration block given an IPv4 prefix string
@@ -332,7 +332,7 @@ class DhcpClientService(UtilService):
     _startup = ("sh startdhcpclient.sh",)
     _shutdown = ("killall dhclient",)
     _validate = ("pidof dhclient",)
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Generate a script to invoke dhclient on all interfaces.
@@ -351,7 +351,7 @@ class DhcpClientService(UtilService):
             cfg += "/sbin/dhclient -nw -pf /var/run/dhclient-%s.pid" % ifc.name
             cfg += " -lf /var/run/dhclient-%s.lease %s\n" % (ifc.name,  ifc.name)
         return cfg
-        
+
 addservice(DhcpClientService)
 
 class FtpService(UtilService):
@@ -363,7 +363,7 @@ class FtpService(UtilService):
     _startup = ("vsftpd ./vsftpd.conf",)
     _shutdown = ("killall vsftpd",)
     _validate = ("pidof vsftpd",)
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Generate a vsftpd.conf configuration file.
@@ -392,11 +392,11 @@ class HttpService(UtilService):
     _configs = ("/etc/apache2/apache2.conf", "/etc/apache2/envvars",
                 "/var/www/index.html",)
     _dirs = ("/etc/apache2", "/var/run/apache2", "/var/log/apache2",
-             "/var/lock/apache2", "/var/www", )
-    _startup = ("apache2ctl start",)
+             "/run/lock", "/var/lock/apache2", "/var/www", )
+    _startup = ("chown www-data /var/lock/apache2", "apache2ctl start",)
     _shutdown = ("apache2ctl stop",)
     _validate = ("pidof apache2",)
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Generate an apache2.conf configuration file.
@@ -432,7 +432,7 @@ KeepAliveTimeout 5
 <IfModule mpm_worker_module>
     StartServers          2
     MinSpareThreads      25
-    MaxSpareThreads      75 
+    MaxSpareThreads      75
     ThreadLimit          64
     ThreadsPerChild      25
     MaxClients          150
@@ -442,7 +442,7 @@ KeepAliveTimeout 5
 <IfModule mpm_event_module>
     StartServers          2
     MinSpareThreads      25
-    MaxSpareThreads      75 
+    MaxSpareThreads      75
     ThreadLimit          64
     ThreadsPerChild      25
     MaxClients          150
@@ -544,7 +544,7 @@ export LANG
         for ifc in node.netifs():
             if hasattr(ifc, 'control') and ifc.control == True:
                 continue
-            body += "<li>%s - %s</li>\n" % (ifc.name, ifc.addrlist)            
+            body += "<li>%s - %s</li>\n" % (ifc.name, ifc.addrlist)
         return "<html><body>%s</body></html>" % body
 
 addservice(HttpService)
@@ -598,10 +598,10 @@ class RadvdService(UtilService):
     _startup = ("radvd -C /etc/radvd/radvd.conf -m logfile -l /var/log/radvd.log",)
     _shutdown = ("pkill radvd",)
     _validate = ("pidof radvd",)
-        
+
     @classmethod
     def generateconfig(cls, node, filename, services):
-        ''' Generate a RADVD router advertisement daemon config file 
+        ''' Generate a RADVD router advertisement daemon config file
         using the network address of each interface.
         '''
         cfg = "# auto-generated by RADVD service (utility.py)\n"
@@ -633,7 +633,7 @@ interface %s
 """ % prefix
             cfg += "};\n"
         return cfg
-        
+
     @staticmethod
     def subnetentry(x):
         ''' Generate a subnet declaration block given an IPv6 prefix string
@@ -655,7 +655,7 @@ class AtdService(UtilService):
     _dirs = ("/var/spool/cron/atjobs", "/var/spool/cron/atspool")
     _startup = ("sh startatd.sh", )
     _shutdown = ("pkill atd", )
-    
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         return """
@@ -665,7 +665,7 @@ chown -R daemon /var/spool/cron/*
 chmod -R 700 /var/spool/cron/*
 atd
 """
-        
+
 addservice(AtdService)
 
 class UserDefinedService(UtilService):
