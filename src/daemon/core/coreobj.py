@@ -7,7 +7,7 @@
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
 '''
-coreobj.py: defines the basic objects for emulation: the PyCoreObj base class, 
+coreobj.py: defines the basic objects for emulation: the PyCoreObj base class,
 along with PyCoreNode, PyCoreNet, and PyCoreNetIf
 '''
 import sys, threading, os, shutil
@@ -45,11 +45,11 @@ class PyCoreObj(object):
     '''
     apitype = None
 
-    def __init__(self, session, objid = None, name = None, verbose = False, 
+    def __init__(self, session, objid = None, name = None, verbose = False,
                 start = True):
         self.session = session
         if objid is None:
-            objid = session.getobjid()            
+            objid = session.getobjid()
         self.objid = objid
         if name is None:
             name = "o%s" % self.objid
@@ -112,7 +112,7 @@ class PyCoreObj(object):
         ''' Return the attached interface count.
         '''
         return len(self._netif)
-    
+
     def getifindex(self, netif):
         for ifindex in self._netif:
             if self._netif[ifindex] is netif:
@@ -186,7 +186,7 @@ class PyCoreObj(object):
             PyCoreNets do.
         '''
         return []
-        
+
     def info(self, msg):
         ''' Utility method for printing informational messages when verbose
             is turned on.
@@ -200,7 +200,7 @@ class PyCoreObj(object):
         '''
         print(("%s: %s" % (self.name, msg)), file = sys.stderr)
         sys.stderr.flush()
-        
+
     def exception(self, level, source, text):
         ''' Generate an Exception Message for this session, providing this
             object number.
@@ -311,7 +311,7 @@ class PyCoreNode(PyCoreObj):
             return self._netif[ifindex]
         else:
             return None
-        
+
     def attachnet(self, ifindex, net):
         if ifindex not in self._netif:
             raise ValueError("ifindex %s does not exist" % ifindex)
@@ -341,7 +341,7 @@ class PyCoreNode(PyCoreObj):
                 continue
             for netif2 in obj.netifs():
                 if netif1.net == netif2.net:
-                    r += (netif1.net, netif1, netif2),                    
+                    r += (netif1.net, netif1, netif2),
         return r
 
 class PyCoreNet(PyCoreObj):
@@ -363,7 +363,7 @@ class PyCoreNet(PyCoreObj):
         netif.netifi = i
         with self._linked_lock:
             self._linked[netif] = {}
-        
+
     def detach(self, netif):
         del self._netif[netif.netifi]
         netif.netifi = None
@@ -388,7 +388,7 @@ class PyCoreNet(PyCoreObj):
                 otherobj = netif.othernet
                 if otherobj.objid == self.objid:
                     continue
-                
+
             tlvdata = b""
             tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
                                                 self.objid)
@@ -406,7 +406,7 @@ class PyCoreNet(PyCoreObj):
                 tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_BW,
                                                     bw)
             if loss is not None:
-                tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_PER, 
+                tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_PER,
                                                     str(loss))
             if duplicate is not None:
                 tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_DUP,
@@ -436,7 +436,7 @@ class PyCoreNet(PyCoreObj):
 
             msg = coreapi.CoreLinkMessage.pack(flags, tlvdata)
             msgs.append(msg)
-        return msgs 
+        return msgs
 
 class PyCoreNetIf(object):
     ''' Base class for interfaces.
@@ -462,7 +462,7 @@ class PyCoreNetIf(object):
 
     def shutdown(self):
         pass
-    
+
     def attachnet(self, net):
         if self.net:
             self.detachnet()
@@ -490,7 +490,7 @@ class PyCoreNetIf(object):
         if key not in self._params:
             return None
         return self._params[key]
-        
+
     def getparams(self):
         ''' Return (key, value) pairs from the _params dict.
         '''
@@ -498,7 +498,7 @@ class PyCoreNetIf(object):
         for k in sorted(self._params.keys()):
             r.append((k, self._params[k]))
         return r
-    
+
     def setparam(self, key, value):
         ''' Set a parameter in the _params dict.
             Returns True if the parameter has changed.
