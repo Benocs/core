@@ -48,7 +48,7 @@ class Bird(CoreService):
             for a in ifc.addrlist:
                 if a.find(".") >= 0:
                     return a .split('/') [0]
-        #raise ValueError,  "no IPv4 address found for router ID"
+        #raise ValueError("no IPv4 address found for router ID")
         return "0.0.0.0"
 
     @classmethod
@@ -61,7 +61,7 @@ class Bird(CoreService):
 /* Main configuration file for BIRD. This is ony a template,
  * you will *need* to customize it according to your needs
  * Beware that only double quotes \'"\' are valid. No singles. */
- 
+
 
 log "/var/log/%s.log" all;
 #debug protocols all;

@@ -29,7 +29,7 @@ class NrlService(CoreService):
     @classmethod
     def generateconfig(cls,  node, filename, services):
         return ""
-        
+
     @staticmethod
     def firstipv4prefix(node, prefixlen=24):
         ''' Similar to QuaggaService.routerid(). Helper to return the first IPv4
@@ -44,7 +44,7 @@ class NrlService(CoreService):
                     addr = a.split('/')[0]
                     pre = IPv4Prefix("%s/%s" % (addr, prefixlen))
                     return str(pre)
-        #raise ValueError,  "no IPv4 address found"
+        #raise ValueError( "no IPv4 address found")
         return "0.0.0.0/%s" % prefixlen
 
 class NrlNhdp(NrlService):
@@ -62,20 +62,20 @@ class NrlNhdp(NrlService):
         cmd = cls._startup[0]
         cmd += " -l /var/log/nrlnhdp.log"
         cmd += " -rpipe %s_nhdp" % node.name
-        
+
         servicenames = [x._name for x in services]
         if "SMF" in servicenames:
             cmd += " -flooding ecds"
             cmd += " -smfClient %s_smf" % node.name
-        
+
         netifs = [x for x in node.netifs() if not getattr(x, 'control', False)]
         if len(netifs) > 0:
             interfacenames = [x.name for x in netifs]
             cmd += " -i "
             cmd += " -i ".join(interfacenames)
-        
+
         return (cmd, )
-     
+
 addservice(NrlNhdp)
 
 class NrlSmf(NrlService):
@@ -85,7 +85,7 @@ class NrlSmf(NrlService):
     _startup = ("nrlsmf", )
     _shutdown = ("killall nrlsmf", )
     _validate = ("pidof nrlsmf", )
-    
+
     @classmethod
     def getstartup(cls,  node,  services):
         ''' Generate the appropriate command-line based on node interfaces.
@@ -97,7 +97,7 @@ class NrlSmf(NrlService):
         netifs = [x for x in node.netifs() if not getattr(x, 'control', False)]
         if len(netifs) == 0:
             return ()
-                        
+
         if "arouted" in servicenames:
             cmd += " tap %s_tap" % (node.name,)
             cmd += " unicast %s" % cls.firstipv4prefix(node, 24)
@@ -111,11 +111,11 @@ class NrlSmf(NrlService):
                 cmd += " cf "
             interfacenames = [x.name for x in netifs]
             cmd += ",".join(interfacenames)
-            
+
         cmd += " hash MD5"
         cmd += " log /var/log/nrlsmf.log"
         return (cmd, )
-     
+
 addservice(NrlSmf)
 
 class NrlOlsr(NrlService):
@@ -125,7 +125,7 @@ class NrlOlsr(NrlService):
     _startup = ("nrlolsrd", )
     _shutdown = ("killall nrlolsrd", )
     _validate = ("pidof nrlolsrd", )
-    
+
     @classmethod
     def getstartup(cls,  node,  services):
         ''' Generate the appropriate command-line based on node interfaces.
@@ -147,7 +147,7 @@ class NrlOlsr(NrlService):
             cmd += " -z"
 
         return (cmd, )
-        
+
 addservice(NrlOlsr)
 
 class Arouted(NrlService):
@@ -159,7 +159,7 @@ class Arouted(NrlService):
     _startup = ("sh startarouted.sh", )
     _shutdown = ("pkill arouted", )
     _validate = ("pidof arouted", )
-    
+
     @classmethod
     def generateconfig(cls, node, filename, services):
         ''' Return the Quagga.conf or quaggaboot.sh file contents.

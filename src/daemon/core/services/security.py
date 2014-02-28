@@ -4,8 +4,8 @@
 # Copyright (c)2011-2012 the Boeing Company.
 # See the LICENSE file included in this distribution.
 #
-''' 
-security.py: defines security services (vpnclient, vpnserver, ipsec and 
+'''
+security.py: defines security services (vpnclient, vpnserver, ipsec and
 firewall)
 '''
 
@@ -15,7 +15,7 @@ from core.service import CoreService, addservice
 from core.constants import *
 
 class VPNClient(CoreService):
-    ''' 
+    '''
     '''
     _name = "VPNClient"
     _group = "Security"
@@ -44,7 +44,7 @@ class VPNClient(CoreService):
 addservice(VPNClient)
 
 class VPNServer(CoreService):
-    ''' 
+    '''
     '''
     _name = "VPNServer"
     _group = "Security"
@@ -102,7 +102,7 @@ class IPsec(CoreService):
 addservice(IPsec)
 
 class Firewall(CoreService):
-    ''' 
+    '''
     '''
     _name = "Firewall"
     _group = "Security"

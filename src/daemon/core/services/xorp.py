@@ -16,7 +16,7 @@ from core.misc.ipaddr import IPv4Prefix
 from core.constants import *
 
 class XorpRtrmgr(CoreService):
-    ''' XORP router manager service builds a config.boot file based on other 
+    ''' XORP router manager service builds a config.boot file based on other
     enabled XORP services, and launches necessary daemons upon startup.
     '''
     _name = "xorp_rtrmgr"
@@ -31,8 +31,8 @@ class XorpRtrmgr(CoreService):
 
     @classmethod
     def generateconfig(cls, node, filename, services):
-        ''' Returns config.boot configuration file text. Other services that 
-        depend on this will have generatexorpconfig() hooks that are 
+        ''' Returns config.boot configuration file text. Other services that
+        depend on this will have generatexorpconfig() hooks that are
         invoked here. Filename currently ignored.
         '''
         cfg = "interfaces {\n"
@@ -52,7 +52,7 @@ class XorpRtrmgr(CoreService):
             except ValueError:
                 pass
         return cfg
-    
+
     @staticmethod
     def addrstr(x):
         ''' helper for mapping IP addresses to XORP config statements
@@ -65,7 +65,7 @@ class XorpRtrmgr(CoreService):
         cfg += "\t\tprefix-length: %s\n" % plen
         cfg +="\t    }\n"
         return cfg
-    
+
     @staticmethod
     def lladdrstr(ifc):
         ''' helper for adding link-local address entries (required by OSPFv3)
@@ -74,7 +74,7 @@ class XorpRtrmgr(CoreService):
         cfg += "\t\tprefix-length: 64\n"
         cfg += "\t    }\n"
         return cfg
-            
+
 addservice(XorpRtrmgr)
 
 class XorpService(CoreService):
@@ -101,7 +101,7 @@ class XorpService(CoreService):
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-    
+
     @staticmethod
     def mfea(forwarding, ifcs):
         ''' Helper to add a multicast forwarding engine entry to the config file.
@@ -125,7 +125,7 @@ class XorpService(CoreService):
         cfg += "}\n"
         return cfg
 
-        
+
     @staticmethod
     def policyexportconnected():
         ''' Helper to add a policy statement for exporting connected routes.
@@ -150,8 +150,8 @@ class XorpService(CoreService):
                 continue
             for a in ifc.addrlist:
                 if a.find(".") >= 0:
-                    return a.split('/')[0]          
-        #raise ValueError,  "no IPv4 address found for router ID"
+                    return a.split('/')[0]
+        #raise ValueError("no IPv4 address found for router ID")
         return "0.0.0.0"
 
     @classmethod
@@ -194,7 +194,7 @@ class XorpOspfv2(XorpService):
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpOspfv2)
 
 class XorpOspfv3(XorpService):
@@ -223,7 +223,7 @@ class XorpOspfv3(XorpService):
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpOspfv3)
 
 class XorpBgp(XorpService):
@@ -231,7 +231,7 @@ class XorpBgp(XorpService):
     '''
     _name = "XORP_BGP"
     _custom_needed = True
-    
+
     @classmethod
     def generatexorpconfig(cls, node):
         cfg = "/* This is a sample config that should be customized with\n"
@@ -284,7 +284,7 @@ class XorpRip(XorpService):
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpRip)
 
 class XorpRipng(XorpService):
@@ -315,11 +315,11 @@ class XorpRipng(XorpService):
             cfg += "\t\t    disable: false\n"
             cfg += "\t\t}\n"
             cfg += "\t    }\n"
-            cfg += "\t}\n"            
+            cfg += "\t}\n"
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpRipng)
 
 class XorpPimSm4(XorpService):
@@ -330,7 +330,7 @@ class XorpPimSm4(XorpService):
     @classmethod
     def generatexorpconfig(cls,  node):
         cfg = cls.mfea("mfea4", node.netifs())
-                
+
         cfg += "\nprotocols {\n"
         cfg += "    igmp {\n"
         names = []
@@ -342,10 +342,10 @@ class XorpPimSm4(XorpService):
             cfg += "\t    vif %s {\n" % ifc.name
             cfg += "\t\tdisable: false\n"
             cfg += "\t    }\n"
-            cfg += "\t}\n"            
+            cfg += "\t}\n"
         cfg += "    }\n"
         cfg += "}\n"
-        
+
         cfg += "\nprotocols {\n"
         cfg += "    pimsm4 {\n"
 
@@ -368,17 +368,17 @@ class XorpPimSm4(XorpService):
         cfg += "\t\t}\n"
         cfg += "\t    }\n"
         cfg += "\t}\n"
-        
+
         cfg += "    }\n"
         cfg += "}\n"
-        
+
         cfg += "\nprotocols {\n"
         cfg += "    fib2mrib {\n"
         cfg += "\tdisable: false\n"
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpPimSm4)
 
 class XorpPimSm6(XorpService):
@@ -389,7 +389,7 @@ class XorpPimSm6(XorpService):
     @classmethod
     def generatexorpconfig(cls,  node):
         cfg = cls.mfea("mfea6", node.netifs())
-                
+
         cfg += "\nprotocols {\n"
         cfg += "    mld {\n"
         names = []
@@ -401,13 +401,13 @@ class XorpPimSm6(XorpService):
             cfg += "\t    vif %s {\n" % ifc.name
             cfg += "\t\tdisable: false\n"
             cfg += "\t    }\n"
-            cfg += "\t}\n"            
+            cfg += "\t}\n"
         cfg += "    }\n"
         cfg += "}\n"
-        
+
         cfg += "\nprotocols {\n"
         cfg += "    pimsm6 {\n"
-        
+
         names.append("register_vif")
         for name in names:
             cfg += "\tinterface %s {\n" % name
@@ -427,17 +427,17 @@ class XorpPimSm6(XorpService):
         cfg += "\t\t}\n"
         cfg += "\t    }\n"
         cfg += "\t}\n"
-        
+
         cfg += "    }\n"
         cfg += "}\n"
-        
+
         cfg += "\nprotocols {\n"
         cfg += "    fib2mrib {\n"
         cfg += "\tdisable: false\n"
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpPimSm6)
 
 class XorpOlsr(XorpService):
@@ -468,5 +468,5 @@ class XorpOlsr(XorpService):
         cfg += "    }\n"
         cfg += "}\n"
         return cfg
-        
+
 addservice(XorpOlsr)

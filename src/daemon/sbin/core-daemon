@@ -107,7 +107,6 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         self.nodestatusreq = {}
         numthreads = int(server.cfg['numthreads'])
         if numthreads < 1:
-            #raise ValueError, \
             print(("invalid number of threads: %s" % numthreads))
             return
         self.handlerthreads = []
@@ -778,7 +777,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                             upstream = True
                             netif = net2.getlinknetif(net)
                         if netif is None:
-                            raise ValueError, "modify unknown link between nets"
+                            raise ValueError("modify unknown link between nets")
                         if upstream:
                             netif.swapparams('_params_up')
                             net.linkconfig(netif, bw = bw, delay = delay,
@@ -804,7 +803,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                                                 devname = netif.name)
                                 netif.swapparams('_params_up')
                     else:
-                        raise ValueError, "modify link for unknown nodes"
+                        raise ValueError("modify link for unknown nodes")
                 elif node1 is None:
                     # node1 = layer 2node, node2 = layer3 node
                     net.linkconfig(node2.netif(ifindex2, net), bw = bw,
@@ -1162,7 +1161,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         '''
         eventtype = msg.gettlv(coreapi.CORE_TLV_EVENT_TYPE)
         if eventtype is None:
-            raise NotImplementedError, "Event message missing event type"
+            raise NotImplementedError("Event message missing event type")
         node = msg.gettlv(coreapi.CORE_TLV_EVENT_NODE)
 
         if self.verbose:
@@ -1173,7 +1172,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 try:
                     n = self.session.obj(node)
                 except KeyError:
-                    raise KeyError, "Event message for unknown node %d" % node
+                    raise KeyError("Event message for unknown node %d" % node)
                 if eventtype == coreapi.CORE_EVENT_INSTANTIATION_STATE:
                     # configure mobility models for WLAN added during runtime
                     if isinstance(n, pycore.nodes.WlanNode):
