@@ -32,7 +32,7 @@ def enumdict(d):
 
 # Constants
 
-CORE_API_VER		=	"1.22"
+CORE_API_VER		=	"1.23"
 CORE_API_PORT		=	4038
 
 # Message types
@@ -135,6 +135,7 @@ link_tlvs = {
     0x10: "CORE_TLV_LINK_MBURST",
     0x20: "CORE_TLV_LINK_TYPE",
     0x21: "CORE_TLV_LINK_GUIATTR",
+    0x22: "CORE_TLV_LINK_UNI",
     0x23: "CORE_TLV_LINK_EMUID",
     0x24: "CORE_TLV_LINK_NETID",
     0x25: "CORE_TLV_LINK_KEY",
@@ -313,6 +314,7 @@ event_types = dict(enumerate([
     "CORE_EVENT_FILE_OPEN",
     "CORE_EVENT_FILE_SAVE",
     "CORE_EVENT_SCHEDULED",
+    "CORE_EVENT_RECONFIGURE",
 ]))
 
 enumdict(event_types)

@@ -33,11 +33,11 @@ class CoreTlvData(object):
     @classmethod
     def unpack(cls, data):
         return struct.unpack(cls.datafmt, data)[0]
-    
+
     @classmethod
     def packstring(cls, strvalue):
         return cls.pack(cls.fromstring(strvalue))
-        
+
     @classmethod
     def fromstring(cls, s):
         return cls.datatype(s)
@@ -118,7 +118,7 @@ class CoreTlvDataUint16List(CoreTlvData):
     def unpack(data):
         datafmt = "!%dH" % (len(data)/2)
         return struct.unpack(datafmt, data)
-        
+
     @classmethod
     def fromstring(cls, s):
         return tuple([int(x) for x in s.split()])
@@ -206,7 +206,7 @@ class CoreTlv(object):
         else:
             hdr = struct.pack(cls.longhdrfmt, tlvtype, 0, tlvlen)
         return hdr + tlvdata
-        
+
     @classmethod
     def packstring(cls, tlvtype, value):
         return cls.pack(tlvtype, cls.tlvdataclsmap[tlvtype].fromstring(value))
@@ -255,13 +255,14 @@ class CoreLinkTlv(CoreTlv):
         CORE_TLV_LINK_BW: CoreTlvDataUint64,
         CORE_TLV_LINK_PER: CoreTlvDataString,
         CORE_TLV_LINK_DUP: CoreTlvDataString,
-        CORE_TLV_LINK_JITTER: CoreTlvDataUint32,
+        CORE_TLV_LINK_JITTER: CoreTlvDataUint64,
         CORE_TLV_LINK_MER: CoreTlvDataUint16,
         CORE_TLV_LINK_BURST: CoreTlvDataUint16,
         CORE_TLV_LINK_SESSION: CoreTlvDataString,
         CORE_TLV_LINK_MBURST: CoreTlvDataUint16,
         CORE_TLV_LINK_TYPE: CoreTlvDataUint32,
         CORE_TLV_LINK_GUIATTR: CoreTlvDataString,
+        CORE_TLV_LINK_UNI: CoreTlvDataUint16,
         CORE_TLV_LINK_EMUID: CoreTlvDataUint32,
         CORE_TLV_LINK_NETID: CoreTlvDataUint32,
         CORE_TLV_LINK_KEY: CoreTlvDataUint32,
@@ -318,7 +319,7 @@ class CoreConfTlv(CoreTlv):
         CORE_TLV_CONF_GROUPS: CoreTlvDataString,
         CORE_TLV_CONF_SESSION: CoreTlvDataString,
         CORE_TLV_CONF_NETID: CoreTlvDataUint32,
-        CORE_TLV_CONF_OPAQUE: CoreTlvDataString, 
+        CORE_TLV_CONF_OPAQUE: CoreTlvDataString,
     }
 
 class CoreFileTlv(CoreTlv):
@@ -447,7 +448,7 @@ class CoreMessage(object):
         while data:
             tlv, data = self.tlvcls.unpack(data)
             self.addtlvdata(tlv.tlvtype, tlv.value)
-            
+
     def packtlvdata(self):
         ''' Opposite of parsedata(). Return packed TLV data using
         self.tlvdata dict. Used by repack().
@@ -458,7 +459,7 @@ class CoreMessage(object):
             v = self.tlvdata[k]
             tlvdata += self.tlvcls.pack(k, v)
         return tlvdata
-    
+
     def repack(self):
         ''' Invoke after updating self.tlvdata[] to rebuild self.rawmsg.
         Useful for modifying a message that has been parsed, before
@@ -525,7 +526,7 @@ class CoreMessage(object):
         if n2 is not None:
             r.append(n2)
         return r
-        
+
     def sessionnumbers(self):
         ''' Return a list of session numbers included in this message.
         '''
