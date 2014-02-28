@@ -29,9 +29,8 @@ EMANE is developed by U.S. Naval Research Labs (NRL) Code 5522 and Adjacent
 Link LLC,
 who maintain these websites:
 
-* `<http://cs.itd.nrl.navy.mil/work/emane/index.php>`_
+* `<http://www.nrl.navy.mil/itd/ncs/products/emane>`_
 * `<http://www.adjacentlink.com/>`_
-* `<http://labs.cengen.com/emane/>`_  (former EMANE project home)
 
 Instead of building Linux Ethernet bridging networks with CORE, higher-fidelity
 wireless networks can be emulated using EMANE bound to virtual devices. CORE
@@ -94,7 +93,7 @@ containing the *EmaneModel* subclass. A portion of the default
   
 
 EMANE can be installed from deb or RPM packages or from source. See the 
-`EMANE website <http://cs.itd.nrl.navy.mil/work/emane/index.php>`_ for 
+`EMANE website <http://www.nrl.navy.mil/itd/ncs/products/emane>`_ for
 full details. 
 
 Here are quick instructions for installing all EMANE packages:
@@ -104,12 +103,10 @@ Here are quick instructions for installing all EMANE packages:
   # install dependencies
   sudo apt-get install libssl-dev libxml-lixbml-perl libxml-simple-perl
   # download and install EMANE 0.8.1
-  export URL=http://labs.cengen.com/emane/download/deb/ubuntu-12_04
-  wget $URL/0.8.1/amd64/emane-bundle-0.8.1.amd64.tgz
-  mkdir emane-0.8.1
-  cd emane-0.8.1
-  tar xzf ../emane-bundle-0.8.1.amd64.tgz
-  sudo dpkg -i *.deb
+  export URL=http://downloads.pf.itd.nrl.navy.mil/emane/0.8.1-r2
+  wget $URL/emane-0.8.1-release-2.ubuntu-12_04.amd64.tgz
+  tar xzf emane-0.8.1-release-2.ubuntu-12_04.amd64.tgz
+  sudo dpkg -i emane-0.8.1-release-2/deb/ubuntu-12_04/amd64/*.deb
   
 
 If you have an EMANE event generator (e.g. mobility or pathloss scripts) and
