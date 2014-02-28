@@ -8,7 +8,7 @@
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
 '''
-core-daemon: the CORE daemon is a server process that receives CORE API 
+core-daemon: the CORE daemon is a server process that receives CORE API
 messages and instantiates emulated nodes and networks within the kernel. Various
 message handlers are defined and some support for sending messages.
 '''
@@ -35,7 +35,7 @@ except ImportError:
 from core.constants import *
 from core.api import coreapi
 from core.coreobj import PyCoreNet
-from core.misc.utils import hexdump, daemonize
+from core.misc.utils import hexdump, daemonize, cmdresult, mutedetach
 from core.misc.xmlutils import opensessionxml, savesessionxml
 
 DEFAULT_MAXFD = 1024
@@ -84,7 +84,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
        4. The message data is queued using queuemsg().
        5. The handlerthread() thread pops messages from the queue and uses
           handlemsg() to invoke the appropriate handler for that message type.
-       
+
     '''
 
     maxmsgqueuedtimes = 8
@@ -195,7 +195,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         return coreapi.CoreRegMessage.pack(coreapi.CORE_API_ADD_FLAG, tlvdata)
 
     def sendall(self, data):
-        ''' Send raw data to the other end of this TCP connection 
+        ''' Send raw data to the other end of this TCP connection
         using socket's sendall().
         '''
         return self.request.sendall(data)
@@ -212,7 +212,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         if len(msghdr) != coreapi.CoreMessage.hdrsiz:
             if len(msghdr) == 0:
                 raise EOFError("client disconnected")
-            else:            
+            else:
                 raise IOError("invalid message header size")
         msgtype, msgflags, msglen = coreapi.CoreMessage.unpackhdr(msghdr)
         if msglen == 0:
@@ -269,7 +269,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             self.msgcv.release()
             self.handlemsg(msg)
 
-        
+
     def handlemsg(self, msg):
         ''' Handle an incoming message; dispatch based on message type,
             optionally sending replies.
@@ -324,7 +324,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         '''
         # use port as session id
         port = self.request.getpeername()[1]
-        self.session = self.server.getsession(sessionid = port, 
+        self.session = self.server.getsession(sessionid = port,
                                               useexisting = False)
         self.session.connect(self)
         while True:
@@ -410,7 +410,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 if hasattr(self.session.options, 'enablerj45'):
                     if self.session.options.enablerj45 == '0':
                         clsargs['start'] = False
-            # this instantiates an object of class nodecls, 
+            # this instantiates an object of class nodecls,
             # creating the node or network
             n = self.session.addobj(cls = nodecls, objid = nodenum,
                                     name = nodename, **clsargs)
@@ -428,7 +428,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             if netid is not None:
                 n.netid = netid
 
-            # add services to a node, either from its services TLV or 
+            # add services to a node, either from its services TLV or
             # through the configured defaults for this node type
             if nodetype == coreapi.CORE_NODE_DEF or \
                nodetype == coreapi.CORE_NODE_PHYS or \
@@ -460,7 +460,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             except KeyError:
                 pass
             self.session.delobj(nodenum)
-            
+
             if msg.flags & coreapi.CORE_API_STR_FLAG:
                 tlvdata = b""
                 tlvdata += coreapi.CoreNodeTlv.pack(coreapi.CORE_TLV_NODE_NUMBER,
@@ -490,7 +490,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                     n.canvas = canvas
                 if icon is not None:
                     n.icon = icon
-        
+
         return replies
 
 
@@ -518,6 +518,13 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         node2 = None
         net = None
         net2 = None
+
+        uni = msg.gettlv(coreapi.CORE_TLV_LINK_UNI)
+        if uni is not None and uni == 1:
+            unidirectional = True
+        else:
+            unidirectional = False
+
 
         # one of the nodes may exist on a remote server
         if nodenum1 is not None and nodenum2 is not None:
@@ -590,7 +597,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 objs = [x for x in objs if x is not None]
                 if len(objs) < 2:
                     raise ValueError("wireless link/unlink message between unknown objects")
-                
+
                 nets = objs[0].commonnets(objs[1])
                 for (netcommon, netif1, netif2) in nets:
                     if not isinstance(netcommon, pycore.nodes.WlanNode) and \
@@ -605,7 +612,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                     numwlan += 1
                 if numwlan == 0:
                     raise ValueError("no common network found for wireless link/unlink")
-                        
+
             elif msg.flags & coreapi.CORE_API_ADD_FLAG:
                 ''' Add a new link.
                 '''
@@ -664,14 +671,15 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                         netaddrlist.append("%s/%s" % (ipv61, ipv6mask1))
                     ifindex2 = node2.newnetif(net, addrlist = addrlist,
                                    hwaddr = mac2, ifindex = ifindex2)
-                    net.linkconfig(node2.netif(ifindex2, net), bw = bw,
+                    if not unidirectional:
+                        net.linkconfig(node2.netif(ifindex2, net), bw = bw,
                                    delay = delay, loss = loss,
                                    duplicate = duplicate, jitter = jitter)
                 if node2 is None and net2:
                     if ipv42 is not None and ipv4mask2 is not None:
                         netaddrlist.append("%s/%s" % (ipv42, ipv4mask2))
                     if ipv62 is not None and ipv6mask2 is not None:
-                        netaddrlist.append("%s/%s" % (ipv62, ipv6mask2))               
+                        netaddrlist.append("%s/%s" % (ipv62, ipv6mask2))
 
                 # tunnel node finalized with this link message
                 if key and isinstance(net, pycore.nodes.TunnelNode):
@@ -682,13 +690,23 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                     net2.setkey(key)
                     if len(netaddrlist) > 0:
                         net2.addrconfig(netaddrlist)
-                
+
                 if net and net2:
                     # two layer-2 networks linked together
                     if isinstance(net2, pycore.nodes.RJ45Node):
-                        net2.linknet(net) # RJ45 nodes have different linknet()
+                        netif = net2.linknet(net) # RJ45 nodes have different linknet()
                     else:
-                        net.linknet(net2)
+                        netif = net.linknet(net2)
+                    net.linkconfig(netif, bw = bw, delay = delay, loss = loss,
+                                   duplicate = duplicate, jitter = jitter)
+                    if not unidirectional:
+                        netif.swapparams('_params_up')
+                        net2.linkconfig(netif, bw = bw, delay = delay, loss = loss,
+                                   duplicate = duplicate, jitter = jitter,
+                                   devname = netif.name)
+                        netif.swapparams('_params_up')
+
+
                 elif net is None and net2 is None and \
                   (node1 is None or node2 is None):
                     # apply address/parameters to PhysicalNodes
@@ -749,17 +767,53 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 duplicate = msg.gettlv(coreapi.CORE_TLV_LINK_DUP)
                 jitter = msg.gettlv(coreapi.CORE_TLV_LINK_JITTER)
                 numnet = 0
+                # TODO: clean up all this logic. Having the add flag or not
+                #       should use the same code block.
                 if node1 is None and node2 is None:
-                    raise ValueError("modify link for unknown nodes")
+                    if net and net2:
+                        # modify link between nets
+                        netif = net.getlinknetif(net2)
+                        upstream = False
+                        if netif is None:
+                            upstream = True
+                            netif = net2.getlinknetif(net)
+                        if netif is None:
+                            raise ValueError, "modify unknown link between nets"
+                        if upstream:
+                            netif.swapparams('_params_up')
+                            net.linkconfig(netif, bw = bw, delay = delay,
+                                       loss = loss, duplicate = duplicate,
+                                       jitter = jitter, devname = netif.name)
+                            netif.swapparams('_params_up')
+                        else:
+                            net.linkconfig(netif, bw = bw, delay = delay,
+                                           loss = loss, duplicate = duplicate,
+                                           jitter = jitter)
+                        if not unidirectional:
+                            if upstream:
+                                net2.linkconfig(netif, bw = bw, delay = delay,
+                                                loss = loss,
+                                                duplicate = duplicate,
+                                                jitter = jitter)
+                            else:
+                                netif.swapparams('_params_up')
+                                net2.linkconfig(netif, bw = bw, delay = delay,
+                                                loss = loss,
+                                                duplicate = duplicate,
+                                                jitter = jitter,
+                                                devname = netif.name)
+                                netif.swapparams('_params_up')
+                    else:
+                        raise ValueError, "modify link for unknown nodes"
                 elif node1 is None:
                     # node1 = layer 2node, node2 = layer3 node
                     net.linkconfig(node2.netif(ifindex2, net), bw = bw,
-                                   delay = delay, loss = loss, 
+                                   delay = delay, loss = loss,
                                    duplicate = duplicate, jitter = jitter)
                 elif node2 is None:
                     # node2 = layer 2node, node1 = layer3 node
                     net.linkconfig(node1.netif(ifindex1, net), bw = bw,
-                                   delay = delay, loss = loss, 
+                                   delay = delay, loss = loss,
                                    duplicate = duplicate, jitter = jitter)
                 else:
                     nets = node1.commonnets(node2)
@@ -770,14 +824,15 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                         net.linkconfig(netif1, bw = bw, delay = delay,
                                        loss = loss, duplicate = duplicate,
                                        jitter = jitter, netif2 = netif2)
-                        net.linkconfig(netif2, bw = bw, delay = delay,
+                        if not unidirectional:
+                            net.linkconfig(netif2, bw = bw, delay = delay,
                                        loss = loss, duplicate = duplicate,
                                        jitter = jitter, netif2 = netif1)
                         numnet += 1
                     if numnet == 0:
                         raise ValueError("no common network found")
 
-        
+
         finally:
             if node1:
                 node1.lock.release()
@@ -792,8 +847,9 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         execnum = msg.gettlv(coreapi.CORE_TLV_EXEC_NUM)
         exectime = msg.gettlv(coreapi.CORE_TLV_EXEC_TIME)
         cmd = msg.gettlv(coreapi.CORE_TLV_EXEC_CMD)
-        
-        if nodenum is None:
+
+        # local flag indicates command executed locally, not on a node
+        if nodenum is None and not msg.flags & coreapi.CORE_API_LOC_FLAG:
             raise ValueError("Execute Message is missing node number.")
         if execnum is None:
             raise ValueError("Execute Message is missing execution number.")
@@ -806,16 +862,24 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         except KeyError:
             # XXX wait and queue this message to try again later
             # XXX maybe this should be done differently
-            time.sleep(0.125)
-            self.queuemsg(msg)
-            return ()
+            if not msg.flags & coreapi.CORE_API_LOC_FLAG:
+                time.sleep(0.125)
+                self.queuemsg(msg)
+                return ()
+            else:
+                pass
         # build common TLV items for reply
         tlvdata = b""
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NODE, nodenum)
+        if nodenum is not None:
+            tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NODE,
+                    nodenum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NUM, execnum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_CMD, cmd)
-        
+
         if msg.flags & coreapi.CORE_API_TTY_FLAG:
+            if nodenum is None:
+                raise NotImplementedError
             # echo back exec message with cmd for spawning interactive terminal
             if cmd == "bash":
                 cmd = "/bin/bash"
@@ -832,7 +896,10 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             if msg.flags & coreapi.CORE_API_STR_FLAG or \
                msg.flags & coreapi.CORE_API_TXT_FLAG:
                 # shlex.split() handles quotes within the string
-                status, res = n.cmdresult(shlex.split(cmd))
+                if msg.flags & coreapi.CORE_API_LOC_FLAG:
+                    status, res = cmdresult(shlex.split(cmd))
+                else:
+                    status, res = n.cmdresult(shlex.split(cmd))
                 if self.verbose:
                     self.info("done exec cmd='%s' with status=%d res=(%d bytes)"
                               % (cmd, status, len(res)))
@@ -846,7 +913,10 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 return (reply, )
             # execute the command with no response
             else:
-                n.cmd(shlex.split(cmd), wait=False)
+                if msg.flags & coreapi.CORE_API_LOC_FLAG:
+                    mutedetach(shlex.split(cmd))
+                else:
+                    n.cmd(shlex.split(cmd), wait=False)
         return ()
 
 
@@ -854,11 +924,9 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         ''' Register Message Handler
         '''
         replies = []
-        
-        # execute a Python script
+        # execute a Python script or XML file
         ex = msg.gettlv(coreapi.CORE_TLV_REG_EXECSRV)
         if ex:
-            # TODO: load and execute XML files here
             try:
                 self.info("executing '%s'" % ex)
                 if isinstance(self.server, CoreUdpServer):
@@ -868,8 +936,16 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 if msg.flags & coreapi.CORE_API_STR_FLAG:
                     old_session_ids = set(server.getsessionids())
                 sys.argv = shlex.split(ex)
-                scriptname = sys.argv[0]
-                exec(compile(open(scriptname).read(), scriptname, 'exec'), {'server': server})
+                filename = sys.argv[0]
+                if os.path.splitext(filename)[1].lower() == '.xml':
+                    session = server.getsession(useexisting=False)
+                    opensessionxml(session, filename, start=True)
+                # TODO: Script may not return; run in separate thread here.
+                #       Wait for some configurable timeout period, then check
+                #       for new session below. Wait for session to enter
+                #       the runtime state, then send back the register message.
+                else:
+                    execfile(filename, {'server': server})
                 if msg.flags & coreapi.CORE_API_STR_FLAG:
                     new_session_ids = set(server.getsessionids())
                     new_sid = new_session_ids.difference(old_session_ids)
@@ -886,9 +962,10 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                     msg = coreapi.CoreRegMessage.pack(0, tlvdata)
                     replies.append(msg)
             except Exception as e:
-                self.warn("error executing '%s': %s" % (ex, e))
+                self.warn("error executing '%s': %s" % \
+                        (ex, traceback.format_exc()))
             return replies
-            
+
         gui = msg.gettlv(coreapi.CORE_TLV_REG_GUI)
         if gui is None:
             self.info("ignoring Register message")
@@ -932,12 +1009,12 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 self.warn("ignoring invalid File message: source and data " \
                          "TLVs are both present")
                 return ()
-                
-            # some File Messages store custom files in services, 
+
+            # some File Messages store custom files in services,
             # prior to node creation
             if type is not None:
-                if type[:8] == "service:":                
-                    self.session.services.setservicefile(nodenum, type, 
+                if type[:8] == "service:":
+                    self.session.services.setservicefile(nodenum, type,
                                                          filename, srcname, data)
                     return ()
                 elif type[:5] == "hook:":
@@ -1083,13 +1160,28 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
     def handleeventmsg(self, msg):
         ''' Event Message handler
         '''
-        eventtype = msg.tlvdata[coreapi.CORE_TLV_EVENT_TYPE]
+        eventtype = msg.gettlv(coreapi.CORE_TLV_EVENT_TYPE)
+        if eventtype is None:
+            raise NotImplementedError, "Event message missing event type"
+        node = msg.gettlv(coreapi.CORE_TLV_EVENT_NODE)
+
         if self.verbose:
             self.info("EVENT %d: %s at %s" % \
                 (eventtype, coreapi.event_types[eventtype], time.ctime()))
         if eventtype <= coreapi.CORE_EVENT_SHUTDOWN_STATE:
+            if node is not None:
+                try:
+                    n = self.session.obj(node)
+                except KeyError:
+                    raise KeyError, "Event message for unknown node %d" % node
+                if eventtype == coreapi.CORE_EVENT_INSTANTIATION_STATE:
+                    # configure mobility models for WLAN added during runtime
+                    if isinstance(n, pycore.nodes.WlanNode):
+                        return (self.session.mobility.startup(nodenums=(n.objid,)))
+                self.warn("dropping unhandled Event message with node number")
+                return ()
             self.session.setstate(state=eventtype, info=True, sendevent=False)
-            
+
         if eventtype == coreapi.CORE_EVENT_DEFINITION_STATE:
             # clear all session objects in order to receive new definitions
             self.session.delobjs()
@@ -1116,8 +1208,10 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             if self.session.master:
                 self.warn("Unexpected event message: SHUTDOWN state received " \
                           "at session master")
-        elif eventtype >= coreapi.CORE_EVENT_START and \
-             eventtype <= coreapi.CORE_EVENT_RESTART:
+        elif eventtype in (coreapi.CORE_EVENT_START,  coreapi.CORE_EVENT_STOP, \
+                           coreapi.CORE_EVENT_RESTART, \
+                           coreapi.CORE_EVENT_PAUSE, \
+                           coreapi.CORE_EVENT_RECONFIGURE):
             name = msg.gettlv(coreapi.CORE_TLV_EVENT_NAME)
             # TODO: register system for event message handlers, like confobjs
             if name[:8] == "service:":
@@ -1145,7 +1239,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 self.warn("Event message scheduled event missing start time")
                 return ()
             if msg.flags & coreapi.CORE_API_ADD_FLAG:
-                self.session.addevent(float(etime), node=node, name=name, 
+                self.session.addevent(float(etime), node=node, name=name,
                                       data=data)
             else:
                 raise NotImplementedError
@@ -1177,7 +1271,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                 if sid == 0:
                     session = self.session
                 else:
-                    session = self.server.getsession(sessionid = sid, 
+                    session = self.server.getsession(sessionid = sid,
                                                      useexisting = True)
                 if session is None:
                     self.info("session %s not found" % sid)
@@ -1204,7 +1298,7 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             # handle ADD or DEL flags
             for sid in sids:
                 sid = int(sid)
-                session = self.server.getsession(sessionid = sid, 
+                session = self.server.getsession(sessionid = sid,
                                                  useexisting = True)
                 if session is None:
                     self.info("session %s not found (flags=0x%x)" % \
@@ -1260,19 +1354,19 @@ class CoreDatagramRequestHandler(CoreRequestHandler):
         self.debug = bool(server.tcpserver.cfg['debug'].lower() == "true")
         socketserver.BaseRequestHandler.__init__(self, request,
                                                  client_address, server)
-    
+
     def setup(self):
         ''' Client has connected, set up a new connection.
         '''
         if self.verbose:
             self.info("new UDP connection: %s:%s" % self.client_address)
-        
+
     def handle(self):
         msg = self.recvmsg()
-        
+
     def finish(self):
         return socketserver.BaseRequestHandler.finish(self)
-        
+
     def recvmsg(self):
         ''' Receive data, parse a CoreMessage and queue it onto an existing
         session handler's queue, if available.
@@ -1309,18 +1403,18 @@ class CoreDatagramRequestHandler(CoreRequestHandler):
         #self.info("UDP message has session numbers: %s" % sids)
         if len(sids) > 0:
             for sid in sids:
-                sess = self.server.tcpserver.getsession(sessionid=sid, 
+                sess = self.server.tcpserver.getsession(sessionid=sid,
                                                         useexisting=True)
                 if sess:
                     self.session = sess
-                    sess.broadcast(self, msg)                    
+                    sess.broadcast(self, msg)
                     self.handlemsg(msg)
                 else:
                     self.warn("Session %d in %s message not found." % \
                               (sid, msg.typestr()))
         else:
             # no session specified, find an existing one
-            sess = self.server.tcpserver.getsession(sessionid=0, 
+            sess = self.server.tcpserver.getsession(sessionid=0,
                                                     useexisting=True)
             if sess or msg.msgtype == coreapi.CORE_API_REG_MSG:
                 self.session = sess
@@ -1330,13 +1424,13 @@ class CoreDatagramRequestHandler(CoreRequestHandler):
             else:
                 self.warn("No active session, dropping %s message." % \
                           msg.typestr())
-        
+
     def queuemsg(self, msg):
         ''' UDP handlers are short-lived and do not have message queues.
         '''
         raise Exception("Unable to queue %s message for later processing " \
                 "using UDP!" % msg.typestr())
-        
+
     def sendall(self, data):
         ''' Use sendto() on the connectionless UDP socket.
         '''
@@ -1409,7 +1503,7 @@ class CoreServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             else:
                 del(self._sessions[session.sessionid])
         return session
-        
+
     def getsessionids(self):
         ''' Return a list of active session numbers.
         '''
@@ -1540,7 +1634,7 @@ class CoreServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         finally:
             self._sessionslock.release()
         return found
-    
+
     def startudp(self, server_address):
         ''' Start a thread running a UDP server on the same host,port for
         connectionless requests.
@@ -1565,12 +1659,12 @@ class CoreUdpServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
         self.tcpserver = tcpserver
         socketserver.UDPServer.__init__(self, server_address,
                                         RequestHandlerClass)
-                                        
+
     def start(self):
         ''' Thread target to run concurrently with the TCP server.
         '''
         self.serve_forever()
-        
+
 
 
 def banner():
@@ -1689,7 +1783,7 @@ def getMergedConfig(filename):
                 bn = os.path.basename(val).replace('cored', 'core-daemon')
                 val = os.path.join(os.path.dirname(val), bn)
             cfg.set(section, name, val)
-    
+
     # merge command line with config file
     for opt in options.__dict__:
         val = options.__dict__[opt]
