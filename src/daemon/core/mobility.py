@@ -41,7 +41,7 @@ class MobilityManager(ConfigurableManager):
         Instantiate any mobility models that have been configured for a WLAN.
         '''
         if nodenums is None:
-            nodenums = self.configs.keys()
+            nodenums = list(self.configs.keys())
 
         for nodenum in nodenums:
             try:

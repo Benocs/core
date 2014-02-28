@@ -197,7 +197,7 @@ class SimpleLxcNode(PyCoreNode):
                 }
 
             mount_type = None
-            for key in defaultmounts.keys():
+            for key in list(defaultmounts.keys()):
                 if target.startswith(key):
                     mount_type = defaultmounts[key]
                     break
@@ -529,7 +529,7 @@ class LxcNode(SimpleLxcNode):
     def chmod(self, filename, mode = 0o644):
         filename = self.hostfilename(filename)
         if os.path.exists(filename):
-            print("chmodding file: %s to mode: 0%o" % (f.name, mode))
+            print(("chmodding file: %s to mode: 0%o" % (f.name, mode)))
             os.chmod(filename, mode)
 
     def nodefilecopy(self, filename, srcfilename, mode = None):
@@ -545,10 +545,10 @@ class LxcNode(SimpleLxcNode):
     def nodefilelink(self, srcfilename, filename, hard = True):
         ''' Create a link within the node to point to a file '''
 
-        print('nodefilelink: srcfilename: %s, filename: %s, hard: %s' % (str(srcfilename),
-                str(filename), str(hard)))
+        print(('nodefilelink: srcfilename: %s, filename: %s, hard: %s' % (str(srcfilename),
+                str(filename), str(hard))))
         hostfilename = self.hostfilename(filename)
-        print('  hostfilename: %s' % (str(hostfilename)))
+        print(('  hostfilename: %s' % (str(hostfilename))))
         if hard:
             os.link(srcfilename, hostfilename)
         else:

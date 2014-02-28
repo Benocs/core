@@ -6,7 +6,7 @@
 # server metrics: loadave1, 5, 15, mem, used cpu% of total, cpu1, cpu2, ..., cpun
 # node metrics: throughput, mem, cpu total, usr, sys, wait
 #
-import os, sys, time, re, optparse, signal, commands, pdb
+import os, sys, time, re, optparse, signal, subprocess, pdb
 
 def readfile(fname):
     lines=[]
@@ -14,8 +14,8 @@ def readfile(fname):
         f = open(fname, "r")
     except:
         if options.timestamp == True:
-	    print str(time.time()),
-	print "ERROR: failed to open file %s\n" % fname
+	    print(str(time.time()), end=' ')
+	print("ERROR: failed to open file %s\n" % fname)
     else :
 	lines = f.readlines()
 	f.close()
@@ -31,7 +31,7 @@ def numcpus():
     return n
 
 def handler(signum, frame):
-    print "stop timestamp:", str(time.time()) + ", cyclecount=", cyclecount, ", caught signal", signum
+    print("stop timestamp:", str(time.time()) + ", cyclecount=", cyclecount, ", caught signal", signum)
     sys.exit(0)
 
 class ServerMetrics(object):
@@ -67,7 +67,7 @@ class ServerMetrics(object):
         return self.smetrics[key]
 
     def getkeys(self):
-        return self.smetrics.keys()
+        return list(self.smetrics.keys())
 
     def tocsv(self):
 	rv = "Server"
@@ -78,7 +78,7 @@ class ServerMetrics(object):
 	    else:
                 if isinstance(self.smetrics[k], list):
                     rv += ", [" + \
-                          ", ".join(map(lambda(x):str(round(x, 2)), self.smetrics[k])) \
+                          ", ".join([str(round(x, 2)) for x in self.smetrics[k]]) \
 			   + "]"
 		else:
 		    rv += ", " + str(self.smetrics[k])
@@ -112,15 +112,15 @@ def checkserverthreshold(metricval):
                     alarm = ["server", os.uname()[1], str(ind) + key,
 		     "%.2f" % pcpus[ind], ">", serverthresholds.getvalue(key)]
                     if options.timestamp:
-	                print str(time.time()) + ",",
-                    print ", ".join(map(lambda(x):str(x), alarm))
+	                print(str(time.time()) + ",", end=' ')
+                    print(", ".join([str(x) for x in alarm]))
 	else: 
 	    if metricval.getvalue(key) > serverthresholds.getvalue(key):
                 alarm = ["server", os.uname()[1], key,
 		  "%.2f" % metricval.getvalue(key), ">", serverthresholds.getvalue(key)]
                 if options.timestamp:
-	            print str(time.time()) + ",",
-            	print ", ".join(map(lambda(x):str(x), alarm))
+	            print(str(time.time()) + ",", end=' ')
+            	print(", ".join([str(x) for x in alarm]))
 
 def collectservercputimes():
 # return cpu times in ticks of this server total and each processor 3*(1+#cpu) columns
@@ -130,7 +130,7 @@ def collectservercputimes():
     lines = readfile("/proc/stat")
     for i in range(ncpus + 1):
         items = lines[i].split()
-        (user, nice, sys, idle) = map(lambda(x): int(x), items[1:5])
+        (user, nice, sys, idle) = [int(x) for x in items[1:5]]
 	rval[i] = [user+nice, sys, idle]
     return rval
     
@@ -139,7 +139,7 @@ def csvservercputimes(cputimes):
 # (usr, sys, idle) in ticks
     rval = ''
     for i in range(len(cputimes)):
-        rval += ', '.join(map(lambda(x):str(x), cputimes[i]))
+        rval += ', '.join([str(x) for x in cputimes[i]])
     return rval
 
 def calcservercputimes(cputimea, cputimeb):
@@ -162,12 +162,12 @@ def calcservercputimes(cputimea, cputimeb):
 def collectservermems(): 
 # return memory (total, free) in KB from proc/meminfo
     lines = readfile("/proc/meminfo")
-    mem = map(lambda(x):x.split(), lines[0:2])
-    return map(lambda(x):int(x), zip(*mem)[1])
+    mem = [x.split() for x in lines[0:2]]
+    return [int(x) for x in zip(*mem)[1]]
 
 def csvservermems(mems): 
 # return a csv string of this server memory (total, free)
-    return ", ".join(map(lambda x: str(x), mems))
+    return ", ".join([str(x) for x in mems])
 
 def calcserverusedmem(mems): 
 # return int(100*(MemTotal-MemFree)/MemTotal) from /proc/meminfo
@@ -233,10 +233,10 @@ class NodeMetrics(object):
 	return self.nmetrics[key]
 
     def getkeys(self):
-	return self.nmetrics.keys()
+	return list(self.nmetrics.keys())
 
     def tocsv(self):
-	return ", ".join(map(lambda(x):str(x), self.nmetrics.values()))
+	return ", ".join([str(x) for x in list(self.nmetrics.values())])
 
 
 class LogSession(object):
@@ -257,7 +257,7 @@ class LogSession(object):
     # return dict of all CORE session pids in a dict using node name as the keys 
     # parent pid (vnoded) is the first value 
         self.pids = {}
-        nodes = commands.getstatusoutput("ls /tmp/pycore.%s/*pid" % options.session)
+        nodes = subprocess.getstatusoutput("ls /tmp/pycore.%s/*pid" % options.session)
         if nodes[0] != 0:
     	    # if options.timestamp == True:
     	        # print str(time.time()),
@@ -267,18 +267,18 @@ class LogSession(object):
         nodes = nodes[1].split('\n')
         for nod in nodes:
     	    nodename = nod.split('/')[-1].strip(".pid")
-    	    self.pids[nodename] = commands.getoutput("cat %s" % nod)
+    	    self.pids[nodename] = subprocess.getoutput("cat %s" % nod)
     
         # do not expect failure of this command
-        procs = commands.getoutput('ps -eo ppid,pid,comm').split('\n')
+        procs = subprocess.getoutput('ps -eo ppid,pid,comm').split('\n')
     
         # build self.pids dict with key=nodename and val="ppid,pid,cmd"
         for nname in self.pids:
             # print nname, self.pids[nname]
             if self.pids[nname] == "":
     	        if options.timestamp == True:
-    	            print str(time.time()),
-    	        print "ERROR: null vnoded pid of node: %s" % nname 
+    	            print(str(time.time()), end=' ')
+    	        print("ERROR: null vnoded pid of node: %s" % nname) 
     	    else:
     	        childprocs = []
     	        ppid = self.pids[nname]
@@ -298,12 +298,12 @@ class LogSession(object):
         for pp in self.pids:
     	    if self.pids[pp] != []:
                 for ap in range(len(self.pids[pp]) - 1):
-    	            print ", " + self.pids[pp][ap][0], # ap pid
-    	            print ", " + self.pids[pp][ap][1], # ap cmd
-                    procmetrics = map(lambda(x):str(x),self.pids[pp][ap][-1])
-    	            print ", " + ", ".join(procmetrics),
-    	        nodemetrics = map(lambda(x):str(x), self.pids[pp][-1])
-    	        print ", " + ", ".join(nodemetrics)
+    	            print(", " + self.pids[pp][ap][0], end=' ') # ap pid
+    	            print(", " + self.pids[pp][ap][1], end=' ') # ap cmd
+                    procmetrics = [str(x) for x in self.pids[pp][ap][-1]]
+    	            print(", " + ", ".join(procmetrics), end=' ')
+    	        nodemetrics = [str(x) for x in self.pids[pp][-1]]
+    	        print(", " + ", ".join(nodemetrics))
 
     def getprocessmetrics(self, pid):
     # return [cpu#, vsize(kb), ttime, utime, stime, wtime] 
@@ -321,7 +321,7 @@ class LogSession(object):
         if lines == []:
     	   return rval
         items = lines[0].split()
-        (utime, stime, cutime, cstime) = map(lambda(x):int(x), items[13:17])
+        (utime, stime, cutime, cstime) = [int(x) for x in items[13:17]]
         # print ">???", utime, stime, cutime, cstime
         rval = (items[38],      	# last run processor
         	int(items[22])/1000, 		# process virtual mem in kb
@@ -337,10 +337,10 @@ class LogSession(object):
         lines = readfile("/proc/" + pid + "/net/dev")
         if lines == []:
     	    return -0.00
-        ifs = map(lambda(x): x.split(), lines[2:])
-        ifm = zip(*ifs)
-        rv = sum(map(lambda(x):int(x), ifm[1])) # received bytes
-        tr = sum(map(lambda(x):int(x), ifm[9])) # transmited bytes
+        ifs = [x.split() for x in lines[2:]]
+        ifm = list(zip(*ifs))
+        rv = sum([int(x) for x in ifm[1]]) # received bytes
+        tr = sum([int(x) for x in ifm[9]]) # transmited bytes
 	#print 'node thruput :', rv, tr, (rv + tr)/1000
         return (rv + tr)/1000
     
@@ -368,23 +368,23 @@ class LogSession(object):
     	        procm = self.getprocessmetrics(self.pids[nod][ap][0])
     	        if procm == []:
     		    if options.timestamp == True:
-    		        print str(time.time()),
-    	            print "WARNING: transient process", self.pids[nod][ap][1], \
-			  "/", self.pids[nod][ap][0], "on node %s" % nod
+    		        print(str(time.time()), end=' ')
+    	            print("WARNING: transient process", self.pids[nod][ap][1], \
+			  "/", self.pids[nod][ap][0], "on node %s" % nod)
     	        else:
     	            nodeapps[ap] = procm
     	            self.pids[nod][ap].append(nodeapps[ap])
-            processm = zip(*nodeapps.values()) # get overall node metrics
+            processm = list(zip(*list(nodeapps.values()))) # get overall node metrics
             # print processm
     	    if len(processm) > 0:
 		# if nod == 'n6':
 		    # print nod, self.getnodethroughput(self.pids[nod][0][0])  
     	        nmetric.setvalues(( self.getnodethroughput(self.pids[nod][0][0]), 
-            	      sum(map(lambda(x):int(x), processm[1])), # vsize(kb)
-    		      sum(map(lambda(x):int(x), processm[2])), # ttime
-    		      sum(map(lambda(x):int(x), processm[3])), # utime
-    		      sum(map(lambda(x):int(x), processm[4])), # stime
-    		      sum(map(lambda(x):int(x), processm[5])))) # wtime 
+            	      sum([int(x) for x in processm[1]]), # vsize(kb)
+    		      sum([int(x) for x in processm[2]]), # ttime
+    		      sum([int(x) for x in processm[3]]), # utime
+    		      sum([int(x) for x in processm[4]]), # stime
+    		      sum([int(x) for x in processm[5]]))) # wtime 
                 metricref[nod] = nmetric
                 # print nod, self.pids[nod][0][0], metricref[nod].tocsv()
         return metricref
@@ -403,8 +403,8 @@ class LogSession(object):
 
 	for k in self.nodemetricsC:
             if options.timestamp:
-                print str(time.time()) + ",",
- 	    print k, ",", mm[k].tocsv()
+                print(str(time.time()) + ",", end=' ')
+ 	    print(k, ",", mm[k].tocsv())
 
     def readnodethresholds(self, filename): 
 	if filename is None:
@@ -430,8 +430,8 @@ class LogSession(object):
                 alarm = ["node", nname + "/" + self.pids[nname][0][0], keyname,\
                       calcm.getvalue(keyname), ">", self.nodethresholds.getvalue(keyname)]
                 if options.timestamp:
-                    print str(time.time()) + ",",
-                print ", ".join(map(lambda(x):str(x), alarm))
+                    print(str(time.time()) + ",", end=' ')
+                print(", ".join([str(x) for x in alarm]))
 
     def calcnodemetrics(self, cputimea, cputimeb, mems):
     # return a dict of nodemetrics indexed by node name
@@ -442,10 +442,10 @@ class LogSession(object):
         hostusedcpu = p[0] + p[1]
         hostusedmem = mems[0] - mems[1]
         if hostusedcpu == 0:
-	    print "WARNING: host used cpu = 0, ", p[0], p[1]
+	    print("WARNING: host used cpu = 0, ", p[0], p[1])
 	    hostusedcpu = 1
         if hostusedmem == 0:
-	    print "WARNING: host used mem = 0, ", mems[0], mems[1]
+	    print("WARNING: host used mem = 0, ", mems[0], mems[1])
 	    hostusedmem = 1
 
 	nodesa = self.nodemetricsA
@@ -460,8 +460,8 @@ class LogSession(object):
 		       ( False == isinstance(nodesb[nod], NodeMetrics)) |  \
 		       ( False == isinstance(nodesa[nod], NodeMetrics)):
     		        if options.timestamp == True:
-    		            print str(time.time()),
-    	                print "Warning: nodes %s is not fully instanciated" % nod
+    		            print(str(time.time()), end=' ')
+    	                print("Warning: nodes %s is not fully instanciated" % nod)
 		    else:
     	                # calc throughput kbps
     		        #print "node b : ", nodesb[nod].tocsv() 
@@ -496,7 +496,7 @@ class LogSession(object):
 	        except IndexError:
 		    pass
 	    else:
-	        print "Warning: transient node %s " % nod
+	        print("Warning: transient node %s " % nod)
 
         return nodesb
     
@@ -551,12 +551,12 @@ def main():
 	# print logsession
 
     # mark host log baseline
-    print "server: ", ", ".join(map(lambda(x):str(x), os.uname())), ",", ncpus, "CPU cores"
-    print "start timestamp:", time.time(), ", baseline data: "
-    print csvserverbaseline()
-    print "server metrics: ", ", ".join(map(lambda(x):str(x), serverthresholds.getkeys()))
+    print("server: ", ", ".join([str(x) for x in os.uname()]), ",", ncpus, "CPU cores")
+    print("start timestamp:", time.time(), ", baseline data: ")
+    print(csvserverbaseline())
+    print("server metrics: ", ", ".join([str(x) for x in serverthresholds.getkeys()]))
     if options.session is not None:
-        print "node metrics: nodename, ", ", ".join(map(lambda(x):str(x), logsession.nodethresholds.getkeys()))
+        print("node metrics: nodename, ", ", ".join([str(x) for x in logsession.nodethresholds.getkeys()]))
 
     cyclecount = 0
     while True:
@@ -572,7 +572,7 @@ def main():
 
         calccputime = calcservercputimes(cputimea, cputimeb)
 	m = csvservermetrics(collectservermetrics(calccputime, mems, options.alarm))
-	print m
+	print(m)
 
         if options.session is not None:
 	    nodesb = logsession.getnodemetrics('b')

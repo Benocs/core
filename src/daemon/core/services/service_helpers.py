@@ -25,7 +25,7 @@ def nodewalker(startnode, currentnode, visited_list, receiver_list,
         receiver_list.extend(node_cb(startnode, currentnode))
 
     for localnetif in currentnode.netifs():
-        for idx, net_netif in localnetif.net._netif.items():
+        for idx, net_netif in list(localnetif.net._netif.items()):
             # skip our own interface
             if localnetif == net_netif.node:
                 continue

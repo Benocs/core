@@ -592,16 +592,12 @@ class Session(object):
         '''
 
         with self._objslock:
-            count = len(filter(lambda(x): \
-                               not isinstance(x, (nodes.PtpNet, nodes.CtrlNet)),
-                               self.objs()))
+            count = len([x for x in self.objs() if not isinstance(x, (nodes.PtpNet, nodes.CtrlNet))])
             # on Linux, GreTapBridges are auto-created, not part of
             # GUI's node count
             if 'GreTapBridge' in globals():
-                count -= len(filter(lambda(x): \
-                                    isinstance(x, GreTapBridge) and not \
-                                    isinstance(x, nodes.TunnelNode),
-                                    self.objs()))
+                count -= len([x for x in self.objs() if isinstance(x, GreTapBridge) and not \
+                                    isinstance(x, nodes.TunnelNode)])
         return count
 
     def checkruntime(self):
@@ -916,7 +912,7 @@ class Session(object):
                 # interfaces. we will now iterate over those interface and push
                 # one API message each.
                 if created_nodemsg:
-                    for ifindex, interface in obj._netif.items():
+                    for ifindex, interface in list(obj._netif.items()):
                         msg = interface.tointerfacemsg(flags = coreapi.CORE_API_ADD_FLAG)
                         if msg is not None:
                             replies.append(msg)

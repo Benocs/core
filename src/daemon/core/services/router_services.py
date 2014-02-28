@@ -62,7 +62,7 @@ class InterASStaticRoute(utility.UtilService):
             if hasattr(localnetif, 'control') and localnetif.control == True:
                 continue
 
-            for idx, net_netif in localnetif.net._netif.items():
+            for idx, net_netif in list(localnetif.net._netif.items()):
                 candidate_node = net_netif.node
 
                 # skip our own interface

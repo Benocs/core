@@ -573,7 +573,7 @@ class CoreBroker(ConfigurableManager):
         if host is None or sock is None:
             return
         # communicate this session's current state to the server
-        print('state: %s' % str(self.session.getstate()))
+        print(('state: %s' % str(self.session.getstate())))
         tlvdata = coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_TYPE,
                                             self.session.getstate())
         msg = coreapi.CoreEventMessage.pack(0, tlvdata)

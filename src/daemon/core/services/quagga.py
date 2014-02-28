@@ -335,7 +335,7 @@ class Ospfv2(QuaggaService):
         # find any link on which two equal netid's (i.e., AS numbers) are
         # present and configure an ospf-session on this interface
         # on all other interfaces, disable ospf
-        for idx, net_netif in ifc.net._netif.items():
+        for idx, net_netif in list(ifc.net._netif.items()):
 
             # skip our own interface
             if ifc == net_netif:
@@ -519,7 +519,7 @@ class Bgp(QuaggaService):
             if hasattr(localnetif, 'control') and localnetif.control == True:
                 continue
 
-            for idx, net_netif in localnetif.net._netif.items():
+            for idx, net_netif in list(localnetif.net._netif.items()):
                 candidate_node = net_netif.node
 
                 # skip our own interface
@@ -666,7 +666,7 @@ class ISIS(QuaggaService):
         # present and on which two routers are present.
         # then configure an isis-session on this interface
         # on all other interfaces, disable isis
-        for idx, net_netif in ifc.net._netif.items():
+        for idx, net_netif in list(ifc.net._netif.items()):
 
             # only add each interface once
             if added_ifc:

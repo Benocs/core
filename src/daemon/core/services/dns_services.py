@@ -127,8 +127,8 @@ class Bind9(DNSServices):
             ttl = 900, refresh = 900, retry = 450,
             expire = 3600000, negcache = 900):
 
-        print('generating SOA header for zone: %s, served by: %s' % (str(zone),
-                str(auth_nameservers)))
+        print(('generating SOA header for zone: %s, served by: %s' % (str(zone),
+                str(auth_nameservers))))
 
         if not isinstance(auth_nameservers, list) or \
                 len(auth_nameservers) == 0 or \
@@ -144,7 +144,7 @@ class Bind9(DNSServices):
             raise ValueError
 
         # create  list of name server-names (drop their addresses)
-        nameservers = list(map(lambda x: x[0], auth_nameservers))
+        nameservers = list([x[0] for x in auth_nameservers])
 
         soaitems = []
         soaitems.append('$TTL %d\n' % ttl)
@@ -156,8 +156,7 @@ class Bind9(DNSServices):
             soaitems.append('@ IN SOA %s.%s root.%s.%s' % (nameservers[0], zone, nameservers[0], zone))
         soaitems.append(' (%d %d %d %d %d)\n' % (serial, refresh, retry, expire, negcache))
 
-        soaitems.append('%s\n' % '\n'.join(list(map(lambda x: '  IN NS %s' % x[0],
-            auth_nameservers))))
+        soaitems.append('%s\n' % '\n'.join(list(['  IN NS %s' % x[0] for x in auth_nameservers])))
 
         return ''.join(soaitems)
 
@@ -172,13 +171,13 @@ class Bind9(DNSServices):
         virtualservers = []
         for servername, ipaddr, server_zone in servers:
             if server_zone == zone:
-                print('adding to zone: "%s" server: "%s"' % (server_zone, servername))
+                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
                 virtualservers.append((servername, ipaddr))
 
-        rawzonecontents = cls.compileZoneFile(cls, list(map(lambda x: (x[0], x[1], zone), virtualservers)))[0]
+        rawzonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in virtualservers]))[0]
         SOAHeader = cls.generateSOAHeader(cls, virtualservers, zone)
         zonecontents = '%s\n%s' % (SOAHeader, rawzonecontents)
-        print("zone: %s: %s" % (zone, zonecontents))
+        print(("zone: %s: %s" % (zone, zonecontents)))
 
         ## TODO: handle the case when two tuples exit with both the same zone
 
@@ -202,11 +201,11 @@ class Bind9(DNSServices):
         virtualservers = []
         for servername, ipaddr, server_zone in servers:
             if server_zone == zone:
-                print('adding to zone: "%s" server: "%s"' % (server_zone, servername))
+                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
                 virtualservers.append((servername, ipaddr))
 
-        zonecontents = cls.compileZoneFile(cls, list(map(lambda x: (x[0], x[1], zone), virtualservers)))[0]
-        print("zone: %s: %s" % (zone, zonecontents))
+        zonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in virtualservers]))[0]
+        print(("zone: %s: %s" % (zone, zonecontents)))
 
         ## TODO: handle the case when two tuples exit with both the same zone
 
@@ -230,11 +229,11 @@ class Bind9(DNSServices):
         virtualservers = []
         for servername, ipaddr, server_zone in servers:
             if server_zone == zone:
-                print('adding to zone: "%s" server: "%s"' % (server_zone, servername))
+                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
                 virtualservers.append((servername, ipaddr))
 
-        zonecontent = cls.compileZoneFile(cls, [], list(map(lambda x: (x[0], x[1], zone), virtualservers)))[1]
-        print("zone: %s: %s" % (zone, zonecontent))
+        zonecontent = cls.compileZoneFile(cls, [], list([(x[0], x[1], zone) for x in virtualservers]))[1]
+        print(("zone: %s: %s" % (zone, zonecontent)))
 
         ## TODO: handle the case when two tuples exit with both the same zone
 
@@ -352,18 +351,15 @@ class Bind9(DNSServices):
         CFG_SECTION_VALUES = '__section_values__'
         if cfgitems is None:
             cfgitems = []
-        for key, valueitems in named_cfg.items():
-            prefix_whitespace = ''.join(list(map(lambda x: ' ',
-                    range(level*2))))
+        for key, valueitems in list(named_cfg.items()):
+            prefix_whitespace = ''.join(list([' ' for x in range(level*2)]))
             prefix_whitespace = '  %s' % prefix_whitespace
             if not key == CFG_SECTION_VALUES:
                 cfgitems.append("%s%s {\n" % (prefix_whitespace, key))
             if isinstance(valueitems, dict):
                 cls.compile_named_conf(cls, valueitems, cfgitems, level+1)
             elif isinstance(valueitems, list):
-                cfgitems.extend(list(map(
-                        lambda x: ''.join([prefix_whitespace, x, '\n']),
-                        valueitems)))
+                cfgitems.extend(list([''.join([prefix_whitespace, x, '\n']) for x in valueitems]))
             elif isinstance(str(valueitems), str):
                 cfgitems.append(''.join([prefix_whitespace,
                         str(valueitems), '\n']))
@@ -504,7 +500,7 @@ class Bind9(DNSServices):
         # check if remote node is a root dns server and
         # we are not ourselves a root server
         if service_flags.DNSRootServer in currentnode.services:
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
 
                 server_name = '%s' % (currentnode.name)
@@ -516,7 +512,7 @@ class Bind9(DNSServices):
                 #servers.extend([str(currentnode.getLoopbackIPv4())])
 
         if service_flags.DNSASRootServer in currentnode.services:
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 server_name = currentnode.name
                 server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
@@ -539,7 +535,7 @@ class Bind9(DNSServices):
         #        not (service_flags.DNSASRootServer in startnode.services and \
         if service_flags.DNSASRootServer in currentnode.services and \
                 currentnode.netid == startnode.netid:
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
 
                 if hasattr(currentnode, 'netid') and not currentnode.netid is None:
@@ -573,7 +569,7 @@ class Bind9(DNSServices):
                 currentnode.netid == startnode.netid:
 
             # add plain hostname
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 #hosts.extend([str(currentnode.getLoopbackIPv4())])
                 # TODO: switch this addr to loopback as soon as loopback-routing works
@@ -582,7 +578,7 @@ class Bind9(DNSServices):
                 hosts.append((server_name, server_addr, zone))
 
             # add all interface names
-            for intf in currentnode._netif.values():
+            for intf in list(currentnode._netif.values()):
                 server_name = '%s.%s' % (intf.name, currentnode.name)
                 # use first v4 and first v6 address of this interface
                 v4addr = None
@@ -617,7 +613,7 @@ class Bind9(DNSServices):
         #    hosts.append((server_name, server_addr, zone))
 
         # add all interface names
-        for intf in currentnode._netif.values():
+        for intf in list(currentnode._netif.values()):
             server_name = '%s.%s' % (intf.name, currentnode.name)
             # use first v4 and first v6 address of this interface
             v4addr = None
@@ -822,9 +818,9 @@ class DNSMasq(DNSServices):
 
         if service_flags.DNSASRootServer in node.services:
             cfgitems.append("server=/AS%s.virtual./\n" % netid)
-            if len(node._netif.values()) > 0:
+            if len(list(node._netif.values())) > 0:
                 intflist = []
-                for intf in node._netif.values():
+                for intf in list(node._netif.values()):
                     intflist.append(intf.name)
                     if intf.addrlist > 0:
                         for addr in intf.addrlist:
@@ -865,7 +861,7 @@ class DNSMasq(DNSServices):
         # we are not ourselves a root server
         if service_flags.DNSRootServer in currentnode.services and \
                 not service_flags.DNSRootServer in startnode.services:
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 cfgitems.extend(['server=/virtual./',
                         list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
@@ -881,7 +877,7 @@ class DNSMasq(DNSServices):
             if service_flags.DNSASRootServer in currentnode.services and \
                     not (service_flags.DNSASRootServer in startnode.services and \
                             currentnode.netid == startnode.netid):
-                if len(currentnode._netif.values()) > 0 and \
+                if len(list(currentnode._netif.values())) > 0 and \
                         len(list(currentnode._netif.values())[0].addrlist) > 0:
                     asnumber = currentnode.netid
                     if asnumber is None:
@@ -943,7 +939,7 @@ class DNSMasq(DNSServices):
                     while subnet_prefix.minaddr() < target_network_broadcastaddr:
                         subnet_list = str(subnet_prefix.minaddr() - 1).split('.')
                         subnet_list.reverse()
-                        if len(currentnode._netif.values()) > 0 and \
+                        if len(list(currentnode._netif.values())) > 0 and \
                                 len(list(currentnode._netif.values())[0].addrlist) > 0:
                             cfgitems.extend(['server=/', '.'.join(subnet_list[1:]),
                                     '.in-addr.arpa./',
@@ -969,7 +965,7 @@ class DNSMasq(DNSServices):
         # if true, add PTR delegation records
         if startnode.netid == currentnode.netid:
             # add interfaces
-            for intf in currentnode._netif.values():
+            for intf in list(currentnode._netif.values()):
                 for addr in intf.addrlist:
                     # TODO: no support for v6 yet
                     if isIPv6Address(addr):
@@ -981,7 +977,7 @@ class DNSMasq(DNSServices):
                     addr_list = str(addr).split('/')[0].split('.')
                     addr_list.reverse()
 
-                    if len(startnode._netif.values()) > 0 and \
+                    if len(list(startnode._netif.values())) > 0 and \
                             len(list(startnode._netif.values())[0].addrlist) > 0:
                         cfgitems.extend(['server=/', '.'.join(addr_list),
                                 '.in-addr.arpa./',
@@ -1019,7 +1015,7 @@ class DNSMasq(DNSServices):
             cfgitems.append('%s %s.AS%s.virtual.\n' % (str(currentnode.getLoopbackIPv4()),
                     currentnode.name, str(asnumber)))
             # add interfaces
-            for intf in currentnode._netif.values():
+            for intf in list(currentnode._netif.values()):
                 for addr in intf.addrlist:
                     # TODO: no support for v6 yet
                     if isIPv6Address(addr):
@@ -1072,7 +1068,7 @@ class DNSResolvconf(DNSServices):
         # check if remote node is a dns server within our AS
         if service_flags.DNSResolver in currentnode.services and \
                 startnode.netid == currentnode.netid:
-            if len(currentnode._netif.values()) > 0 and \
+            if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 cfgitems = ['nameserver ',
                         list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],

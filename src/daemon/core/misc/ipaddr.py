@@ -155,7 +155,7 @@ class IPv6Addr(IPAddr):
 class IPPrefix(object):
     def __init__(self, af, prefixstr):
         "prefixstr format: address/prefixlen"
-        print('generating prefix for str: %s' % prefixstr)
+        print(('generating prefix for str: %s' % prefixstr))
 
         self.af = af
         if self.af == AF_INET:
@@ -176,8 +176,8 @@ class IPPrefix(object):
             self.prefixlen = self.addrlen
 
     def __str__(self):
-        print("IPADDR: family: %s, prefix: %s, len: %s" % (str(self.af),
-                str(self.prefix), str(self.prefixlen)))
+        print(("IPADDR: family: %s, prefix: %s, len: %s" % (str(self.af),
+                str(self.prefix), str(self.prefixlen))))
         return str(self.prefix)
 
     def __eq__(self, other):
@@ -198,7 +198,7 @@ class IPPrefix(object):
             raise ValueError("invalid hostid for prefix %s: %s" % (str(self), str(hostid)))
 
         addr = IPAddr(self.af, int(self.prefix.network_address) + int(hostid))
-        print('new address: %s' % str(addr))
+        print(('new address: %s' % str(addr)))
         return addr
 
     def minaddr(self):
@@ -247,7 +247,7 @@ class NetIDNodeMap():
         if not netid in NetIDNodeMap.mapping:
             NetIDNodeMap.mapping[netid] = {}
         if not nodeid in NetIDNodeMap.mapping[netid]:
-            if len(NetIDNodeMap.mapping[netid].values()) == 0:
+            if len(list(NetIDNodeMap.mapping[netid].values())) == 0:
                 NetIDNodeMap.mapping[netid][nodeid] = 1
             else:
                 NetIDNodeMap.mapping[netid][nodeid] = max(NetIDNodeMap.mapping[netid].values()) + 1

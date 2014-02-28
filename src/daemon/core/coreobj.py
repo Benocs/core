@@ -568,7 +568,7 @@ class PyCoreNetIf(object):
         tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NODE,
                                             self.node.objid)
         # find netif index
-        for index, netif in self.node._netif.items():
+        for index, netif in list(self.node._netif.items()):
           if netif == self:
             print("netindex: %s" % str(index))
             tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NUM,

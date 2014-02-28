@@ -267,7 +267,7 @@ class PhysicalNode(PyCoreNode):
                 }
 
             mount_type = None
-            for key in defaultmounts.keys():
+            for key in list(defaultmounts.keys()):
                 if target.startswith(key):
                     mount_type = defaultmounts[key]
                     break
