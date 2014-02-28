@@ -45,7 +45,7 @@ class Session(object):
     ''' CORE session manager.
     '''
     def __init__(self, sessionid = None, cfg = {}, server = None,
-                 persistent = False):
+                 persistent = False, mkdir = True):
         if sessionid is None:
             # try to keep this short since it's used to construct
             # network interface names
@@ -57,7 +57,8 @@ class Session(object):
         self.sessionid = sessionid
         self.sessiondir = os.path.join(tempfile.gettempdir(),
                                        "pycore.%s" % self.sessionid)
-        os.mkdir(self.sessiondir)
+        if mkdir:
+            os.mkdir(self.sessiondir)
         self.name = None
         self.filename = None
         self.thumbnail = None
@@ -220,18 +221,16 @@ class Session(object):
         self._state = state
         replies = []
 
-        if not self.isconnected():
-            return replies
-        if info:
+        if self.isconnected() and info:
             statename = coreapi.state_name(state)
-            self._handlerslock.acquire()
-            for handler in self._handlers:
-                handler.info("SESSION %s STATE %d: %s at %s" % \
-                             (self.sessionid, state, statename, time.ctime()))
-            self._handlerslock.release()
+            with self._handlerslock:
+                for handler in self._handlers:
+                    handler.info("SESSION %s STATE %d: %s at %s" % \
+                                (self.sessionid, state, statename,
+                                 time.ctime()))
         self.writestate(state)
         self.runhook(state)
-        if sendevent:
+        if self.isconnected() and sendevent:
             tlvdata = b""
             tlvdata += coreapi.CoreEventTlv.pack(coreapi.CORE_TLV_EVENT_TYPE,
                                                  state)
@@ -533,6 +532,7 @@ class Session(object):
                 tlvdata += coreapi.CoreExceptionTlv.pack(
                                     eval("coreapi.CORE_TLV_EXCP_%s" % t), v)
         msg = coreapi.CoreExceptionMessage.pack(0, tlvdata)
+        self.warn("exception: %s (%s) %s" % (source, objid, text))
         # send Exception Message to connected handlers (e.g. GUI)
         self.broadcastraw(None, msg)
 
@@ -586,6 +586,24 @@ class Session(object):
         # send a node status response message
         self.checkruntime()
 
+    def getnodecount(self):
+        ''' Returns the number of CoreNodes and CoreNets, except for those
+        that are not considered in the GUI's node count.
+        '''
+
+        with self._objslock:
+            count = len(filter(lambda(x): \
+                               not isinstance(x, (nodes.PtpNet, nodes.CtrlNet)),
+                               self.objs()))
+            # on Linux, GreTapBridges are auto-created, not part of
+            # GUI's node count
+            if 'GreTapBridge' in globals():
+                count -= len(filter(lambda(x): \
+                                    isinstance(x, GreTapBridge) and not \
+                                    isinstance(x, nodes.TunnelNode),
+                                    self.objs()))
+        return count
+
     def checkruntime(self):
         ''' Check if we have entered the runtime state, that all nodes have been
             started and the emulation is running. Start the event loop once we
@@ -599,20 +617,7 @@ class Session(object):
         if self.getstate() == coreapi.CORE_EVENT_RUNTIME_STATE:
             return
         session_node_count = int(self.node_count)
-        nc = 0
-        with self._objslock:
-            for obj in self.objs():
-                # these networks may be added by the daemon and are not
-                # considered in the GUI's node count
-                if isinstance(obj, (nodes.PtpNet, nodes.CtrlNet)):
-                    continue
-                # on Linux, GreTapBridges are auto-created, not part of GUI's
-                # node count
-                if 'GreTapBridge' in globals():
-                    if isinstance(obj, GreTapBridge) and \
-                       not isinstance(obj, nodes.TunnelNode):
-                        continue
-                nc += 1
+        nc = self.getnodecount()
         # count booted nodes not emulated on this server
         # TODO: let slave server determine RUNTIME and wait for Event Message
         # broker.getbootocunt() counts all CoreNodes from status reponse 
