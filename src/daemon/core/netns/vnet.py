@@ -32,7 +32,7 @@ class EbtablesQueue(object):
     rate = 0.3
     # ebtables
     atomic_file = "/tmp/pycore.ebtables.atomic"
-    
+
     def __init__(self):
         ''' Initialize the helper class, but don't start the update thread
         until a WLAN is instantiated.
@@ -48,7 +48,7 @@ class EbtablesQueue(object):
         # timestamps of last WLAN update; this keeps track of WLANs that are
         # using this queue
         self.last_update_time = {}
-        
+
     def startupdateloop(self, wlan):
         ''' Kick off the update loop; only needs to be invoked once.
         '''
@@ -61,7 +61,7 @@ class EbtablesQueue(object):
         self.updatethread = threading.Thread(target = self.updateloop)
         self.updatethread.daemon = True
         self.updatethread.start()
-    
+
     def stopupdateloop(self, wlan):
         ''' Kill the update loop thread if there are no more WLANs using it.
         '''
@@ -77,7 +77,7 @@ class EbtablesQueue(object):
         if self.updatethread:
             self.updatethread.join()
             self.updatethread = None
-    
+
     def ebatomiccmd(self, cmd):
         ''' Helper for building ebtables atomic file command list.
         '''
@@ -85,7 +85,7 @@ class EbtablesQueue(object):
         if cmd:
             r.extend(cmd)
         return r
-        
+
     def lastupdate(self, wlan):
         ''' Return the time elapsed since this WLAN was last updated.
         '''
@@ -95,13 +95,13 @@ class EbtablesQueue(object):
             self.last_update_time[wlan] = time.time()
             elapsed = 0.0
         return elapsed
-    
+
     def updated(self, wlan):
         ''' Keep track of when this WLAN was last updated.
         '''
         self.last_update_time[wlan] = time.time()
         self.updates.remove(wlan)
-        
+
     def updateloop(self):
         ''' Thread target that looks for WLANs needing update, and
         rate limits the amount of ebtables activity. Only one userspace program
@@ -117,7 +117,7 @@ class EbtablesQueue(object):
                     self.updated(wlan)
             self.updatelock.release()
             time.sleep(self.rate)
-    
+
     def ebcommit(self, wlan):
         ''' Perform ebtables atomic commit using commands built in the
         self.cmds list.
@@ -146,7 +146,7 @@ class EbtablesQueue(object):
             os.unlink(self.atomic_file)
         except Exception as e:
             self.eberror(wlan, "atomic-commit (%s)" % cmd, e)
-        
+
     def ebchange(self, wlan):
         ''' Flag a change to the given WLAN's _linked dict, so the ebtables
         chain will be rebuilt at the next interval.
@@ -155,7 +155,7 @@ class EbtablesQueue(object):
         if wlan not in self.updates:
             self.updates.append(wlan)
         self.updatelock.release()
-    
+
     def buildcmds(self, wlan):
         ''' Inspect a _linked dict from a wlan, and rebuild the ebtables chain
         for that WLAN.
@@ -177,7 +177,7 @@ class EbtablesQueue(object):
                         ["-A", wlan.brname, "-o", netif1.localname,
                         "-i", netif2.localname, "-j", "DROP"]])
         wlan._linked_lock.release()
-    
+
     def eberror(self, wlan, source, error):
         ''' Log an ebtables command error and send an exception.
         '''
@@ -185,7 +185,7 @@ class EbtablesQueue(object):
             return
         wlan.exception(coreapi.CORE_EXCP_LEVEL_ERROR, wlan.brname,
                        "ebtables command error: %s\n%s\n" % (source, error))
-        
+
 
 # a global object because all WLANs share the same queue
 # cannot have multiple threads invoking the ebtables commnd
@@ -328,11 +328,14 @@ class LxBrNet(PyCoreNet):
         ebq.ebchange(self)
 
     def linkconfig(self, netif, bw = None, delay = None,
-                   loss = None, duplicate = None, jitter = None, netif2 = None):
+                   loss = None, duplicate = None, jitter = None, netif2 = None,
+                   devname = None):
         ''' Configure link parameters by applying tc queuing disciplines on the
             interface.
         '''
-        tc = [TC_BIN, "qdisc", "replace", "dev", netif.localname]
+        if devname is None:
+            devname = netif.localname
+        tc = [TC_BIN, "qdisc", "replace", "dev", devname]
         parent = ["root"]
         changed = False
         if netif.setparam('bw', bw):
@@ -344,6 +347,9 @@ class LxBrNet(PyCoreNet):
                        "burst", str(burst), "limit", str(limit)]
             if bw > 0:
                 if self.up:
+                    if (self.verbose):
+                        self.info("linkconfig: %s" % \
+                                  ([tc + parent + ["handle", "1:"] + tbf],))
                     check_call(tc + parent + ["handle", "1:"] + tbf)
                 netif.setparam('has_tbf', True)
                 changed = True
@@ -377,21 +383,27 @@ class LxBrNet(PyCoreNet):
                 netem += ["delay", "0us", "%sus" % jitter, "25%"]
             else:
                 netem += ["%sus" % jitter, "25%"]
-        
+
         if loss is not None:
             netem += ["loss", "%s%%" % min(loss, 100)]
         if duplicate is not None:
             netem += ["duplicate", "%s%%" % min(duplicate, 100)]
-        if delay <= 0 and loss <= 0 and duplicate <= 0:
+        if delay <= 0 and jitter <= 0 and loss <= 0 and duplicate <= 0:
             # possibly remove netem if it exists and parent queue wasn't removed
             if not netif.getparam('has_netem'):
                 return
             tc[2] = "delete"
             if self.up:
+                if self.verbose:
+                    self.info("linkconfig: %s" % \
+                              ([tc + parent + ["handle", "10:"]],))
                 check_call(tc + parent + ["handle", "10:"])
             netif.setparam('has_netem', False)
         elif len(netem) > 1:
             if self.up:
+                if self.verbose:
+                    self.info("linkconfig: %s" % \
+                              ([tc + parent + ["handle", "10:"] + netem],))
                 check_call(tc + parent + ["handle", "10:"] + netem)
             netif.setparam('has_netem', True)
 
@@ -403,10 +415,10 @@ class LxBrNet(PyCoreNet):
         localname = "n%s.%s.%s" % (self.objid, net.objid, sessionid)
         name = "n%s.%s.%s" % (net.objid, self.objid, sessionid)
         netif = VEth(node = None, name = name, localname = localname,
-                     mtu = 1500, net = self, start = self.up)        
+                     mtu = 1500, net = self, start = self.up)
         self.attach(netif)
         if net.up:
-            # this is similar to net.attach() but uses netif.name instead 
+            # this is similar to net.attach() but uses netif.name instead
             # of localname
             check_call([BRCTL_BIN, "addif", net.brname, netif.name])
             check_call([IP_BIN, "link", "set", netif.name, "up"])
@@ -416,6 +428,16 @@ class LxBrNet(PyCoreNet):
             net._linked[netif] = {}
         netif.net = self
         netif.othernet = net
+        return netif
+
+    def getlinknetif(self, net):
+        ''' Return the interface of that links this net with another net
+        (that were linked using linknet()).
+        '''
+        for netif in self.netifs():
+            if hasattr(netif, 'othernet') and netif.othernet == net:
+                return netif
+        return None
 
     def addrconfig(self, addrlist):
         ''' Set addresses on the bridge.
@@ -430,7 +452,7 @@ class LxBrNet(PyCoreNet):
                                "Error adding IP address: %s" % e)
 
 class GreTapBridge(LxBrNet):
-    ''' A network consisting of a bridge with a gretap device for tunneling to 
+    ''' A network consisting of a bridge with a gretap device for tunneling to
         another system.
     '''
     def __init__(self, session, remoteip = None, objid = None, name = None,
@@ -471,9 +493,9 @@ class GreTapBridge(LxBrNet):
             self.gretap.shutdown()
             self.gretap = None
         LxBrNet.shutdown(self)
-    
+
     def addrconfig(self, addrlist):
-        ''' Set the remote tunnel endpoint. This is a one-time method for 
+        ''' Set the remote tunnel endpoint. This is a one-time method for
             creating the GreTap device, which requires the remoteip at startup.
             The 1st address in the provided list is remoteip, 2nd optionally
             specifies localip.

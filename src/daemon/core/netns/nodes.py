@@ -95,27 +95,14 @@ class PtpNet(LxBrNet):
                                             if1.node.objid)
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER,
                                             if2.node.objid)
-        delay = if1.getparam('delay')
-        bw = if1.getparam('bw')
-        loss = if1.getparam('loss')
-        duplicate = if1.getparam('duplicate')
-        jitter = if1.getparam('jitter')
-        if delay is not None:
-            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_DELAY,
-                                                delay)
-        if bw is not None:
-            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_BW, bw)
-        if loss is not None:
-            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_PER,
-                                                str(loss))
-        if duplicate is not None:
-            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_DUP,
-                                                str(duplicate))
-        if jitter is not None:
-            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_JITTER,
-                                                jitter)
+        uni = False
+        if if1.getparams() != if2.getparams():
+            uni = True
+        tlvdata += self.netifparamstolink(if1)
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_TYPE,
                                             self.linktype)
+        if uni:
+            tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_UNI, 1)
 
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_IF1NUM, \
                                             if1.node.getifindex(if1))
@@ -153,7 +140,23 @@ class PtpNet(LxBrNet):
                                                 IPAddr(af=family, addr=ipl))
             tlvdata += coreapi.CoreLinkTlv.pack(tlvtypemask, mask)
         msg = coreapi.CoreLinkMessage.pack(flags, tlvdata)
-        return [msg,]
+        if not uni:
+            return [msg,]
+        # build a 2nd link message for the upstream link parameters
+        # (swap if1 and if2)
+        tlvdata = ""
+        tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
+                                            if2.node.objid)
+        tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER,
+                                            if1.node.objid)
+        tlvdata += self.netifparamstolink(if2)
+        tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_UNI, 1)
+        tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_IF1NUM, \
+                                            if2.node.getifindex(if2))
+        tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_IF2NUM, \
+                                            if1.node.getifindex(if1))
+        msg2 = coreapi.CoreLinkMessage.pack(0, tlvdata)
+        return [msg, msg2]
 
 class SwitchNode(LxBrNet):
     apitype = coreapi.CORE_NODE_SWITCH
@@ -164,7 +167,7 @@ class HubNode(LxBrNet):
     apitype = coreapi.CORE_NODE_HUB
     policy = "ACCEPT"
     type = "hub"
-    
+
     def __init__(self, session, objid = None, name = None, verbose = False,
                         start = True):
         ''' the Hub node forwards packets to all bridge ports by turning off
@@ -180,7 +183,7 @@ class WlanNode(LxBrNet):
     linktype = coreapi.CORE_LINK_WIRELESS
     policy = "DROP"
     type = "wlan"
-    
+
     def __init__(self, session, objid = None, name = None, verbose = False,
                         start = True, policy = None):
         LxBrNet.__init__(self, session, objid, name, verbose, start, policy)
@@ -188,7 +191,7 @@ class WlanNode(LxBrNet):
         self.model = None
         # mobility model such as scripted
         self.mobility = None
-        
+
     def attach(self, netif):
         LxBrNet.attach(self, netif)
         if self.model:
@@ -199,7 +202,7 @@ class WlanNode(LxBrNet):
             # invokes any netif.poshook
             netif.setposition(x, y, z)
             #self.model.setlinkparams()
-        
+
     def setmodel(self, model, config):
         ''' Mobility and wireless model.
         '''
@@ -218,7 +221,26 @@ class WlanNode(LxBrNet):
         elif model._type == coreapi.CORE_TLV_REG_MOBILITY:
             self.mobility = model(session=self.session, objid=self.objid,
                                verbose=self.verbose, values=config)
-        
+
+    def updatemodel(self, model_name, values):
+        ''' Allow for model updates during runtime (similar to setmodel().)
+        '''
+        if (self.verbose):
+            self.info("updating model %s" % model_name)
+        if self.model is None or self.model._name != model_name:
+            return
+        model = self.model
+        if model._type == coreapi.CORE_TLV_REG_WIRELESS:
+            if not model.updateconfig(values):
+                return
+            if self.model._positioncallback:
+                for netif in self.netifs():
+                    netif.poshook = self.model._positioncallback
+                    if netif.node is not None:
+                        (x,y,z) = netif.node.position.get()
+                        netif.poshook(netif, x, y, z)
+            self.model.setlinkparams()
+
     def tolinkmsgs(self, flags):
         msgs = LxBrNet.tolinkmsgs(self, flags)
         if self.model:
@@ -232,7 +254,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
     '''
     apitype = coreapi.CORE_NODE_RJ45
     type = "rj45"
-    
+
     def __init__(self, session, objid = None, name = None, mtu = 1500,
                  verbose = False, start = True):
         PyCoreNode.__init__(self, session, objid, name, verbose=verbose,
@@ -260,7 +282,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
                       (IP_BIN, self.localname))
             return
         self.up = True
-        
+
     def shutdown(self):
         ''' Bring the interface down. Remove any addresses and queuing
             disciplines.
@@ -272,16 +294,16 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
         mutecall([TC_BIN, "qdisc", "del", "dev", self.localname, "root"])
         self.up = False
         self.restorestate()
-        
+
     def attachnet(self, net):
         PyCoreNetIf.attachnet(self, net)
-        
+
     def detachnet(self):
         PyCoreNetIf.detachnet(self)
 
     def newnetif(self, net = None, addrlist = [], hwaddr = None,
-                 ifindex = None, ifname = None):        
-        ''' This is called when linking with another node. Since this node 
+                 ifindex = None, ifname = None):
+        ''' This is called when linking with another node. Since this node
             represents an interface, we do not create another object here,
             but attach ourselves to the given network.
         '''
@@ -301,7 +323,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
             return ifindex
         finally:
             self.lock.release()
-    
+
     def delnetif(self, ifindex):
         if ifindex is None:
             ifindex = 0
@@ -325,12 +347,12 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
         if ifindex == self.ifindex:
             return self
         return None
-    
+
     def getifindex(self, netif):
         if netif != self:
             return None
         return self.ifindex
-        
+
     def addaddr(self, addr):
         if self.up:
             check_call([IP_BIN, "addr", "add", str(addr), "dev", self.name])
@@ -340,7 +362,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
         if self.up:
             check_call([IP_BIN, "addr", "del", str(addr), "dev", self.name])
         PyCoreNetIf.deladdr(self, addr)
-        
+
     def savestate(self):
         ''' Save the addresses and other interface state before using the
         interface for emulation purposes. TODO: save/restore the PROMISC flag
@@ -371,7 +393,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
                 if items[1][:4] == "fe80":
                     continue
                 self.old_addrs.append((items[1], None))
-                    
+
     def restorestate(self):
         ''' Restore the addresses and other interface state after using it.
         '''
@@ -380,19 +402,19 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
                 check_call([IP_BIN, "addr", "add", addr[0], "dev",
                             self.localname])
             else:
-                check_call([IP_BIN, "addr", "add", addr[0], "brd", addr[1], 
+                check_call([IP_BIN, "addr", "add", addr[0], "brd", addr[1],
                             "dev", self.localname])
         if self.old_up:
             check_call([IP_BIN, "link", "set", self.localname, "up"])
-            
+
     def setposition(self, x=None, y=None, z=None):
         ''' Use setposition() from both parent classes.
         '''
         PyCoreObj.setposition(self, x, y, z)
         # invoke any poshook
         PyCoreNetIf.setposition(self, x, y, z)
-               
-            
+
+
 
 
 

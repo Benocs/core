@@ -63,7 +63,7 @@ class TunTap(PyCoreNetIf):
     def startup(self):
         # TODO: more sophisticated TAP creation here
         #   Debian does not support -p (tap) option, RedHat does.
-        # For now, this is disabled to allow the TAP to be created by another 
+        # For now, this is disabled to allow the TAP to be created by another
         # system (e.g. EMANE's emanetransportd)
         #check_call(["tunctl", "-t", self.name])
         # self.install()
@@ -85,7 +85,7 @@ class TunTap(PyCoreNetIf):
         '''
         netns = str(self.node.pid)
         # check for presence of device - tap device may not appear right away
-        # waits ~= stime * ( 2 ** attempts) seconds 
+        # waits ~= stime * ( 2 ** attempts) seconds
         attempts = 9
         stime = 0.01
         while attempts > 0:
@@ -138,7 +138,7 @@ class GreTap(PyCoreNetIf):
         if not start:
             self.up = False
             return
-        
+
         if remoteip is None:
             raise ValueError("missing remote IP required for GRE TAP device")
         cmd = ("ip", "link", "add", self.localname, "type", "gretap",
@@ -161,9 +161,9 @@ class GreTap(PyCoreNetIf):
             cmd = ("ip", "link", "del", self.localname)
             check_call(cmd)
             self.localname = None
-    
+
     def tonodemsg(self, flags):
         return None
-        
+
     def tolinkmsgs(self, flags):
         return []

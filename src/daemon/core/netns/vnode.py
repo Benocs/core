@@ -72,9 +72,11 @@ class SimpleLxcNode(PyCoreNode):
                   "-p", self.ctrlchnlname + ".pid"]
         if self.nodedir:
             vnoded += ["-C", self.nodedir]
+        env = self.session.getenviron(state=False)
+        env['NODE_NUMBER'] = str(self.objid)
+        env['NODE_NAME'] = str(self.name)
         try:
-            tmp = subprocess.Popen(vnoded, stdout = subprocess.PIPE,
-                                   env = self.session.getenviron(state=False))
+            tmp = subprocess.Popen(vnoded, stdout = subprocess.PIPE, env = env)
         except OSError as e:
             msg = "error running vnoded command: %s (%s)" % (vnoded, e)
             self.exception(coreapi.CORE_EXCP_LEVEL_FATAL,
@@ -454,7 +456,7 @@ class LxcNode(SimpleLxcNode):
 
     def boot(self):
         self.session.services.bootnodeservices(self)
-        
+
     def validate(self):
         self.session.services.validatenodeservices(self)
 
