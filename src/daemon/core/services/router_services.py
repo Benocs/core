@@ -28,18 +28,16 @@ class LoopbackAddress(utility.UtilService):
     """ assigns a loopback ip address to each router """
     _name = "LoopbackAddress"
     _configs = ("loopback.sh",)
-    _startup = ("sh loopback.sh",)
-    _meta = "assigns a loopback ip address to each router"
+    _startup = (,)
+    _meta = "DEPRECATED. remove this service from your configuration"
 
     @classmethod
     def generateconfig(cls, node, filename, services):
         addr = node.getLoopbackIPv4()
-
-        cfg = ''.join([
-            "#!/bin/sh\n",
-            "ip addr add %s/32 dev lo\n" % addr
-            ])
-        return cfg
+        print(('[WARN] service LoopbackAddress is deprecated. Loopback address '
+                'handling is now done directly by the node. This service does '
+                'nothing and exists solely for backward compatibility.'))
+        return ''
 
 addservice(LoopbackAddress)
 
