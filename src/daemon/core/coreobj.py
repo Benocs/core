@@ -150,7 +150,7 @@ class PyCoreObj(object):
         service_list = []
         if hasattr(self, 'services'):
             for service in self.services:
-                print('adding service: %s' % str(service._name))
+                self.info('adding service to node msg: %s' % str(service._name))
                 service_list.extend([service._name, '|'])
         if len(service_list) > 0:
             service_list.pop(-1)
@@ -245,9 +245,10 @@ class PyCoreNode(PyCoreObj):
         if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
                 len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
                 'loopback_net_per_netid' in CONFIGS['ipaddrs']:
-            print('found configuration entry for loopback devices: %s. each netid gets a /%s' %
+            self.info(('found configuration entry for loopback devices: %s. '
+                    'each netid gets a /%s' %
                     (str(CONFIGS['ipaddrs']['loopback_net']),
-                    str(CONFIGS['ipaddrs']['loopback_net_per_netid'])))
+                    str(CONFIGS['ipaddrs']['loopback_net_per_netid']))))
         else:
             return None
 
@@ -570,7 +571,6 @@ class PyCoreNetIf(object):
         # find netif index
         for index, netif in list(self.node._netif.items()):
           if netif == self:
-            print("netindex: %s" % str(index))
             tlvdata += coreapi.CoreIfaceTlv.pack(coreapi.CORE_TLV_IFACE_NUM,
                                                 index)
             break
@@ -589,10 +589,8 @@ class PyCoreNetIf(object):
                 tlvtypeip = coreapi.CORE_TLV_IFACE_IP6ADDR
                 tlvtypemask = coreapi.CORE_TLV_IFACE_IP6MASK
             ipl = socket.inet_pton(family, ip)
-            print('IPAddr: %s' % str(IPAddr(af=family, addr=ipl)))
             tlvdata += coreapi.CoreIfaceTlv.pack(tlvtypeip,
                                                 IPAddr(af=family, addr=ipl))
-            #                                    IPAddr.toint(str(IPAddr(af=family, addr=ipl))))
             tlvdata += coreapi.CoreIfaceTlv.pack(tlvtypemask, mask)
 
         if hasattr(self, "hwaddr") and self.hwaddr is not None:
