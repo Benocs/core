@@ -25,9 +25,7 @@ class CoreTlvData(object):
     @classmethod
     def pack(cls, value):
         "return: (tlvlen, tlvdata)"
-        print(('cls: %s, fmt: %s, value: %s' % (str(cls), str(cls.datafmt), str(value))))
         tmp = struct.pack(cls.datafmt, value)
-        #return len(tmp) - cls.padlen, bytes(tmp, encoding = 'utf-8')
         return len(tmp) - cls.padlen, tmp
 
     @classmethod
