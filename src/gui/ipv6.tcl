@@ -153,21 +153,25 @@ proc buildInterfaceID { cur_node } {
 
 
   # hier hintere bytes -> steigen bei anzahl der interfaces
-  # TODO auch lsb2 betrachte
   set lsb0 0
   set lsb1 0
   set lsb2 0
 
-  for { set z2 0 } { $z2 < $zaehler2 } { incr z2 } {
-    set lsb1 $z2
+  # zaehler2 beinhaltet die anzahl von interfaces pro node
+  for { set z2_2 0 } { $z2_2 < $zaehler2 } { incr z2_2 } {
+    set lsb2 $z2_2
+ 
+    for { set z2 0 } { $z2 < 255 && $z2_2 < $zaehler2 } { incr z2 } {
+      set lsb1 $z2
 
-    for { set var1 0 } { $var1 < 255 && $z2 < $zaehler2 } { incr var1 } {
-      set lsb0 $var1
+      for { set var1 0 } { $var1 < 255 && $z2_2 < $zaehler2 } { incr var1 } {
+        set lsb0 $var1
 
-      # TODO wie war das gemeint. wie bei werten unter 16 fuehrende 0
-      incr z2
+        incr z2_2
+      }
     }
   }
+
 
   if { $lsb0 < 15 } {
     set ipv6_0_0 "0[format %x $lsb0]"
@@ -182,23 +186,34 @@ proc buildInterfaceID { cur_node } {
     set ipv6_0_1 "[format %x $lsb1]"
   }
 
-  set ipv6_0 "00:$ipv6_0_1$ipv6_0_0"
+
+  if { $lsb2 < 15 } {
+    set ipv6_0_2 "0[format %x $lsb2]"
+  } else {
+    set ipv6_0_2 "[format %x $lsb2]"
+  }
+
+
+  set ipv6_0 "[string toupper $ipv6_0_2:$ipv6_0_1$ipv6_0_0]"
 
 
   # hier vordere bytes nach selben muster
   #   wie hintere bytes -> steigen bei anzahl der nodes
-  # TODO auch lsb5 behandeln
   set lsb3 0
   set lsb4 0
   set lsb5 0
+ 
+  # zaehler1 beinhaltet die anzahl der nodes
+  for { set z1_2 0 } { $z1_2 < $zaehler1 } { incr z1_2 } {
+    set lsb5 $z1_2
+    for { set z1 0 } { $z1 < 255 && $z1_2 < $zaehler1 } { incr z1 } {
+      set lsb4 $z1
+      #puts "$lsb1:$lsb0"
+      for { set var2 0 } { $var2 < 255 && $z1_2 < $zaehler1 } { incr var2 } {
+        set lsb3 $var2
 
-  for { set z1 0 } { $z1 < $zaehler1 } { incr z1 } {
-    set lsb4 $z1
-    #puts "$lsb1:$lsb0"
-    for { set var2 0 } { $var2 < 255 && $z1 < $zaehler1 } { incr var2 } {
-      set lsb3 $var2
-
-      incr z1
+        incr z1_2
+      }
     }
   }
 
@@ -214,7 +229,16 @@ proc buildInterfaceID { cur_node } {
     set ipv6_1_1 "[format %x $lsb4]"
   }
 
-  set ipv6_1 "00$ipv6_1_1:$ipv6_1_0"
+
+  if { $lsb5 < 15 } {
+    set ipv6_1_2 "0[format %x $lsb5]"
+  } else {
+    set ipv6_1_2 "[format %x $lsb5]"
+  }
+
+
+
+  set ipv6_1 "[string toupper $ipv6_1_2$ipv6_1_1:$ipv6_1_0]"
 
   set temp "$ipv6_1"
   append temp "FF:FE$ipv6_0"
@@ -484,7 +508,7 @@ proc autoIPv6defaultroute { node iface } {
 #   * valid -- function returns 0 if the input string is not in the form
 #     of a valid IP address, 1 otherwise
 #****
-# TODO schaut nur die syntax an.. nicht etwa ieee vorgaben
+# BEACHTE: schaut nur die syntax an.. nicht etwa ieee vorgaben
 proc checkIPv6Addr { str } {
     set doublec false
     set wordlist [split $str :]
