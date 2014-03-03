@@ -83,9 +83,10 @@ proc doStuff1 {} {
 
   frame $wi.as.line1
   label $wi.as.line1.label -text "AS Topology Parameters"
-  # TODO fkt importAS erstellen
-  button $wi.as.line1.import -text "Import..." -command "importAS"
-  pack $wi.as.line1.label $wi.as.line1.import -side left
+  # fkt importAS bei bedarf erstellen & button wieder einkommentieren
+  #button $wi.as.line1.import -text "Import..." -command "importAS"
+  #$wi.as.line1.import
+  pack $wi.as.line1.label -side left
   pack $wi.as.line1 -side top -anchor w -padx 4 -pady 4
    
   frame $wi.as.line2
@@ -191,7 +192,7 @@ proc doStuff1 {} {
 
   frame $wi.router.line1
   label $wi.router.line1.label -text "Router Topology Parameters"
-  # TODO importRouter erstellen
+  # importRouter erstellen und button wieder einkommentieren
   button $wi.router.line1.import -text "Import..." -command "importRouter"
   pack $wi.router.line1.label $wi.router.line1.import -side left
   pack $wi.router.line1 -side top -anchor w -padx 4 -pady 4
@@ -350,7 +351,8 @@ proc doStuff1 {} {
   pack $wi.topdown.line5 -side top -anchor w -padx 4 -pady 4
 
   frame $wi.topdown.line6
-  #TODO sind die buttons ueberhaupt noch so notwendig.. fkt dahinter implementieren?
+  #sind die buttons ueberhaupt noch so notwendig.. fkt dahinter implementieren bei bedarf
+  # und wieder einkommentieren
   button $wi.topdown.line6.buttonleft -text "Set AS Parameters" -command "setASPara"
   button $wi.topdown.line6.buttonright -text "Set Router Paramters" -command "setRouterPara"
   pack $wi.topdown.line6.buttonright $wi.topdown.line6.buttonleft -side right
@@ -360,7 +362,7 @@ proc doStuff1 {} {
 
   #
   # Bottom Up (hinten anstellen)
-  # TODO hier noch wenn gewuenscht erstellen
+  # hier noch wenn gewuenscht erstellen
   labelframe $wi.bottomup -borderwidth 4 -text "Bottom Up"
 
   pack $wi.bottomup -side right -fill x
@@ -369,10 +371,6 @@ proc doStuff1 {} {
   #
   # Buttons unten
   #
-
-  #TODO button save und cancel zusammenbringen nach oben zB
-  # und writeBriteConf auf save legen
-
 
   # Topology Erstellungen Einstellungen
   labelframe $wi.bot2 -borderwidth 4 -text "2nd: Build Topology"
@@ -521,7 +519,7 @@ proc switched {} {
     .core_testing.as.line3.combo configure -state normal
     .core_testing.as.line5.combo configure -state normal
 
-    #TODO allgemein je nach auswahl werte anpassen-- mal schauen..
+    #allgemein je nach auswahl werte anpassen
 
     set var_as_alpha_beta [.core_testing.as.line3.combo get]
     if {[string equal "Waxman" $var_as_alpha_beta]} {
@@ -1140,7 +1138,9 @@ proc buildCfg {} {
       #append data "      Name = 4\n"
     }
 
-    # TODO: bei bandwidth distribution 4 und 3 vertauscht?
+    # Im Brite Original sind bei bandwidth distribution Punkt 4 und 3 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_as_bandwdistr [.core_testing.as.line9.combo get]
     if {[string equal "Constant" $var_as_bandwdistr]} {
       append data "	 BWDist = 1\n"
@@ -1221,7 +1221,9 @@ proc buildCfg {} {
       #append data "      Name = 4\n"
     }
 
-    # TODO: bei bandwidth distribution 4 und 3 vertauscht?
+    # Im Brite Original sind bei bandwidth distribution Punkt 4 und 3 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_router_bandwdistr [.core_testing.router.line9.combo get]
     if {[string equal "Constant" $var_router_bandwdistr]} {
       append data "	 BWDist = 1\n"
@@ -1250,13 +1252,15 @@ proc buildCfg {} {
 
   } elseif {[string equal "2 Level: TOP-DOWN" $var_model]} {
 # Abschnitt TopDown 
-# TODO: spaeter vielleicht um doppelten code zu vermeiden
+# spaeter vielleicht um doppelten code zu vermeiden
 #   teile in fktn auslagern
 
     append data "BeginModel\n"
     append data "	Name = 5\n"
 
-    # TODO option 2 und 3 logisch vertauscht?
+    # Im Brite Original sind Option 2 und 3 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_topdown_ecm [.core_testing.topdown.line2.combo get]
     if {[string equal "Random" $var_topdown_ecm]} {
       append data "	edgeConn = 1\n"
@@ -1275,7 +1279,9 @@ proc buildCfg {} {
       append data "	k = " $testing_prefs(gui_brite_topdown_k)\n
     }
 
-    # TODO option 3 und 4 logisch vertauscht?
+    # Im Brite Original sind Option 3 und 4 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_topdown_inter_bw [.core_testing.topdown.line3.combo1 get]
     if {[string equal "Constant" $var_topdown_inter_bw]} {
       append data "	BWInter = 1\n"
@@ -1289,7 +1295,9 @@ proc buildCfg {} {
     append data "	BWInterMin = " $testing_prefs(gui_brite_topdown_leftMinBW)\n
     append data "	BWInterMax = " $testing_prefs(gui_brite_topdown_leftMaxBW)\n
 
-    # TODO option 3 und 4 logisch vertauscht?
+    # Im Brite Original sind Option 3 und 4 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_topdown_intra_bw [.core_testing.topdown.line3.combo2 get]
     if {[string equal "Constant" $var_topdown_intra_bw]} {
       append data "	BWIntra = 1\n"
@@ -1361,7 +1369,9 @@ proc buildCfg {} {
     }
 
 
-    # TODO: bei bandwidth distribution 4 und 3 vertauscht?
+    # Im Brite Original sind bandwidth distribution 3 und 4 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_topdown_bandwdistr_as [.core_testing.topdown.line3.combo1 get]
     if {[string equal "Constant" $var_topdown_bandwdistr_as]} {
       append data "	 BWDist = 1\n"
@@ -1443,7 +1453,9 @@ proc buildCfg {} {
       #append data "      Name = 4\n"
     }
 
-    # TODO: bei bandwidth distribution 4 und 3 vertauscht?
+    # Im Brite Original sind bandwidth distribution 3 und 4 vertauscht.
+    #   Scheint letzen endes dann doch zu passen bzw hier kommt das selbe falsche/richtige
+    #   Ergebnis wie im original Brite.
     set var_topdown_bandwdistr_router [.core_testing.topdown.line3.combo2 get]
     if {[string equal "Constant" $var_topdown_bandwdistr_router]} {
       append data "	 BWDist = 1\n"
@@ -1479,8 +1491,6 @@ proc buildCfg {} {
   }
 
 
-
-# TODO aenderungen ausgabedateityp hier initial anpassen..
   append data "BeginOutput\n"
   append data "	BRITE = 1\n"
   append data "	OTTER = 0\n"
@@ -1489,7 +1499,7 @@ proc buildCfg {} {
   append data "	Javasim = 0\n"
   append data "EndOutput"
 
-#
+#  Auschnitt aus dem Original Configfile
 #        BRITE = 1        #1/0=enable/disable output in BRITE format
 #        OTTER = 0        #1/0=enable/disable visualization in otter
 #        DML = 0          #1/0=enable/disable output to SSFNet's DML format 
@@ -1552,10 +1562,6 @@ proc loadBriteConf { } {
   }
 
 }
-
-# TODO wenn conf noch nicht definiert lade initTestingPrefs--.
-
-
 
 
 # variablen definition fuer Testing GUI nach

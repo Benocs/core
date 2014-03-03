@@ -59,7 +59,7 @@ proc findFreeIPv4Net { quarknode mask } {
 
     set ipnets5 {}
 
-    # TODO testweise so, spaeter optimieren
+    #testweise so, spaeter optimieren
     # alle ips byte 0-4 -> zB 10.14.54.2/30 -> 10 14 54 2 30
     foreach node $node_list {
         foreach ifc [ifcList $node] {
@@ -136,8 +136,6 @@ proc findFreeIPv4Net { quarknode mask } {
 	# von zu ASip abhandeln
 	 if { [info exists tempAS] } {
 		if { $tempAS != 999 } {
-#			puts "TEMPAS<<<<" 
-#			puts $tempAS
 			set i $tempAS
 		}
 	}
@@ -146,49 +144,38 @@ proc findFreeIPv4Net { quarknode mask } {
 	#  30er muessen immer vierer bloecke am stueck nehmen
 	#   zB  0 <1 2> 3   4 <5 6> 7   8 <9 10> 11   12 <13 14> 15   16 <17 18> 19   20 <21 22> 23
 	#   zB 6 und 9 fuer node ips darf bei 30er nicht vorkommen..
-	#TODO wenn geht logik vereinfachen	
+	# wenn geht logik vereinfachen	
 	# testen ob 3. byte als 24er vergeben -> wenn ja incr j
         for { set j $c } { $j < 255 } { incr j } {
-	#	puts "j"
-	#	puts $j
 		if {[lsearch $ipnets3 "$a $i $j"] != -1} {
 			# wenn vergeben -> testen ob 24 er
 			if {[lsearch $ipnets5 "$a $i $j 1 24"] != -1} {
 				# 1 er ip im 24 vorhanden -> netz vorhanden
-	#			puts "1er im 24er vorhanden"
 				continue
 			}
 		}
 
-		
 	  	for { set lastByte $d } { $lastByte < 255 } { incr lastByte } {
 	    		if {fmod([expr $lastByte],4) == 0} {
 		 		incr lastByte 1
-	#			puts "0 incr 1"
 			} elseif {fmod([expr $lastByte],4) == 1 &&\
 			 [lsearch $ipnets4 "$a $i $j $lastByte"] != -1} {
 				incr lastByte 4
-	#			puts "1 incr 4"
 			} elseif {fmod([expr $lastByte],4) == 2 &&\
 			 [lsearch $ipnets4 "$a $i $j $lastByte"] != -1} {
 		 		incr lastByte 3
-	#			puts "2 incr 3"
 			} elseif {fmod([expr $lastByte],4) == 3} {
 	 	 	 	incr lastByte 2
-	#			puts "3 incr 2"
 			} else { } 
 
 			# abbruch wenn hinterstes byte zu groß
                         if { $lastByte > 254 } { continue }
 
 	            	if {[lsearch $ipnets4 "$a $i $j $lastByte"] == -1} {
-	#			puts "setzte ip"
-	#			puts $lastByte
 	                	set ipnet "$a.$i.$j.$lastByte"
 	                	return $ipnet
             		} else {
-	#			puts "ip schon vorhanden"
-	#			puts "$a.$i.$j.$lastByte"
+			  #ip schon vorhanden - nichts unternehmen
 			}
 	  	}
         }
@@ -199,32 +186,36 @@ proc findFreeIPv4Net { quarknode mask } {
 # asID wird zurueckgeliefert wenn nicht gesetzt 0
 proc getASiD { nodeGetAS } {
 
+       global g_prefs
+
        set asID [getNodeNetId $nodeGetAS]
 
-       # groesser 255 und leer wird in 0 umgewandelt
-	# nein -> prefs.conf definierter gui_asid_standard wert
-       if { $asID > 255 || $asID == "" } {
-            	set asID "0"
-		#set asID $g_prefs(gui_asid_standard)
+       # groesser 255 wird in 0 umgewandelt
+       # bei verwendung von topogen hat asID wert ""
+       #  -> in prefs.conf definierter
+       #  wert gui_asid_standard wird verwendet
+
+       if { $asID == "" } {
+         set asID $g_prefs(gui_asid_standard)
        }
+
+       if { $asID > 255 } {
+            	set asID "0"
+       }
+
        return $asID
 }
 
 
 proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
-	#momentan vergabe der 24er
-
-	#puts "findIPLINK"
-	#puts $linkNode
-
-
+    #momentan vergabe der 24er
     global g_prefs node_list tempAS
 
 
-	#TODO effizienter machen wenn so funktional
+    # effizienter machen wenn so funktional
     set ipnets4 {}
-	# hier variablen zum test aller vier bytes vorhandener ips
+    # hier variablen zum test aller vier bytes vorhandener ips
     # alle ips byte 0-3
     foreach node $node_list {
 	foreach ifc [ifcList $node] {
@@ -285,11 +276,6 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
 
 
-    #puts "---"
-    #foreach bla $ipnets {
-#	puts $bla
-    #}
-
     # die addresse dann byte 0-3
     if {![info exists g_prefs(gui_ipv4_addr)]} { setDefaultAddrs ipv4 }
     set abcd [split $g_prefs(gui_ipv4_addr) .]
@@ -305,14 +291,6 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     #proc fuer asID
     set i [getASiD $linkNode] 
 
-
-# TODO 24er muessen auch adressbereich der 30 beachten (immer 4er schritte von 0 an)
-#   und nicht die selben adressen nehmen
-
-	#puts "ip4AmSwitchNetzAddressen"
-	#foreach ip4 $ip4AmSwitchNetzAddressen {
-	#	puts $ip4
-	#}
 
 	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen	
 	if { 0 == [llength $ip4AmSwitchNetzAddressen] } {
@@ -369,7 +347,6 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 				    return $ipnet4
 	        	 }
 		}
-
 	}
 
 }
@@ -423,9 +400,6 @@ proc autoIPv4addr { node iface } {
 		set peer [logicalPeerByIfc $l2node $ifc]
 		set peer_if [ifcByLogicalPeer $peer $l2node]
 		set peer_ip4addr [getIfcIPv4addr $peer $peer_if]
-		# TODO wann ueberhaupt irgendwann wird das benoetigt
-		#puts "peer_ip4addr:"
-		#puts $peer_ip4addr
 		if { $peer_ip4addr != "" } {
 		    lappend peer_ip4addrs [lindex [split $peer_ip4addr /] 0]
 		    set netmaskbits [lindex [split $peer_ip4addr /] 1]
@@ -445,12 +419,6 @@ proc autoIPv4addr { node iface } {
 	}
     }
 
-    #puts "---"
-    #puts $peer
-    #puts $peer_if
-    #puts $peer_ip4addr
-    #puts $netmaskbits
-    
     # first node connected to wlan should use wlan prefix
     if { [nodeType $peer_node] == "wlan" && 
     	 [llength $peer_ip4addrs] == 0 } {
@@ -487,7 +455,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node 
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL1"
 		# hier sind addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
@@ -504,7 +471,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL2"
 		# hier sind keine addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
@@ -514,8 +480,6 @@ proc autoIPv4addr { node iface } {
 		#setNodeNetId $peer_node [getASiD $node]
 	}
 	set tempAS [getASiD $node]
-#	puts "tempAS ausgehend"
-#	puts $tempAS 
     }
 }
 
@@ -532,7 +496,9 @@ proc autoIPv4addr { node iface } {
 #   * node  -- default gateway is provided for this node 
 #   * iface -- the interface on witch we search for a new default gateway
 #****
-# TODO schauen ob mit autoIPv4addr interferiert
+# schauen ob mit autoIPv4addr interferiert
+# -> wenn dann nur wenn nicht LINK und nicht NETWORK
+# -> betrifft uns nicht
 proc autoIPv4defaultroute { node iface } {
     if { [[typemodel $node].layer] != "NETWORK" } {
 	#
@@ -685,8 +651,6 @@ proc ipv4ToNet { ip prefixlen } {
 }
 
 proc getDefaultIPv4Addrs { } {
-    # TODO wozu hier g_prefs
-    global g_prefs
     return [list "10.0.0.0" "192.168.0.0" "172.16.0.0"]
 }
 
