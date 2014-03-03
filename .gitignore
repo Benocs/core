@@ -1,4 +1,12 @@
 Makefile
+Makefile.in
+aclocal.m4
+conf.py
+config
+src/gui/core-gui
+src/gui/version.tcl
+constants.py
+daemon/core/constants.py
 stamp*
 *.jpg
 *.install
