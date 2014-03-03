@@ -178,20 +178,19 @@ class CoreBroker(ConfigurableManager):
         if host in self.recvbuffer:
             self.session.info('already got %d/%d msg-bytes. trying to read another %d bytes..' %
                     (len(self.recvbuffer[host]['data']), self.recvbuffer[host]['msglen'],
-                        self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data'])),
-                    file=sys.stderr, flush=True)
+                        self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data'])))
             tmpmsgdata = sock.recv(self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data']))
             self.session.info('read another %dbytes' % len(tmpmsgdata))
             msgdata = self.recvbuffer[host]['data'] + tmpmsgdata
             self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
-                    (self.recvbuffer[host]['msglen'], len(msgdata)), file=sys.stderr, flush=True)
+                    (self.recvbuffer[host]['msglen'], len(msgdata)))
         else:
             msgdata = sock.recv(msglen)
             self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
-                    (msglen, len(msgdata)), file=sys.stderr, flush=True)
+                    (msglen, len(msgdata)))
 
         if (len(msgdata) < msglen):
-            self.session.info('did not read enough data. buffering..', file=sys.stderr, flush=True)
+            self.session.info('did not read enough data. buffering..')
             if not host in self.recvbuffer:
                 self.recvbuffer[host] = { 'msglen': msglen, 'msgflags': msgflags, 'msgtype': msgtype,
                         'msghdr': msghdr, 'data': b'' }
@@ -200,7 +199,7 @@ class CoreBroker(ConfigurableManager):
 
         # clear host buffer as we have a complete msg
         if host in self.recvbuffer:
-            self.session.info('deleting host from recvbuffer', file=sys.stderr, flush=True)
+            self.session.info('deleting host from recvbuffer')
             self.recvbuffer.pop(host)
 
         data = msghdr + msgdata
