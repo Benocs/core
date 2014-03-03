@@ -59,6 +59,8 @@ class CoreBroker(ConfigurableManager):
         self.dorecvloop = False
         self.recvthread = None
 
+        self.recvbuffer = {}
+
     def startup(self):
         ''' Build tunnels between network-layer nodes now that all node
             and link information has been received; called when session
@@ -121,7 +123,7 @@ class CoreBroker(ConfigurableManager):
         ''' Thread target that receives messages from server sockets.
         '''
         self.dorecvloop = True
-        # note: this loop continues after emulation is stopped, 
+        # note: this loop continues after emulation is stopped,
         # even with 0 servers
         while self.dorecvloop:
             rlist = []
@@ -152,19 +154,55 @@ class CoreBroker(ConfigurableManager):
             and forwarded. Return value of zero indicates the socket has closed
             and should be removed from the self.servers dict.
         '''
-        msghdr = sock.recv(coreapi.CoreMessage.hdrsiz)
-        if len(msghdr) == 0:
-            # server disconnected
-            sock.close()
-            return 0
-        if len(msghdr) != coreapi.CoreMessage.hdrsiz:
-            if self.verbose:
-                self.session.info("warning: broker received not enough data " \
-                                  "len=%s" % len(msghdr))
-            return len(msghdr)
 
-        msgtype, msgflags, msglen = coreapi.CoreMessage.unpackhdr(msghdr)
-        msgdata = sock.recv(msglen)
+        # if buffer of this host exists, check for it. don't do the hdr-code-path
+        if not host in self.recvbuffer:
+            msghdr = sock.recv(coreapi.CoreMessage.hdrsiz)
+            if len(msghdr) == 0:
+                # server disconnected
+                sock.close()
+                return 0
+            if len(msghdr) != coreapi.CoreMessage.hdrsiz:
+                if self.verbose:
+                    self.session.info("warning: broker received not enough data " \
+                                      "len=%s" % len(msghdr))
+                return len(msghdr)
+
+            msgtype, msgflags, msglen = coreapi.CoreMessage.unpackhdr(msghdr)
+        else:
+            msghdr = self.recvbuffer[host]['msghdr']
+            msglen = self.recvbuffer[host]['msglen']
+            msgtype = self.recvbuffer[host]['msgtype']
+            msgflags = self.recvbuffer[host]['msgflags']
+
+        if host in self.recvbuffer:
+            self.session.info('already got %d/%d msg-bytes. trying to read another %d bytes..' %
+                    (len(self.recvbuffer[host]['data']), self.recvbuffer[host]['msglen'],
+                        self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data'])),
+                    file=sys.stderr, flush=True)
+            tmpmsgdata = sock.recv(self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data']))
+            self.session.info('read another %dbytes' % len(tmpmsgdata))
+            msgdata = self.recvbuffer[host]['data'] + tmpmsgdata
+            self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
+                    (self.recvbuffer[host]['msglen'], len(msgdata)), file=sys.stderr, flush=True)
+        else:
+            msgdata = sock.recv(msglen)
+            self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
+                    (msglen, len(msgdata)), file=sys.stderr, flush=True)
+
+        if (len(msgdata) < msglen):
+            self.session.info('did not read enough data. buffering..', file=sys.stderr, flush=True)
+            if not host in self.recvbuffer:
+                self.recvbuffer[host] = { 'msglen': msglen, 'msgflags': msgflags, 'msgtype': msgtype,
+                        'msghdr': msghdr, 'data': b'' }
+            self.recvbuffer[host]['data'] += msgdata
+            return len(msgdata)
+
+        # clear host buffer as we have a complete msg
+        if host in self.recvbuffer:
+            self.session.info('deleting host from recvbuffer', file=sys.stderr, flush=True)
+            self.recvbuffer.pop(host)
+
         data = msghdr + msgdata
         count = None
         # snoop exec response for remote interactive TTYs
