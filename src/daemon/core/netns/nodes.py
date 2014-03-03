@@ -144,7 +144,7 @@ class PtpNet(LxBrNet):
             return [msg,]
         # build a 2nd link message for the upstream link parameters
         # (swap if1 and if2)
-        tlvdata = ""
+        tlvdata = b""
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
                                             if2.node.objid)
         tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER,

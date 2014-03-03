@@ -32,7 +32,7 @@ def main():
     if options.list is True:
         hdr = sock.recv(coreapi.CoreMessage.hdrsiz)
         msgtype, msgflags, msglen = coreapi.CoreMessage.unpackhdr(hdr)
-        data = ""
+        data = b""
         if msglen:
             data = sock.recv(msglen)
         msg = coreapi.CoreMessage(msgflags, hdr, data)

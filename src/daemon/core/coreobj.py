@@ -375,7 +375,7 @@ class PyCoreNet(PyCoreObj):
         ''' Helper for tolinkmsgs() to build TLVs having link parameters
             from interface parameters.
         '''
-        tlvdata = ""
+        tlvdata = b""
         delay = netif.getparam('delay')
         bw = netif.getparam('bw')
         loss = netif.getparam('loss')
@@ -456,7 +456,7 @@ class PyCoreNet(PyCoreObj):
             if not uni:
                 continue
             # build a 2nd link message for any upstream link parameters
-            tlvdata = ""
+            tlvdata = b""
             tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N1NUMBER,
                                                 otherobj.objid)
             tlvdata += coreapi.CoreLinkTlv.pack(coreapi.CORE_TLV_LINK_N2NUMBER,
