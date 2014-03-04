@@ -503,14 +503,24 @@ class Session(object):
     def info(self, msg):
         ''' Utility method for writing output to stdout.
         '''
-        print(msg)
-        sys.stdout.flush()
+        if hasattr(self.options, 'clientlogfile'):
+            fname = self.options.clientlogfile
+            with open(fname, 'a') as logfile:
+               print(msg, file = logfile, flush = True)
+        else:
+            print(msg, file = sys.stdout, flush = True)
+            sys.stdout.flush()
 
     def warn(self, msg):
         ''' Utility method for writing output to stderr.
         '''
-        print(msg, file = sys.stderr)
-        sys.stderr.flush()
+        if hasattr(self.options, 'clientlogfile'):
+            fname = self.options.clientlogfile
+            with open(fname, 'a') as logfile:
+               print(msg, file = logfile, flush = True)
+        else:
+            print(msg, file = sys.stderr, flush = True)
+            sys.stderr.flush()
 
     def dumpsession(self):
         ''' Debug print this session.
