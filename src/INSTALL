@@ -15,8 +15,6 @@ export PYTHON=python3; ./configure --prefix=/usr
 
 make $BUILD_PARALLEL
 su -c "make install" root
-[ -e "/usr/lib/python3.3" ] && [ \! -e /usr/lib/python3.3/dist-packages ] && \
-    su -c "ln -s /usr/lib/python3.3/site-packages /usr/lib/python3.3/dist-packages" root
 
 CORECFG="/etc/core"
 mkdir -p "$CORECFG"
@@ -24,10 +22,9 @@ chmod -R 775 "$CORECFG"
 addgroup core || echo "group \"core\" already exists. this can be ignored"
 chgrp -R core "$CORECFG"
 
-#mkdir -p $HOME/.core
-cp files/nodes.conf "$CORECFG/"
-cp files/ipaddrs.conf "$CORECFG/"
-cp files/widgets.conf "$CORECFG/"
+cp -v files/nodes.conf "$CORECFG/"
+cp -v files/ipaddrs.conf "$CORECFG/"
+cp -v files/widgets.conf "$CORECFG/"
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 

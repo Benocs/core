@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 aclocal.m4
+aclocal.m4e
 conf.py
 config
 src/gui/core-gui

@@ -38,7 +38,7 @@ install:	install-exec-hook
 
 # Python libraries install
 install-exec-hook:
-	SBINDIR=${DESTDIR}/@SBINDIR@ $(PYTHON) setup.py install --prefix=${DESTDIR}/${prefix} --install-purelib=${DESTDIR}/${pythondir} --install-platlib=${DESTDIR}/${pyexecdir} --no-compile
+	SBINDIR=${DESTDIR}/@SBINDIR@ $(PYTHON) setup.py install --prefix=${DESTDIR}/${prefix} --install-layout=deb --install-purelib=${DESTDIR}/${pythondir} --install-platlib=${DESTDIR}/${pyexecdir} --no-compile
 #python setup.py install --prefix=${DESTDIR}${PYTHON_PREFIX}
 
 # Python libraries uninstall

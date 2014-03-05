@@ -18,5 +18,5 @@
 /usr/share/man/man1/core-cleanup.1
 /usr/share/man/man1/core-xen-cleanup.1
 # ATpythondirAT is expanding to ${prefix}/lib/python2.7/dist-packages
-/usr/lib/python2.7/dist-packages
+/usr/lib/python3.3/dist-packages
 /etc/init.d

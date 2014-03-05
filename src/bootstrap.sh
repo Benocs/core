@@ -44,5 +44,6 @@ echo "(1/4) Running aclocal..." && aclocal -I config \
   && echo "(3/4) Running automake..." \
 	&& automake --add-missing --copy --foreign \
   && echo "(4/4) Running autoconf..." && autoconf \
+  && sed -ie 's/PYTHON_VERSION\/site-packages/PYTHON_VERSION\/dist-packages/' aclocal.m4 \
   && echo "" \
   && echo "You are now ready to run \"./configure\"."
