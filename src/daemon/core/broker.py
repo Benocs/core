@@ -154,7 +154,6 @@ class CoreBroker(ConfigurableManager):
             and forwarded. Return value of zero indicates the socket has closed
             and should be removed from the self.servers dict.
         '''
-
         # if buffer of this host exists, check for it. don't do the hdr-code-path
         if not host in self.recvbuffer:
             msghdr = sock.recv(coreapi.CoreMessage.hdrsiz)
@@ -176,21 +175,26 @@ class CoreBroker(ConfigurableManager):
             msgflags = self.recvbuffer[host]['msgflags']
 
         if host in self.recvbuffer:
-            self.session.info('already got %d/%d msg-bytes. trying to read another %d bytes..' %
-                    (len(self.recvbuffer[host]['data']), self.recvbuffer[host]['msglen'],
-                        self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data'])))
+            if self.verbose:
+                self.session.info('already got %d/%d msg-bytes. trying to read another %d bytes..' %
+                        (len(self.recvbuffer[host]['data']), self.recvbuffer[host]['msglen'],
+                            self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data'])))
             tmpmsgdata = sock.recv(self.recvbuffer[host]['msglen'] - len(self.recvbuffer[host]['data']))
-            self.session.info('read another %dbytes' % len(tmpmsgdata))
+            if self.verbose:
+                self.session.info('read another %dbytes' % len(tmpmsgdata))
             msgdata = self.recvbuffer[host]['data'] + tmpmsgdata
-            self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
-                    (self.recvbuffer[host]['msglen'], len(msgdata)))
+            if self.verbose:
+                self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
+                        (self.recvbuffer[host]['msglen'], len(msgdata)))
         else:
             msgdata = sock.recv(msglen)
-            self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
-                    (msglen, len(msgdata)))
+            if self.verbose:
+                self.session.info('received msghdr: msglen: %d, read data bytes: %d' %
+                        (msglen, len(msgdata)))
 
         if (len(msgdata) < msglen):
-            self.session.info('did not read enough data. buffering..')
+            if self.verbose:
+                self.session.info('did not read enough data. buffering..')
             if not host in self.recvbuffer:
                 self.recvbuffer[host] = { 'msglen': msglen, 'msgflags': msgflags, 'msgtype': msgtype,
                         'msghdr': msghdr, 'data': b'' }
@@ -199,7 +203,8 @@ class CoreBroker(ConfigurableManager):
 
         # clear host buffer as we have a complete msg
         if host in self.recvbuffer:
-            self.session.info('deleting host from recvbuffer')
+            if self.verbose:
+                self.session.info('deleting host from recvbuffer')
             self.recvbuffer.pop(host)
 
         data = msghdr + msgdata
