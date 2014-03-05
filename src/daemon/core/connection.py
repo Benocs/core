@@ -146,6 +146,101 @@ class MsgHandler():
                     (msg.type, msg.typestr()))
         """
 
+class TLVHelper():
+
+    @staticmethod
+    def str_to_msgtypenum(s):
+        """ Convert a shorthand string into a message type number """
+        fulltypestr = str_to_msgtypename(s)
+        for k, v in coreapi.message_types.items():
+            if v == fulltypestr:
+                return k
+        return None
+
+    @staticmethod
+    def str_to_msgflagnum(s):
+        flagname = "CORE_API_%s_FLAG" % s.upper()
+        for (k, v) in coreapi.message_flags.items():
+            if v == flagname:
+                return k
+        return None
+
+    @staticmethod
+    def tlvname_to_num(tlv_cls, name):
+        """ Convert the given TLV Type class and TLV name to the TLV number  """
+        for (k, v) in tlv_cls.tlvtypemap.items():
+            if v == name:
+                return k
+        return None
+
+    @staticmethod
+    def str_to_tlvname(t, s):
+        """ Convert the given TLV type t and string s to a TLV name """
+        return "CORE_TLV_%s_%s" % (t.upper(), s.upper())
+
+    @staticmethod
+    def parse_tlv_stringlist(args):
+        if len(args) < 3:
+            print(('[ERROR] message too short. specify at least msgtype, tlvtype and '
+                    'tlvdata'))
+            return (False, None, 0, None)
+
+        msg_type = args[0].lower()
+
+        if not msg_type in msg_types:
+            print('[ERROR] unsupported msg_type: %s' % msg_type)
+            return (False, None, 0, None)
+
+        if msg_types[msg_type][1] is None:
+            print('[ERROR] msg_type: %s not implemented' % msg_type)
+            return (False, None, 0, None)
+
+        msg_cls = coreapi.msgclsmap[msg_types[msg_type][0]]
+        tlv_cls = msg_cls.tlvcls
+
+        # pop msg_type from arg list
+        args.pop(0)
+
+        flags_or_tlvtype = args[0].lower()
+        flags = 0
+        if flags_or_tlvtype.startswith('flags='):
+            # build a message consisting of TLVs from 'type=value' arguments
+            flagstr = flags_or_tlvtype.split('=')[1]
+            for f in flagstr.split(","):
+                if f == '':
+                    continue
+                n = TLVHelper.str_to_msgflagnum(f)
+                if n is None:
+                    print('[ERROR] Invalid flag "%s"' % f)
+                    return (False, None, 0, None)
+                flags |= n
+
+            # pop flags from arg list
+            args.pop(0)
+        #print('flags: 0x%x' % flags)
+
+        tlv_data_list = []
+        while len(args) >= 2:
+            tlv_type_raw = args.pop(0)
+            tlv_value = args.pop(0)
+
+            #print('fetching next tlv_type and tlv_value: %s, %s' %
+            #       (tlv_type_raw, tlv_value))
+
+            tlv_name = TLVHelper.str_to_tlvname(msg_types[msg_type][2], tlv_type_raw)
+            tlv_type = TLVHelper.tlvname_to_num(tlv_cls, tlv_name)
+            if tlv_name not in list(tlv_cls.tlvtypemap.values()):
+                print("[ERROR] Unknown TLV: '%s' / %s:%s" % (tlv_type_raw, tlv_name, str(args)))
+                return (False, None, 0, None)
+
+            #print('tlv_name: %s, tlv_value: %s' % (tlv_name, tlv_value))
+            tlv_data_list.append(tlv_cls.packstring(tlv_type, tlv_value))
+
+        tlv_data = b''.join(tlv_data_list)
+        #print('tlvdata: %s' % str(tlv_data))
+
+        return (True, msg_cls, flags, tlv_data)
+
 class CoreConnection():
 
     session = None
