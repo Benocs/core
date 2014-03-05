@@ -28,7 +28,7 @@ class LoopbackAddress(utility.UtilService):
     """ assigns a loopback ip address to each router """
     _name = "LoopbackAddress"
     _configs = ("loopback.sh",)
-    _startup = (,)
+    _startup = ()
     _meta = "DEPRECATED. remove this service from your configuration"
 
     @classmethod
