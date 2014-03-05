@@ -44,7 +44,7 @@ for configfile in config_files:
                     key = key_value[0].replace('"', '').replace("'", "").strip()
                     value = key_value[1].replace('"', '').replace("'", "").strip()
 
-                    print('new config: %s, %s = %s' % (configname, key, value))
+                    #print('new config: %s, %s = %s' % (configname, key, value))
                     localconfig[key] = value
                 except:
                     print('ERROR: could not read line: %s' % line)
