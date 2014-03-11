@@ -97,8 +97,8 @@ class SimpleLxcNode(PyCoreNode):
         self.info("bringing up loopback interface")
         self.cmd([IP_BIN, "link", "set", "lo", "up"])
         self.info("adding loopback address: %s/32" % \
-                str(node.getLoopbackIPv4()))
-        self.cmd([IP_BIN, "addr", "add", "%s/32" % str(node.getLoopbackIPv4()),
+                str(self.getLoopbackIPv4()))
+        self.cmd([IP_BIN, "addr", "add", "%s/32" % str(self.getLoopbackIPv4()),
                 "dev", "lo"])
         self.info("setting hostname: %s" % self.name)
         self.cmd(["hostname", self.name])
