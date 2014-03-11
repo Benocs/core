@@ -397,9 +397,11 @@ proc doStuff1 {} {
   #entry $wi.bot3.line1.entry_imnout -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom3_imnout)
 
   #$wi.bot3.line1.entry_loadbrite $wi.bot3.line1.text_loadbrite $wi.bot3.line1.entry_imnout $wi.bot3.line1.text_imnout
+  label $wi.bot4.line1.text_imnin -text "Load this .imn into GUI:"
+  entry $wi.bot4.line1.entry_imnin -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom4_imnin)
 
   button $wi.bot4.line1.buildtop -text "Load .imn" -command "loadIMN"
-  pack $wi.bot4.line1.buildtop -side right
+  pack $wi.bot4.line1.buildtop $wi.bot4.line1.entry_imnin $wi.bot4.line1.text_imnin -side right
   pack $wi.bot4.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.bot4 -side bottom -fill x
 
@@ -410,13 +412,13 @@ proc doStuff1 {} {
 
   frame $wi.bot3.line1 -borderwidth 0
 
-  label $wi.bot3.line1.text_loadbrite -text "LoadBrite:"
+  label $wi.bot3.line1.text_loadbrite -text "Load Brite-Topology:"
   entry $wi.bot3.line1.entry_loadbrite -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom3_loadbrite)
-  label $wi.bot3.line1.text_imnout -text "Output:"
+  label $wi.bot3.line1.text_imnout -text ".imn Output:"
   entry $wi.bot3.line1.entry_imnout -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom3_imnout)
 
   button $wi.bot3.line1.buildtop -text "Build .imn" -command "buildIMN"
-  pack $wi.bot3.line1.buildtop $wi.bot3.line1.entry_loadbrite $wi.bot3.line1.text_loadbrite $wi.bot3.line1.entry_imnout $wi.bot3.line1.text_imnout -side right
+  pack $wi.bot3.line1.buildtop $wi.bot3.line1.entry_imnout $wi.bot3.line1.text_imnout $wi.bot3.line1.entry_loadbrite $wi.bot3.line1.text_loadbrite -side right
   pack $wi.bot3.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.bot3 -side bottom -fill x
 
@@ -424,25 +426,25 @@ proc doStuff1 {} {
   labelframe $wi.bot2 -borderwidth 4 -text "2nd: Build Topology"
 
   frame $wi.bot2.line1 -borderwidth 0
-  label $wi.bot2.line1.text_loadcfg -text "LoadCfg:"
+  label $wi.bot2.line1.text_loadcfg -text "Load Brite-Cfg:"
   entry $wi.bot2.line1.entry_loadcfg -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_loadcfg)
-  label $wi.bot2.line1.text_briteout -text "Output:"
+  label $wi.bot2.line1.text_briteout -text "Topology Output:"
   entry $wi.bot2.line1.entry_briteout -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom2_briteout)
   button $wi.bot2.line1.buildtop -text "Build Topology" -command "buildTopology"
-  pack $wi.bot2.line1.buildtop $wi.bot2.line1.entry_loadcfg $wi.bot2.line1.text_loadcfg $wi.bot2.line1.entry_briteout $wi.bot2.line1.text_briteout -side right
+  pack $wi.bot2.line1.buildtop $wi.bot2.line1.entry_briteout $wi.bot2.line1.text_briteout $wi.bot2.line1.entry_loadcfg $wi.bot2.line1.text_loadcfg -side right
   pack $wi.bot2.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.bot2 -side bottom -fill x
 
 
   # Config Einstellungen
-  labelframe $wi.bot -borderwidth 4 -text "1st: Config Generation"
+  labelframe $wi.bot -borderwidth 4 -text "1st: Build Config"
 
   frame $wi.bot.line1 -borderwidth 0
   # unterschied destroy $wi und detroy .core_testing
   #  beides zerstoert das fenster
   button $wi.bot.line1.buildtop -text "Build Cfg" -command "buildCfg"
 
-  label $wi.bot.line1.text_savedest -text "SaveCfg:"
+  label $wi.bot.line1.text_savedest -text "BriteCfg Output:"
   entry $wi.bot.line1.entry_savedest -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_savedest)
   label $wi.bot.line1.text_execpath -text "BritePath:"
   entry $wi.bot.line1.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_execpath)
@@ -560,21 +562,21 @@ proc buildIMN {} {
   global testing_prefs
 
   # aufruf script von robert mit parametern
-  # TODO script execdir anpassen
-  set execdir "/home/hanstest"
+  # TODO core-topogen script is called here
+  set execdir "/tmp"
 
   cd $execdir
   puts [pwd]
 
 
   set exec_string exec
-  lappend exec_string ./core_topogen.py
+  lappend exec_string core-topogen.py
   # pfad zur.brite datei
   lappend exec_string $testing_prefs(gui_brite_bottom3_loadbrite)
   # pfad zur imn ausgabedatei
   lappend exec_string $testing_prefs(gui_brite_bottom3_imnout)
 
-  lappend exec_string "weitere parameter"
+  #lappend exec_string "weitere parameter"
 
   # ist mit und ohne & blockeriend ..
   lappend  exec_string >@stdout 2>@stderr &
@@ -1769,6 +1771,7 @@ proc initTestingPrefs {} {
     gui_brite_bottom2_briteout			"/usr/share/core/topoOut"
     gui_brite_bottom3_loadbrite			"/usr/share/core/topoOut"
     gui_brite_bottom3_imnout			"/usr/share/core/topo.imn"
+    gui_brite_bottom4_imnin			"/usr/share/core/topo.imn"
   }
 }
 

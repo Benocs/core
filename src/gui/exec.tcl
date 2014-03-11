@@ -145,9 +145,12 @@ proc drawToolbar { mode } {
     #
     # edit mode button bar
     #
-    set buttons [list start start2 link]
+    set buttons [list start start2 stop2 link]
     foreach b $buttons {
-        if { $mode == "exec"} { destroy .left.$b } else {
+        if { $mode == "exec"} { 
+            destroy .left.$b 
+            puts "destroy1 $b"
+        } else {
 	    # add buttons when in edit mode
 	    set imgf "$CORE_DATA_DIR/icons/tiny/$b.gif"
 	    set image [image create photo -file $imgf]
@@ -158,13 +161,18 @@ proc drawToolbar { mode } {
 		-command "popupMenuChoose \"\" $b $imgf"
 	        leftToolTip $b .left
 	    	pack .left.$b -side top
+                puts "here1 $b"
+                puts ""
 	    }
 	}
     }
     # popup toolbar buttons have submenus
     set buttons {routers hubs bgobjs}
     foreach b $buttons {
-        if { $mode == "exec"} { destroy .left.$b } else {
+        if { $mode == "exec"} {
+             destroy .left.$b
+             puts "destroy2 $b"
+        } else {
 	    # create buttons for parent items
 	    set menubuttons { }
 	    if { $b == "routers" } {
@@ -199,25 +207,38 @@ proc drawToolbar { mode } {
 	    # set submenu tooltips for user-defined types to type name
 	    setLeftTooltips $b $menubuttons
 	    pack .left.$b -side top
+            puts "here2 $b"
+            puts ""
 	}
     }
 
     #
     # Exec mode button bar
-    #
+    # left picture-menu if session stopped
     if { "$mode" == "edit" } {
+        .left.stop2 configure -command "startStopButton2 extraStop"
+	.left.start2 configure -command "startStopButton2 extraStart"
 	.left.start configure -command "startStopButton exec"
-	.left.start2 configure -command "startStopButton2 exec"
     }
-    foreach b {stop stop2 observe plot marker twonode run } {
-	if { "$mode" != "exec" } { destroy .left.$b } else {
+
+    # left picture-menu if session started
+    foreach b {stop start2 stop2 observe plot marker twonode run } {
+	if { "$mode" != "exec" } {
+            # do not destroy the start2 and stop2 buttons here
+            if { $b != "start2" && $b != "stop2" } {
+              destroy .left.$b
+              puts "destroy3 $b"
+            }
+        } else {
 	    set cmd ""
 	    set fn "$CORE_DATA_DIR/icons/tiny/$b.gif"
 	    set image [image create photo -file $fn]
 	    if { $b == "stop" } {
 		set cmd "startStopButton edit"
+            } elseif { $b == "start2" } {
+                set cmd "startStopButton2 extraStart"
 	    } elseif { $b == "stop2" } {
-		set cmd "startStopButton2 edit"
+		set cmd "startStopButton2 extraStop"
 	    } elseif { $b == "observe" } {
 	    	set cmd "popupObserverWidgets"
 	    } elseif { $b == "marker" } {
@@ -236,6 +257,8 @@ proc drawToolbar { mode } {
 		-width 32 -height 32 -activebackground gray -image $image
 	    leftToolTip $b .left
 	    pack .left.$b -side top
+            puts "here3 $b"
+            puts ""
 	}
     }
     # turn off any existing tooltip
@@ -369,6 +392,10 @@ proc setOperMode { mode { type "" } } {
     global undolevel redolevel
     global g_prefs
 
+    # session start -> all links and nodes on
+    # session stop -> all links and nodes off
+    global link_list node_list
+
     # special handling when experiment is already running
     acquireOperModeLock $mode
 
@@ -423,6 +450,15 @@ proc setOperMode { mode { type "" } } {
 	}
 	widget_loop
 	mobility_script_loop
+
+        # iterate through all nodes and links and set their state on
+        foreach node $node_list {
+          setNodeState $node "on"
+        }
+        foreach link $link_list {
+          setLinkState $link "on"
+        }
+
     ### stop button is pressed
     } else {
 	if {$oper_mode != "edit"} {
@@ -441,6 +477,14 @@ proc setOperMode { mode { type "" } } {
 	# Bind left mouse click to clearing the CPU graph
 	bind .bottom.cpu_load <1> {manageCPUwindow %X %Y 0}
 	manageCPUwindow %X %Y 0
+
+        # iterate through all nodes and links and set their state off
+        foreach node $node_list {
+          setNodeState $node "off"
+        }
+        foreach link $link_list {
+          setLinkState $link "off"
+        }
     }
     .c config -cursor left_ptr
     releaseOperModeLock

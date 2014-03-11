@@ -101,9 +101,16 @@ proc findFreeIPv6Net { quarknode mask } {
 
   for {set j $startv6 } { $j < 65535} { incr j 2 } {
 
+
+    # abbruch bei zu vielen subnetzen
+    #   mit fehlermeldung in console.
+    if { $j > 65534 } {
+      puts " Error: IPv6 to many /63 subnets (>32767)"
+      return "IPv6 Error"
+    }
+
     # pruefen ob subnet noch nicht vorhanden
     # hier nur auf 3tes element (4. 16Bit Block) getestet.
-
     set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
 
     if { [llength $ls_r] == 0 || [llength $ls_r] == 1 } {
@@ -301,7 +308,13 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
     set zahl1 65280
 
     # von FF00 runter in subnetbits bis freies subnet gefunden
-    for { set j $zahl1 } { $j > 0 } { set j [expr $j - 256] } {
+    for { set j $zahl1 } { $j >= 0 } { set j [expr $j - 256] } {
+
+      # abbruchbedingung wenn subnetze fuer 56er Netze ausgehen
+      if { $j == 0 } {
+        puts "Error: IPv6 to many /56 subnets (>255)"
+        return "IPv6 Error"
+      }
 
       # decimal j in hex -> treffer von ipnetsv63rds in ls_r speichern als HEX
       set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]

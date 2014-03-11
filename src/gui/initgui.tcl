@@ -148,6 +148,9 @@ set defThruPlotMaxKBPS 10
 #
 # Initialize a few variables to default values
 #
+set defLinkState "off"
+set defNodeState "off"
+
 set defLinkColor Red
 set defFillColor Gray
 set defLinkWidth 2
