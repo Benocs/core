@@ -8,7 +8,7 @@
 TINY_ICONS =	tiny/button.play.gif \
 		tiny/select.gif tiny/marker.gif \
 		tiny/rj45.gif tiny/text.gif \
-		tiny/edit-delete.gif tiny/stop.gif tiny/stop2.gif \
+		tiny/edit-delete.gif tiny/stop.gif tiny/stop2.gif tiny/stop3.gif \
 		tiny/blank.gif tiny/mobility.gif \
 		tiny/script_play.gif tiny/arrow.gif \
 		tiny/lanswitch.gif tiny/script_pause.gif \
@@ -22,7 +22,7 @@ TINY_ICONS =	tiny/button.play.gif \
 		tiny/eraser.gif \
 		tiny/stock_connect.gif tiny/stock_disconnect.gif \
 		tiny/ping.gif tiny/link.gif \
-		tiny/start.gif tiny/start2.gif \
+		tiny/start.gif tiny/start2.gif tiny/start3.gif \
 		tiny/trace.gif tiny/button.stop.gif \
 		tiny/arrow.down.gif tiny/oval.gif \
 		tiny/wlan.gif tiny/delete.gif \

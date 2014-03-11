@@ -149,7 +149,6 @@ proc drawToolbar { mode } {
     foreach b $buttons {
         if { $mode == "exec"} { 
             destroy .left.$b 
-            puts "destroy1 $b"
         } else {
 	    # add buttons when in edit mode
 	    set imgf "$CORE_DATA_DIR/icons/tiny/$b.gif"
@@ -161,8 +160,6 @@ proc drawToolbar { mode } {
 		-command "popupMenuChoose \"\" $b $imgf"
 	        leftToolTip $b .left
 	    	pack .left.$b -side top
-                puts "here1 $b"
-                puts ""
 	    }
 	}
     }
@@ -171,7 +168,6 @@ proc drawToolbar { mode } {
     foreach b $buttons {
         if { $mode == "exec"} {
              destroy .left.$b
-             puts "destroy2 $b"
         } else {
 	    # create buttons for parent items
 	    set menubuttons { }
@@ -207,8 +203,6 @@ proc drawToolbar { mode } {
 	    # set submenu tooltips for user-defined types to type name
 	    setLeftTooltips $b $menubuttons
 	    pack .left.$b -side top
-            puts "here2 $b"
-            puts ""
 	}
     }
 
@@ -222,22 +216,18 @@ proc drawToolbar { mode } {
     }
 
     # left picture-menu if session started
-    foreach b {stop start2 stop2 observe plot marker twonode run } {
+    foreach b {stop start3 stop3 observe plot marker twonode run } {
 	if { "$mode" != "exec" } {
-            # do not destroy the start2 and stop2 buttons here
-            if { $b != "start2" && $b != "stop2" } {
               destroy .left.$b
-              puts "destroy3 $b"
-            }
         } else {
 	    set cmd ""
 	    set fn "$CORE_DATA_DIR/icons/tiny/$b.gif"
 	    set image [image create photo -file $fn]
 	    if { $b == "stop" } {
 		set cmd "startStopButton edit"
-            } elseif { $b == "start2" } {
+            } elseif { $b == "start3" } {
                 set cmd "startStopButton2 extraStart"
-	    } elseif { $b == "stop2" } {
+	    } elseif { $b == "stop3" } {
 		set cmd "startStopButton2 extraStop"
 	    } elseif { $b == "observe" } {
 	    	set cmd "popupObserverWidgets"
@@ -257,8 +247,6 @@ proc drawToolbar { mode } {
 		-width 32 -height 32 -activebackground gray -image $image
 	    leftToolTip $b .left
 	    pack .left.$b -side top
-            puts "here3 $b"
-            puts ""
 	}
     }
     # turn off any existing tooltip
@@ -355,16 +343,49 @@ proc startStopButton { mode } {
 
 proc startStopButton2 { mode } {
 
+  global activetool node_list link_list
+
+  # set the active tool back to select
+  set activetool select
+           
+
   # TODO start here for partial start of network
   #      normal start of session with fkt setOperMode
 
   puts "startStopButton2 pressed. parameter mode: $mode"
 
-    set c .c
-    
-    foreach img [$c find withtag "selected"] {
-	# fkt "setOperMode" and following fkts need new code 	
+#    set c .c
+#    
+#    foreach img [$c find withtag "selected"] {
+#	# fkt "setOperMode" and following fkts need new code 	
+#    }
+
+  # hier vorerst alle nodes und links states off bzw on
+  #   schalten, anhand von button "start/stop the network"
+  if { $mode == "extraStart" } {
+    # iterate through all nodes and links and set their state on
+    foreach node $node_list {
+      setNodeState $node "on"
     }
+    foreach link $link_list {
+      setLinkState $link "on"
+    }
+    
+  }
+
+  if { $mode == "extraStop" } {
+    # iterate through all nodes and links and set their state off
+    foreach node $node_list {
+      setNodeState $node "off"
+    }
+    foreach link $link_list {
+      setLinkState $link "off"
+    }
+    
+  }
+
+
+
 }
 
 
