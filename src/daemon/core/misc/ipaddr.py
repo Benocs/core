@@ -225,6 +225,12 @@ class IPv6Prefix(IPPrefix):
         IPPrefix.__init__(self, AF_INET6, prefixstr)
 
 def isIPAddress(af, addrstr):
+    if af == AF_INET and isinstance(addrstr, IPv4Address):
+        return True
+    if af == AF_INET6 and isinstance(addrstr, IPv6Address):
+        return True
+    if isinstance(addrstr, IPAddress):
+        return True
     try:
         tmp = socket.inet_pton(af, addrstr)
         return True
@@ -232,9 +238,17 @@ def isIPAddress(af, addrstr):
         return False
 
 def isIPv4Address(addrstr):
+    if isinstance(addrstr, IPv4Address):
+        return True
+    if isinstance(addrstr, IPAddress):
+        addrstr = str(addrstr)
     return isIPAddress(AF_INET, addrstr)
 
 def isIPv6Address(addrstr):
+    if isinstance(addrstr, IPv6Address):
+        return True
+    if isinstance(addrstr, IPAddress):
+        addrstr = str(addrstr)
     return isIPAddress(AF_INET6, addrstr)
 
 class NetIDNodeMap():
