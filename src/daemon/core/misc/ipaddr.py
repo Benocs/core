@@ -124,10 +124,17 @@ class IPAddr(object):
 
     def __sub__(self, other):
         try:
+            # TODO: FIXME: this doesn't seem right.. (IPAddr.__sub__(other))
             tmp = -int(other)
         except:
             return NotImplemented
         return self.__add__(tmp)
+
+    def __le__(self, other):
+        return self.addr_newstyle.__le__(other.addr_newstyle)
+
+    def __lt__(self, other):
+        return self.addr_newstyle.__lt__(other.addr_newstyle)
 
     @classmethod
     def fromstring(cls, s):
@@ -155,7 +162,6 @@ class IPv6Addr(IPAddr):
 class IPPrefix(object):
     def __init__(self, af, prefixstr):
         "prefixstr format: address/prefixlen"
-        print(('generating prefix for str: %s' % prefixstr))
 
         self.af = af
         if self.af == AF_INET:
@@ -176,8 +182,6 @@ class IPPrefix(object):
             self.prefixlen = self.addrlen
 
     def __str__(self):
-        print(("IPADDR: family: %s, prefix: %s, len: %s" % (str(self.af),
-                str(self.prefix), str(self.prefixlen))))
         return str(self.prefix)
 
     def __eq__(self, other):
@@ -198,14 +202,13 @@ class IPPrefix(object):
             raise ValueError("invalid hostid for prefix %s: %s" % (str(self), str(hostid)))
 
         addr = IPAddr(self.af, int(self.prefix.network_address) + int(hostid))
-        print(('new address: %s' % str(addr)))
         return addr
 
     def minaddr(self):
-        return self.prefix.network_address + 1
+        return IPv4Addr(self.prefix.network_address + 1)
 
     def maxaddr(self):
-        return self.prefix.broadcast_address - 1
+        return IPv4Addr(self.prefix.broadcast_address - 1)
 
     def numaddr(self):
         return self.prefix.num_addresses - 2
