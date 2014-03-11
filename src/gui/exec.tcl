@@ -149,7 +149,6 @@ proc drawToolbar { mode } {
     foreach b $buttons {
         if { $mode == "exec"} { 
             destroy .left.$b 
-            puts "destroy1 $b"
         } else {
 	    # add buttons when in edit mode
 	    set imgf "$CORE_DATA_DIR/icons/tiny/$b.gif"
@@ -161,8 +160,6 @@ proc drawToolbar { mode } {
 		-command "popupMenuChoose \"\" $b $imgf"
 	        leftToolTip $b .left
 	    	pack .left.$b -side top
-                puts "here1 $b"
-                puts ""
 	    }
 	}
     }
@@ -171,7 +168,6 @@ proc drawToolbar { mode } {
     foreach b $buttons {
         if { $mode == "exec"} {
              destroy .left.$b
-             puts "destroy2 $b"
         } else {
 	    # create buttons for parent items
 	    set menubuttons { }
@@ -207,8 +203,6 @@ proc drawToolbar { mode } {
 	    # set submenu tooltips for user-defined types to type name
 	    setLeftTooltips $b $menubuttons
 	    pack .left.$b -side top
-            puts "here2 $b"
-            puts ""
 	}
     }
 
@@ -253,8 +247,6 @@ proc drawToolbar { mode } {
 		-width 32 -height 32 -activebackground gray -image $image
 	    leftToolTip $b .left
 	    pack .left.$b -side top
-            puts "here3 $b"
-            puts ""
 	}
     }
     # turn off any existing tooltip
