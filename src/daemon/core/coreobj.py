@@ -250,24 +250,19 @@ class PyCoreNode(PyCoreObj):
                     (str(CONFIGS['ipaddrs']['loopback_net']),
                     str(CONFIGS['ipaddrs']['loopback_net_per_netid']))))
         else:
-            return None
+            raise ValueError('Could not read ipaddrs.conf')
 
         # loopback_net_per_netid
         global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
         global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
-        try:
-            global_prefixlen = int(global_prefixlen)
-        except ValueError:
-            return None
+        global_prefixlen = int(global_prefixlen)
         # local means per netid (e.g., AS)
-        try:
-            local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
-        except ValueError:
-            return None
+        local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
 
         if hasattr(self, 'netid') and not self.netid is None:
             netid = self.netid
         else:
+            # TODO: netid 0 is invalid
             netid = 0
 
         global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
