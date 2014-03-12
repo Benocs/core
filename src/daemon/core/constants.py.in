@@ -21,17 +21,16 @@ UMOUNT_BIN              = "@umount_path@/umount"
 #UNIONFS_BIN             = "@unionfs_path@/unionfs-fuse"
 UNIONFS_BIN             = "/usr/bin/unionfs-fuse"
 
-config_files = ['ipaddrs.conf']
+from os.path import exists, expanduser, join
 
 CONFIGS = {}
-from os.path import exists, expanduser, join
 # since this is the core-daemon, user should always expand to /root/
 home = expanduser('~')
 dotcore = join(home, '.core')
-for configfile in config_files:
-    fullpath = join(dotcore, configfile)
-    configname = configfile[:configfile.rfind('.conf')]
-    if exists(fullpath):
+
+class KeyValueConf():
+    @staticmethod
+    def parse(filename):
         localconfig = {}
         with open(fullpath, 'r') as f:
             for line in f:
@@ -44,10 +43,130 @@ for configfile in config_files:
                     key = key_value[0].replace('"', '').replace("'", "").strip()
                     value = key_value[1].replace('"', '').replace("'", "").strip()
 
-                    #print('new config: %s, %s = %s' % (configname, key, value))
                     localconfig[key] = value
                 except:
                     print('ERROR: could not read line: %s' % line)
+        return localconfig
+
+class IPAddrsConf(KeyValueConf):
+    pass
+
+class CoreConf():
+    pass
+
+class NodesConf():
+    @staticmethod
+    def parse(filename):
+        localconfig = {}
+        # per line states
+        state = 0
+        states = {
+                0: 'idx',
+                1: 'name',
+                2: 'normal-icon',
+                3: 'tiny-icon',
+                4: 'services',
+                5: 'type',
+                6: 'metadata',
+                }
+
+        nodedef = None
+        with open(fullpath, 'r') as f:
+            for line in f:
+                try:
+                    line = line.strip()
+                    if line.startswith('#'):
+                        continue
+
+                    # idx
+                    nodedef = {}
+                    nodekey = None
+                    next_delimeter = line.find('{')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    nodedef[states[state]] = line[:next_delimeter].strip()
+                    line = line[next_delimeter:].strip()
+                    state += 1
+
+                    # name
+                    if line.startswith('{') and line.endswith('}'):
+                        line = line[1:-1].strip()
+                        next_delimeter = line.find(' ')
+                        if next_delimeter == -1:
+                            raise ValueError('malformed line: %' % line)
+                        nodedef[states[state]] = line[:next_delimeter].strip()
+                        nodekey = nodedef[states[state]]
+                        line = line[next_delimeter:].strip()
+                        state += 1
+                    else:
+                        raise ValueError('malformed line: %' % line)
+
+                    # normal-icon
+                    next_delimeter = line.find(' ')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    nodedef[states[state]] = line[:next_delimeter].strip()
+                    line = line[next_delimeter:].strip()
+                    state += 1
+
+                    # tiny-icon
+                    next_delimeter = line.find(' ')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    nodedef[states[state]] = line[:next_delimeter].strip()
+                    line = line[next_delimeter:].strip()
+                    state += 1
+
+                    # services
+                    if not line.startswith('{'):
+                        raise ValueError('malformed line: %' % line)
+                    next_delimeter = line.find('}')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    # remove '{' and '}'
+                    services_line = line[1:next_delimeter].strip()
+                    nodedef[states[state]] = services_line.split()
+                    line = line[next_delimeter+1:].strip()
+                    state += 1
+
+                    # type
+                    next_delimeter = line.find(' ')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    nodedef[states[state]] = line[:next_delimeter].strip()
+                    line = line[next_delimeter:].strip()
+                    state += 1
+
+                    # metadata
+                    if not line.startswith('{'):
+                        raise ValueError('malformed line: %' % line)
+                    next_delimeter = line.find('}')
+                    if next_delimeter == -1:
+                        raise ValueError('malformed line: %' % line)
+                    # remove '{' and '}'
+                    nodedef[states[state]] = line[1:next_delimeter].strip()
+                    line = line[next_delimeter+1:].strip()
+                    state += 1
+
+                    # done
+                    if len(nodedef) > 0 and not nodekey is None:
+                        localconfig[nodekey] = nodedef
+                    state = 0
+                except:
+                    print('ERROR: could not read line: %s' % line)
+        return localconfig
+
+config_files = [
+        #('core.conf', CoreConf),
+        ('ipaddrs.conf', IPAddrsConf),
+        ('nodes.conf', NodesConf),
+        ]
+
+for configfile, parsercls in config_files:
+    fullpath = join(dotcore, configfile)
+    configname = configfile[:configfile.rfind('.conf')]
+    if exists(fullpath):
+        localconfig = parsercls.parse(fullpath)
         if len(localconfig) > 0:
             CONFIGS[configname] = localconfig
 
