@@ -732,21 +732,23 @@ proc updateLinkLabel { link } {
 
     set bwstr  [getLinkBandwidthString $link]
     set delstr [getLinkDelayString $link]
-    set ber [getLinkBER $link]
-    set dup [getLinkDup $link]
-    set labelstr "$labelstr[getLinkBandwidthString $link]
+    set berstr [getLinkBERString $link]
+    set dupstr [getLinkDupString $link]
+    set labelstr "
 "
+    if { "$bwstr" != "" } {
+	set labelstr "$labelstr$bwstr
+"
+    }
     if { "$delstr" != "" } {
 	set labelstr "$labelstr$delstr
 "
     }
-    if { "$ber" != "" } {
-	set berstr "loss=$ber%"
+    if { "$berstr" != "" } {
 	set labelstr "$labelstr$berstr
 "
     }
-    if { "$dup" != "" } {
-	set dupstr "dup=$dup%"
+    if { "$dupstr" != "" } {
 	set labelstr "$labelstr$dupstr
 "
     }

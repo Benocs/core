@@ -510,14 +510,6 @@ proc zurueck_stellen {} {
 proc buildTopology [] {
   global testing_prefs
 
-#testing_prefs(gui_brite_bottom_savedest)
-# 373   entry $wi.bot2.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_execpath)
-# 375   entry $wi.bot2.entry_loadcfg -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_loadcfg)
-
-#  puts [pwd]
-#  cd /home/jw/dateien/sw/brite/BRITE/Java
-#  puts [pwd]
-
   set execdir $testing_prefs(gui_brite_bottom_execpath)
 
   # hier entscheidet sich nach auswahl ob brite mit java oder als exe aufgerufen wird
@@ -624,7 +616,7 @@ proc switched {} {
     .core_testing.as.line3.combo configure -state normal
     .core_testing.as.line5.combo configure -state normal
 
-    #allgemein je nach auswahl werte anpassen
+    #allgemein je nach Auswahl werte anpassen
 
     set var_as_alpha_beta [.core_testing.as.line3.combo get]
     if {[string equal "Waxman" $var_as_alpha_beta]} {
@@ -1357,8 +1349,7 @@ proc buildCfg {} {
 
   } elseif {[string equal "2 Level: TOP-DOWN" $var_model]} {
 # Abschnitt TopDown
-# spaeter vielleicht um doppelten code zu vermeiden
-#   teile in fktn auslagern
+#  als naechstes teile in fktn auslagern, um doppelten code zu vermeiden
 
     append data "BeginModel\n"
     append data "	Name = 5\n"
