@@ -114,11 +114,11 @@ class IPAddr(object):
                         str(ipaddress.IPv4Address(self.addr_newstyle + other.addr_newstyle)))
             elif self.addr_newstyle.version == 6:
                 return IPAddr(AF_INET6,
-                        str(ipaddress.IPv64Address(self.addr_newstyle + other.addr_newstyle)))
+                        str(ipaddress.IPv6Address(self.addr_newstyle + other.addr_newstyle)))
         elif isinstance(other, ipaddress.IPv4Address):
             return IPAddr(AF_INET, str(ipaddress.IPv4Address(self.addr_newstyle + other)))
         elif isinstance(other, ipaddress.IPv6Address):
-            return IPAddr(AF_INET6, str(ipaddress.IPv64Address(self.addr_newstyle + other)))
+            return IPAddr(AF_INET6, str(ipaddress.IPv6Address(self.addr_newstyle + other)))
         else:
             raise ValueError
 
@@ -225,11 +225,11 @@ class IPv6Prefix(IPPrefix):
         IPPrefix.__init__(self, AF_INET6, prefixstr)
 
 def isIPAddress(af, addrstr):
-    if af == AF_INET and isinstance(addrstr, IPv4Address):
+    if af == AF_INET and isinstance(addrstr, IPv4Addr):
         return True
-    if af == AF_INET6 and isinstance(addrstr, IPv6Address):
+    if af == AF_INET6 and isinstance(addrstr, IPv6Addr):
         return True
-    if isinstance(addrstr, IPAddress):
+    if isinstance(addrstr, IPAddr):
         return True
     try:
         tmp = socket.inet_pton(af, addrstr)
@@ -238,16 +238,16 @@ def isIPAddress(af, addrstr):
         return False
 
 def isIPv4Address(addrstr):
-    if isinstance(addrstr, IPv4Address):
+    if isinstance(addrstr, IPv4Addr):
         return True
-    if isinstance(addrstr, IPAddress):
+    if isinstance(addrstr, IPAddr):
         addrstr = str(addrstr)
     return isIPAddress(AF_INET, addrstr)
 
 def isIPv6Address(addrstr):
-    if isinstance(addrstr, IPv6Address):
+    if isinstance(addrstr, IPv6Addr):
         return True
-    if isinstance(addrstr, IPAddress):
+    if isinstance(addrstr, IPAddr):
         addrstr = str(addrstr)
     return isIPAddress(AF_INET6, addrstr)
 
