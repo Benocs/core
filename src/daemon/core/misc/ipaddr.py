@@ -87,8 +87,22 @@ class IPAddr(object):
             raise ValueError("invalid af/addr")
 
         self.af = af
-        self.addr = addr
-        self.addr_newstyle = tmp
+        self.addr = tmp
+        if af == AF_INET:
+            # assume a /32 as default prefix length
+            self.prefixlen = 32
+        else:
+            # assume a /128 as default prefix length
+            self.prefixlen = 128
+
+    def set_prefixlen(self, prefixlen):
+        if not isinstance(prefixlen, int):
+            raise ValueError('prefixlen needs to be a number')
+
+        self.prefixlen = prefixlen
+
+    def get_prefixlen(self):
+        return self.prefixlen
 
     def isIPv4(self):
         return self.af == AF_INET
@@ -97,11 +111,11 @@ class IPAddr(object):
         return self.af == AF_INET6
 
     def __str__(self):
-        return self.addr_newstyle.compressed
+        return self.addr.compressed
 
     def __eq__(self, other):
         try:
-            return self.addr_newstyle == other.addr_newstyle
+            return self.addr == other.addr
         except:
             return False
 
@@ -109,16 +123,16 @@ class IPAddr(object):
         if not self.__class__ == other.__class:
             raise ValueError
         if isinstance(other, IPAddr):
-            if self.addr_newstyle.version == 4:
+            if self.addr.version == 4:
                 return IPAddr(AF_INET,
-                        str(ipaddress.IPv4Address(self.addr_newstyle + other.addr_newstyle)))
-            elif self.addr_newstyle.version == 6:
+                        str(ipaddress.IPv4Address(self.addr + other.addr)))
+            elif self.addr.version == 6:
                 return IPAddr(AF_INET6,
-                        str(ipaddress.IPv6Address(self.addr_newstyle + other.addr_newstyle)))
+                        str(ipaddress.IPv6Address(self.addr + other.addr)))
         elif isinstance(other, ipaddress.IPv4Address):
-            return IPAddr(AF_INET, str(ipaddress.IPv4Address(self.addr_newstyle + other)))
+            return IPAddr(AF_INET, str(ipaddress.IPv4Address(self.addr + other)))
         elif isinstance(other, ipaddress.IPv6Address):
-            return IPAddr(AF_INET6, str(ipaddress.IPv6Address(self.addr_newstyle + other)))
+            return IPAddr(AF_INET6, str(ipaddress.IPv6Address(self.addr + other)))
         else:
             raise ValueError
 
@@ -131,10 +145,10 @@ class IPAddr(object):
         return self.__add__(tmp)
 
     def __le__(self, other):
-        return self.addr_newstyle.__le__(other.addr_newstyle)
+        return self.addr.__le__(other.addr)
 
     def __lt__(self, other):
-        return self.addr_newstyle.__lt__(other.addr_newstyle)
+        return self.addr.__lt__(other.addr)
 
     @classmethod
     def fromstring(cls, s):
@@ -149,7 +163,7 @@ class IPAddr(object):
     def toint(s):
         ''' convert IPv4 string to 32-bit integer
         '''
-        return int(self.addr_newstyle)
+        return int(self.addr)
 
 class IPv4Addr(IPAddr):
     def __init__(self, addr):
