@@ -65,9 +65,10 @@ proc doStuff1 {} {
     destroy .core_testing
   }
 
-  button $wi.top.line1.save -text "Save & Close" -command "writeBriteConf; destroy .core_testing"
+  button $wi.top.line1.save -text "Save" -command "writeBriteConf"
+  button $wi.top.line1.saveclose -text "Save & Close" -command "writeBriteConf; destroy .core_testing"
 
-  pack $wi.top.line1.label $wi.top.line1.combo $wi.top.line1.label2 $wi.top.line1.combo2 $wi.top.line1.cancel $wi.top.line1.save  -side left
+  pack $wi.top.line1.label $wi.top.line1.combo $wi.top.line1.label2 $wi.top.line1.combo2 $wi.top.line1.cancel $wi.top.line1.save $wi.top.line1.saveclose -side left
   pack $wi.top.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.top -side top -fill x
 
@@ -495,17 +496,9 @@ proc doStuff1 {} {
   .core_testing.topdown.line6.buttonleft configure -state disabled
   .core_testing.topdown.line6.buttonright configure -state disabled
 
-
-}
-
-# stellt die Topology auf 1 Level: AS ONLY zurueck wenn eine topology generiert wurde
-proc zurueck_stellen {} {
-  global testing_prefs
-
-  set testing_prefs(gui_brite_top_topotypes) "1 Level: AS ONLY"
+  # refresh GUI with new values
   switched
 }
-
 
 proc buildTopology [] {
   global testing_prefs
@@ -527,7 +520,7 @@ proc buildTopology [] {
     lappend exec_string $testing_prefs(gui_brite_bottom2_loadcfg)
     lappend exec_string $testing_prefs(gui_brite_bottom2_briteout)
     lappend exec_string seed_file
-    lappend exec_string >@stdout 2>@stderr &
+    lappend exec_string >@stdout 2>@stderr
     {*}$exec_string
 
   } else {
@@ -572,6 +565,7 @@ proc buildIMN {} {
 
   # ist mit und ohne & blockeriend ..
   lappend  exec_string >@stdout 2>@stderr &
+
   # ausfuehren
   {*}$exec_string
 
@@ -584,11 +578,12 @@ proc loadIMN {} {
 
   global currentFile testing_prefs
 
-  set currentFile $testing_prefs(gui_brite_bottom3_imnout)
+  set currentFile $testing_prefs(gui_brite_bottom4_imnin)
+  puts $testing_prefs(gui_brite_bottom4_imnin)
   writeBriteConf
-  destroy .core_testing
+  #destroy .core_testing
   openFile
-  
+
 }
 
 
