@@ -397,8 +397,6 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
                           (nodetype, nodetypestr))
                 return ()
             start = False
-            if self.session.getstate() > coreapi.CORE_EVENT_DEFINITION_STATE:
-                start = True
 
             nodename =  msg.tlvdata[coreapi.CORE_TLV_NODE_NAME]
             model = msg.gettlv(coreapi.CORE_TLV_NODE_MODEL)
@@ -426,6 +424,10 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             netid = msg.gettlv(coreapi.CORE_TLV_NODE_NETID)
             if netid is not None:
                 n.netid = netid
+
+            if self.session.getstate() > coreapi.CORE_EVENT_DEFINITION_STATE:
+                start = True
+                n.startup()
 
             # add services to a node, either from its services TLV or
             # through the configured defaults for this node type
