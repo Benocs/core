@@ -120,7 +120,7 @@ class IPAddr(object):
             return False
 
     def __add__(self, other):
-        if not self.__class__ == other.__class:
+        if not self.__class__ == other.__class__ and not isinstance(other, int):
             raise ValueError
         if isinstance(other, IPAddr):
             if self.addr.version == 4:
@@ -133,13 +133,14 @@ class IPAddr(object):
             return IPAddr(AF_INET, str(ipaddress.IPv4Address(self.addr + other)))
         elif isinstance(other, ipaddress.IPv6Address):
             return IPAddr(AF_INET6, str(ipaddress.IPv6Address(self.addr + other)))
+        elif isinstance(other, int):
+            return self.__class__(self.addr + other)
         else:
-            raise ValueError
+            return NotImplemented
 
     def __sub__(self, other):
         try:
-            # TODO: FIXME: this doesn't seem right.. (IPAddr.__sub__(other))
-            tmp = -int(other)
+            tmp = -int(other.addr)
         except:
             return NotImplemented
         return self.__add__(tmp)
