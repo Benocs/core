@@ -23,6 +23,7 @@ su -c "make install && \
     chmod -R 775 "$CORECFG" && \
     addgroup core || echo \"group \\\"core\\\" already exists. this can be ignored\" && \
     chgrp -R core \"$CORECFG\" && \
+    cp -v files/brite.conf \"$CORECFG/\" && \
     cp -v files/nodes.conf \"$CORECFG/\" && \
     cp -v files/ipaddrs.conf \"$CORECFG/\" && \
     cp -v files/widgets.conf \"$CORECFG/\" && \
