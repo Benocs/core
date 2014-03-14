@@ -214,10 +214,10 @@ class PyCoreObj(object):
             self.session.exception(level, source, id, text)
 
     def setnetid(self, netid):
-      self.netid = netid
+        self.netid = netid
 
     def getnetid(self):
-      return self.netid
+        return self.netid
 
 
 class PyCoreNode(PyCoreObj):
@@ -269,8 +269,10 @@ class PyCoreNode(PyCoreObj):
             netid = self.netid
         else:
             # TODO: netid 0 is invalid - instead use first unused ASN
+            self.warn('[LOOPBACK] no ASN found. falling back to default (0)')
             netid = 0
 
+        self.info('[LOOPBACK] ASN: %d' % netid)
         global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
 
         baseprefix = IPv4Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
@@ -279,6 +281,7 @@ class PyCoreNode(PyCoreObj):
 
         nodeid = NetIDNodeMap.register_node(self.nodeid(), netid)
         addr = target_network_prefix.addr(nodeid)
+        self.info('[LOOPBACK] generated addr for node: %s: %s' % (self.name, str(addr)))
         return addr
 
     def makenodedir(self):
