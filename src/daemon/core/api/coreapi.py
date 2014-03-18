@@ -128,7 +128,7 @@ class CoreTlvDataIPv4Addr(CoreTlvDataObj):
 
     @staticmethod
     def getvalue(obj):
-        return obj.addr
+        return obj.addr.packed
 
     @staticmethod
     def newobj(value):
@@ -141,7 +141,7 @@ class CoreTlvDataIPv6Addr(CoreTlvDataObj):
 
     @staticmethod
     def getvalue(obj):
-        return obj.addr
+        return obj.addr.packed
 
     @staticmethod
     def newobj(value):
