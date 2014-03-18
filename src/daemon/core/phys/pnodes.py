@@ -93,8 +93,8 @@ class PhysicalNode(PyCoreNode):
         tmp = subprocess.Popen(args, stdin = subprocess.PIPE,
                                stdout = subprocess.PIPE,
                                stderr = subprocess.PIPE)
-        result = tmp.stdout.read()
-        result += tmp.stderr.read()
+        result = tmp.stdout.read().decode()
+        result += tmp.stderr.read().decode()
         tmp.stdin.close()
         tmp.stdout.close()
         tmp.stderr.close()

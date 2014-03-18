@@ -83,7 +83,7 @@ class SimpleLxcNode(PyCoreNode):
                 "SimpleLxcNode.startup()", msg)
             raise Exception(msg)
         try:
-            self.pid = int(tmp.stdout.read())
+            self.pid = int(tmp.stdout.read().decode())
             tmp.stdout.close()
         except Exception:
             msg = "vnoded failed to create a namespace; "

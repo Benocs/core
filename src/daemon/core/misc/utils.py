@@ -109,8 +109,8 @@ def cmdresult(args):
                              stdout = subprocess.PIPE,
                              stderr = subprocess.PIPE)
     cmdid.stdin.close()
-    result = cmdid.stdout.read()
-    result += cmdid.stderr.read()
+    result = cmdid.stdout.read().decode()
+    result += cmdid.stderr.read().decode()
     cmdid.stdout.close()
     cmdid.stderr.close()
     status = cmdid.wait()

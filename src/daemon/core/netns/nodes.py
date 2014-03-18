@@ -377,7 +377,7 @@ class RJ45Node(PyCoreNode, PyCoreNetIf):
         if tmp.wait():
             self.warn("Command failed: %s" % cmd)
             return
-        lines = tmp.stdout.read()
+        lines = tmp.stdout.read().decode()
         tmp.stdout.close()
         for l in lines.split('\n'):
             items = l.split()
