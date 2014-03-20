@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # (c)2010-2012 the Boeing Company
 #
@@ -38,12 +38,29 @@ if [ x${UNAME} = xFreeBSD ]; then
 	echo '	@echo ""' >> BSDmakefile
 fi
 
+fix_automake() {
+  for aclocal in aclocal.m4*; do
+    echo "patching $aclocal.."
+    grep -n "PYTHON_VERSION\/site-packages" "$aclocal"
+    sed -i -e 's/PYTHON_VERSION\/site-packages/PYTHON_VERSION\/dist-packages/' "$aclocal"
+    echo "done patching $aclocal:"
+    grep -n "PYTHON_VERSION\/dist-packages" "$aclocal"
+  done
+}
+
+fix_configure() {
+  # TODO: FIXME: this is not how it's supposed to be
+  sed -i -e 's/pythondir=\$am_cv_python_pythondir/pythondir=\$PYTHON_PREFIX\/lib\/python\$PYTHON_VERSION\/dist-packages/' configure
+  sed -i -e 's/pyexecdir=\$am_cv_python_pyexecdir/pyexecdir=\$PYTHON_PREFIX\/lib\/python\$PYTHON_VERSION\/dist-packages/' configure
+}
+
 # bootstrapping
 echo "(1/4) Running aclocal..." && aclocal -I config \
+  && fix_automake \
   && echo "(2/4) Running autoheader..." && autoheader \
   && echo "(3/4) Running automake..." \
 	&& automake --add-missing --copy --foreign \
   && echo "(4/4) Running autoconf..." && autoconf \
-  && sed -ie 's/PYTHON_VERSION\/site-packages/PYTHON_VERSION\/dist-packages/' aclocal.m4 \
+  && fix_configure \
   && echo "" \
   && echo "You are now ready to run \"./configure\"."
