@@ -16,7 +16,9 @@ if os.uname()[0] == "Linux":
 elif os.uname()[0] == "FreeBSD":
     from core.bsd import nodes
 from core.service import CoreService, addservice
-from core.misc.ipaddr import IPv4Prefix, isIPv4Address, isIPv6Address
+from core.misc.ipaddr import IPPrefix, isIPAddress
+from core.misc.ipaddr import IPv4Addr, IPv4Prefix, isIPv4Address
+from core.misc.ipaddr import IPv6Addr, IPv6Prefix, isIPv6Address
 from core.api import coreapi
 from core.constants import *
 
@@ -680,10 +682,13 @@ class ISIS(QuaggaService):
             #if not service_flags.Router in net_netif.node.services:
             #    continue
 
+            # TODO: if other side is a switch/hub/etc, use "isis network lan"
+
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
                 cfg += "  ip router isis 1\n"
                 cfg += "  isis circuit-type level-2-only\n"
+                # TODO: if other side is switch, use "isis network lan"
                 cfg += "  isis network point-to-point\n"
                 cfg += "!\n"
                 # only add each interface once
@@ -710,34 +715,16 @@ class ISIS(QuaggaService):
     def bearbeiteipstr(ipstr, netid):
         ''' get ip return three middle blocks of isis netid
         '''
-        """
+        #"""
         # isis-is is 12 characters long
         # it has the format: 49.nnnn.aaaa.bbbb.cccc.00
         # where nnnn == netid (i.e., same on all routers)
         #       abc  == routerid (i.e., unique among all routers)
 
-        hexip = hex(int(ipaddress.IPv4Address(ipstr)))[2:]
-        if len(hexip) < 8:
-            hexip = '0%s' % hexip
-
-        netid = str(netid)
-        isisnetidlist = [ '0' for i in range(4 - len(netid)) ]
-        isisnetidlist.append(netid)
-        isisnetid = ''.join(isisnetidlist)
-
-        # 49.1000.
-        #isisid = "49.%s.%s.%s.0000.00" % (isisnetid, hexip[:4], hexip[4:])
-        isisid = "49.%s.%s.%s.0000.00" % (hexip[4:], hexip[:4], hexip[4:])
-        #return isisid
-        """
-
-        # punkte entfernen
-        temp =  ''.join(c for c in ipstr if c not in '.')
-        # laenge auffuellen TODO schauen ob so immer richtig
-        while len(temp) < 12:
-            temp += str(12-len(temp))
-        # punkte an richtiger stelle einfuegen und zurueckliefern
-        return '49.' + temp[:4] + '.' + temp[4:8] + '.' + temp[8:] + '.00'
+        splitted = ''.join(['%03d' % int(e) for e in ipstr.split('.')])
+        isisid = '49.1000.%s.%s.%s.00' % (splitted[:4], splitted[4:8], splitted[8:])
+        print('[DEBUG] isis id: %s' % isisid)
+        return isisid
 
 addservice(ISIS)
 
