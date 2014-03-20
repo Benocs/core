@@ -27,7 +27,7 @@ su -c "make install && \
     cp -v files/nodes.conf \"$CORECFG/\" && \
     cp -v files/ipaddrs.conf \"$CORECFG/\" && \
     cp -v files/widgets.conf \"$CORECFG/\" && \
-    ln -s \"$CORECFG\" /root/.core" root
+    ln -s \"$CORECFG\" /root/.core || echo \"link already exists. this can be ignored\"" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
