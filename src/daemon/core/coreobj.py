@@ -242,28 +242,28 @@ class PyCoreNode(PyCoreObj):
             self.services.append(service)
 
     def getLoopbackIPv4(self):
-        if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
-                len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
-                'loopback_net_per_netid' in CONFIGS['ipaddrs']:
-            self.info(('found configuration entry for loopback devices: %s. '
-                    'each netid gets a /%s' %
-                    (str(CONFIGS['ipaddrs']['loopback_net']),
-                    str(CONFIGS['ipaddrs']['loopback_net_per_netid']))))
+        if 'ipaddrs' in CONFIGS and 'ipv4_loopback_net' in CONFIGS['ipaddrs'] and \
+                len(CONFIGS['ipaddrs']['ipv4_loopback_net'].split('/')) == 2 and \
+                'ipv4_loopback_net_per_netid' in CONFIGS['ipaddrs']:
+            #self.info(('found configuration entry for loopback devices: %s. '
+            #        'each netid gets a /%s' %
+            #        (str(CONFIGS['ipaddrs']['ipv4_loopback_net']),
+            #        str(CONFIGS['ipaddrs']['ipv4_loopback_net_per_netid']))))
+            pass
         else:
             raise ValueError('Could not read ipaddrs.conf')
 
-        # loopback_net_per_netid
-        global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
+        global_loopback_prefix_str = CONFIGS['ipaddrs']['ipv4_loopback_net']
         global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
         try:
             global_prefixlen = int(global_prefixlen)
         except ValueError:
-            raise ValueError('Could not parse loopback_net from ipaddrs.conf')
+            raise ValueError('Could not parse ipv4_loopback_net from ipaddrs.conf')
         # local means per netid (e.g., AS)
         try:
-            local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+            local_prefixlen = int(CONFIGS['ipaddrs']['ipv4_loopback_net_per_netid'])
         except ValueError:
-            raise ValueError('Could not parse loopback_net_per_netid from ipaddrs.conf')
+            raise ValueError('Could not parse ipv4_loopback_net_per_netid from ipaddrs.conf')
 
         if hasattr(self, 'netid') and not self.netid is None:
             netid = self.netid
@@ -272,7 +272,7 @@ class PyCoreNode(PyCoreObj):
             self.warn('[LOOPBACK] no ASN found. falling back to default (0)')
             netid = 0
 
-        self.info('[LOOPBACK] ASN: %d' % netid)
+        #self.info('[LOOPBACK] ASN: %d' % netid)
         global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
 
         baseprefix = IPv4Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
@@ -281,7 +281,50 @@ class PyCoreNode(PyCoreObj):
 
         nodeid = NetIDNodeMap.register_node(self.nodeid(), netid)
         addr = target_network_prefix.addr(nodeid)
-        self.info('[LOOPBACK] generated addr for node: %s: %s' % (self.name, str(addr)))
+        #self.info('[LOOPBACK] generated addr for node: %s: %s' % (self.name, str(addr)))
+        return addr
+
+    def getLoopbackIPv6(self):
+        if 'ipaddrs' in CONFIGS and 'ipv6_loopback_net' in CONFIGS['ipaddrs'] and \
+                len(CONFIGS['ipaddrs']['ipv6_loopback_net'].split('/')) == 2 and \
+                'ipv6_loopback_net_per_netid' in CONFIGS['ipaddrs']:
+            pass
+            #self.info(('found configuration entry for loopback devices: %s. '
+            #        'each netid gets a /%s' %
+            #        (str(CONFIGS['ipaddrs']['ipv6_loopback_net']),
+            #        str(CONFIGS['ipaddrs']['ipv6_loopback_net_per_netid']))))
+        else:
+            raise ValueError('Could not read ipaddrs.conf')
+
+        global_loopback_prefix_str = CONFIGS['ipaddrs']['ipv6_loopback_net']
+        global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
+        try:
+            global_prefixlen = int(global_prefixlen)
+        except ValueError:
+            raise ValueError('Could not parse ipv6_loopback_net from ipaddrs.conf')
+        # local means per netid (e.g., AS)
+        try:
+            local_prefixlen = int(CONFIGS['ipaddrs']['ipv6_loopback_net_per_netid'])
+        except ValueError:
+            raise ValueError('Could not parse ipv6_loopback_net_per_netid from ipaddrs.conf')
+
+        if hasattr(self, 'netid') and not self.netid is None:
+            netid = self.netid
+        else:
+            # TODO: netid 0 is invalid - instead use first unused ASN
+            self.warn('[LOOPBACK] no ASN found. falling back to default (0)')
+            netid = 0
+
+        #self.info('[LOOPBACK] ASN: %d' % netid)
+        global_loopback_prefix = IPv6Prefix(global_loopback_prefix_str)
+
+        baseprefix = IPv6Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
+        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_prefix = IPv6Prefix('%s/%d' % (target_network_baseaddr, local_prefixlen))
+
+        nodeid = NetIDNodeMap.register_node(self.nodeid(), netid)
+        addr = target_network_prefix.addr(nodeid)
+        #self.info('[LOOPBACK] generated addr for node: %s: %s' % (self.name, str(addr)))
         return addr
 
     def makenodedir(self):
