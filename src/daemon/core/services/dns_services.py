@@ -905,11 +905,10 @@ class DNSMasq(DNSServices):
             # this is a two-step process:
             # 1) collect all loopback ip's of this AS
             # 1.1) aggregate found addresses as much as possible -- this is TODO
-            if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
-                    len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
-                    'loopback_net_per_netid' in CONFIGS['ipaddrs']:
-                # loopback_net_per_netid
-                global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
+            if 'ipaddrs' in CONFIGS and 'ipv4_loopback_net' in CONFIGS['ipaddrs'] and \
+                    len(CONFIGS['ipaddrs']['ipv4_loopback_net'].split('/')) == 2 and \
+                    'ipv4_loopback_net_per_netid' in CONFIGS['ipaddrs']:
+                global_loopback_prefix_str = CONFIGS['ipaddrs']['ipv4_loopback_net']
                 global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
                 try:
                     global_prefixlen = int(global_prefixlen)
@@ -917,7 +916,7 @@ class DNSMasq(DNSServices):
                     return None
                 # local means per netid (e.g., AS)
                 try:
-                    local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+                    local_prefixlen = int(CONFIGS['ipaddrs']['ipv4_loopback_net_per_netid'])
                 except ValueError:
                     return None
 
