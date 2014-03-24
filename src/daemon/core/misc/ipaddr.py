@@ -110,6 +110,9 @@ class IPAddr(object):
     def isIPv6(self):
         return self.af == AF_INET6
 
+    def __repr__(self):
+        return '%s/%d' % (self.addr.compressed, self.prefixlen)
+
     def __str__(self):
         return self.addr.compressed
 
@@ -220,10 +223,20 @@ class IPPrefix(object):
         return addr
 
     def minaddr(self):
-        return IPv4Addr(self.prefix.network_address + 1)
+        if self.af == AF_INET:
+            return IPv4Addr(self.prefix.network_address + 1)
+        elif self.af == AF_INET6:
+            return IPv6Addr(self.prefix.network_address + 1)
+        else:
+            raise ValueError("invalid address family: '%s'" % self.af)
 
     def maxaddr(self):
-        return IPv4Addr(self.prefix.broadcast_address - 1)
+        if self.af == AF_INET:
+            return IPv4Addr(self.prefix.broadcast_address - 1)
+        elif self.af == AF_INET6:
+            return IPv6Addr(self.prefix.broadcast_address - 1)
+        else:
+            raise ValueError("invalid address family: '%s'" % self.af)
 
     def numaddr(self):
         return self.prefix.num_addresses - 2
