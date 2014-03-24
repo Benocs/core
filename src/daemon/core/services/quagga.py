@@ -512,6 +512,8 @@ class Bgp(QuaggaService):
             cfg += "  aggregate-address %s %s summary-only\n" % (str(target_network_baseaddr), target_network_prefix.netmaskstr())
             cfg += "!\n"
 
+        cfg += "!\n"
+
 
         # find any link on which two different netid's (i.e., AS numbers) are
         # present and configure a bgp-session between the two corresponding nodes.
@@ -537,16 +539,50 @@ class Bgp(QuaggaService):
                             for remote_node_addr in net_netif.addrlist:
                                 #local_node_addr = node.getLoopbackIPv4()
                                 #remote_node_addr = net_netif.node.getLoopbackIPv4()
-                                cfg += "  neighbor %s remote-as %s\n" % \
-                                        (str(remote_node_addr.split('/')[0]), str(net_netif.node.netid))
-                                cfg += "  neighbor %s update-source %s\n" % \
-                                        (str(remote_node_addr.split('/')[0]), str(local_node_addr))
+                                if (isIPv4Address(str(local_node_addr.split('/')[0])) and \
+                                        isIPv4Address(str(remote_node_addr.split('/')[0]))) or \
+                                        (isIPv6Address(str(local_node_addr.split('/')[0])) and \
+                                        isIPv6Address(str(remote_node_addr.split('/')[0]))):
+                                    cfg += "  neighbor %s remote-as %s\n" % \
+                                            (str(remote_node_addr.split('/')[0]), str(net_netif.node.netid))
+                                    cfg += "  neighbor %s update-source %s\n" % \
+                                            (str(remote_node_addr.split('/')[0]),
+                                                    str(local_node_addr.split('/')[0]))
 
         # configure IBGP connections
         confstr_list = [cfg]
         service_helpers.nodewalker(node, node, [], confstr_list,
                 cls.nodewalker_callback)
         cfg = ''.join(confstr_list)
+
+        cfg += "  address-family ipv6\n"
+        for localnetif in node.netifs():
+            # do not include control interfaces
+            if hasattr(localnetif, 'control') and localnetif.control == True:
+                continue
+
+            for idx, net_netif in list(localnetif.net._netif.items()):
+                candidate_node = net_netif.node
+
+                # skip our own interface
+                if localnetif == net_netif.node:
+                    continue
+
+                # found two different ASes.
+                if not node.netid == net_netif.node.netid:
+                    if (hasattr(node, 'type') and node.type == "egp_node") and \
+                            (hasattr(net_netif.node, 'type') and \
+                            net_netif.node.type == "egp_node"):
+                        for remote_node_addr in net_netif.addrlist:
+                            if isIPv6Address(remote_node_addr.split('/')[0]):
+                                cfg += "  neighbor %s activate\n" % \
+                                        (str(remote_node_addr.split('/')[0]))
+        # network fc00:3::/32
+        # neighbor fc00::1:9 activate
+        cfg += "  exit-address-family\n"
+
+        cfg += "  ip forwarding\n"
+        cfg += "  ipv6 forwarding\n"
         return cfg
 
     @staticmethod
@@ -687,6 +723,7 @@ class ISIS(QuaggaService):
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
                 cfg += "  ip router isis 1\n"
+                cfg += "  ipv6 router isis 1\n"
                 cfg += "  isis circuit-type level-2-only\n"
                 # TODO: if other side is switch, use "isis network lan"
                 cfg += "  isis network point-to-point\n"
@@ -706,20 +743,29 @@ class ISIS(QuaggaService):
         cfg += "!\n"
 
         cfg += "router isis 1\n"
-        cfg += "  net %s\n" % cls.bearbeiteipstr(cls.routerid(node), str(node.netid))
+        cfg += "  net %s\n" % cls.get_ISIS_ID(cls.routerid(node), str(node.netid))
         cfg += "!\n"
 
         return cfg
 
     @staticmethod
-    def bearbeiteipstr(ipstr, netid):
-        ''' get ip return three middle blocks of isis netid
-        '''
-        #"""
+    def get_ISIS_ID(ipstr, netid):
+        """ calculates and returns an ISIS-ID based on the supplied IP addr """
         # isis-is is 12 characters long
         # it has the format: 49.nnnn.aaaa.bbbb.cccc.00
         # where nnnn == netid (i.e., same on all routers)
         #       abc  == routerid (i.e., unique among all routers)
+
+        #hexip = hex(int(IPv4Addr(ipstr).addr))[2:]
+        #if len(hexip) < 8:
+        #    hexip = '0%s' % hexip
+
+        #netid = str(netid)
+        #isisnetidlist = [ '0' for i in range(4 - len(netid)) ]
+        #isisnetidlist.append(netid)
+        #isisnetid = ''.join(isisnetidlist)
+
+        # 49.1000.
 
         splitted = ''.join(['%03d' % int(e) for e in ipstr.split('.')])
         isisid = '49.1000.%s.%s.%s.00' % (splitted[:4], splitted[4:8], splitted[8:])
