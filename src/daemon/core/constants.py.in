@@ -26,7 +26,8 @@ from os.path import exists, expanduser, join
 CONFIGS = {}
 # since this is the core-daemon, user should always expand to /root/
 home = expanduser('~')
-dotcore = join(home, '.core')
+#dotcore = join(home, '.core')
+dotcore = '/etc/core'
 
 class KeyValueConf():
     @staticmethod
