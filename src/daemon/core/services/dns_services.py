@@ -156,7 +156,7 @@ class Bind9(DNSServices):
             soaitems.append('@ IN SOA %s.%s root.%s.%s' % (nameservers[0], zone, nameservers[0], zone))
         soaitems.append(' (%d %d %d %d %d)\n' % (serial, refresh, retry, expire, negcache))
 
-        soaitems.append('%s\n' % '\n'.join(list(['  IN NS %s' % x[0] for x in auth_nameservers])))
+        soaitems.append('%s\n' % '\n'.join(set(['  IN NS %s' % x[0] for x in auth_nameservers])))
 
         return ''.join(soaitems)
 
@@ -164,7 +164,9 @@ class Bind9(DNSServices):
     def generateDelegationRecord(cls, delegation_servers, zone):
         delegationitems = []
         delegationitems.append('$ORIGIN %s\n' % zone)
-        for server, server_addr in delegation_servers:
+        tmp_servers = [server for server, server_addr in delegation_servers]
+        # add each server once but only once (that's why the set is there)
+        for server in set(tmp_servers):
             delegationitems.append('@ IN NS %s.%s\n' % (server, zone))
 
         for server, server_addr in delegation_servers:
@@ -175,7 +177,7 @@ class Bind9(DNSServices):
                 recordtype = 'AAAA'
             else:
                 raise ValueError
-            delegationitems.append('%s %s %s' % (server, recordtype, server_addr))
+            delegationitems.append('%s %s %s\n' % (server, recordtype, server_addr))
 
         return ''.join(delegationitems)
 
@@ -540,20 +542,21 @@ class Bind9(DNSServices):
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
 
                 server_name = '%s' % (currentnode.name)
-                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-                zone = "."
-                servers.append((server_name, server_addr, zone))
-                zone = "virtual."
-                servers.append((server_name, server_addr, zone))
-                #servers.extend([str(currentnode.getLoopbackIPv4())])
+                for server_addr in list(currentnode._netif.values())[0].addrlist:
+                    server_addr = server_addr.partition('/')[0]
+                    zone = "."
+                    servers.append((server_name, server_addr, zone))
+                    zone = "virtual."
+                    servers.append((server_name, server_addr, zone))
 
         if service_flags.DNSASRootServer in currentnode.services:
             if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 server_name = currentnode.name
-                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
+                for server_addr in list(currentnode._netif.values())[0].addrlist:
+                    server_addr = server_addr.partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -577,12 +580,11 @@ class Bind9(DNSServices):
                 else:
                     netid = 0
 
-                #server_name = '%s.AS%s.virtual.' % (currentnode.name, str(netid))
                 server_name = currentnode.name
-                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
-                #servers.extend([str(currentnode.getLoopbackIPv4())])
+                for server_addr in list(currentnode._netif.values())[0].addrlist:
+                    server_addr = server_addr.partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -603,10 +605,10 @@ class Bind9(DNSServices):
                     netid = 0
 
                 server_name = currentnode.name
-                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
-                #servers.extend([str(currentnode.getLoopbackIPv4())])
+                for server_addr in list(currentnode._netif.values())[0].addrlist:
+                    server_addr = server_addr.partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -629,11 +631,11 @@ class Bind9(DNSServices):
             # add plain hostname
             if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
-                #hosts.extend([str(currentnode.getLoopbackIPv4())])
                 # TODO: switch this addr to loopback as soon as loopback-routing works
                 server_name = currentnode.name
-                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-                hosts.append((server_name, server_addr, zone))
+                for server_addr in list(currentnode._netif.values())[0].addrlist:
+                    server_addr = server_addr.partition('/')[0]
+                    hosts.append((server_name, server_addr, zone))
 
             # add all interface names
             for intf in list(currentnode._netif.values()):
@@ -652,41 +654,6 @@ class Bind9(DNSServices):
                     hosts.append((server_name, v4addr, zone))
                 if not v6addr is None:
                     hosts.append((server_name, v6addr, zone))
-
-        return hosts
-
-    @staticmethod
-    def nodewalker_root_dns_find_all_nodes_callback(startnode, currentnode):
-        """ add any host to hostlist and return it """
-        hosts = []
-        # element in hosts: tuple(server-fqdn, server-ipaddr, zone that host lives in)
-
-        # add plain hostname
-        #if len(currentnode._netif.values()) > 0 and \
-        #        len(list(currentnode._netif.values())[0].addrlist) > 0:
-        #    #hosts.extend([str(currentnode.getLoopbackIPv4())])
-        #    # TODO: switch this addr to loopback as soon as loopback-routing works
-        #    server_name = currentnode.name
-        #    server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
-        #    hosts.append((server_name, server_addr, zone))
-
-        # add all interface names
-        for intf in list(currentnode._netif.values()):
-            server_name = '%s.%s' % (intf.name, currentnode.name)
-            # use first v4 and first v6 address of this interface
-            v4addr = None
-            v6addr = None
-            for addr in intf.addrlist:
-                addr = addr.partition('/')[0]
-                if v4addr is None and isIPv4Address(addr):
-                    v4addr = addr
-                #if v6addr is None and isIPv6Address(addr):
-                #    v6addr = addr
-
-            if not v4addr is None:
-                hosts.append((server_name, v4addr, zone))
-            #if not v6addr is None:
-            #    hosts.append((server_name, v6addr, zone))
 
         return hosts
 
@@ -716,9 +683,6 @@ class Bind9ForwarderAndServer(Bind9):
         elif service_flags.DNSRootServer in node.services:
             cls.cfg_add_item(cfgitems, 'zone "."', 'type master;')
             cls.cfg_add_item(cfgitems, 'zone "."', 'file "/etc/bind/db.root";')
-        #else:
-        #    cls.cfg_add_item(cfgitems, 'zone "."', 'type hint;')
-        #    cls.cfg_add_item(cfgitems, 'zone "."', 'file "/etc/bind/db.root";')
 
         return cls.compile_named_conf(cls, cfgitems)
 
