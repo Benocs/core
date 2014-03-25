@@ -1056,13 +1056,56 @@ class DNSResolvconf(DNSServices):
             confstr_list.append('nameserver 127.0.0.1\n')
         else:
             # add any dns server which is on our AS to the list of resolvers
-            service_helpers.nodewalker(node, node, [], confstr_list, cls.nodewalker_callback)
+            list_len = len(confstr_list)
+            service_helpers.nodewalker(node, node, [], confstr_list,
+                    cls.nodewalker_Resolver_only_callback)
+
+            # if no resolvers could be found, also include authoritative AS dns
+            if list_len == len(confstr_list):
+                list_len = len(confstr_list)
+                service_helpers.nodewalker(node, node, [], confstr_list,
+                        cls.nodewalker_Resolver_and_ASAuth_only_callback)
+                # if no resolvers could be found, also include authoritative AS and root dns
+                if list_len == len(confstr_list):
+                    service_helpers.nodewalker(node, node, [], confstr_list,
+                            cls.nodewalker_all_DNS_Resolver_callback)
         confstr_list.append('search virtual\ndomain virtual\n')
 
         return ''.join(confstr_list)
 
     @staticmethod
-    def nodewalker_callback(startnode, currentnode):
+    def nodewalker_Resolver_only_callback(startnode, currentnode):
+        cfgitems = []
+        # check if remote node is a dns server within our AS
+        if service_flags.DNSResolver in currentnode.services and \
+                not service_flags.DNSRootServer in currentnode.services and \
+                not service_flags.DNSASRootServer in currentnode.services and \
+                startnode.netid == currentnode.netid:
+            if len(list(currentnode._netif.values())) > 0 and \
+                    len(list(currentnode._netif.values())[0].addrlist) > 0:
+                cfgitems = ['nameserver ',
+                        list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
+                        '\n']
+            #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
+        return cfgitems
+
+    @staticmethod
+    def nodewalker_Resolver_and_ASAuth_only_callback(startnode, currentnode):
+        cfgitems = []
+        # check if remote node is a dns server within our AS
+        if service_flags.DNSResolver in currentnode.services and \
+                not service_flags.DNSRootServer in currentnode.services and \
+                startnode.netid == currentnode.netid:
+            if len(list(currentnode._netif.values())) > 0 and \
+                    len(list(currentnode._netif.values())[0].addrlist) > 0:
+                cfgitems = ['nameserver ',
+                        list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
+                        '\n']
+            #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
+        return cfgitems
+
+    @staticmethod
+    def nodewalker_all_DNS_Resolver_callback(startnode, currentnode):
         cfgitems = []
         # check if remote node is a dns server within our AS
         if service_flags.DNSResolver in currentnode.services and \
