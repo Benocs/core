@@ -91,7 +91,8 @@ fi
 
 start() {
 	msg "Starting core-daemon"
-	$daemon $cored -d
+    > /var/log/core-daemon.log
+	$daemon $cored -d -v -g
 	RETVAL=$?
 	endmsg
 	return $RETVAL
