@@ -22,8 +22,6 @@ import os
 from core.service import CoreService, addservice
 from core.misc.utils import *
 
-from core.services import utility
-
 class ServiceFlag(CoreService):
     _name = "serviceFlag"
     _group = "Service Flags"
