@@ -161,7 +161,27 @@ class Bind9(DNSServices):
         return ''.join(soaitems)
 
     @staticmethod
-    def generateDBAuthoritativeFile(cls, node, zone, nodewalker_cb):
+    def generateDelegationRecord(cls, delegation_servers, zone):
+        delegationitems = []
+        delegationitems.append('$ORIGIN %s\n' % zone)
+        for server, server_addr in delegation_servers:
+            delegationitems.append('@ IN NS %s.%s\n' % (server, zone))
+
+        for server, server_addr in delegation_servers:
+            recordtype = ''
+            if isIPv4Address(server_addr):
+                recordtype = 'A'
+            elif isIPv6Address(server_addr):
+                recordtype = 'AAAA'
+            else:
+                raise ValueError
+            delegationitems.append('%s %s %s' % (server, recordtype, server_addr))
+
+        return ''.join(delegationitems)
+
+    @staticmethod
+    def generateDBAuthoritativeFile(cls, node, zone, nodewalker_cb,
+            delegation_servers_cb=None):
         # add any authoritative dns server to the list of resolvers for that AS,
         # if we are not an authoritative dns server for the same AS
         servers = []
@@ -170,6 +190,7 @@ class Bind9(DNSServices):
         # servers managing virtual zone
         virtualservers = []
         for servername, ipaddr, server_zone in servers:
+            print(('[DEBUG] candidate: server: %s, zone: %s' % (servername, server_zone)))
             if server_zone == zone:
                 print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
                 virtualservers.append((servername, ipaddr))
@@ -177,10 +198,25 @@ class Bind9(DNSServices):
         rawzonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in virtualservers]))[0]
         SOAHeader = cls.generateSOAHeader(cls, virtualservers, zone)
         zonecontents = '%s\n%s' % (SOAHeader, rawzonecontents)
+
+        if not delegation_servers_cb is None:
+            delegation_servers = []
+            service_helpers.nodewalker(node, node, [], delegation_servers,
+                    delegation_servers_cb)
+            delegation_servers_map = {}
+            for servername, addr, server_zone in delegation_servers:
+                if not server_zone in delegation_servers_map:
+                    delegation_servers_map[server_zone] = []
+                delegation_servers_map[server_zone].append((servername, addr))
+            delegation_records = []
+            for server_zone, servers in delegation_servers_map.items():
+                delegation_records.append(cls.generateDelegationRecord(cls, servers, server_zone))
+
+            zonecontents = '%s\n%s' % (zonecontents, '\n\n'.join(delegation_records))
+
         print(("zone: %s: %s" % (zone, zonecontents)))
 
         ## TODO: handle the case when two tuples exit with both the same zone
-
         if len(servers) > 0:
             # rename root-zone from '.' to 'root'
             if zone == '.':
@@ -523,9 +559,7 @@ class Bind9(DNSServices):
 
     @staticmethod
     def nodewalker_root_dns_find_auth_servers_callback(startnode, currentnode):
-        """ add any dns root server to the list of resolvers and
-            add any auth-zone server to the list of that zone-resolvers
-        """
+        """ add any auth-zone server to the list of that zone-resolvers """
         servers = []
         # element in servers: tuple(server-fqdn, server-ipaddr, zone that server handles)
 
@@ -544,6 +578,30 @@ class Bind9(DNSServices):
                     netid = 0
 
                 #server_name = '%s.AS%s.virtual.' % (currentnode.name, str(netid))
+                server_name = currentnode.name
+                server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
+                zone = "AS%s.virtual." % str(netid)
+                servers.append((server_name, server_addr, zone))
+                #servers.extend([str(currentnode.getLoopbackIPv4())])
+
+        return servers
+
+    @staticmethod
+    def nodewalker_root_dns_find_all_auth_servers_callback(startnode, currentnode):
+        """ add any auth-zone server to the list of that zone-resolvers """
+        servers = []
+        # element in servers: tuple(server-fqdn, server-ipaddr, zone that server handles)
+
+        # check if remote node is an authoritative dns server for an AS
+        if service_flags.DNSASRootServer in currentnode.services:
+            if len(list(currentnode._netif.values())) > 0 and \
+                    len(list(currentnode._netif.values())[0].addrlist) > 0:
+
+                if hasattr(currentnode, 'netid') and not currentnode.netid is None:
+                    netid = currentnode.netid
+                else:
+                    netid = 0
+
                 server_name = currentnode.name
                 server_addr = list(currentnode._netif.values())[0].addrlist[0].partition('/')[0]
                 zone = "AS%s.virtual." % str(netid)
@@ -684,14 +742,14 @@ class Bind9ForwarderAndServer(Bind9):
                     cls.nodewalker_find_root_dns_callback)
             # create virtual. zone db
             cls.generateDBAuthoritativeFile(cls, node, 'virtual.',
-                    cls.nodewalker_find_root_dns_callback)
+                    cls.nodewalker_find_root_dns_callback,
+                    cls.nodewalker_root_dns_find_all_auth_servers_callback)
         else:
             # create root zone db with hints
             cls.generateDBClientFile(cls, node, '.',
                     cls.nodewalker_find_root_dns_callback)
 
-        if service_flags.DNSRootServer in node.services or \
-                service_flags.DNSASRootServer in node.services:
+        if service_flags.DNSASRootServer in node.services:
             zone = 'AS%s.virtual.' % str(netid)
             # strip '.' at end
             zonefname = zone.rstrip('.')
@@ -702,13 +760,6 @@ class Bind9ForwarderAndServer(Bind9):
             cls.cfg_add_item(cfgitems, 'zone "%s"' % zone, 'file "/etc/bind/db.%s";' % zonefname)
             cls.generateDBAuthoritativeFile(cls, node, zone,
                     cls.nodewalker_root_dns_find_auth_servers_callback)
-
-            ## and add AS zones to root nameservers as delegates (hint)
-            #elif service_flags.DNSRootServer in node.services:
-            #    cls.cfg_add_item(cfgitems, 'zone "%s"' % zone, 'type hint;')
-            #    cls.cfg_add_item(cfgitems, 'zone "%s"' % zone, 'file "/etc/bind/db.%s";' % zonefname)
-            #    cls.generateDBClientFile(cls, node, zone,
-            #            cls.nodewalker_root_dns_find_auth_servers_callback)
 
             # add reverse lookup PTR records TODO: v6 .in-addr.arpa.
             #if service_flags.DNSRootServer in node.services:
