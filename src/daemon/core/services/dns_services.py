@@ -127,8 +127,8 @@ class Bind9(DNSServices):
             ttl = 900, refresh = 900, retry = 450,
             expire = 3600000, negcache = 900):
 
-        print(('generating SOA header for zone: %s, served by: %s' % (str(zone),
-                str(auth_nameservers))))
+        #print(('generating SOA header for zone: %s, served by: %s' % (str(zone),
+        #        str(auth_nameservers))))
 
         if not isinstance(auth_nameservers, list) or \
                 len(auth_nameservers) == 0 or \
@@ -182,23 +182,40 @@ class Bind9(DNSServices):
         return ''.join(delegationitems)
 
     @staticmethod
-    def generateDBAuthoritativeFile(cls, node, zone, nodewalker_cb,
-            delegation_servers_cb=None):
+    def getServers(cls, node, zone, nodewalker_cb):
         # add any authoritative dns server to the list of resolvers for that AS,
         # if we are not an authoritative dns server for the same AS
         servers = []
         service_helpers.nodewalker(node, node, [], servers, nodewalker_cb)
 
         # servers managing virtual zone
-        virtualservers = []
+        zone_servers = []
         for servername, ipaddr, server_zone in servers:
-            print(('[DEBUG] candidate: server: %s, zone: %s' % (servername, server_zone)))
+            #print(('[DEBUG] candidate: server: %s, zone: %s' % (servername, server_zone)))
             if server_zone == zone:
-                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
-                virtualservers.append((servername, ipaddr))
+                #print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
+                zone_servers.append((servername, ipaddr))
+        return servers, zone_servers
 
-        rawzonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in virtualservers]))[0]
-        SOAHeader = cls.generateSOAHeader(cls, virtualservers, zone)
+    @staticmethod
+    def writeZoneFile(cls, node, zone, zonecontents):
+        #print(("zone: %s: %s" % (zone, zonecontent)))
+        ## TODO: handle the case when two tuples exit with both the same zone
+        # rename root-zone from '.' to 'root'
+        if zone == '.':
+            zone = 'root'
+        # strip '.' at end
+        zone = zone.rstrip('.')
+        # and write result
+        node.nodefile('/etc/bind/db.%s' % zone, zonecontents)
+
+    @staticmethod
+    def generateDBAuthoritativeFile(cls, node, zone, nodewalker_cb,
+            delegation_servers_cb=None):
+        servers, zone_servers = cls.getServers(cls, node, zone, nodewalker_cb)
+
+        rawzonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in zone_servers]))[0]
+        SOAHeader = cls.generateSOAHeader(cls, zone_servers, zone)
         zonecontents = '%s\n%s' % (SOAHeader, rawzonecontents)
 
         if not delegation_servers_cb is None:
@@ -216,74 +233,22 @@ class Bind9(DNSServices):
 
             zonecontents = '%s\n%s' % (zonecontents, '\n\n'.join(delegation_records))
 
-        print(("zone: %s: %s" % (zone, zonecontents)))
-
-        ## TODO: handle the case when two tuples exit with both the same zone
         if len(servers) > 0:
-            # rename root-zone from '.' to 'root'
-            if zone == '.':
-                zone = 'root'
-            # strip '.' at end
-            zone = zone.rstrip('.')
-            # and write result
-            node.nodefile('/etc/bind/db.%s' % zone, zonecontents)
+            cls.writeZoneFile(cls, node, zone, zonecontents)
 
     @staticmethod
     def generateDBClientFile(cls, node, zone, nodewalker_cb):
-        # add any authoritative dns server to the list of resolvers for that AS,
-        # if we are not an authoritative dns server for the same AS
-        servers = []
-        service_helpers.nodewalker(node, node, [], servers, nodewalker_cb)
-
-        # servers managing virtual zone
-        virtualservers = []
-        for servername, ipaddr, server_zone in servers:
-            if server_zone == zone:
-                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
-                virtualservers.append((servername, ipaddr))
-
-        zonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in virtualservers]))[0]
-        print(("zone: %s: %s" % (zone, zonecontents)))
-
-        ## TODO: handle the case when two tuples exit with both the same zone
-
+        servers, zone_servers = cls.getServers(cls, node, zone, nodewalker_cb)
+        zonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in zone_servers]))[0]
         if len(servers) > 0:
-            # rename root-zone from '.' to 'root'
-            if zone == '.':
-                zone = 'root'
-            # strip '.' at end
-            zone = zone.rstrip('.')
-            # and write result
-            node.nodefile('/etc/bind/db.%s' % zone, zonecontents)
+            cls.writeZoneFile(cls, node, zone, zonecontents)
 
     @staticmethod
     def generateZoneContent(cls, node, zone, nodewalker_cb):
-        # add any authoritative dns server to the list of resolvers for that AS,
-        # if we are not an authoritative dns server for the same AS
-        servers = []
-        service_helpers.nodewalker(node, node, [], servers, nodewalker_cb)
-
-        # servers managing virtual zone
-        virtualservers = []
-        for servername, ipaddr, server_zone in servers:
-            if server_zone == zone:
-                print(('adding to zone: "%s" server: "%s"' % (server_zone, servername)))
-                virtualservers.append((servername, ipaddr))
-
-        zonecontent = cls.compileZoneFile(cls, [], list([(x[0], x[1], zone) for x in virtualservers]))[1]
-        print(("zone: %s: %s" % (zone, zonecontent)))
-
-        ## TODO: handle the case when two tuples exit with both the same zone
-
+        servers, zone_servers = cls.getServers(cls, node, zone, nodewalker_cb)
+        zonecontents = cls.compileZoneFile(cls, [], list([(x[0], x[1], zone) for x in zone_servers]))[1]
         if len(servers) > 0:
-            # rename root-zone from '.' to 'root'
-            if zone == '.':
-                zone = 'root'
-            # strip '.' at end
-            zone = zone.rstrip('.')
-            # and write result
-            with node.opennodefile('/etc/bind/db.%s' % zone, mode = 'a') as f:
-                f.write(zonecontent)
+            cls.writeZoneFile(cls, node, zone, zonecontents)
 
     @staticmethod
     def generatePTRAuthoritativeFile(cls, node, zone, nodewalker_cb):
