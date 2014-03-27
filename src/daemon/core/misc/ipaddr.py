@@ -35,6 +35,8 @@ import random
 
 import ipaddress
 
+from core.constants import *
+
 AF_INET = socket.AF_INET
 AF_INET6 = socket.AF_INET6
 
@@ -299,3 +301,164 @@ class NetIDNodeMap():
 
         return NetIDNodeMap.mapping[netid][nodeid]
 
+class Interface():
+    @staticmethod
+    def cfg_sanitation_checks(ipversion=4):
+        interface_net = 'ipv%d_interface_net' % ipversion
+        interface_net_per_netid = 'ipv%d_interface_net_per_netid' % ipversion
+        interface_net_per_ptp_link = 'ipv%d_interface_net_per_ptp_link' % \
+                ipversion
+        interface_net_per_brdcst_link = 'ipv%d_interface_net_per_brdcst_link' %\
+                ipversion
+
+        if not 'ipaddrs' in CONFIGS or \
+                not interface_net in CONFIGS['ipaddrs'] or \
+                not len(CONFIGS['ipaddrs'][interface_net].split('/')) == 2 or \
+                not interface_net_per_netid in CONFIGS['ipaddrs'] or \
+                not interface_net_per_ptp_link in CONFIGS['ipaddrs'] or \
+                not interface_net_per_brdcst_link in CONFIGS['ipaddrs']:
+            raise ValueError('Could not read ipaddrs.conf')
+
+    @staticmethod
+    def getInterfaceNet(ipversion=4):
+        Interface.cfg_sanitation_checks(ipversion=ipversion)
+
+        interface_net = 'ipv%d_interface_net' % ipversion
+        interface_net_per_netid = 'ipv%d_interface_net_per_netid' % ipversion
+
+        if ipversion == 4:
+            ipprefix_cls = IPv4Prefix
+        elif ipversion == 6:
+            ipprefix_cls = IPv6Prefix
+        else:
+            raise ValueError('IP version is neither 4 nor 6: %s' % str(ipversion))
+
+        global_interface_prefix_str = CONFIGS['ipaddrs'][interface_net]
+        global_prefixbase, global_prefixlen = global_interface_prefix_str.split('/')
+        try:
+            global_prefixlen = int(global_prefixlen)
+        except ValueError:
+            raise ValueError('Could not parse %s from ipaddrs.conf' % interface_net)
+
+        global_interface_prefix = ipprefix_cls(global_interface_prefix_str)
+        return global_interface_prefix
+
+    @staticmethod
+    def getInterfaceNet_per_net(netid, ipversion=4):
+        Interface.cfg_sanitation_checks(ipversion=ipversion)
+
+        interface_net = 'ipv%d_interface_net' % ipversion
+        interface_net_per_netid = 'ipv%d_interface_net_per_netid' % ipversion
+
+        if ipversion == 4:
+            ipprefix_cls = IPv4Prefix
+        elif ipversion == 6:
+            ipprefix_cls = IPv6Prefix
+        else:
+            raise ValueError('IP version is neither 4 nor 6: %s' % str(ipversion))
+
+        # local means per netid (e.g., AS)
+        try:
+            local_prefixlen = int(CONFIGS['ipaddrs'][interface_net_per_netid])
+        except ValueError:
+            raise ValueError('Could not parse %s from ipaddrs.conf' % interface_net_per_netid)
+
+        global_interface_prefix = Interface.getInterfaceNet(ipversion)
+        global_prefixbase, global_prefixlen = str(global_interface_prefix).split('/')
+
+        baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
+        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
+        return target_network_prefix
+
+class Loopback():
+    @staticmethod
+    def cfg_sanitation_checks(ipversion=4):
+        loopback_net = 'ipv%d_loopback_net' % ipversion
+        loopback_net_per_netid = 'ipv%d_loopback_net_per_netid' % ipversion
+
+        if not 'ipaddrs' in CONFIGS or \
+                not loopback_net in CONFIGS['ipaddrs'] or \
+                not len(CONFIGS['ipaddrs'][loopback_net].split('/')) == 2 or \
+                not loopback_net_per_netid in CONFIGS['ipaddrs']:
+            raise ValueError('Could not read ipaddrs.conf')
+
+    @staticmethod
+    def getLoopbackNet(ipversion=4):
+        Loopback.cfg_sanitation_checks(ipversion=ipversion)
+
+        loopback_net = 'ipv%d_loopback_net' % ipversion
+        loopback_net_per_netid = 'ipv%d_loopback_net_per_netid' % ipversion
+
+        if ipversion == 4:
+            ipprefix_cls = IPv4Prefix
+        elif ipversion == 6:
+            ipprefix_cls = IPv6Prefix
+        else:
+            raise ValueError('IP version is neither 4 nor 6: %s' % str(ipversion))
+
+        global_loopback_prefix_str = CONFIGS['ipaddrs'][loopback_net]
+        global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
+        try:
+            global_prefixlen = int(global_prefixlen)
+        except ValueError:
+            raise ValueError('Could not parse %s from ipaddrs.conf' % loopback_net)
+
+        global_loopback_prefix = ipprefix_cls(global_loopback_prefix_str)
+        return global_loopback_prefix
+
+    @staticmethod
+    def getLoopbackNet_per_net(netid, ipversion=4):
+        Loopback.cfg_sanitation_checks(ipversion=ipversion)
+
+        loopback_net = 'ipv%d_loopback_net' % ipversion
+        loopback_net_per_netid = 'ipv%d_loopback_net_per_netid' % ipversion
+
+        if ipversion == 4:
+            ipprefix_cls = IPv4Prefix
+        elif ipversion == 6:
+            ipprefix_cls = IPv6Prefix
+        else:
+            raise ValueError('IP version is neither 4 nor 6: %s' % str(ipversion))
+
+        # local means per netid (e.g., AS)
+        try:
+            local_prefixlen = int(CONFIGS['ipaddrs'][loopback_net_per_netid])
+        except ValueError:
+            raise ValueError('Could not parse %s from ipaddrs.conf' % loopback_net_per_netid)
+
+        global_loopback_prefix = Loopback.getLoopbackNet(ipversion)
+        global_prefixbase, global_prefixlen = str(global_loopback_prefix).split('/')
+
+        baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
+        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
+        return target_network_prefix
+
+    @staticmethod
+    def getLoopback(node, ipversion=4):
+        Loopback.cfg_sanitation_checks(ipversion=ipversion)
+
+        if hasattr(node, 'netid') and not node.netid is None:
+            netid = node.netid
+        else:
+            # TODO: netid 0 is invalid - instead use first unused ASN
+            node.warn('[LOOPBACK] no ASN found. falling back to default (0)')
+            netid = 0
+        #node.info('[LOOPBACK] ASN: %d' % netid)
+
+        target_network_prefix =  Loopback.getLoopbackNet_per_net(netid, ipversion)
+
+        nodeid = NetIDNodeMap.register_node(node.nodeid(), netid)
+        addr = target_network_prefix.addr(nodeid)
+        node.info('[LOOPBACK] generated addr for node: %s: %s' % (node.name, str(addr)))
+
+        return addr
+
+    @staticmethod
+    def getLoopbackIPv4(node):
+        return Loopback.getLoopback(node, ipversion=4)
+
+    @staticmethod
+    def getLoopbackIPv6(node):
+        return Loopback.getLoopback(node, ipversion=6)
