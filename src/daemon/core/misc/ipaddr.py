@@ -367,7 +367,7 @@ class Interface():
         global_prefixbase, global_prefixlen = str(global_interface_prefix).split('/')
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
-        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_baseaddr = baseprefix.minaddr() + ((netid - 1) * (baseprefix.numaddr() + 2))
         target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
         return target_network_prefix
 
@@ -445,13 +445,12 @@ class Loopback():
             # TODO: netid 0 is invalid - instead use first unused ASN
             node.warn('[LOOPBACK] no ASN found. falling back to default (0)')
             netid = 0
-        #node.info('[LOOPBACK] ASN: %d' % netid)
 
         target_network_prefix =  Loopback.getLoopbackNet_per_net(netid, ipversion)
 
         nodeid = NetIDNodeMap.register_node(node.nodeid(), netid)
         addr = target_network_prefix.addr(nodeid)
-        node.info('[LOOPBACK] generated addr for node: %s: %s' % (node.name, str(addr)))
+        #node.info('[LOOPBACK] generated addr for node: %s: %s' % (node.name, str(addr)))
 
         return addr
 
