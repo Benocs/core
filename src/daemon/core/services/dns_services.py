@@ -459,6 +459,7 @@ class Bind9(DNSServices):
         print(('[DEBUG] deployed ASN\'s: %s' % asns))
         for net in loopback_net, interface_net:
             zonename = cls.getPTRZoneNameFromPrefix(cls, net)
+            net_prefixlen = net.prefixlen
             print(('[DEBUG] zonename: %s' % zonename))
 
             ORIGINHeader = '$ORIGIN %s\n' % zonename
@@ -517,8 +518,8 @@ class Bind9(DNSServices):
                                 asn_addr > asn_net.maxaddr():
                             continue
 
-                        # set prefix length. just to be sure
-                        asn_addr.set_prefixlen(asn_net.prefixlen)
+                        # set prefix length of the supernet
+                        asn_addr.set_prefixlen(net_prefixlen)
                         asn_ptr_name = cls.getPTR_CNAME_FromAddr_IPv4(cls, asn_addr)
 
                         #print(('[DEBUG] deployed ASN network (IPv%d): %s' %
