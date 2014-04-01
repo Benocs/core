@@ -396,173 +396,114 @@ class Bind9(DNSServices):
 
         zonenames = []
 
-        ipversion = 4
         SOAHeader = cls.generateSOAHeader(cls, rootservers, '.')
         print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
 
-        # collect loopback address space
-        loopback_net = Loopback.getLoopbackNet(ipversion)
-        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
+        for ipversion in 4, 6:
+            # collect loopback address space
+            loopback_net = Loopback.getLoopbackNet(ipversion)
+            print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
 
-        # collect interface address space
-        interface_net = Interface.getInterfaceNet(ipversion)
-        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
+            # collect interface address space
+            interface_net = Interface.getInterfaceNet(ipversion)
+            print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
 
-        # get all deployed ASN's
-        asns = list(NetIDNodeMap.mapping.keys())
-        print(('[DEBUG] deployed ASN\'s: %s' % asns))
-        for net in loopback_net, interface_net:
-            zonename = cls.getPTRZoneNameFromPrefix(cls, net)
-            net_prefixlen = net.prefixlen
-            print(('[DEBUG] zonename: %s' % zonename))
+            # get all deployed ASN's
+            asns = list(NetIDNodeMap.mapping.keys())
+            print(('[DEBUG] deployed ASN\'s: %s' % asns))
+            for net in loopback_net, interface_net:
+                zonename = cls.getPTRZoneNameFromPrefix(cls, net)
+                net_prefixlen = net.prefixlen
+                print(('[DEBUG] zonename: %s' % zonename))
 
-            ORIGINHeader = '$ORIGIN %s\n' % zonename
-            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
+                ORIGINHeader = '$ORIGIN %s\n' % zonename
+                print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
 
-            zoneentries = []
-            for asn in asns:
-                # get AS address space
-                if net == loopback_net:
-                    asn_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
-                elif net == interface_net:
-                    asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
+                zoneentries = []
+                for asn in asns:
+                    # get AS address space
+                    if net == loopback_net:
+                        asn_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
+                    elif net == interface_net:
+                        asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
 
-                # find authoritative AS dns servers
-                # zone == "AS%s.virtual." % str(netid)
-                for server_name, server_addr, zone in as_auth_servers:
-                    server_asn = zone.lstrip('AS')
-                    server_asn = int(server_asn[:server_asn.find('.')])
+                    # find authoritative AS dns servers
+                    # zone == "AS%s.virtual." % str(netid)
+                    for server_name, server_addr, zone in as_auth_servers:
+                        server_asn = zone.lstrip('AS')
+                        server_asn = int(server_asn[:server_asn.find('.')])
 
-                    # not the correct asn
-                    if not asn == server_asn:
-                        continue
-
-                    # not our IP version
-                    if ipversion == 4 and not isIPv4Address(server_addr):
-                        continue
-                    #if ipversion == 6:
-                    #    # and not isIPv6Address(server_addr):
-                    #    continue
-
-                    print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
-                            (server_name, server_addr, zone)))
-
-                    # get host list of this AS
-                    # TODO: iterating over all nodes for each AS for interface and
-                    # loopback address space is expensive. and we are only talking
-                    # about IPv4 at the moment. is there a better way of doing this?
-                    hosts = []
-                    # TODO: tmp. setting another netid of a node is a dirty hack
-                    tmpnetid = node.netid
-                    node.netid = server_asn
-                    service_helpers.nodewalker(node, node, [], hosts,
-                            cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
-                    node.netid = tmpnetid
-                    for hostname, asn_addr, zone in hosts:
-                        if not isIPv4Address(asn_addr):
+                        # not the correct asn
+                        if not asn == server_asn:
                             continue
 
-                        asn_addr = IPv4Addr(asn_addr)
-
-                        print(('[DEBUG] asn_addr(%s) in asn_net(%s)' %
-                                (str(asn_addr), str(asn_net))))
-
-                        if asn_addr < asn_net.minaddr() or \
-                                asn_addr > asn_net.maxaddr():
+                        # not our IP version
+                        if ipversion == 4 and not isIPv4Address(server_addr):
+                            continue
+                        if ipversion == 6 and not isIPv6Address(server_addr):
                             continue
 
-                        # set prefix length of the supernet
-                        asn_addr.set_prefixlen(net_prefixlen)
-                        asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
+                        print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
+                                (server_name, server_addr, zone)))
 
-                        #print(('[DEBUG] deployed ASN network (IPv%d): %s' %
-                        #        (ipversion, str(asn_net))))
-                        print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
-                                (ipversion, str(asn_addr))))
+                        if ipversion == 4:
+                            # get host list of this AS
+                            # TODO: iterating over all nodes for each AS for interface and
+                            # loopback address space is expensive. and we are only talking
+                            # about IPv4 at the moment. is there a better way of doing this?
+                            hosts = []
+                            # TODO: tmp. setting another netid of a node is a dirty hack
+                            tmpnetid = node.netid
+                            node.netid = server_asn
+                            service_helpers.nodewalker(node, node, [], hosts,
+                                    cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
+                            node.netid = tmpnetid
+                            for hostname, asn_addr, zone in hosts:
+                                if not isIPv4Address(asn_addr):
+                                    continue
 
-                        print(('[DEBUG] adding: "%s IN NS %s"' %
-                                (asn_ptr_name, server_name)))
-                        zoneentries.append(('%s IN NS %s' %
-                                (asn_ptr_name, server_name)))
+                                asn_addr = IPv4Addr(asn_addr)
 
-            print(('[DEBUG] subnet name servers: %s' % (zoneentries)))
+                                print(('[DEBUG] asn_addr(%s) in asn_net(%s)' %
+                                        (str(asn_addr), str(asn_net))))
 
-            zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
-                    '\n'.join(zoneentries))
-            cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding ptrzone to zonenames: %s' % zonename))
-            zonenames.append(zonename)
+                                if asn_addr < asn_net.minaddr() or \
+                                        asn_addr > asn_net.maxaddr():
+                                    continue
 
-        # next is IPv6
-        ipversion = 6
-        SOAHeader = cls.generateSOAHeader(cls, rootservers, '.')
-        print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
+                                # set prefix length of the supernet
+                                asn_addr.set_prefixlen(net_prefixlen)
+                                asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
 
-        # collect loopback address space
-        loopback_net = Loopback.getLoopbackNet(ipversion)
-        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
+                                #print(('[DEBUG] deployed ASN network (IPv%d): %s' %
+                                #        (ipversion, str(asn_net))))
+                                print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
+                                        (ipversion, str(asn_addr))))
 
-        # collect interface address space
-        interface_net = Interface.getInterfaceNet(ipversion)
-        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
+                                print(('[DEBUG] adding: "%s IN NS %s"' %
+                                        (asn_ptr_name, server_name)))
+                                zoneentries.append(('%s IN NS %s' %
+                                        (asn_ptr_name, server_name)))
+                        elif ipversion == 6:
+                            asn_ptr_name = cls.getPTRZoneNameFromPrefix(cls, asn_net)
+                            print(('[DEBUG] adding: "%s IN NS %s"' %
+                                    (asn_ptr_name, server_name)))
+                            zoneentries.append(('%s IN NS %s' %
+                                    (asn_ptr_name, server_name)))
 
-        # get all deployed ASN's
-        asns = list(NetIDNodeMap.mapping.keys())
-        print(('[DEBUG] deployed ASN\'s: %s' % asns))
-        for net in loopback_net, interface_net:
-            zonename = cls.getPTRZoneNameFromPrefix(cls, net)
-            net_prefixlen = net.prefixlen
-            print(('[DEBUG] zonename: %s' % zonename))
+                print(('[DEBUG] subnet name servers: %s' % (zoneentries)))
 
-            ORIGINHeader = '$ORIGIN %s\n' % zonename
-            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
-
-            zoneentries = []
-            for asn in asns:
-                # get AS address space
-                if net == loopback_net:
-                    asn_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
-                elif net == interface_net:
-                    asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
-
-                # find authoritative AS dns servers
-                # zone = "AS%s.virtual." % str(netid)
-                for server_name, server_addr, zone in as_auth_servers:
-                    server_asn = zone.lstrip('AS')
-                    server_asn = int(server_asn[:server_asn.find('.')])
-
-                    # not the correct asn
-                    if not asn == server_asn:
-                        continue
-
-                    # not our IP version
-                    #if ipversion == 4 and not isIPv4Address(server_addr):
-                    if not isIPv6Address(server_addr):
-                        continue
-
-                    print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
-                            (server_name, server_addr, zone)))
-                    asn_ptr_name = cls.getPTRZoneNameFromPrefix(cls, asn_net)
-                    print(('[DEBUG] adding: "%s IN NS %s"' %
-                            (asn_ptr_name, server_name)))
-                    zoneentries.append(('%s IN NS %s' %
-                            (asn_ptr_name, server_name)))
-
-            print(('[DEBUG] subnet name servers: %s' % (zoneentries)))
-
-            zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
-                    '\n'.join(zoneentries))
-            cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding ptrzone to zonenames: %s' % zonename))
-            zonenames.append(zonename)
+                zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
+                        '\n'.join(zoneentries))
+                cls.writeZoneFile(cls, node, zonename, zonecontents)
+                print(('[DEBUG] adding ptrzone to zonenames: %s' % zonename))
+                zonenames.append(zonename)
 
         return zonenames
 
     @staticmethod
     def getAndGeneratePTRZonesASAuthServer(cls, node):
         """ returns a list of all reverse zones a root dns server serves """
-        #print(('[DEBUG] '))
-
         # find dns as authoritative servers
         # (server_name, server_addr, zone)
         as_auth_servers = []
@@ -581,141 +522,90 @@ class Bind9(DNSServices):
             netid = 0
         asn = netid
 
-        ipversion = 4
-        # collect loopback address space
-        loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
-        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
+        for ipversion in 4, 6:
+            # collect loopback address space
+            loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
+            print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
 
-        # collect interface address space
-        interface_net = Interface.getInterfaceNet_per_net(netid, ipversion)
-        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
+            # collect interface address space
+            interface_net = Interface.getInterfaceNet_per_net(netid, ipversion)
+            print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
 
-        auth_servers = [(server_name, server_addr) \
-                for server_name, server_addr, zone in as_auth_servers \
-                if zone == "AS%s.virtual." % str(netid) and \
-                isIPv4Address(server_addr)]
+            if ipversion == 4:
+                auth_servers = [(server_name, server_addr) \
+                        for server_name, server_addr, zone in as_auth_servers \
+                        if zone == "AS%s.virtual." % str(netid) and \
+                        isIPv4Address(server_addr)]
+            elif ipversion == 6:
+                auth_servers = [(server_name, server_addr) \
+                        for server_name, server_addr, zone in as_auth_servers \
+                        if zone == "AS%s.virtual." % str(netid) and \
+                        isIPv6Address(server_addr)]
+            else:
+                raise ValueError
 
-        for asn_net in loopback_net, interface_net:
-            zonename = cls.getPTRZoneNameFromPrefix(cls, asn_net)
-            print(('[DEBUG] zonename: %s' % zonename))
+            for asn_net in loopback_net, interface_net:
+                zonename = cls.getPTRZoneNameFromPrefix(cls, asn_net)
+                print(('[DEBUG] zonename: %s' % zonename))
 
-            ORIGINHeader = '$ORIGIN %s\n' % zonename
-            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
+                ORIGINHeader = '$ORIGIN %s\n' % zonename
+                print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
 
-            SOAHeader = cls.generateSOAHeader(cls, auth_servers, zonename)
-            print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
+                SOAHeader = cls.generateSOAHeader(cls, auth_servers, zonename)
+                print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
 
-            zoneentries = []
+                zoneentries = []
 
-            # get host list of this AS
-            # TODO: iterating over all nodes for interface and
-            # loopback address space is expensive. and we are only talking
-            # about IPv4 at the moment. is there a better way of doing this?
-            hosts = []
-            service_helpers.nodewalker(node, node, [], hosts,
-                    cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
-            for hostname, asn_addr, zone in hosts:
-                if not isIPv4Address(asn_addr):
-                    continue
+                # get host list of this AS
+                # TODO: iterating over all nodes for interface and
+                # loopback address space is expensive. and we are only talking
+                # about IPv4 or IPv6 at the moment.
+                # is there a better way of doing this?
+                hosts = []
+                service_helpers.nodewalker(node, node, [], hosts,
+                        cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
+                for hostname, asn_addr, zone in hosts:
+                    if ipversion == 4 and not isIPv4Address(asn_addr):
+                        continue
+                    if ipversion == 6 and not isIPv6Address(asn_addr):
+                        continue
 
-                asn_addr = IPv4Addr(asn_addr)
+                    if ipversion == 4:
+                        asn_addr = IPv4Addr(asn_addr)
+                    elif ipversion == 6:
+                        asn_addr = IPv6Addr(asn_addr)
+                    else:
+                        raise ValueError
 
-                if asn_addr < asn_net.minaddr() or \
-                        asn_addr > asn_net.maxaddr():
-                    continue
+                    if asn_addr < asn_net.minaddr() or \
+                            asn_addr > asn_net.maxaddr():
+                        continue
 
-                # set prefix length. just to be sure
-                asn_addr.set_prefixlen(asn_net.prefixlen)
-                asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
+                    # set prefix length. just to be sure
+                    asn_addr.set_prefixlen(asn_net.prefixlen)
+                    asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
 
-                print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
-                        (ipversion, str(asn_addr))))
+                    print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
+                            (ipversion, str(asn_addr))))
 
-                print(('[DEBUG] adding: "%s IN PTR %s.AS%s.virtual.' %
-                        (asn_ptr_name, hostname, str(netid))))
-                zoneentries.append(('%s IN PTR %s.AS%s.virtual.' %
-                        (asn_ptr_name, hostname, str(netid))))
+                    print(('[DEBUG] adding: "%s IN PTR %s.AS%s.virtual.' %
+                            (asn_ptr_name, hostname, str(netid))))
+                    zoneentries.append(('%s IN PTR %s.AS%s.virtual.' %
+                            (asn_ptr_name, hostname, str(netid))))
 
-            print(('[DEBUG] PTR records: %s' % (zoneentries)))
+                print(('[DEBUG] PTR records: %s' % (zoneentries)))
 
-            zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
-                    '\n'.join(zoneentries))
-            cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding IPv4 ptrzone: %s' % zonename))
-            zonenames.append(zonename)
-
-        # TODO: next is IPv6
-        ipversion = 6
-        # collect loopback address space
-        loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
-        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
-
-        # collect interface address space
-        interface_net = Interface.getInterfaceNet_per_net(netid, ipversion)
-        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
-
-        auth_servers = [(server_name, server_addr) \
-                for server_name, server_addr, zone in as_auth_servers \
-                if zone == "AS%s.virtual." % str(netid) and \
-                isIPv6Address(server_addr)]
-
-        for asn_net in loopback_net, interface_net:
-            zonename = cls.getPTRZoneNameFromPrefix(cls, asn_net)
-            print(('[DEBUG] zonename: %s' % zonename))
-
-            ORIGINHeader = '$ORIGIN %s\n' % zonename
-            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
-
-            SOAHeader = cls.generateSOAHeader(cls, auth_servers, zonename)
-            print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
-
-            zoneentries = []
-
-            # get host list of this AS
-            # TODO: iterating over all nodes for interface and
-            # loopback address space is expensive. and we are only talking
-            # about IPv6 at the moment. is there a better way of doing this?
-            hosts = []
-            service_helpers.nodewalker(node, node, [], hosts,
-                    cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
-            for hostname, asn_addr, zone in hosts:
-                if not isIPv6Address(asn_addr):
-                    continue
-
-                asn_addr = IPv6Addr(asn_addr)
-
-                if asn_addr < asn_net.minaddr() or \
-                        asn_addr > asn_net.maxaddr():
-                    continue
-
-                # set prefix length. just to be sure
-                asn_addr.set_prefixlen(asn_net.prefixlen)
-                asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
-
-                print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
-                        (ipversion, str(asn_addr))))
-
-                print(('[DEBUG] adding: "%s IN PTR %s.AS%s.virtual.' %
-                        (asn_ptr_name, hostname, str(netid))))
-                zoneentries.append(('%s IN PTR %s.AS%s.virtual.' %
-                        (asn_ptr_name, hostname, str(netid))))
-
-            print(('[DEBUG] PTR records: %s' % (zoneentries)))
-
-            zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
-                    '\n'.join(zoneentries))
-            cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding IPv6 ptrzone: %s' % zonename))
-            zonenames.append(zonename)
+                zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
+                        '\n'.join(zoneentries))
+                cls.writeZoneFile(cls, node, zonename, zonecontents)
+                print(('[DEBUG] adding ptrzone: %s' % zonename))
+                zonenames.append(zonename)
 
         return zonenames
 
     @staticmethod
     def getAndGeneratePTRZones(cls, node):
         """ returns a list of all reverse zonenames a dns server serves """
-
-        #print(('[DEBUG] getAndGeneratePTRZones(): node: %s' % (node)))
-        #print(('[DEBUG] ASN: %s' % node.netid))
 
         zonenames = []
         if service_flags.DNSRootServer in node.services:
@@ -1191,7 +1081,7 @@ class Bind9ForwarderAndServer(Bind9):
         # xTODO: fix with internal root-servers /etc/bind/db.root
         # xTODO: on AS Auth. Servers: define (cfg) and create/poplule db.AS$foo.virtual, db.reverse
         # xTODO: rueckwaertshochguck
-        # TODO: v6, v6 and v6 (resolvconf, root-hints (force at least one addr to be v6), delegates, PTR
+        # TODO: v6, v6 and v6 (resolvconf, xroot-hints (force at least one addr to be v6), xdelegates, xPTR
         return cls.compile_named_conf(cls, cfgitems)
 
     @staticmethod
