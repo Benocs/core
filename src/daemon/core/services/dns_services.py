@@ -202,7 +202,7 @@ class Bind9(DNSServices):
         # add any authoritative dns server to the list of resolvers for that AS,
         # if we are not an authoritative dns server for the same AS
         servers = []
-        service_helpers.nodewalker(node, node, [], servers, nodewalker_cb)
+        service_helpers.nodewalker(node, node, servers, nodewalker_cb)
 
         # servers managing virtual zone
         zone_servers = []
@@ -254,7 +254,7 @@ class Bind9(DNSServices):
 
         if not delegation_servers_cb is None:
             delegation_servers = []
-            service_helpers.nodewalker(node, node, [], delegation_servers,
+            service_helpers.nodewalker(node, node, delegation_servers,
                     delegation_servers_cb)
             delegation_servers_map = {}
             for servername, addr, server_zone in delegation_servers:
@@ -273,7 +273,7 @@ class Bind9(DNSServices):
 
         if not hosts_cb is None:
             hosts = []
-            service_helpers.nodewalker(node, node, [], hosts,
+            service_helpers.nodewalker(node, node, hosts,
                      hosts_cb)
             # remove nameservers as they have already been added
             # TODO: remove nameservers as they have already been added -- hosts = [(server_name, v6addr, zone) for server_name, v6addr, zone ]
@@ -382,14 +382,14 @@ class Bind9(DNSServices):
         # find dns root servers
         # (server_name, server_addr)
         rootservers = []
-        service_helpers.nodewalker(node, node, [], rootservers,
+        service_helpers.nodewalker(node, node, rootservers,
                 cls.nodewalker_find_root_dns_callback)
         rootservers = [('%s.' % server_name, server_addr) \
                 for server_name, server_addr in rootservers]
         # find dns as authoritative servers
         # (server_name, server_addr, zone)
         as_auth_servers = []
-        service_helpers.nodewalker(node, node, [], as_auth_servers,
+        service_helpers.nodewalker(node, node, as_auth_servers,
                 cls.nodewalker_root_dns_find_all_auth_servers_callback)
         as_auth_servers = [('%s.%s' % (server_name, zone), server_addr, zone) \
                 for server_name, server_addr, zone in as_auth_servers]
@@ -455,7 +455,7 @@ class Bind9(DNSServices):
                             # TODO: tmp. setting another netid of a node is a dirty hack
                             tmpnetid = node.netid
                             node.netid = server_asn
-                            service_helpers.nodewalker(node, node, [], hosts,
+                            service_helpers.nodewalker(node, node, hosts,
                                     cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
                             node.netid = tmpnetid
                             for hostname, asn_addr, zone in hosts:
@@ -507,7 +507,7 @@ class Bind9(DNSServices):
         # find dns as authoritative servers
         # (server_name, server_addr, zone)
         as_auth_servers = []
-        service_helpers.nodewalker(node, node, [], as_auth_servers,
+        service_helpers.nodewalker(node, node, as_auth_servers,
                 cls.nodewalker_root_dns_find_all_auth_servers_callback)
         as_auth_servers = [('%s.%s' % (server_name, zone), server_addr, zone) \
                 for server_name, server_addr, zone in as_auth_servers]
@@ -562,7 +562,7 @@ class Bind9(DNSServices):
                 # about IPv4 or IPv6 at the moment.
                 # is there a better way of doing this?
                 hosts = []
-                service_helpers.nodewalker(node, node, [], hosts,
+                service_helpers.nodewalker(node, node, hosts,
                         cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
                 for hostname, asn_addr, zone in hosts:
                     if ipversion == 4 and not isIPv4Address(asn_addr):
@@ -1128,7 +1128,7 @@ class DNSMasq(DNSServices):
 
         # add any dns root server to the list of resolvers
         cfgitemscount = len(cfgitems)
-        service_helpers.nodewalker(node, node, [], cfgitems,
+        service_helpers.nodewalker(node, node, cfgitems,
                 cls.nodewalker_find_root_and_as_dns_callback)
 
         # if no root server could be found, handle everything ourself
@@ -1162,7 +1162,7 @@ class DNSMasq(DNSServices):
                     "server=/virtual./\n",
                     "auth-zone=virtual.\n",
                     "domain=virtual.\n"])
-            service_helpers.nodewalker(node, node, [], cfgitems,
+            service_helpers.nodewalker(node, node, cfgitems,
                     cls.nodewalker_root_dns_callback)
         else:
             cfgitems.append("domain=AS%s.virtual.\n" % netid)
@@ -1303,7 +1303,7 @@ class DNSMasq(DNSServices):
 
             # 2) collect all interface ip addresses of this AS
             # 2.1) aggregate found addresses as much as possible -- this is also TODO
-            service_helpers.nodewalker(currentnode, currentnode, [], cfgitems,
+            service_helpers.nodewalker(currentnode, currentnode, cfgitems,
                     DNSMasq.nodewalker_find_as_local_intf_addrs_callback)
 
         return cfgitems
@@ -1343,7 +1343,7 @@ class DNSMasq(DNSServices):
 
         if service_flags.DNSASRootServer in node.services:
             # add any host within our AS and add it to the domain db
-            service_helpers.nodewalker(node, node, [], cfgitems,
+            service_helpers.nodewalker(node, node, cfgitems,
                     cls.nodewalker_virtual_hosts_callback)
 
         return ''.join(cfgitems)
@@ -1406,20 +1406,25 @@ class DNSResolvconf(DNSServices):
             # if we are a DNS server, add 127.0.0.1 to resolv.conf
             confstr_list.append('nameserver ::1\nnameserver 127.0.0.1\n')
         else:
+            print('[DNSResolvconf] generating for node: %s' % node.name)
             # add any dns server which is on our AS to the list of resolvers
             list_len = len(confstr_list)
-            service_helpers.nodewalker(node, node, [], confstr_list,
+            service_helpers.nodewalker(node, node, confstr_list,
                     cls.nodewalker_Resolver_only_callback)
+
+            print('[DNSResolvconf] found %d resolvers' % len(confstr_list))
 
             # if no resolvers could be found, also include authoritative AS dns
             if list_len == len(confstr_list):
                 list_len = len(confstr_list)
-                service_helpers.nodewalker(node, node, [], confstr_list,
+                service_helpers.nodewalker(node, node, confstr_list,
                         cls.nodewalker_Resolver_and_ASAuth_only_callback)
+                print('[DNSResolvconf] found %d resolvers and AS auth servers' % len(confstr_list))
                 # if no resolvers could be found, also include authoritative AS and root dns
                 if list_len == len(confstr_list):
-                    service_helpers.nodewalker(node, node, [], confstr_list,
+                    service_helpers.nodewalker(node, node, confstr_list,
                             cls.nodewalker_all_DNS_Resolver_callback)
+                    print('[DNSResolvconf] found %d resolvers, AS auth and root servers' % len(confstr_list))
         confstr_list.append('search virtual\ndomain virtual\n')
 
         return ''.join(confstr_list)
@@ -1427,11 +1432,15 @@ class DNSResolvconf(DNSServices):
     @staticmethod
     def nodewalker_Resolver_only_callback(startnode, currentnode):
         cfgitems = []
+        #print(('[DNSResolvconf] startnode: %s, AS: %d, potential node: %s, AS: %d' %
+        #        (startnode.name, startnode.netid, currentnode.name, currentnode.netid)))
         # check if remote node is a dns server within our AS
         if service_flags.DNSResolver in currentnode.services and \
                 not service_flags.DNSRootServer in currentnode.services and \
                 not service_flags.DNSASRootServer in currentnode.services and \
                 startnode.netid == currentnode.netid:
+            #print(('[DNSResolvconf] startnode: %s, found potential resolver node: %s' %
+            #        (startnode.name, currentnode.name)))
             if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 cfgitems = ['nameserver ',

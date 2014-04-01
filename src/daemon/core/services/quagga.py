@@ -551,7 +551,7 @@ class Bgp(QuaggaService):
 
         # configure IBGP connections
         confstr_list = [cfg]
-        service_helpers.nodewalker(node, node, [], confstr_list,
+        service_helpers.nodewalker(node, node, confstr_list,
                 cls.nodewalker_callback)
         cfg = ''.join(confstr_list)
 

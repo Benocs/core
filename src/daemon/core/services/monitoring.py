@@ -147,7 +147,7 @@ plugins: nfprobe
 """)
 
         # add any nfprobe9sink which is on our AS to the list of collectors
-        service_helpers.nodewalker(node, node, [], confstr_list, NetFlow9ProbeService.nodewalker_callback)
+        service_helpers.nodewalker(node, node, confstr_list, NetFlow9ProbeService.nodewalker_callback)
 
         confstr_list.append(
 """
