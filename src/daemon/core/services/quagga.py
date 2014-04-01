@@ -724,6 +724,12 @@ class ISIS(QuaggaService):
                     cfg += "  isis passive\n"
                 else:
                     cfg += "  isis circuit-type level-2-only\n"
+
+                    # if this interface is connected via a point-to-point-link,
+                    # set "isis network point-to-point.
+                    # if this directive is not set, isis will speak mode lan
+                    if isinstance(ifc.net, nodes.PtpNet):
+                        cfg += "  isis network point-to-point\n"
                 cfg += "!\n"
 
                 # only add each interface once
