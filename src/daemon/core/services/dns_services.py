@@ -169,10 +169,6 @@ class Bind9(DNSServices):
         soaitems.append('$TTL %d\n' % ttl)
         soaitems.append('; (serial refresh retry expire negative_cache)\n')
 
-        #if zone == '.':
-        #    soaitems.append('@ IN SOA %s. root.%s.' % (nameservers[0], nameservers[0]))
-        #else:
-        #    soaitems.append('@ IN SOA %s.%s root.%s.%s' % (nameservers[0], zone, nameservers[0], zone))
         soaitems.append('@ IN SOA %s root.%s' % (nameservers[0], nameservers[0]))
         soaitems.append(' (%d %d %d %d %d)\n' % (serial, refresh, retry, expire, negcache))
 
@@ -229,56 +225,6 @@ class Bind9(DNSServices):
         zone = zone.rstrip('.')
         # and write result
         node.nodefile('/etc/bind/db.%s' % zone, zonecontents)
-
-    """
-    @staticmethod
-    def generateDBAuthoritativeFile(cls, node, zone, nodewalker_cb,
-            delegation_servers_cb=None):
-        servers, zone_servers = cls.getServers(cls, node, zone, nodewalker_cb)
-        tmpservers = []
-        for server, addr, server_zone in servers:
-            if server_zone == '.':
-                tmpservers.append(('%s.' % server, addr, server_zone))
-            else:
-                tmpservers.append(('%s.%s' % (server, server_zone), addr, server_zone))
-        servers = tmpservers
-        if zone == '.':
-            zone_servers = [('%s.' % server, addr) for server, addr in zone_servers]
-        else:
-            zone_servers = [('%s.%s' % (server, zone), addr) for server, addr in zone_servers]
-        print(('[==DEBUG==] servers: %s' % servers))
-        print(('[==DEBUG==] zone_servers: %s' % zone_servers))
-
-        rawzonecontents = cls.compileZoneFile(cls, list([(x[0], x[1], zone) for x in zone_servers]))[0]
-        print(('[DEBUG] generateDBAuthoritativeFile(node="%s", zone="%s"): zone_servers: %s' %
-                (node, zone, zone_servers)))
-        SOAHeader = cls.generateSOAHeader(cls, zone_servers, zone)
-        print(('[DEBUG] SOAHeader: %s' % SOAHeader))
-        zonecontents = '%s\n%s' % (SOAHeader, rawzonecontents)
-        print(('[DEBUG] zonecontents: %s' % zonecontents))
-
-        if not delegation_servers_cb is None:
-            delegation_servers = []
-            service_helpers.nodewalker(node, node, [], delegation_servers,
-                    delegation_servers_cb)
-            delegation_servers_map = {}
-            for servername, addr, server_zone in delegation_servers:
-                if server_zone == '.':
-                    servername = ('%s.' % server)
-                else:
-                    servername = ('%s.%s' % (server, server_zone))
-                if not server_zone in delegation_servers_map:
-                    delegation_servers_map[server_zone] = []
-                delegation_servers_map[server_zone].append((servername, addr))
-            delegation_records = []
-            for server_zone, servers in delegation_servers_map.items():
-                delegation_records.append(cls.generateDelegationRecord(cls, servers, server_zone))
-
-            zonecontents = '%s\n%s' % (zonecontents, '\n\n'.join(delegation_records))
-
-        if len(servers) > 0:
-            cls.writeZoneFile(cls, node, zone, zonecontents)
-    """
 
     @staticmethod
     def generateDBAuthoritativeFile(cls, node, zone, nameservers_cb,
@@ -358,7 +304,6 @@ class Bind9(DNSServices):
         # IPv4
         if prefix.af == AF_INET:
             num_network_bytes = int(prefix.prefixlen / 8)
-            #net_list = str(prefix.minaddr()).split('.')[:num_network_bytes]
             net_list = str(prefix.minaddr()).split('.')[:num_network_bytes]
             net_list.reverse()
             zone_name = '%s.in-addr.arpa.' % '.'.join(net_list)
@@ -408,7 +353,7 @@ class Bind9(DNSServices):
             raise ValueError('Only IPv4 is supported')
 
     @staticmethod
-    def getPTR_CNAME_FromAddr_IPv4(cls, addr):
+    def getPTR_CNAME_FromAddr(cls, addr):
         """ returns a CNAME record from this address """
         # IPv4
         if addr.isIPv4():
@@ -418,8 +363,17 @@ class Bind9(DNSServices):
             #print('[---==== DEBUG ====---] returning (%s) %s addr_list: %s' % \
             #        (str(addr), str(num_network_bytes), str(addr_list)))
             return '.'.join(addr_list)
+        elif addr.isIPv6():
+            num_network_nibbles = int(addr.prefixlen / 4)
+            addr_str = addr.addr.exploded.replace(':', '')
+            host_str = addr_str[num_network_nibbles:]
+            host_list = []
+            for c in host_str:
+                host_list.append(c)
+            host_list.reverse()
+            return '.'.join(host_list)
         else:
-            raise ValueError('Only IPv4 is supported')
+            raise ValueError('Only IPv4 and IPv6 are supported')
 
     @staticmethod
     def getAndGeneratePTRZonesRootServer(cls, node):
@@ -474,7 +428,7 @@ class Bind9(DNSServices):
                     asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
 
                 # find authoritative AS dns servers
-                # zone = "AS%s.virtual." % str(netid)
+                # zone == "AS%s.virtual." % str(netid)
                 for server_name, server_addr, zone in as_auth_servers:
                     server_asn = zone.lstrip('AS')
                     server_asn = int(server_asn[:server_asn.find('.')])
@@ -484,12 +438,11 @@ class Bind9(DNSServices):
                         continue
 
                     # not our IP version
-                    #if ipversion == 4 and not isIPv4Address(server_addr):
-                    if not isIPv4Address(server_addr):
+                    if ipversion == 4 and not isIPv4Address(server_addr):
                         continue
-                    if ipversion == 6:
-                        # and not isIPv6Address(server_addr):
-                        continue
+                    #if ipversion == 6:
+                    #    # and not isIPv6Address(server_addr):
+                    #    continue
 
                     print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
                             (server_name, server_addr, zone)))
@@ -520,7 +473,7 @@ class Bind9(DNSServices):
 
                         # set prefix length of the supernet
                         asn_addr.set_prefixlen(net_prefixlen)
-                        asn_ptr_name = cls.getPTR_CNAME_FromAddr_IPv4(cls, asn_addr)
+                        asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
 
                         #print(('[DEBUG] deployed ASN network (IPv%d): %s' %
                         #        (ipversion, str(asn_net))))
@@ -537,62 +490,70 @@ class Bind9(DNSServices):
             zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
                     '\n'.join(zoneentries))
             cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding IPv4 Loopback ptrzone to zonenames: %s' % zonename))
+            print(('[DEBUG] adding ptrzone to zonenames: %s' % zonename))
             zonenames.append(zonename)
 
         # next is IPv6
         ipversion = 6
+        SOAHeader = cls.generateSOAHeader(cls, rootservers, '.')
+        print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
+
+        # collect loopback address space
+        loopback_net = Loopback.getLoopbackNet(ipversion)
+        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
+
+        # collect interface address space
+        interface_net = Interface.getInterfaceNet(ipversion)
+        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
+
         # get all deployed ASN's
         asns = list(NetIDNodeMap.mapping.keys())
         print(('[DEBUG] deployed ASN\'s: %s' % asns))
-        for asn in asns:
-            # get AS address space
-            asn_loopback_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
-            print(('[DEBUG] deployed ASN loopback network (IPv%d): %s' %
-                    (ipversion, str(asn_loopback_net))))
-            asn_interface_net = Interface.getInterfaceNet_per_net(asn, ipversion)
-            print(('[DEBUG] deployed ASN interface network (IPv%d): %s' %
-                    (ipversion, str(asn_interface_net))))
+        for net in loopback_net, interface_net:
+            zonename = cls.getPTRZoneNameFromPrefix(cls, net)
+            net_prefixlen = net.prefixlen
+            print(('[DEBUG] zonename: %s' % zonename))
 
-            for asn_net in asn_loopback_net, asn_loopback_net:
-                zoneentries = []
-                as_servers = []
-                as_zone = ''
+            ORIGINHeader = '$ORIGIN %s\n' % zonename
+            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
+
+            zoneentries = []
+            for asn in asns:
+                # get AS address space
+                if net == loopback_net:
+                    asn_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
+                elif net == interface_net:
+                    asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
+
                 # find authoritative AS dns servers
+                # zone = "AS%s.virtual." % str(netid)
                 for server_name, server_addr, zone in as_auth_servers:
                     server_asn = zone.lstrip('AS')
                     server_asn = int(server_asn[:server_asn.find('.')])
-
-                    print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
-                            (server_name, server_addr, zone)))
 
                     # not the correct asn
                     if not asn == server_asn:
                         continue
 
                     # not our IP version
+                    #if ipversion == 4 and not isIPv4Address(server_addr):
                     if not isIPv6Address(server_addr):
                         continue
 
-                    #print(('[DEBUG] adding: " IN NS %s"' % (server_name)))
-                    # get reverse dotted notation for address space
-                    #zoneentries.append((' IN NS %s' % (server_name)))
-                    as_servers.append((server_name, server_addr))
-                    as_zone = zone
+                    print(('[DEBUG] server_name: %s, server_addr: %s, zone: %s' %
+                            (server_name, server_addr, zone)))
+                    asn_ptr_name = cls.getPTRZoneNameFromPrefix(cls, asn_net)
+                    print(('[DEBUG] adding: "%s IN NS %s"' %
+                            (asn_ptr_name, server_name)))
+                    zoneentries.append(('%s IN NS %s' %
+                            (asn_ptr_name, server_name)))
 
-            SOAHeader = cls.generateSOAHeader(cls, as_servers, as_zone)
-            print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
-
-            zonename = cls.getPTRZoneNameFromPrefix(cls, asn_net)
-            print(('[DEBUG] zonename: %s' % zonename))
-
-            ORIGINHeader = '$ORIGIN %s\n' % zonename
-            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
+            print(('[DEBUG] subnet name servers: %s' % (zoneentries)))
 
             zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
                     '\n'.join(zoneentries))
             cls.writeZoneFile(cls, node, zonename, zonecontents)
-            print(('[DEBUG] adding IPv6 ptrzone to zonenames: %s' % zonename))
+            print(('[DEBUG] adding ptrzone to zonenames: %s' % zonename))
             zonenames.append(zonename)
 
         return zonenames
@@ -613,8 +574,6 @@ class Bind9(DNSServices):
 
         zonenames = []
 
-        ipversion = 4
-
         if hasattr(node, 'netid') and not node.netid is None:
             netid = node.netid
         else:
@@ -622,6 +581,7 @@ class Bind9(DNSServices):
             netid = 0
         asn = netid
 
+        ipversion = 4
         # collect loopback address space
         loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
         print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
@@ -666,7 +626,7 @@ class Bind9(DNSServices):
 
                 # set prefix length. just to be sure
                 asn_addr.set_prefixlen(asn_net.prefixlen)
-                asn_ptr_name = cls.getPTR_CNAME_FromAddr_IPv4(cls, asn_addr)
+                asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
 
                 print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
                         (ipversion, str(asn_addr))))
@@ -685,6 +645,68 @@ class Bind9(DNSServices):
             zonenames.append(zonename)
 
         # TODO: next is IPv6
+        ipversion = 6
+        # collect loopback address space
+        loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
+        print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
+
+        # collect interface address space
+        interface_net = Interface.getInterfaceNet_per_net(netid, ipversion)
+        print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
+
+        auth_servers = [(server_name, server_addr) \
+                for server_name, server_addr, zone in as_auth_servers \
+                if zone == "AS%s.virtual." % str(netid) and \
+                isIPv6Address(server_addr)]
+
+        for asn_net in loopback_net, interface_net:
+            zonename = cls.getPTRZoneNameFromPrefix(cls, asn_net)
+            print(('[DEBUG] zonename: %s' % zonename))
+
+            ORIGINHeader = '$ORIGIN %s\n' % zonename
+            print(('[DEBUG] ORIGINHeader: %s' % ORIGINHeader))
+
+            SOAHeader = cls.generateSOAHeader(cls, auth_servers, zonename)
+            print(('[DEBUG] SOAHeader:\n%s' % SOAHeader))
+
+            zoneentries = []
+
+            # get host list of this AS
+            # TODO: iterating over all nodes for interface and
+            # loopback address space is expensive. and we are only talking
+            # about IPv6 at the moment. is there a better way of doing this?
+            hosts = []
+            service_helpers.nodewalker(node, node, [], hosts,
+                    cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
+            for hostname, asn_addr, zone in hosts:
+                if not isIPv6Address(asn_addr):
+                    continue
+
+                asn_addr = IPv6Addr(asn_addr)
+
+                if asn_addr < asn_net.minaddr() or \
+                        asn_addr > asn_net.maxaddr():
+                    continue
+
+                # set prefix length. just to be sure
+                asn_addr.set_prefixlen(asn_net.prefixlen)
+                asn_ptr_name = cls.getPTR_CNAME_FromAddr(cls, asn_addr)
+
+                print(('[DEBUG] ASN PTR addr (IPv%d): %s' %
+                        (ipversion, str(asn_addr))))
+
+                print(('[DEBUG] adding: "%s IN PTR %s.AS%s.virtual.' %
+                        (asn_ptr_name, hostname, str(netid))))
+                zoneentries.append(('%s IN PTR %s.AS%s.virtual.' %
+                        (asn_ptr_name, hostname, str(netid))))
+
+            print(('[DEBUG] PTR records: %s' % (zoneentries)))
+
+            zonecontents = '%s\n%s\n%s\n' % (ORIGINHeader, SOAHeader,
+                    '\n'.join(zoneentries))
+            cls.writeZoneFile(cls, node, zonename, zonecontents)
+            print(('[DEBUG] adding IPv6 ptrzone: %s' % zonename))
+            zonenames.append(zonename)
 
         return zonenames
 
@@ -702,56 +724,6 @@ class Bind9(DNSServices):
             zonenames = cls.getAndGeneratePTRZonesASAuthServer(cls, node)
 
         return zonenames
-
-    @staticmethod
-    def generatePTRAuthoritativeFile(cls, node, zone, nodewalker_cb):
-        """ build world wide PTR record file. distributing it to AS-nameserver is TODO """
-
-        # TODO:
-        """
-        root_nameservers = []
-        service_helpers.nodewalker(node, node, [], root_nameservers,
-                cls.nodewalker_find_root_and_as_dns_callback)
-
-        # servers managing virtual zone
-        virtualservers = []
-        for servername, ipaddr, server_zone in root_nameservers:
-            if server_zone == zone:
-                print('adding to zone: "%s" server: "%s"' % (server_zone, servername))
-                virtualservers.append((servername, ipaddr))
-
-        #####################################
-
-        nodes = []
-        service_helpers.nodewalker(node, node, [], nodes, nodewalker_cb)
-
-        # nodes managing virtual zone
-        virtualnodes = []
-        for servername, ipaddr, server_zone in nodes:
-            print('adding to zone: "%s" server: "%s"' % (server_zone, servername))
-            virtualnodes.append((servername, ipaddr))
-
-        #rawzonecontent = cls.compileZoneFile(cls, list(map(lambda x: (x[0], x[1], zone), virtualnodes)))[0]
-        rawzonecontent = cls.compileZoneFile(cls,
-                list(map(lambda x: (x[0], x[1], zone), virtualservers))
-                list(map(lambda x: (x[0], x[1], zone), virtualnodes)))
-
-        SOAHeader = cls.generateSOAHeader(cls, virtualnodes, zone)
-        zonecontents = '%s\n%s' % (SOAHeader, rawzonecontent)
-        print("zone: %s: %s" % (zone, zonecontent))
-
-        ## TODO: handle the case when two tuples exit with both the same zone
-
-        if len(nodes) > 0:
-            # rename root-zone from '.' to 'root'
-            if zone == '.':
-                zone = 'root'
-            # strip '.' at end
-            zone = zone.rstrip('.')
-            # and write result
-            node.nodefile('/etc/bind/db.%s' % zone, zonecontents)
-        """
-
 
     @staticmethod
     def generateDefaultLocalConf(cls, cfgitems = None):
@@ -798,6 +770,10 @@ class Bind9(DNSServices):
         cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
                 'print-category yes;')
         cls.cfg_add_item(cfgitems, ['logging', 'category default'],
+                'default_file;')
+        cls.cfg_add_item(cfgitems, ['logging', 'category queries'],
+                'default_file;')
+        cls.cfg_add_item(cfgitems, ['logging', 'category resolver'],
                 'default_file;')
 
         return cfgitems
@@ -1139,6 +1115,7 @@ class Bind9ForwarderAndServer(Bind9):
             super().cfg_del_item(cfgitems, 'zone "."', 'type hint;')
             super().cfg_del_item(cfgitems, 'zone "."', 'file "/etc/bind/db.root";')
 
+        # check if this DNS server is a pure forwarder
         if cls._use_external_resolver:
             cls.cfg_add_item(cfgitems, 'zone "."', 'type forward;')
             cls.cfg_add_item(cfgitems, ['zone "."', 'forwarders'],
@@ -1194,25 +1171,13 @@ class Bind9ForwarderAndServer(Bind9):
             zonefname = zone.rstrip('.')
 
             # add AS zones to AS-auth-nameservers as master
-            #if service_flags.DNSASRootServer in node.services:
             cls.cfg_add_item(cfgitems, 'zone "%s"' % zone, 'type master;')
             cls.cfg_add_item(cfgitems, 'zone "%s"' % zone, 'file "/etc/bind/db.%s";' % zonefname)
-            #cls.generateDBAuthoritativeFile(cls, node, zone,
-            #        cls.nodewalker_root_dns_find_auth_servers_callback)
             cls.generateDBAuthoritativeFile(cls, node, zone,
                     cls.nodewalker_root_dns_find_auth_servers_callback,
                     None,
                     cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
 
-            # add reverse lookup PTR records TODO: v6 .in-addr.arpa.
-            #if service_flags.DNSRootServer in node.services:
-            #    ptrzone_suffix = 'in-addr.arpa.'
-            #    ptrzonefname = ptrzone.rstrip('.')
-            #    cls.cfg_add_item(cfgitems, 'ptrzone "%s"' % ptrzone, 'type master;')
-            #    cls.cfg_add_item(cfgitems, 'ptrzone "%s"' % ptrzone, 'file "/etc/bind/db.%s";' % ptrzonefname)
-            #    cls.generatePTRAuthoritativeFile(cls, node, ptrzone,
-            #            cls.nodewalker_root_dns_find_all_nodes_callback)
-            #
             # add reverse lookup PTR records
             ptrzones = cls.getAndGeneratePTRZones(cls, node)
             print(('[DEBUG] getAndGeneratePTRZones() returned ptrzones: %s' % ptrzones))
@@ -1222,15 +1187,10 @@ class Bind9ForwarderAndServer(Bind9):
                 cls.cfg_add_item(cfgitems, 'zone "%s"' % ptrzone, 'type master;')
                 cls.cfg_add_item(cfgitems, 'zone "%s"' % ptrzone, 'file "/etc/bind/db.%s";' % ptrzonefname)
 
-            # add hosts that live in this AS to this zone
-            #if service_flags.DNSASRootServer in node.services:
-            #    cls.generateZoneContent(cls, node, zone,
-            #            cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
-
         # xTODO: populate /etc/bind/db.virtual (when done, do we need the forward-section? no. remove it.)
         # xTODO: fix with internal root-servers /etc/bind/db.root
         # xTODO: on AS Auth. Servers: define (cfg) and create/poplule db.AS$foo.virtual, db.reverse
-        # TODO: rueckwaertshochguck
+        # xTODO: rueckwaertshochguck
         # TODO: v6, v6 and v6 (resolvconf, root-hints (force at least one addr to be v6), delegates, PTR
         return cls.compile_named_conf(cls, cfgitems)
 
@@ -1238,7 +1198,6 @@ class Bind9ForwarderAndServer(Bind9):
     def generateNamedOptionsConf(cls, node, services):
         cfgitems = cls.generateDefaultOptionsConf(cls)
         return cls.compile_named_conf(cls, cfgitems)
-
 
 addservice(Bind9ForwarderAndServer)
 
@@ -1555,7 +1514,7 @@ class DNSResolvconf(DNSServices):
 
         if service_flags.DNSResolver in node.services:
             # if we are a DNS server, add 127.0.0.1 to resolv.conf
-            confstr_list.append('nameserver 127.0.0.1\n')
+            confstr_list.append('nameserver ::1\nnameserver 127.0.0.1\n')
         else:
             # add any dns server which is on our AS to the list of resolvers
             list_len = len(confstr_list)
@@ -1588,6 +1547,7 @@ class DNSResolvconf(DNSServices):
                 cfgitems = ['nameserver ',
                         list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
                         '\n']
+            # TODO: getLoopback
             #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
         return cfgitems
 
@@ -1603,6 +1563,7 @@ class DNSResolvconf(DNSServices):
                 cfgitems = ['nameserver ',
                         list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
                         '\n']
+            # TODO: getLoopback
             #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
         return cfgitems
 
@@ -1617,6 +1578,7 @@ class DNSResolvconf(DNSServices):
                 cfgitems = ['nameserver ',
                         list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
                         '\n']
+            # TODO: getLoopback
             #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
         return cfgitems
 
