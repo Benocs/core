@@ -714,20 +714,18 @@ class ISIS(QuaggaService):
             if ifc == net_netif:
                 continue
 
-            # other end of link is not router. don't send ISIS hellos
-            #if not service_flags.Router in net_netif.node.services:
-            #    continue
-
-            # TODO: if other side is a switch/hub/etc, use "isis network lan"
-
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
                 cfg += "  ip router isis 1\n"
                 cfg += "  ipv6 router isis 1\n"
-                cfg += "  isis circuit-type level-2-only\n"
-                # TODO: if other side is switch, use "isis network lan"
-                cfg += "  isis network point-to-point\n"
+
+                # other end of link is not router. don't send ISIS hellos
+                if not service_flags.Router in net_netif.node.services:
+                    cfg += "  isis passive\n"
+                else:
+                    cfg += "  isis circuit-type level-2-only\n"
                 cfg += "!\n"
+
                 # only add each interface once
                 added_ifc = True
 
