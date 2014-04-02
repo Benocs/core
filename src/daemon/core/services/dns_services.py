@@ -836,10 +836,10 @@ class Bind9(DNSServices):
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
 
                 server_name = '%s' % (currentnode.name)
-                for server_addr in list(currentnode._netif.values())[0].addrlist:
-                    server_addr = server_addr.partition('/')[0]
+                for server_addr in currentnode.getLoopbackIPv4(), \
+                        currentnode.getLoopbackIPv6():
+                    server_addr = str(server_addr).partition('/')[0]
                     servers.append((server_name, server_addr))
-                # TODO: getLoopback
 
         return servers
 
@@ -863,23 +863,24 @@ class Bind9(DNSServices):
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
 
                 server_name = '%s' % (currentnode.name)
-                for server_addr in list(currentnode._netif.values())[0].addrlist:
-                    server_addr = server_addr.partition('/')[0]
+
+                for server_addr in currentnode.getLoopbackIPv4(), \
+                        currentnode.getLoopbackIPv6():
+                    server_addr = str(server_addr).partition('/')[0]
                     zone = "."
                     servers.append((server_name, server_addr, zone))
                     zone = "virtual."
                     servers.append((server_name, server_addr, zone))
-                # TODO: getLoopback
 
         if service_flags.DNSASRootServer in currentnode.services:
             if len(list(currentnode._netif.values())) > 0 and \
                     len(list(currentnode._netif.values())[0].addrlist) > 0:
                 server_name = currentnode.name
-                for server_addr in list(currentnode._netif.values())[0].addrlist:
-                    server_addr = server_addr.partition('/')[0]
+                for server_addr in currentnode.getLoopbackIPv4(), \
+                        currentnode.getLoopbackIPv6():
+                    server_addr = str(server_addr).partition('/')[0]
                     zone = "AS%s.virtual." % str(netid)
                     servers.append((server_name, server_addr, zone))
-                # TODO: getLoopback
 
         return servers
 
@@ -906,11 +907,11 @@ class Bind9(DNSServices):
                     netid = 0
 
                 server_name = currentnode.name
-                for server_addr in list(currentnode._netif.values())[0].addrlist:
-                    server_addr = server_addr.partition('/')[0]
+                for server_addr in currentnode.getLoopbackIPv4(), \
+                        currentnode.getLoopbackIPv6():
+                    server_addr = str(server_addr).partition('/')[0]
                     zone = "AS%s.virtual." % str(netid)
                     servers.append((server_name, server_addr, zone))
-                # TODO: getLoopback
 
         return servers
 
@@ -931,11 +932,11 @@ class Bind9(DNSServices):
                     netid = 0
 
                 server_name = currentnode.name
-                for server_addr in list(currentnode._netif.values())[0].addrlist:
-                    server_addr = server_addr.partition('/')[0]
+                for server_addr in currentnode.getLoopbackIPv4(), \
+                        currentnode.getLoopbackIPv6():
+                    server_addr = str(server_addr).partition('/')[0]
                     zone = "AS%s.virtual." % str(netid)
                     servers.append((server_name, server_addr, zone))
-                # TODO: getLoopback
 
         return servers
 
@@ -957,12 +958,10 @@ class Bind9(DNSServices):
 
             # add plain hostname
             server_name = currentnode.name
-            server_addr = currentnode.getLoopbackIPv4()
-            server_addr = str(server_addr).partition('/')[0]
-            hosts.append((server_name, server_addr, zone))
-            server_addr = currentnode.getLoopbackIPv6()
-            server_addr = str(server_addr).partition('/')[0]
-            hosts.append((server_name, server_addr, zone))
+            for server_addr in currentnode.getLoopbackIPv4(), \
+                    currentnode.getLoopbackIPv6():
+                server_addr = str(server_addr).partition('/')[0]
+                hosts.append((server_name, server_addr, zone))
 
             # add all interface names
             for intf in list(currentnode._netif.values()):
@@ -1441,13 +1440,11 @@ class DNSResolvconf(DNSServices):
                 startnode.netid == currentnode.netid:
             #print(('[DNSResolvconf] startnode: %s, found potential resolver node: %s' %
             #        (startnode.name, currentnode.name)))
-            if len(list(currentnode._netif.values())) > 0 and \
-                    len(list(currentnode._netif.values())[0].addrlist) > 0:
-                cfgitems = ['nameserver ',
-                        list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
-                        '\n']
-            # TODO: getLoopback
-            #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
+            for server_addr in currentnode.getLoopbackIPv4(), \
+                    currentnode.getLoopbackIPv6():
+                server_addr = str(server_addr).partition('/')[0]
+                cfgitems.extend(['nameserver ', server_addr, '\n'])
+
         return cfgitems
 
     @staticmethod
@@ -1457,13 +1454,10 @@ class DNSResolvconf(DNSServices):
         if service_flags.DNSResolver in currentnode.services and \
                 not service_flags.DNSRootServer in currentnode.services and \
                 startnode.netid == currentnode.netid:
-            if len(list(currentnode._netif.values())) > 0 and \
-                    len(list(currentnode._netif.values())[0].addrlist) > 0:
-                cfgitems = ['nameserver ',
-                        list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
-                        '\n']
-            # TODO: getLoopback
-            #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
+            for server_addr in currentnode.getLoopbackIPv4(), \
+                    currentnode.getLoopbackIPv6():
+                server_addr = str(server_addr).partition('/')[0]
+                cfgitems.extend(['nameserver ', server_addr, '\n'])
         return cfgitems
 
     @staticmethod
@@ -1472,13 +1466,10 @@ class DNSResolvconf(DNSServices):
         # check if remote node is a dns server within our AS
         if service_flags.DNSResolver in currentnode.services and \
                 startnode.netid == currentnode.netid:
-            if len(list(currentnode._netif.values())) > 0 and \
-                    len(list(currentnode._netif.values())[0].addrlist) > 0:
-                cfgitems = ['nameserver ',
-                        list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
-                        '\n']
-            # TODO: getLoopback
-            #cfgitems = ['nameserver ', str(currentnode.getLoopbackIPv4()), '\n']
+            for server_addr in currentnode.getLoopbackIPv4(), \
+                    currentnode.getLoopbackIPv6():
+                server_addr = str(server_addr).partition('/')[0]
+                cfgitems.extend(['nameserver ', server_addr, '\n'])
         return cfgitems
 
 addservice(DNSResolvconf)
