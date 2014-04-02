@@ -106,11 +106,6 @@ class DefaultRouteService(UtilService):
                     if not service_flags.IGP in net_netif.node.services:
                         continue
                     cfg += cls.addrstr(addr)
-
-                    print(('[%s] ip r a default via %s' % (str(cls),
-                            str(addr.split('/')[0]))))
-                    net_netif.node.cmd(['ip', 'route', 'add', 'default', 'via',
-                            addr.split('/')[0]])
         return cfg
 
     @staticmethod
