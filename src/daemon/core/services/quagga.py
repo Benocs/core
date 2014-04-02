@@ -493,7 +493,7 @@ class Bgp(QuaggaService):
             # TODO: netid 0 is invalid
             netid = 0
 
-        if node.type == 'egp_node':
+        if service_flags.EGP in startnode.services:
             #for ipversion in 4, 6:
             # if aggregating the v6 loopback-space, bgp will not connect to any neigbor anymore
             for ipversion in [4]:
