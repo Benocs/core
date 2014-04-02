@@ -741,13 +741,14 @@ class ISIS(QuaggaService):
     @classmethod
     def generatequaggaconfig(cls, node):
         cfg = "!\n! ISIS configuration\n!\n"
-        cfg += "log file /tmp/isis-%s.log debugging\n" % cls.routerid(node)
         cfg += "interface lo\n"
-        cfg += " ip router isis 1\n"
+        cfg += "  ip router isis 1\n"
+        cfg += "  isis passive\n"
         cfg += "!\n"
 
         cfg += "router isis 1\n"
         cfg += "  net %s\n" % cls.get_ISIS_ID(cls.routerid(node), str(node.netid))
+        cfg += "  metric-style wide\n"
         cfg += "!\n"
 
         return cfg
