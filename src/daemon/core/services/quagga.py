@@ -465,6 +465,8 @@ class Bgp(QuaggaService):
         cfg += 'router bgp %s\n' % node.netid
         cfg += '  bgp router-id %s\n' % cls.routerid(node)
         cfg += '  redistribute connected\n'
+        cfg += '  redistribute kernel\n'
+        cfg += '  redistribute static\n'
         cfg += '  redistribute ospf\n'
         cfg += '  redistribute isis\n'
 
