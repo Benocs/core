@@ -19,6 +19,8 @@ from core.service import CoreService, addservice
 from core.misc.ipaddr import IPPrefix, isIPAddress
 from core.misc.ipaddr import IPv4Addr, IPv4Prefix, isIPv4Address
 from core.misc.ipaddr import IPv6Addr, IPv6Prefix, isIPv6Address
+from core.misc.ipaddr import Loopback, Interface
+from core.misc.ipaddr import NetIDNodeMap
 from core.api import coreapi
 from core.constants import *
 
@@ -485,37 +487,20 @@ class Bgp(QuaggaService):
         #cfg += '!\n'
 
         # aggregate AS-local loopback addresses
-        if 'ipaddrs' in CONFIGS and 'loopback_net' in CONFIGS['ipaddrs'] and \
-                len(CONFIGS['ipaddrs']['loopback_net'].split('/')) == 2 and \
-                'loopback_net_per_netid' in CONFIGS['ipaddrs']:
-            # loopback_net_per_netid
-            global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
-            global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
-            try:
-                global_prefixlen = int(global_prefixlen)
-            except ValueError:
-                return None
-            # local means per netid (e.g., AS)
-            try:
-                local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
-            except ValueError:
-                return None
+        if hasattr(node, 'netid') and not node.netid is None:
+            netid = node.netid
+        else:
+            # TODO: netid 0 is invalid
+            netid = 0
 
-            if hasattr(node, 'netid') and not node.netid is None:
-                netid = node.netid
-            else:
-                netid = 0
-
-            global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
-
-            baseprefix = IPv4Prefix('%s/%d' % (global_prefixbase, local_prefixlen))
-            target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
-            target_network_prefix = IPv4Prefix('%s/%d' % (target_network_baseaddr, local_prefixlen))
-            cfg += '  aggregate-address %s %s summary-only\n' % (str(target_network_baseaddr), target_network_prefix.netmaskstr())
+        if node.type == 'egp_node':
+            #for ipversion in 4, 6:
+            # if aggregating the v6 loopback-space, bgp will not connect to any neigbor anymore
+            for ipversion in [4]:
+                target_network_prefix = Loopback.getLoopbackNet_per_net(netid, ipversion)
+                cfg += ('  aggregate-address %s summary-only\n' %
+                        (str(target_network_prefix)))
             cfg += '!\n'
-
-        cfg += '!\n'
-
 
         # find any link on which two different netid's (i.e., AS numbers) are
         # present and configure a bgp-session between the two corresponding nodes.
