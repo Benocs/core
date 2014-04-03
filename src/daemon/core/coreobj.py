@@ -500,10 +500,14 @@ class PyCoreNetIf(object):
             self.net.detach(self)
 
     def addaddr(self, addr):
-        self.addrlist.append(addr)
+        if self.node.enable_ipv4 and isIPv4Address(addr) or \
+                self.node.enable_ipv6 and isIPv6Address(addr):
+            self.addrlist.append(addr)
 
     def deladdr(self, addr):
-        self.addrlist.remove(addr)
+        if self.node.enable_ipv4 and isIPv4Address(addr) or \
+                self.node.enable_ipv6 and isIPv6Address(addr):
+            self.addrlist.remove(addr)
 
     def sethwaddr(self, addr):
         self.hwaddr = addr
