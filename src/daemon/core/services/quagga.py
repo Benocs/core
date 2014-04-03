@@ -550,6 +550,9 @@ class Bgp(QuaggaService):
                 target_network_prefix = Loopback.getLoopbackNet_per_net(netid, ipversion)
                 cfg += ('  aggregate-address %s summary-only\n' %
                         (str(target_network_prefix)))
+                target_network_prefix = Interface.getInterfaceNet_per_net(netid, ipversion)
+                cfg += ('  aggregate-address %s summary-only\n' %
+                        (str(target_network_prefix)))
             cfg += '!\n'
 
         # configure EBGP connections:
