@@ -46,7 +46,7 @@ class PyCoreObj(object):
     apitype = None
 
     def __init__(self, session, objid = None, name = None, verbose = False,
-                start = True):
+                start = True, enable_ipv4=None, enable_ipv6=None):
         self.session = session
         if objid is None:
             objid = session.getobjid()
@@ -63,6 +63,24 @@ class PyCoreObj(object):
         self.verbose = verbose
         self.position = Position()
         self.netid = None
+
+        self.enable_ipv4 = True
+        if not enable_ipv4 is None:
+            self.enable_ipv4 = enable_ipv4
+        elif hasattr(self.session.options, 'enableipv4'):
+            if self.session.options.enableipv4 == '0':
+                self.enable_ipv4 = False
+            elif self.session.options.enableipv4 == '1':
+                self.enable_ipv4 = True
+
+        self.enable_ipv6 = True
+        if not enable_ipv6 is None:
+            self.enable_ipv6 = enable_ipv6
+        elif hasattr(self.session.options, 'enableipv6'):
+            if self.session.options.enableipv6 == '0':
+                self.enable_ipv6 = False
+            elif self.session.options.enableipv6 == '1':
+                self.enable_ipv6 = True
 
     def __str__(self):
         return "%s: id: %s, name: %s" % (str(self.__class__), str(self.objid),
@@ -242,10 +260,18 @@ class PyCoreNode(PyCoreObj):
             self.services.append(service)
 
     def getLoopbackIPv4(self):
-        return Loopback.getLoopbackIPv4(self)
+        if self.enable_ipv4:
+            return Loopback.getLoopbackIPv4(self)
+        else:
+            raise ValueError(('IPv4 is not enabled. Cannot return IPv4 '
+                    'loopback address'))
 
     def getLoopbackIPv6(self):
-        return Loopback.getLoopbackIPv6(self)
+        if self.enable_ipv6:
+            return Loopback.getLoopbackIPv6(self)
+        else:
+            raise ValueError(('IPv6 is not enabled. Cannot return IPv6 '
+                    'loopback address'))
 
     def makenodedir(self):
         if self.nodedir is None:
