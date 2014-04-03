@@ -259,6 +259,14 @@ class PyCoreNode(PyCoreObj):
         if service is not None:
             self.services.append(service)
 
+    def getIPversions(self):
+        ipversions = []
+        if self.enable_ipv4:
+            ipversions.append(4)
+        if self.enable_ipv6:
+            ipversions.append(6)
+        return ipversions
+
     def getLoopback(self, ipversion=4):
         if ipversion == 4:
             return self.getLoopbackIPv4()
