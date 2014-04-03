@@ -508,15 +508,11 @@ class Bgp(QuaggaService):
 
     @classmethod
     def generatequaggaconfig(cls, node):
+        v6cfg = []
+        v6prefixes = []
 
         if not node.enable_ipv4 and not node.enable_ipv6:
             return ''
-
-        ipversions = []
-        if node.enable_ipv4:
-            ipversions.append(4)
-        if node.enable_ipv6:
-            ipversions.append(6)
 
         cfg = '!\n! BGP configuration\n!\n'
         cfg += 'router bgp %s\n' % node.netid
@@ -541,23 +537,22 @@ class Bgp(QuaggaService):
         #cfg += '  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n'
         #cfg += '!\n'
 
-        # aggregate AS-local loopback addresses
         if hasattr(node, 'netid') and not node.netid is None:
             netid = node.netid
         else:
             # TODO: netid 0 is invalid
             netid = 0
 
+        # aggregate AS-local loopback addresses
         if service_flags.EGP in node.services:
-            #for ipversion in ipversions:
             # if aggregating the v6 loopback-space, bgp will not connect to any neigbor anymore
-            #for ipversion in [4]:
-            for ipversion in ipversions:
+            for ipversion in node.getIPversions():
                 target_network_prefix = Loopback.getLoopbackNet_per_net(netid, ipversion)
                 cfg += ('  aggregate-address %s summary-only\n' %
                         (str(target_network_prefix)))
             cfg += '!\n'
 
+        # configure EBGP connections:
         # find any link on which two different netid's (i.e., AS numbers) are
         # present and configure a bgp-session between the two corresponding nodes.
         for localnetif in node.netifs():
@@ -575,35 +570,31 @@ class Bgp(QuaggaService):
 
                 # found two different ASes.
                 if not node.netid == net_netif.node.netid:
-                    if (hasattr(node, 'type') and node.type == 'egp_node') and \
-                            (hasattr(net_netif.node, 'type') and \
-                            net_netif.node.type == 'egp_node'):
+                    if service_flags.EGP in node.services and \
+                            service_flags.EGP in net_netif.node.services:
                         for local_node_addr in localnetif.addrlist:
 
                             local_node_addr_str = str(local_node_addr.split('/')[0])
                             if not node.enable_ipv4 and \
-                                    isIPv4Address(local_node_addr_str):
+                                    isIPv4Address(local_node_addr):
                                 continue
                             if not node.enable_ipv6 and \
-                                    isIPv6Address(local_node_addr_str):
+                                    isIPv6Address(local_node_addr):
                                 continue
 
                             for remote_node_addr in net_netif.addrlist:
-
                                 remote_node_addr_str = str(remote_node_addr.split('/')[0])
                                 if not net_netif.node.enable_ipv4 and \
-                                        isIPv4Address(remote_node_addr_str):
+                                        isIPv4Address(remote_node_addr):
                                     continue
                                 if not net_netif.node.enable_ipv6 and \
-                                        isIPv6Address(remote_node_addr_str):
+                                        isIPv6Address(remote_node_addr):
                                     continue
 
-                                # this is an EGP-link. use interface-addresses for BGP-sessions
-                                if (isIPv4Address(local_node_addr_str) and \
-                                        isIPv4Address(remote_node_addr_str)) or \
-                                        (isIPv6Address(local_node_addr_str) and \
-                                        isIPv6Address(remote_node_addr_str)):
-
+                                # for inter-AS links, use interface addresses
+                                # instead of loopback addresses
+                                if (isIPv4Address(local_node_addr) and \
+                                        isIPv4Address(remote_node_addr)):
                                     cfg += '  neighbor %s remote-as %s\n' % \
                                             (remote_node_addr_str, \
                                             str(net_netif.node.netid))
@@ -611,38 +602,47 @@ class Bgp(QuaggaService):
                                             (remote_node_addr_str, \
                                             local_node_addr_str)
 
+                                elif (isIPv6Address(local_node_addr) and \
+                                        isIPv6Address(remote_node_addr)):
+                                    cfg += '  neighbor %s remote-as %s\n' % \
+                                            (remote_node_addr_str, str(net_netif.node.netid))
+                                    #cfg += '  no neighbor %s activate\n' % \
+                                    #        (str(remote_node_addr.split('/')[0]))
+
+                                    v6cfg.append(('    neighbor %s activate\n' %
+                                            remote_node_addr_str))
+                                    v6cfg.append(('    network %s\n' %
+                                            str(local_node_addr)))
+
         # configure IBGP connections
         confstr_list = [cfg]
         service_helpers.nodewalker(node, node, confstr_list,
-                cls.nodewalker_callback)
+                cls.nodewalker_ibgp_find_neighbors_callback)
         cfg = ''.join(confstr_list)
 
         if node.enable_ipv6:
+            # TODO: collect all neighbor ipv6-addresses
+            # TODO: collect all interface ipv6 prefixes
+            # TODO: add both into 'address-family ipv6' section
+            v6_ibgp_neighbor_list = []
+            service_helpers.nodewalker(node, node, v6_ibgp_neighbor_list,
+                    cls.nodewalker_ibgp_find_neighbor_addrs_v6_callback)
             cfg += '  address-family ipv6\n'
-            for localnetif in node.netifs():
-                # do not include control interfaces
-                if hasattr(localnetif, 'control') and localnetif.control == True:
-                    continue
-
-                for idx, net_netif in list(localnetif.net._netif.items()):
-                    candidate_node = net_netif.node
-
-                    # skip our own interface
-                    if localnetif == net_netif.node:
-                        continue
-
-                    # found two different ASes.
-                    if not node.netid == net_netif.node.netid:
-                        if (hasattr(node, 'type') and node.type == 'egp_node') and \
-                                (hasattr(net_netif.node, 'type') and \
-                                net_netif.node.type == 'egp_node'):
-                            for remote_node_addr in net_netif.addrlist:
-                                if isIPv6Address(remote_node_addr.split('/')[0]):
-                                    cfg += '  neighbor %s activate\n' % \
-                                            (str(remote_node_addr.split('/')[0]))
-            # network fc00:3::/32
-            # neighbor fc00::1:9 activate
-            cfg += '  exit-address-family\n'
+            # activate IBGP neighbors
+            cfg += ''.join(['    neighbor %s activate\n' % \
+                    str(remote_addr).split('/')[0] \
+                    for local_addr, remote_addr in v6_ibgp_neighbor_list])
+            # activate EBGP neighbors
+            cfg += ''.join(v6cfg)
+            # announce networks
+            interface_net = Interface.getInterfaceNet_per_net(netid, 6)
+            loopback_net = Loopback.getLoopbackNet_per_net(netid, 6)
+            cfg += '    network %s\n' % str(loopback_net)
+            cfg += '    network %s\n' % str(interface_net)
+            adj_addrs = cls.collect_adjacent_loopback_addrs_v6(cls, node)
+            for adj_addr in adj_addrs:
+                cfg += '    network %s/128\n' % str(adj_addr)
+            cfg += '\n  exit-address-family\n'
 
         if node.enable_ipv4:
             cfg += '  ip forwarding\n'
@@ -651,24 +651,70 @@ class Bgp(QuaggaService):
         return cfg
 
     @staticmethod
-    def nodewalker_callback(startnode, currentnode):
+    def nodewalker_ibgp_find_neighbors_callback(startnode, currentnode):
         result = []
         if service_flags.Router in startnode.services and \
                 service_flags.Router in currentnode.services and \
                 not startnode == currentnode and \
                 startnode.netid == currentnode.netid:
 
-            if startnode.enable_ipv4 and currentnode.enable_ipv4:
-                startnode_addr = startnode.getLoopbackIPv4()
-                currentnode_addr = currentnode.getLoopbackIPv4()
-                result = ['  neighbor %s remote-as %s\n' % \
+            startnode_ipversions = startnode.getIPversions()
+            currentnode_ipversions = currentnode.getIPversions()
+            ipversions = []
+            for ipversion in 4, 6:
+                if ipversion in startnode_ipversions and currentnode_ipversions:
+                    ipversions.append(ipversion)
+
+            for ipversion in ipversions:
+                if ipversion == 4:
+                    startnode_addr = startnode.getLoopbackIPv4()
+                    currentnode_addr = currentnode.getLoopbackIPv4()
+                elif ipversion == 6:
+                    startnode_addr = startnode.getLoopbackIPv6()
+                    currentnode_addr = currentnode.getLoopbackIPv6()
+
+                result.extend(['  neighbor %s remote-as %s\n' % \
                         (str(currentnode_addr), str(currentnode.netid)),
                         '  neighbor %s update-source %s\n' % \
                         (str(currentnode_addr), str(startnode_addr))
-                        ]
+                        ])
+
                 if service_flags.EGP in startnode.services:
                     result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
         return result
+
+    @staticmethod
+    def nodewalker_ibgp_find_neighbor_addrs_v6_callback(startnode, currentnode):
+        result = []
+        if service_flags.Router in startnode.services and \
+                service_flags.Router in currentnode.services and \
+                not startnode == currentnode and \
+                startnode.netid == currentnode.netid:
+
+            if startnode.enable_ipv6 and currentnode.enable_ipv6:
+                result.append((startnode.getLoopbackIPv6(),
+                        currentnode.getLoopbackIPv6()))
+
+        return result
+
+    @staticmethod
+    def collect_adjacent_loopback_addrs_v6(cls, node):
+        addrs = []
+        for ifc in node.netifs():
+            for idx, net_netif in list(ifc.net._netif.items()):
+
+                # skip our own interface
+                if ifc == net_netif:
+                    continue
+
+                # found the same AS, collect loopback addresses
+                #if node.netid == net_netif.node.netid:
+
+                # other end of link is no router. announce its loopback addr
+                if not service_flags.Router in net_netif.node.services:
+                    if net_netif.node.enable_ipv6:
+                        addrs.append(net_netif.node.getLoopbackIPv6())
+        return addrs
 
 addservice(Bgp)
 
