@@ -1005,13 +1005,17 @@ class SessionConfig(ConfigurableManager, Configurable):
     _type = coreapi.CORE_TLV_REG_UTILITY
     _confmatrix = [
         ("controlnet", coreapi.CONF_DATA_TYPE_STRING, '', '',
-         'Control network'), 
-        ("enablerj45", coreapi.CONF_DATA_TYPE_BOOL, '1', 'On,Off', 
+         'Control network'),
+        ("enablerj45", coreapi.CONF_DATA_TYPE_BOOL, '1', 'On,Off',
          'Enable RJ45s'),
         ("preservedir", coreapi.CONF_DATA_TYPE_BOOL, '0', 'On,Off',
          'Preserve session dir'),
-        ("enablesdt", coreapi.CONF_DATA_TYPE_BOOL, '0', 'On,Off', 
+        ("enablesdt", coreapi.CONF_DATA_TYPE_BOOL, '0', 'On,Off',
          'Enable SDT3D output'),
+        ("enableipv4", coreapi.CONF_DATA_TYPE_BOOL, '1', 'On,Off',
+         'Enable IPv4'),
+        ("enableipv6", coreapi.CONF_DATA_TYPE_BOOL, '1', 'On,Off',
+         'Enable IPv6'),
         ]
     _confgroups = "Options:1-%d" % len(_confmatrix)
     
