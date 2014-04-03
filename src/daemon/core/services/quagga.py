@@ -37,7 +37,7 @@ class Zebra(CoreService):
     '''
     _name = 'zebra'
     _group = 'Quagga'
-    _depends = ('vtysh', 'LoopbackAddress')
+    _depends = ('vtysh',)
     _dirs = ('/etc/quagga',  '/var/run/quagga')
     _configs = ('/etc/quagga/Quagga.conf',
                 'quaggaboot.sh','/etc/quagga/vtysh.conf')
@@ -76,44 +76,57 @@ class Zebra(CoreService):
         for ifc in node.netifs():
             # do not ever include control interfaces in anything
             if hasattr(ifc, 'control') and ifc.control == True:
-            #    cfg += '  '
-            #    cfg += '\n  '.join(map(cls.addrstr, ifc.addrlist))
-            #    cfg += '\n'
                 continue
 
-            cfg += 'interface %s\n' % ifc.name
+            tmpcfg = 'interface %s\n' % ifc.name
 
             cfgv4 = ''
             cfgv6 = ''
+            cfgvall = ''
             want_ipv4 = False
             want_ipv6 = False
             for s in services:
                 if cls._name not in s._depends:
                     continue
-                ifccfg = s.generatequaggaifcconfig(node,  ifc)
-                if s._ipv4_routing:
+                ifccfg = s.generatequaggaifcconfig(node, ifc)
+                if s._ipv4_routing and node.enable_ipv4:
                     want_ipv4 = True
-                if s._ipv6_routing:
+                if s._ipv6_routing and node.enable_ipv6:
                     want_ipv6 = True
-                    cfgv6 += ifccfg
-                else:
-                    cfgv4 += ifccfg
 
-            if want_ipv4:
+                if want_ipv4 and not want_ipv6:
+                    cfgv4 += ifccfg
+                elif not want_ipv4 and want_ipv6:
+                    cfgv6 += ifccfg
+                elif want_ipv4 and want_ipv6:
+                    cfgvall += ifccfg
+
+            if want_ipv4 and not want_ipv6:
                 ipv4list = [x for x in ifc.addrlist if isIPv4Address(x.split('/')[0])]
-                cfg += '  '
-                cfg += '\n  '.join(map(cls.addrstr, ipv4list))
-                cfg += '\n'
-                cfg += cfgv4
-            if want_ipv6:
+                tmpcfg += '  '
+                tmpcfg += '\n  '.join(map(cls.addrstr, ipv4list))
+                tmpcfg += '\n'
+                tmpcfg += cfgv4
+
+            elif not want_ipv4 and want_ipv6:
                 ipv6list = [x for x in ifc.addrlist if isIPv6Address(x.split('/')[0])]
-                cfg += '  '
-                cfg += '\n  '.join(map(cls.addrstr, ipv6list))
-                cfg += '\n'
-                cfg += cfgv6
-            if not want_ipv4 and not want_ipv6:
-                cfg += ifccfg
-            cfg += '!\n'
+                tmpcfg += '  '
+                tmpcfg += '\n  '.join(map(cls.addrstr, ipv6list))
+                tmpcfg += '\n'
+                tmpcfg += cfgv6
+
+            elif want_ipv4 and want_ipv6:
+                tmpcfg += '  '
+                tmpcfg += '\n  '.join(map(cls.addrstr, ifc.addrlist))
+                tmpcfg += '\n'
+                tmpcfg += cfgv4
+                tmpcfg += cfgv6
+                tmpcfg += cfgvall
+
+            tmpcfg += '!\n'
+
+            if want_ipv4 or want_ipv6:
+                cfg += tmpcfg
 
         for s in services:
             if cls._name not in s._depends:
@@ -253,7 +266,11 @@ class QuaggaService(CoreService):
     def routerid(node):
         ''' Helper to return the first IPv4 address of a node as its router ID.
         '''
-        return str(node.getLoopbackIPv4())
+        # Use IPv4 loopback address of this node as the routerID.
+        # Don't get v4-loopback-addr directly from node as the node might has
+        # IPv4 disabled. Instead, directly query the central 'database' for the
+        # IPv4 address that would be the nodes IPv4 loopback.
+        return str(Loopback.getLoopbackIPv4(node))
 
     @staticmethod
     def rj45check(ifc):
@@ -319,6 +336,9 @@ class Ospfv2(QuaggaService):
 
     @classmethod
     def generatequaggaconfig(cls, node):
+        if not node.enable_ipv4:
+            return ''
+
         cfg = '!\n! OSPFv2 (for IPv4) configuration\n!\n'
         cfg += 'router ospf\n'
         cfg += '  router-id %s\n' % cls.routerid(node)
@@ -330,11 +350,16 @@ class Ospfv2(QuaggaService):
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
+        if not node.enable_ipv4:
+            return ''
+
         # do not include control interfaces
         if hasattr(ifc, 'control') and ifc.control == True:
             return ''
 
-        cfg = cls.mtucheck(ifc)
+        cfg = ''
+        cfg += cls.mtucheck(ifc)
+        cfg += cls.ptpcheck(ifc)
 
         # find any link on which two equal netid's (i.e., AS numbers) are
         # present and configure an ospf-session on this interface
@@ -404,6 +429,9 @@ class Ospfv3(QuaggaService):
 
     @classmethod
     def generatequaggaconfig(cls,  node):
+        if not node.enable_ipv4 and not node.enable_ipv6:
+            return ''
+
         cfg = 'router ospf6\n'
         rtrid = cls.routerid(node)
         cfg += '  router-id %s\n' % rtrid
@@ -412,11 +440,24 @@ class Ospfv3(QuaggaService):
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
+        if not node.enable_ipv4 and not node.enable_ipv6:
+            return ''
+
         if hasattr(ifc, 'control') and ifc.control == True:
             return ''
 
-        cfg = cls.mtucheck(ifc)
-        cfg += '  interface %s area 0.0.0.0\n' % ifc.name
+        enable_ifc = False
+        for a in ifc.addrlist:
+            if node.enable_ipv4 and isIPv4Address(a):
+                enable_ifc = True
+            if node.enable_ipv6 and isIPv6Address(a):
+                enable_ifc = True
+
+        cfg = ''
+        if enable_ifc:
+            cfg += cls.mtucheck(ifc)
+            cfg += cls.ptpcheck(ifc)
+            cfg += '  interface %s area 0.0.0.0\n' % ifc.name
         return cfg
 
 addservice(Ospfv3)
@@ -432,7 +473,12 @@ class Ospfv3mdr(Ospfv3):
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
-        cfg = cls.mtucheck(ifc)
+        cfg = super().generatequaggaifcconfig(cls, node, ifc)
+
+        # super() decides whether this interface is to be included.
+        # honor its decision
+        if len(cfg) == 0:
+            return cfg
 
         return cfg + '''\
   ipv6 ospf6 instance-id 65
@@ -462,6 +508,15 @@ class Bgp(QuaggaService):
 
     @classmethod
     def generatequaggaconfig(cls, node):
+
+        if not node.enable_ipv4 and not node.enable_ipv6:
+            return ''
+
+        ipversions = []
+        if node.enable_ipv4:
+            ipversions.append(4)
+        if node.enable_ipv6:
+            ipversions.append(6)
 
         cfg = '!\n! BGP configuration\n!\n'
         cfg += 'router bgp %s\n' % node.netid
@@ -493,10 +548,11 @@ class Bgp(QuaggaService):
             # TODO: netid 0 is invalid
             netid = 0
 
-        if service_flags.EGP in startnode.services:
-            #for ipversion in 4, 6:
+        if service_flags.EGP in node.services:
+            #for ipversion in ipversions:
             # if aggregating the v6 loopback-space, bgp will not connect to any neigbor anymore
-            for ipversion in [4]:
+            #for ipversion in [4]:
+            for ipversion in ipversions:
                 target_network_prefix = Loopback.getLoopbackNet_per_net(netid, ipversion)
                 cfg += ('  aggregate-address %s summary-only\n' %
                         (str(target_network_prefix)))
@@ -523,18 +579,37 @@ class Bgp(QuaggaService):
                             (hasattr(net_netif.node, 'type') and \
                             net_netif.node.type == 'egp_node'):
                         for local_node_addr in localnetif.addrlist:
+
+                            local_node_addr_str = str(local_node_addr.split('/')[0])
+                            if not node.enable_ipv4 and \
+                                    isIPv4Address(local_node_addr_str):
+                                continue
+                            if not node.enable_ipv6 and \
+                                    isIPv6Address(local_node_addr_str):
+                                continue
+
                             for remote_node_addr in net_netif.addrlist:
-                                #local_node_addr = node.getLoopbackIPv4()
-                                #remote_node_addr = net_netif.node.getLoopbackIPv4()
-                                if (isIPv4Address(str(local_node_addr.split('/')[0])) and \
-                                        isIPv4Address(str(remote_node_addr.split('/')[0]))) or \
-                                        (isIPv6Address(str(local_node_addr.split('/')[0])) and \
-                                        isIPv6Address(str(remote_node_addr.split('/')[0]))):
+
+                                remote_node_addr_str = str(remote_node_addr.split('/')[0])
+                                if not net_netif.node.enable_ipv4 and \
+                                        isIPv4Address(remote_node_addr_str):
+                                    continue
+                                if not net_netif.node.enable_ipv6 and \
+                                        isIPv6Address(remote_node_addr_str):
+                                    continue
+
+                                # this is an EGP-link. use interface-addresses for BGP-sessions
+                                if (isIPv4Address(local_node_addr_str) and \
+                                        isIPv4Address(remote_node_addr_str)) or \
+                                        (isIPv6Address(local_node_addr_str) and \
+                                        isIPv6Address(remote_node_addr_str)):
+
                                     cfg += '  neighbor %s remote-as %s\n' % \
-                                            (str(remote_node_addr.split('/')[0]), str(net_netif.node.netid))
+                                            (remote_node_addr_str, \
+                                            str(net_netif.node.netid))
                                     cfg += '  neighbor %s update-source %s\n' % \
-                                            (str(remote_node_addr.split('/')[0]),
-                                                    str(local_node_addr.split('/')[0]))
+                                            (remote_node_addr_str, \
+                                            local_node_addr_str)
 
         # configure IBGP connections
         confstr_list = [cfg]
@@ -542,34 +617,37 @@ class Bgp(QuaggaService):
                 cls.nodewalker_callback)
         cfg = ''.join(confstr_list)
 
-        cfg += '  address-family ipv6\n'
-        for localnetif in node.netifs():
-            # do not include control interfaces
-            if hasattr(localnetif, 'control') and localnetif.control == True:
-                continue
-
-            for idx, net_netif in list(localnetif.net._netif.items()):
-                candidate_node = net_netif.node
-
-                # skip our own interface
-                if localnetif == net_netif.node:
+        if node.enable_ipv6:
+            cfg += '  address-family ipv6\n'
+            for localnetif in node.netifs():
+                # do not include control interfaces
+                if hasattr(localnetif, 'control') and localnetif.control == True:
                     continue
 
-                # found two different ASes.
-                if not node.netid == net_netif.node.netid:
-                    if (hasattr(node, 'type') and node.type == 'egp_node') and \
-                            (hasattr(net_netif.node, 'type') and \
-                            net_netif.node.type == 'egp_node'):
-                        for remote_node_addr in net_netif.addrlist:
-                            if isIPv6Address(remote_node_addr.split('/')[0]):
-                                cfg += '  neighbor %s activate\n' % \
-                                        (str(remote_node_addr.split('/')[0]))
-        # network fc00:3::/32
-        # neighbor fc00::1:9 activate
-        cfg += '  exit-address-family\n'
+                for idx, net_netif in list(localnetif.net._netif.items()):
+                    candidate_node = net_netif.node
 
-        cfg += '  ip forwarding\n'
-        cfg += '  ipv6 forwarding\n'
+                    # skip our own interface
+                    if localnetif == net_netif.node:
+                        continue
+
+                    # found two different ASes.
+                    if not node.netid == net_netif.node.netid:
+                        if (hasattr(node, 'type') and node.type == 'egp_node') and \
+                                (hasattr(net_netif.node, 'type') and \
+                                net_netif.node.type == 'egp_node'):
+                            for remote_node_addr in net_netif.addrlist:
+                                if isIPv6Address(remote_node_addr.split('/')[0]):
+                                    cfg += '  neighbor %s activate\n' % \
+                                            (str(remote_node_addr.split('/')[0]))
+            # network fc00:3::/32
+            # neighbor fc00::1:9 activate
+            cfg += '  exit-address-family\n'
+
+        if node.enable_ipv4:
+            cfg += '  ip forwarding\n'
+        if node.enable_ipv6:
+            cfg += '  ipv6 forwarding\n'
         return cfg
 
     @staticmethod
@@ -580,15 +658,16 @@ class Bgp(QuaggaService):
                 not startnode == currentnode and \
                 startnode.netid == currentnode.netid:
 
-            startnode_addr = startnode.getLoopbackIPv4()
-            currentnode_addr = currentnode.getLoopbackIPv4()
-            result = ['  neighbor %s remote-as %s\n' % \
-                    (str(currentnode_addr), str(currentnode.netid)),
-                    '  neighbor %s update-source %s\n' % \
-                    (str(currentnode_addr), str(startnode_addr))
-                    ]
-            if service_flags.EGP in startnode.services:
-                result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
+            if startnode.enable_ipv4 and currentnode.enable_ipv4:
+                startnode_addr = startnode.getLoopbackIPv4()
+                currentnode_addr = currentnode.getLoopbackIPv4()
+                result = ['  neighbor %s remote-as %s\n' % \
+                        (str(currentnode_addr), str(currentnode.netid)),
+                        '  neighbor %s update-source %s\n' % \
+                        (str(currentnode_addr), str(startnode_addr))
+                        ]
+                if service_flags.EGP in startnode.services:
+                    result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
         return result
 
 addservice(Bgp)
@@ -676,10 +755,15 @@ class ISIS(QuaggaService):
     _startup = ('sh quaggaboot.sh isisd',)
     _shutdown = ('killall isisd', )
     _validate = ('pidof isisd', )
+    _ipv4_routing = True
+    _ipv6_routing = True
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
         added_ifc = False
+
+        if not node.enable_ipv4 and not node.enable_ipv6:
+            return ''
 
         # do not include control interfaces
         if hasattr(ifc, 'control') and ifc.control == True:
@@ -703,8 +787,11 @@ class ISIS(QuaggaService):
 
             # found the same AS, enable IGP/ISIS
             if not added_ifc and node.netid == net_netif.node.netid:
-                cfg += '  ip router isis 1\n'
-                cfg += '  ipv6 router isis 1\n'
+
+                if node.enable_ipv4:
+                    cfg += '  ip router isis 1\n'
+                if node.enable_ipv6:
+                    cfg += '  ipv6 router isis 1\n'
 
                 # other end of link is not router. don't send ISIS hellos
                 if not service_flags.Router in net_netif.node.services:
@@ -728,15 +815,21 @@ class ISIS(QuaggaService):
     @classmethod
     def generatequaggaconfig(cls, node):
         cfg = '!\n! ISIS configuration\n!\n'
-        cfg += 'interface lo\n'
-        cfg += '  ip router isis 1\n'
-        cfg += '  isis passive\n'
-        cfg += '!\n'
+        if node.enable_ipv4 or node.enable_ipv6:
+            cfg += 'interface lo\n'
 
-        cfg += 'router isis 1\n'
-        cfg += '  net %s\n' % cls.get_ISIS_ID(cls.routerid(node), str(node.netid))
-        cfg += '  metric-style wide\n'
-        cfg += '!\n'
+            if node.enable_ipv4:
+                cfg += '  ip router isis 1\n'
+            if node.enable_ipv6:
+                cfg += '  ipv6 router isis 1\n'
+            cfg += '  isis passive\n'
+            cfg += '!\n'
+
+        if node.enable_ipv4 or node.enable_ipv6:
+            cfg += 'router isis 1\n'
+            cfg += '  net %s\n' % cls.get_ISIS_ID(cls.routerid(node), str(node.netid))
+            cfg += '  metric-style wide\n'
+            cfg += '!\n'
 
         return cfg
 

@@ -21,6 +21,7 @@ import os
 
 from core.service import CoreService, addservice
 from core.misc.ipaddr import IPv4Prefix, IPv6Prefix
+from core.misc.ipaddr import Loopback, Interface
 from core.misc.utils import *
 from core.constants import *
 
@@ -95,36 +96,13 @@ killall pmacctd
         # check if remote node is netflow9sink and for same AS
         if NetFlow9SinkService in currentnode.services and \
                 startnode.netid == currentnode.netid:
-            result = ['nfprobe_receiver: ',
-                    list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
-                    ':2055\n']
+            if currentnode.enable_ipv6 and startnode.enable_ipv6:
+                result = ['nfprobe_receiver: ', str(currentnode.getLoopbackIPv6()),
+                        ':2055\n']
+            elif currentnode.enable_ipv4 and startnode.enable_ipv4:
+                result = ['nfprobe_receiver: ', str(currentnode.getLoopbackIPv4()),
+                        ':2055\n']
         return result
-
-    """
-    @staticmethod
-    def nodewalker(startnode, currentnode, visited_list, receiver_list):
-
-        print('current node: %s, netid: %s' % (str(currentnode.name),
-                str(currentnode.netid)))
-        visited_list.append(currentnode)
-
-        # check if remote node is netflow9sink and for same AS
-        if NetFlow9SinkService in currentnode.services and \
-                startnode.netid == currentnode.netid:
-            receiver_list.extend(['nfprobe_receiver: ',
-                    list(currentnode._netif.values())[0].addrlist[0].partition('/')[0],
-                    ':2055\n'])
-
-        for localnetif in currentnode.netifs():
-            for idx, net_netif in localnetif.net._netif.items():
-                # skip our own interface
-                if localnetif == net_netif.node:
-                    continue
-
-                if not net_netif.node in visited_list:
-                    service_helpers.nodewalker(startnode, net_netif.node,
-                            visited_list, receiver_list, nodewalker_callback)
-    """
 
     @staticmethod
     def generateConf(node):

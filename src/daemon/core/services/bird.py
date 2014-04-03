@@ -14,6 +14,7 @@ import os
 
 from core.service import CoreService, addservice
 from core.misc.ipaddr import IPv4Prefix
+from core.misc.ipaddr import Loopback, Interface
 from core.constants import *
 
 class Bird(CoreService):
@@ -42,14 +43,7 @@ class Bird(CoreService):
     def routerid(node):
         ''' Helper to return the first IPv4 address of a node as its router ID.
         '''
-        for ifc in node.netifs():
-            if hasattr(ifc, 'control') and ifc.control == True:
-                continue
-            for a in ifc.addrlist:
-                if a.find(".") >= 0:
-                    return a .split('/') [0]
-        #raise ValueError("no IPv4 address found for router ID")
-        return "0.0.0.0"
+        return str(Loopback.getLoopbackIPv4(node))
 
     @classmethod
     def generateBirdConf(cls, node, services):

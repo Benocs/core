@@ -39,7 +39,6 @@ addservice(EGP)
 
 class Router(ServiceFlag):
     _name = "Router"
-    _depends = ("LoopbackAddress",)
 
 addservice(Router)
 
