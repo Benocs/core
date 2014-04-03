@@ -265,7 +265,8 @@ def isIPAddress(af, addrstr):
     if isinstance(addrstr, IPAddr):
         return True
     try:
-        tmp = socket.inet_pton(af, addrstr)
+        (ip, sep, mask) = addrstr.partition('/')
+        tmp = socket.inet_pton(af, ip)
         return True
     except:
         return False
