@@ -30,6 +30,7 @@ virtual node.
 import os, signal, sys, subprocess, threading, string, shutil
 import random, time
 from core.api import coreapi
+from core.misc.ipaddr import isIPv4Address, isIPv6Address
 from core.misc.utils import *
 from core.constants import *
 from core.coreobj import PyCoreObj, PyCoreNode, PyCoreNetIf, Position
@@ -95,15 +96,20 @@ class SimpleLxcNode(PyCoreNode):
         self.vnodeclient = vnodeclient.VnodeClient(self.name,
                                                    self.ctrlchnlname)
         self.info("bringing up loopback interface")
-        self.cmd([IP_BIN, "link", "set", "lo", "up"])
-        self.info("adding IPv4 loopback address: %s/32" % \
-                str(self.getLoopbackIPv4()))
-        self.cmd([IP_BIN, "addr", "add", "%s/32" % str(self.getLoopbackIPv4()),
-                "dev", "lo"])
-        self.info("adding IPv6 loopback address: %s/128" % \
-                str(self.getLoopbackIPv6()))
-        self.cmd([IP_BIN, "addr", "add", "%s/128" % str(self.getLoopbackIPv6()),
-                "dev", "lo"])
+        if self.enable_ipv4:
+            self.cmd([IP_BIN, "link", "set", "lo", "up"])
+            self.info("adding IPv4 loopback address: %s/32" % \
+                    str(self.getLoopbackIPv4()))
+            self.cmd([IP_BIN, "addr", "add", "%s/32" % str(self.getLoopbackIPv4()),
+                    "dev", "lo"])
+        if self.enable_ipv6:
+            self.cmd([SYSCTL_BIN, '-w', 'net.ipv6.conf.all.disable_ipv6=0'])
+            self.info("adding IPv6 loopback address: %s/128" % \
+                    str(self.getLoopbackIPv6()))
+            self.cmd([IP_BIN, "addr", "add", "%s/128" % str(self.getLoopbackIPv6()),
+                    "dev", "lo"])
+        else:
+            self.cmd([SYSCTL_BIN, '-w', 'net.ipv6.conf.all.disable_ipv6=1'])
         self.info("setting hostname: %s" % self.name)
         self.cmd(["hostname", self.name])
         self.up = True
@@ -167,12 +173,12 @@ class SimpleLxcNode(PyCoreNode):
                 source, target))
 
         # we only mount top-level directories. strip any sub-dirs from paths
-        self.info('orig source, target: %s -> %s' % (source, target))
+        #self.info('orig source, target: %s -> %s' % (source, target))
         if target.count('/') > 1:
             source = source[:source.find(target)]
             target = target[:target[1:].find('/')+1]
             source = os.path.join(source, target[1:])
-        self.info('new  source, target: %s -> %s' % (source, target))
+        #self.info('new  source, target: %s -> %s' % (source, target))
 
         ### tmp. mv to config ###
         def getDefaultMountType(target):
@@ -235,34 +241,36 @@ class SimpleLxcNode(PyCoreNode):
                     break
 
         if already_mounted:
-            self.info('directory %s already mounted.' % target)
+            #self.info('directory %s already mounted.' % target)
             return
 
         source = os.path.abspath(source)
-        self.info("nodedir: %s" % self.nodedir)
+        #self.info("nodedir: %s" % self.nodedir)
         if mount_type is None:
             mount_type = getDefaultMountType(target)
-            self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
+            #self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
         else:
-            if mount_type == 'bind':
-                self.info('mounting %s at %s using bind-mounts' % (source, target))
-            elif mount_type == 'union':
-                self.info('mounting %s at %s using union-mounts' % (source, target))
-            else:
+            #if mount_type == 'bind':
+            #    self.info('mounting %s at %s using bind-mounts' % (source, target))
+            #elif mount_type == 'union':
+            #    self.info('mounting %s at %s using union-mounts' % (source, target))
+            #else:
+            #    self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
+
+            if not mount_type == 'bind' and not mount_type == 'union':
                 mount_type = getDefaultMountType(target)
-                self.info('mounting %s at %s using %s-mounts' % (source, target, mount_type))
 
         try:
             if mount_type == 'bind':
                 shcmd = "mkdir -p '%s' && %s -n --bind '%s' '%s'" % \
                     (target, MOUNT_BIN, source, target)
-                self.info('assembled bindcmd: %s' % shcmd)
+                #self.info('assembled bindcmd: %s' % shcmd)
             elif mount_type == 'union':
                 host_dirs = os.path.join(self.nodedir, '../host_dirs')
-                self.info('host_dirs: %s' % host_dirs)
+                #self.info('host_dirs: %s' % host_dirs)
 
                 bound_host_dir = os.path.join(host_dirs, target.lstrip('/'))
-                self.info('bound_host_dir: %s' % bound_host_dir)
+                #self.info('bound_host_dir: %s' % bound_host_dir)
 
                 shcmditems = []
                 shcmditems.append("mkdir -p '%s' && mkdir -p '%s' && " %
@@ -275,7 +283,7 @@ class SimpleLxcNode(PyCoreNode):
                         "%s=RW:%s=RO %s") % (UNIONFS_BIN, source,
                         bound_host_dir, target)])
                 shcmd = ''.join(shcmditems)
-                self.info('assembled unionfscmd: %s' % shcmd)
+                #self.info('assembled unionfscmd: %s' % shcmd)
             else:
                 raise ValueError
             self.shcmd(shcmd)
@@ -359,20 +367,29 @@ class SimpleLxcNode(PyCoreNode):
                 self.exception(coreapi.CORE_EXCP_LEVEL_ERROR,
                     "SimpleLxcNode.sethwaddr()",
                     "error setting MAC address %s" % str(addr))
+
     def addaddr(self, ifindex, addr):
         if self.up:
-            self.cmd([IP_BIN, "addr", "add", str(addr),
-                  "dev", self.ifname(ifindex)])
-        self._netif[ifindex].addaddr(addr)
+            if self.enable_ipv4 and isIPv4Address(addr) or \
+                    self.enable_ipv6 and isIPv6Address(addr):
+                self.cmd([IP_BIN, "addr", "add", str(addr),
+                    "dev", self.ifname(ifindex)])
+        if self.enable_ipv4 and isIPv4Address(addr) or \
+                self.enable_ipv6 and isIPv6Address(addr):
+            self._netif[ifindex].addaddr(addr)
 
     def deladdr(self, ifindex, addr):
         try:
-            self._netif[ifindex].deladdr(addr)
+            if self.enable_ipv4 and isIPv4Address(addr) or \
+                    self.enable_ipv6 and isIPv6Address(addr):
+                self._netif[ifindex].deladdr(addr)
         except ValueError:
             self.warn("trying to delete unknown address: %s" % addr)
         if self.up:
-            self.cmd([IP_BIN, "addr", "del", str(addr),
-                  "dev", self.ifname(ifindex)])
+            if self.enable_ipv4 and isIPv4Address(addr) or \
+                    self.enable_ipv6 and isIPv6Address(addr):
+                self.cmd([IP_BIN, "addr", "del", str(addr),
+                      "dev", self.ifname(ifindex)])
 
     valid_deladdrtype = ("inet", "inet6", "inet6link")
     def delalladdr(self, ifindex, addrtypes = valid_deladdrtype):
@@ -405,7 +422,9 @@ class SimpleLxcNode(PyCoreNode):
                 netif = self.netif(ifindex)
                 netif.sethwaddr(hwaddr)
                 for addr in maketuple(addrlist):
-                    netif.addaddr(addr)
+                    if self.enable_ipv4 and isIPv4Address(addr) or \
+                            self.enable_ipv6 and isIPv6Address(addr):
+                        netif.addaddr(addr)
                 return ifindex
             else:
                 ifindex = self.newveth(ifindex = ifindex, ifname = ifname,
@@ -415,7 +434,9 @@ class SimpleLxcNode(PyCoreNode):
             if hwaddr:
                 self.sethwaddr(ifindex, hwaddr)
             for addr in maketuple(addrlist):
-                self.addaddr(ifindex, addr)
+                if self.enable_ipv4 and isIPv4Address(addr) or \
+                        self.enable_ipv6 and isIPv6Address(addr):
+                    self.addaddr(ifindex, addr)
             self.ifup(ifindex)
             return ifindex
         finally:
