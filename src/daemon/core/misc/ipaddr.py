@@ -431,7 +431,7 @@ class Loopback():
         global_prefixbase, global_prefixlen = str(global_loopback_prefix).split('/')
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
-        target_network_baseaddr = baseprefix.minaddr() + (netid * (baseprefix.numaddr() + 2))
+        target_network_baseaddr = baseprefix.minaddr() + ((netid - 1) * (baseprefix.numaddr() + 2))
         target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
         return target_network_prefix
 
