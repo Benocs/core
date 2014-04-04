@@ -657,6 +657,11 @@ class Bgp(QuaggaService):
         service_helpers.nodewalker(node, node, confstr_list,
                 cls.nodewalker_ibgp_find_neighbors_callback)
         cfg = ''.join(confstr_list)
+        if node.enable_ipv4 and service_flags.EGP in node.services:
+                interface_net = Interface.getInterfaceNet_per_net(netid, 4)
+                loopback_net = Loopback.getLoopbackNet_per_net(netid, 4)
+                cfg += '  aggregate-address %s summary-only\n' % str(loopback_net)
+                cfg += '  aggregate-address %s summary-only\n' % str(interface_net)
 
         if node.enable_ipv6:
             v6_ibgp_neighbor_list = []
