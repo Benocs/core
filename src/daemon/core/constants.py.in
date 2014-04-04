@@ -36,6 +36,12 @@ class KeyValueConf():
         with open(filename, 'r') as f:
             for line in f:
                 try:
+                    line = line.strip()
+                    if line.startswith('#'):
+                        continue
+                    if len(line) == 0:
+                        continue
+
                     key_value = line.split('=')
                     if not len(key_value) == 2:
                         print('ERROR: could not read line: %s' % line)
