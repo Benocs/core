@@ -439,14 +439,24 @@ class Ospfv3(QuaggaService):
         else:
             return ''
 
-    @staticmethod
-    def ptpcheck(ifc):
-        ''' Helper to detect whether interface is connected to a notional
-        point-to-point link.
-        '''
-        if isinstance(ifc.net, nodes.PtpNet):
-            return '  ipv6 ospf6 network point-to-point\n'
-        return ''
+    @classmethod
+    def generate_area_statement(cls, node, ifc):
+        cfg = []
+        for idx, net_netif in list(ifc.net._netif.items()):
+
+            # skip our own interface
+            if ifc == net_netif:
+                continue
+
+            # found the same AS, enable IGP/OSPF
+            if node.netid == net_netif.node.netid:
+                if service_flags.Router in net_netif.node.services:
+                    cfg.append('  interface %s area 0.0.0.0\n' % ifc.name)
+                for a in ifc.addrlist:
+                    if not isIPv6Address(a):
+                        continue
+                    cfg.append('  area 0.0.0.0 range %s\n' % a)
+        return cfg
 
     @classmethod
     def generatequaggaconfig(cls,  node):
@@ -456,6 +466,10 @@ class Ospfv3(QuaggaService):
         cfg = 'router ospf6\n'
         rtrid = cls.routerid(node)
         cfg += '  router-id %s\n' % rtrid
+        cfg += '  redistribute connected\n'
+        cfg += '!\n'
+        cfg += ''.join(set(cls.interface_iterator(node,
+                cls.generate_area_statement)))
         cfg += '!\n'
         return cfg
 
@@ -477,8 +491,17 @@ class Ospfv3(QuaggaService):
         cfg = ''
         if enable_ifc:
             cfg += cls.mtucheck(ifc)
-            cfg += cls.ptpcheck(ifc)
-            cfg += '  interface %s area 0.0.0.0\n' % ifc.name
+            for idx, net_netif in list(ifc.net._netif.items()):
+
+                # skip our own interface
+                if ifc == net_netif:
+                    continue
+
+                # found the same AS, enable IGP/OSPF
+                if node.netid == net_netif.node.netid:
+                    if service_flags.Router in net_netif.node.services:
+                        cfg += '  ipv6 ospf6 instance-id 0\n'
+                        break
         return cfg
 
 addservice(Ospfv3)
