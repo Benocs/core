@@ -102,14 +102,14 @@ class Zebra(CoreService):
                     cfgvall += ifccfg
 
             if want_ipv4 and not want_ipv6:
-                ipv4list = [x for x in ifc.addrlist if isIPv4Address(x.split('/')[0])]
+                ipv4list = [x for x in ifc.addrlist if isIPv4Address(x)]
                 tmpcfg += '  '
                 tmpcfg += '\n  '.join(map(cls.addrstr, ipv4list))
                 tmpcfg += '\n'
                 tmpcfg += cfgv4
 
             elif not want_ipv4 and want_ipv6:
-                ipv6list = [x for x in ifc.addrlist if isIPv6Address(x.split('/')[0])]
+                ipv6list = [x for x in ifc.addrlist if isIPv6Address(x)]
                 tmpcfg += '  '
                 tmpcfg += '\n  '.join(map(cls.addrstr, ipv6list))
                 tmpcfg += '\n'
@@ -138,9 +138,9 @@ class Zebra(CoreService):
     def addrstr(x):
         ''' helper for mapping IP addresses to zebra config statements
         '''
-        if x.find('.') >= 0:
+        if isIPv4Address(x):
             return 'ip address %s' % x
-        elif x.find(':') >= 0:
+        elif isIPv6Address(x):
             return 'ipv6 address %s' % x
         else:
             raise Value('invalid address: %s').with_traceback(x)
@@ -297,6 +297,19 @@ class QuaggaService(CoreService):
     def generatequaggaconfig(cls,  node):
         return ''
 
+    @classmethod
+    def interface_iterator(cls, node, callback=None):
+        result = []
+        for ifc in node.netifs():
+            # do not ever include control interfaces in anything
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
+
+            if not callback is None:
+                result.extend(callback(node, ifc))
+        return result
+
+
 class Ospfv2(QuaggaService):
     ''' The OSPFv2 service provides IPv4 routing for wired networks. It does
         not build its own configuration file but has hooks for adding to the
@@ -330,9 +343,29 @@ class Ospfv2(QuaggaService):
         ''' Helper to detect whether interface is connected to a notional
         point-to-point link.
         '''
-        if isinstance(ifc.net, nodes.PtpNet):
-            return '  ip ospf network point-to-point\n'
+        #if isinstance(ifc.net, nodes.PtpNet):
+        #    return '  ip ospf network point-to-point\n'
         return ''
+
+    @classmethod
+    def generate_network_statement(cls, node, ifc):
+        cfg = []
+        # find any link on which two equal netid's (i.e., AS numbers) are
+        # present and configure an ospf-session on this interface
+        # on all other interfaces, disable ospf
+        for idx, net_netif in list(ifc.net._netif.items()):
+
+            # skip our own interface
+            if ifc == net_netif:
+                continue
+
+            # found the same AS, enable IGP/OSPF
+            if node.netid == net_netif.node.netid:
+                for a in ifc.addrlist:
+                    if not isIPv4Address(a):
+                        continue
+                    cfg.append('  network %s area 0.0.0.0\n' % a)
+        return cfg
 
     @classmethod
     def generatequaggaconfig(cls, node):
@@ -343,8 +376,11 @@ class Ospfv2(QuaggaService):
         cfg += 'router ospf\n'
         cfg += '  router-id %s\n' % cls.routerid(node)
         cfg += '  redistribute connected\n'
-        cfg += '  redistribute bgp\n'
+        cfg += '!  redistribute static\n'
         cfg += '!\n'
+
+        cfg += ''.join(set(cls.interface_iterator(node,
+                cls.generate_network_statement)))
 
         return cfg
 
@@ -361,21 +397,6 @@ class Ospfv2(QuaggaService):
         cfg += cls.mtucheck(ifc)
         cfg += cls.ptpcheck(ifc)
 
-        # find any link on which two equal netid's (i.e., AS numbers) are
-        # present and configure an ospf-session on this interface
-        # on all other interfaces, disable ospf
-        for idx, net_netif in list(ifc.net._netif.items()):
-
-            # skip our own interface
-            if ifc == net_netif:
-                continue
-
-            # found the same AS, enable IGP/OSPF
-            if node.netid == net_netif.node.netid:
-                for a in ifc.addrlist:
-                    if a.find('.') < 0:
-                        continue
-                    cfg += '  network %s area 0\n' % a
         cfg += '!\n'
         return cfg
 
