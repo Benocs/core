@@ -361,6 +361,8 @@ class Ospfv2(QuaggaService):
 
             # found the same AS, enable IGP/OSPF
             if node.netid == net_netif.node.netid:
+                if not service_flags.Router in net_netif.node.services:
+                    cfg.append('  passive-interface %s\n' % ifc.name)
                 for a in ifc.addrlist:
                     if not isIPv4Address(a):
                         continue
@@ -376,12 +378,10 @@ class Ospfv2(QuaggaService):
         cfg += 'router ospf\n'
         cfg += '  router-id %s\n' % cls.routerid(node)
         cfg += '  redistribute connected\n'
-        cfg += '!  redistribute static\n'
         cfg += '!\n'
-
         cfg += ''.join(set(cls.interface_iterator(node,
                 cls.generate_network_statement)))
-
+        cfg += '!\n'
         return cfg
 
     @classmethod
