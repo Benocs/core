@@ -677,6 +677,8 @@ class Bgp(QuaggaService):
                 loopback_net = Loopback.getLoopbackNet_per_net(netid, 6)
                 cfg += '    network %s\n' % str(loopback_net)
                 cfg += '    network %s\n' % str(interface_net)
+                cfg += '    aggregate-address %s summary-only\n' % str(loopback_net)
+                cfg += '    aggregate-address %s summary-only\n' % str(interface_net)
             adj_addrs = cls.collect_adjacent_loopback_addrs_v6(cls, node)
             for adj_addr in adj_addrs:
                 cfg += '    network %s/128\n' % str(adj_addr)
