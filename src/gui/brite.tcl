@@ -564,7 +564,7 @@ proc buildIMN {} {
   #lappend exec_string "weitere parameter"
 
   # ist mit und ohne & blockeriend ..
-  lappend  exec_string >@stdout 2>@stderr &
+  lappend  exec_string >@stdout 2>@stderr
 
   # ausfuehren
   {*}$exec_string
