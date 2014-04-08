@@ -108,10 +108,10 @@ proc receiveMessage { channel } {
 	    4 { parseRegMessage $bytes $len $flags $channel }
 	    5 { parseConfMessage $bytes $len $flags $channel }
 	    6 { parseFileMessage $bytes $len $flags $channel }
+	    7 { parseIfaceMessage $bytes $len $flags $channel }
 	    8 { parseEventMessage $bytes $len $flags $channel }
 	    9 { parseSessionMessage $bytes $len $flags $channel }
 	    10 { parseExceptionMessage $bytes $len $flags $channel;
-	    #7 { parseIfaceMessage $bytes $len $flags $channel }
 		#
 	      }
 	    default { puts "Unknown Message = $type" }
@@ -1694,6 +1694,12 @@ proc parseMessage { data len flags tlvnamesl tlvsizesl defaultvalsl } {
 	if { $prmsg } { puts -nonewline "$tlvname=$vals($tlvname)," }
     }
     return [array get vals]
+}
+
+proc parseIfaceMessage { data len flags channel } {
+    global showAPI
+    set prmsg $showAPI
+
 }
 
 proc parseExceptionMessage { data len flags channel } {
