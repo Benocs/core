@@ -4148,7 +4148,7 @@ proc animate {} {
 proc zoom { dir } {
     global zoom
 
-    set stops ".25 .5 .75 1.0 1.5 2.0 4.0"
+    set stops ".05 .075 .1 .125 .25 .5 .75 1.0 1.5 2.0 4.0"
     # set i [lsearch $stops $zoom]
     set minzoom [lindex $stops 0]
     set maxzoom [lindex $stops [expr [llength $stops] - 1]]
@@ -4547,7 +4547,7 @@ proc createScaledImages { img } {
     set w [image width [set $img]]
     set h [image height [set $img]]
     # we skip 75% and 150% since resulting images are the same (due to int())
-    foreach size {.25 .5 1.0 2.0 4.0} {
+    foreach size {.05 .075 .1 .125 .25 .5 1.0 2.0 4.0} {
 	# image will be globally accessible
 	global $img$size
 	# create empty photo object
