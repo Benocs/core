@@ -139,7 +139,7 @@ class DefaultRouteService(UtilService):
 
                 for addr in net_netif.addrlist:
                     # only core routers are candidate gateways
-                    if not service_flags.IGP in net_netif.node.services:
+                    if not service_flags.Router in net_netif.node.services:
                         continue
                     if node.enable_ipv4 and isIPv4Address(addr):
                         cfg += cls.addrstr(addr)
@@ -184,7 +184,7 @@ class StaticRouteToLoopback(UtilService):
                     continue
 
                 # only core routers are candidate gateways
-                if not service_flags.IGP in net_netif.node.services:
+                if not service_flags.Router in net_netif.node.services:
                     continue
 
                 for addr in ifc.addrlist:
