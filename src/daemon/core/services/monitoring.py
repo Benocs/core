@@ -21,6 +21,7 @@ import os
 
 from core.service import CoreService, addservice
 from core.misc.ipaddr import IPv4Prefix, IPv6Prefix
+from core.misc.ipaddr import isIPv4Address, isIPv6Address
 from core.misc.ipaddr import Loopback, Interface
 from core.misc.utils import *
 from core.constants import *
@@ -147,3 +148,193 @@ class NetFlow9SinkService(MonitoringService):
     _group = "Service Flags"
 
 addservice(NetFlow9SinkService)
+
+class ICMPProbeService(MonitoringService):
+    _name = "ICMPProbe"
+    _depends = ("Cron",)
+    _configs = (
+            'start_icmp_probe_lo.sh',
+            'icmp_probe_lo.sh',
+            'icmp_probe_lo.hosts',
+            'icmp_probe_lo.hosts.verbose',
+            'start_icmp_probe_if.sh',
+            'icmp_probe_if.sh',
+            'icmp_probe_if.hosts',
+            'icmp_probe_if.hosts.verbose',
+            )
+    _dirs = ()
+    _startup = (
+            "rm -f /tmp/icmp_probe_lo.stop",
+            "rm -f /tmp/icmp_probe_if.stop",
+            "bash start_icmp_probe_lo.sh",
+            "bash start_icmp_probe_if.sh",
+            )
+    _shutdown = ("> /tmp/icmp_probe_lo.stop", "> /tmp/icmp_probe_if.stop",)
+    _validate = ()
+    # TODO: wait for IGP to converge before starting to scan
+    #_starttime = 300
+
+    @classmethod
+    def generateconfig(cls, node, filename, services):
+        if filename == 'start_icmp_probe_lo.sh':
+            return cls.generateStartLo(node)
+        elif filename == 'icmp_probe_lo.sh':
+            return cls.generateConfLo(node)
+        elif filename == 'icmp_probe_lo.hosts':
+            return cls.generateHostsLo(node)
+        elif filename == 'icmp_probe_lo.hosts.verbose':
+            return cls.generateHostsLo(node, True)
+        elif filename == 'start_icmp_probe_if.sh':
+            return cls.generateStartIf(node)
+        elif filename == 'icmp_probe_if.sh':
+            return cls.generateConfIf(node)
+        elif filename == 'icmp_probe_if.hosts':
+            return cls.generateHostsIf(node)
+        elif filename == 'icmp_probe_if.hosts.verbose':
+            return cls.generateHostsIf(node, True)
+
+    @staticmethod
+    def generateStartLo(node):
+        confstr =  """\
+#!/bin/bash
+
+grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
+
+bash ./icmp_probe_lo.sh &
+"""
+        return confstr
+
+    @staticmethod
+    def generateConfLo(node):
+        confstr =  """\
+#!/bin/bash
+
+set -e
+
+error=0
+now=$(date +%Y%m%d-%H%M)
+out=icmp_probe_lo.result.${now}
+
+function abort {
+  echo "error at host: $host" >> ${out}
+  error=1
+}
+
+if [ \! -e /tmp/icmp_probe_lo.stop ]; then
+    > ${out}
+
+    for host in $(cat icmp_probe_lo.hosts); do
+        nice -n19 ping -c1 -w1 $host > /dev/null || abort
+    done
+
+    [ $error -eq 0 ] && echo "all ok" > ${out}
+fi
+"""
+        return confstr
+
+    @staticmethod
+    def generateHostsLo(node, verbose=False):
+        confstr_list =  []
+        if not verbose:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    ICMPProbeService.nodewalker_lo_callback)
+        else:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    ICMPProbeService.nodewalker_lo_verbose_callback)
+        return ''.join(confstr_list)
+
+    @staticmethod
+    def nodewalker_lo_callback(startnode, currentnode):
+        result = []
+        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
+        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            result.extend([str(currentnode.getLoopbackIPv4()), '\n'])
+        return result
+
+    @staticmethod
+    def nodewalker_lo_verbose_callback(startnode, currentnode):
+        result = []
+        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
+        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            result.extend([str(currentnode.getLoopbackIPv4()),
+                    ' ', currentnode.name, '\n'])
+        return result
+
+    @staticmethod
+    def generateStartIf(node):
+        confstr =  """\
+#!/bin/bash
+
+grep -v "icmp_probe_if" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
+
+bash ./icmp_probe_if.sh &
+"""
+        return confstr
+
+    @staticmethod
+    def generateConfIf(node):
+        confstr =  """\
+#!/bin/bash
+
+set -e
+
+error=0
+now=$(date +%Y%m%d-%H%M)
+out=icmp_probe_if.result.${now}
+
+function abort {
+  echo "error at host: $host" >> ${out}
+  error=1
+}
+
+if [ \! -e /tmp/icmp_probe_lo.stop ]; then
+    > ${out}
+
+    for host in $(cat icmp_probe_if.hosts); do
+        nice -n19 ping -c1 -w1 $host > /dev/null || abort
+    done
+
+    [ $error -eq 0 ] && echo "all ok" > ${out}
+fi
+"""
+        return confstr
+
+    @staticmethod
+    def generateHostsIf(node, verbose=False):
+        confstr_list =  []
+        if not verbose:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    ICMPProbeService.nodewalker_if_callback)
+        else:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    ICMPProbeService.nodewalker_if_verbose_callback)
+        return ''.join(confstr_list)
+
+    @staticmethod
+    def nodewalker_if_callback(startnode, currentnode):
+        result = []
+        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
+        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            for intf in currentnode._netif.values():
+                for addr in intf.addrlist:
+                    if isIPv4Address(addr):
+                        result.extend([addr.partition('/')[0], '\n'])
+        return result
+
+    @staticmethod
+    def nodewalker_if_verbose_callback(startnode, currentnode):
+        result = []
+        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
+        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            for intf in currentnode._netif.values():
+                for addr in intf.addrlist:
+                    if isIPv4Address(addr):
+                        result.extend([addr.partition('/')[0],
+                        ' ', currentnode.name, '\n'])
+        return result
+
+addservice(ICMPProbeService)
