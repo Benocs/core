@@ -320,6 +320,7 @@ class Ospfv2(QuaggaService):
     _shutdown = ('killall ospfd', )
     _validate = ('pidof ospfd', )
     _ipv4_routing = True
+    _starttime = 10
 
     @staticmethod
     def mtucheck(ifc):
@@ -413,6 +414,7 @@ class Ospfv3(QuaggaService):
     _validate = ('pidof ospf6d', )
     _ipv4_routing = True
     _ipv6_routing = True
+    _starttime = 10
 
     @staticmethod
     def minmtu(ifc):
@@ -521,6 +523,7 @@ class Ospfv3mdr(Ospfv3):
     '''
     _name = 'OSPFv3MDR'
     _ipv4_routing = True
+    _starttime = 10
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
@@ -556,6 +559,7 @@ class Bgp(QuaggaService):
     _custom_needed = False
     _ipv4_routing = True
     _ipv6_routing = True
+    _starttime = 20
 
     @classmethod
     def generatequaggaconfig(cls, node):
@@ -690,9 +694,9 @@ class Bgp(QuaggaService):
             cfg += '\n  exit-address-family\n'
 
         if node.enable_ipv4:
-            cfg += '  ip forwarding\n'
+            cfg += 'ip forwarding\n'
         if node.enable_ipv6:
-            cfg += '  ipv6 forwarding\n'
+            cfg += 'ipv6 forwarding\n'
         return cfg
 
     @staticmethod
@@ -771,6 +775,7 @@ class Rip(QuaggaService):
     _shutdown = ('killall ripd', )
     _validate = ('pidof ripd', )
     _ipv4_routing = True
+    _starttime = 10
 
     @classmethod
     def generatequaggaconfig(cls,  node):
@@ -794,6 +799,7 @@ class Ripng(QuaggaService):
     _shutdown = ('killall ripngd', )
     _validate = ('pidof ripngd', )
     _ipv6_routing = True
+    _starttime = 10
 
     @classmethod
     def generatequaggaconfig(cls,  node):
@@ -818,6 +824,7 @@ class Babel(QuaggaService):
     _shutdown = ('killall babeld', )
     _validate = ('pidof babeld', )
     _ipv6_routing = True
+    _starttime = 10
 
     @classmethod
     def generatequaggaconfig(cls,  node):
@@ -848,6 +855,7 @@ class ISIS(QuaggaService):
     _validate = ('pidof isisd', )
     _ipv4_routing = True
     _ipv6_routing = True
+    _starttime = 10
 
     @classmethod
     def generatequaggaifcconfig(cls,  node,  ifc):
@@ -962,7 +970,7 @@ class Vtysh(CoreService):
     _startindex = 45
     _startup = ('sh quaggaboot.sh vtysh',)
     _shutdown = ()
-    _starttime = 5
+    _starttime = 30
 
     @classmethod
     def generateconfig(cls, node, filename, services):
