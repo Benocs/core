@@ -199,6 +199,7 @@ proc getASiD { nodeGetAS } {
          set asID $g_prefs(gui_asid_standard)
        }
 
+       set asID [expr {$asID - 1}]
        if { $asID > 255 } {
             	set asID "0"
        }
