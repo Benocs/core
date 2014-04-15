@@ -56,6 +56,7 @@ class Lighttpd(BaseWebService):
     "mod_compress",
     "mod_redirect",
     "mod_accesslog",
+    "mod_status",
 #   "mod_rewrite",
 )
 
@@ -75,6 +76,8 @@ static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )
 
 compress.cache-dir          = "/var/cache/lighttpd/compress/"
 compress.filetype           = ( "application/javascript", "text/css", "text/html", "text/plain" )
+
+status.status-url = "/server-status"
 
 # default listening port for IPv6 falls back to the IPv4 port
 include_shell "/usr/share/lighttpd/use-ipv6.pl " + server.port
