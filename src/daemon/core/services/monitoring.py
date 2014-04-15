@@ -198,7 +198,7 @@ class ICMPProbeService(MonitoringService):
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
+grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/30 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
 
 bash ./icmp_probe_lo.sh &
 """
@@ -213,7 +213,8 @@ set -e
 
 error=0
 now=$(date +%Y%m%d-%H%M)
-out=icmp_probe_lo.result.${now}
+mkdir -p icmp_probe
+out=icmp_probe/icmp_probe_lo.result.${now}
 
 function abort {
   echo "error at host: $host" >> ${out}
@@ -267,7 +268,7 @@ fi
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_if" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
+grep -v "icmp_probe_if" /etc/crontab && echo "*/30 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
 
 bash ./icmp_probe_if.sh &
 """
@@ -282,7 +283,8 @@ set -e
 
 error=0
 now=$(date +%Y%m%d-%H%M)
-out=icmp_probe_if.result.${now}
+mkdir -p icmp_probe
+out=icmp_probe/icmp_probe_if.result.${now}
 
 function abort {
   echo "error at host: $host" >> ${out}
