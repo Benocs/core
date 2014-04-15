@@ -762,7 +762,7 @@ addservice(AtdService)
 
 class CronService(UtilService):
     _name = "Cron"
-    _dirs = (('etc', 'union'), ('/var/spool/cron', 'bind'), ('/run', 'bind'))
+    _dirs = (('/etc', 'union'), ('/var/spool/cron', 'bind'), ('/run', 'bind'))
     #_configs = ('/etc/crontab',)
     _startup = ("/usr/sbin/cron",)
 
