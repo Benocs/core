@@ -241,7 +241,7 @@ class SimpleLxcNode(PyCoreNode):
                     break
 
         if already_mounted:
-            #self.info('directory %s already mounted.' % target)
+            self.info('directory %s already mounted.' % target)
             return
 
         source = os.path.abspath(source)
@@ -278,8 +278,8 @@ class SimpleLxcNode(PyCoreNode):
                 if not os.path.exists(bound_host_dir):
                     shcmditems.append("rsync -avhP '%s/' '%s/' && " %
                             (target, bound_host_dir))
-                shcmditems.extend([("%s -o cow,max_files=32768 "
-                        "-o allow_other,use_ino,suid,dev,nonempty "
+                shcmditems.extend([("%s -o cow,max_files=16384 "
+                        "-o allow_other,use_ino,suid,nodev,nonempty,statfs_omit_ro "
                         "%s=RW:%s=RO %s") % (UNIONFS_BIN, source,
                         bound_host_dir, target)])
                 shcmd = ''.join(shcmditems)
