@@ -608,7 +608,7 @@ proc widget_thru_config {} {
     label $wi.hi.t.lab2 -text "kbps"
     pack $wi.hi.t.lab2 $wi.hi.t.thresh $wi.hi.t.lab1 -side right -padx 4 -pady 4
     pack $wi.hi.lab1 $wi.hi.t -side top
-    scale $wi.hi.threshscale -from 0.0 -to 1000.0 -orient horizontal \
+    scale $wi.hi.threshscale -from 0.0 -to 1000000000.0 -orient horizontal \
     	-showvalue false -sliderrelief raised -variable thruConfig(thresh)
     pack $wi.hi.threshscale -side top -fill x
 
