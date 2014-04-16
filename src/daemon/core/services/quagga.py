@@ -562,6 +562,68 @@ class Bgp(QuaggaService):
     _starttime = 20
 
     @classmethod
+    def configure_EGP(cls, node):
+        cfg = ''
+        v6cfg = []
+        # find any link on which two different netid's (i.e., AS numbers) are
+        # present and configure a bgp-session between the two corresponding nodes.
+        for localnetif in node.netifs():
+
+            # do not include control interfaces
+            if hasattr(localnetif, 'control') and localnetif.control == True:
+                continue
+
+            for idx, net_netif in list(localnetif.net._netif.items()):
+                candidate_node = net_netif.node
+
+                # skip our own interface
+                if localnetif == net_netif.node:
+                    continue
+
+                # found two different ASes.
+                if not node.netid == net_netif.node.netid and \
+                        service_flags.EGP in net_netif.node.services:
+                    for local_node_addr in localnetif.addrlist:
+
+                        local_node_addr_str = str(local_node_addr.split('/')[0])
+                        if not node.enable_ipv4 and \
+                                isIPv4Address(local_node_addr):
+                            continue
+                        if not node.enable_ipv6 and \
+                                isIPv6Address(local_node_addr):
+                            continue
+
+                        for remote_node_addr in net_netif.addrlist:
+                            remote_node_addr_str = str(remote_node_addr.split('/')[0])
+                            if not net_netif.node.enable_ipv4 and \
+                                    isIPv4Address(remote_node_addr):
+                                continue
+                            if not net_netif.node.enable_ipv6 and \
+                                    isIPv6Address(remote_node_addr):
+                                continue
+
+                            # for inter-AS links, use interface addresses
+                            # instead of loopback addresses
+                            if (isIPv4Address(local_node_addr) and \
+                                    isIPv4Address(remote_node_addr)):
+                                cfg += '  neighbor %s remote-as %s\n' % \
+                                        (remote_node_addr_str, \
+                                        str(net_netif.node.netid))
+
+                            elif (isIPv6Address(local_node_addr) and \
+                                    isIPv6Address(remote_node_addr)):
+                                cfg += '  neighbor %s remote-as %s\n' % \
+                                        (remote_node_addr_str, str(net_netif.node.netid))
+
+                                v6cfg.append(('    neighbor %s activate\n' %
+                                        remote_node_addr_str))
+                                v6cfg.append(('    network %s\n' %
+                                        str(local_node_addr)))
+
+        return cfg, v6cfg
+
+
+    @classmethod
     def generatequaggaconfig(cls, node):
         v6cfg = []
         v6prefixes = []
@@ -599,62 +661,10 @@ class Bgp(QuaggaService):
             netid = 0
 
         # configure EBGP connections:
-        # find any link on which two different netid's (i.e., AS numbers) are
-        # present and configure a bgp-session between the two corresponding nodes.
-        for localnetif in node.netifs():
-
-            # do not include control interfaces
-            if hasattr(localnetif, 'control') and localnetif.control == True:
-                continue
-
-            for idx, net_netif in list(localnetif.net._netif.items()):
-                candidate_node = net_netif.node
-
-                # skip our own interface
-                if localnetif == net_netif.node:
-                    continue
-
-                # found two different ASes.
-                if not node.netid == net_netif.node.netid:
-                    if service_flags.EGP in node.services and \
-                            service_flags.EGP in net_netif.node.services:
-                        for local_node_addr in localnetif.addrlist:
-
-                            local_node_addr_str = str(local_node_addr.split('/')[0])
-                            if not node.enable_ipv4 and \
-                                    isIPv4Address(local_node_addr):
-                                continue
-                            if not node.enable_ipv6 and \
-                                    isIPv6Address(local_node_addr):
-                                continue
-
-                            for remote_node_addr in net_netif.addrlist:
-                                remote_node_addr_str = str(remote_node_addr.split('/')[0])
-                                if not net_netif.node.enable_ipv4 and \
-                                        isIPv4Address(remote_node_addr):
-                                    continue
-                                if not net_netif.node.enable_ipv6 and \
-                                        isIPv6Address(remote_node_addr):
-                                    continue
-
-                                # for inter-AS links, use interface addresses
-                                # instead of loopback addresses
-                                if (isIPv4Address(local_node_addr) and \
-                                        isIPv4Address(remote_node_addr)):
-                                    cfg += '  neighbor %s remote-as %s\n' % \
-                                            (remote_node_addr_str, \
-                                            str(net_netif.node.netid))
-
-                                elif (isIPv6Address(local_node_addr) and \
-                                        isIPv6Address(remote_node_addr)):
-                                    cfg += '  neighbor %s remote-as %s\n' % \
-                                            (remote_node_addr_str, str(net_netif.node.netid))
-
-                                    v6cfg.append(('    neighbor %s activate\n' %
-                                            remote_node_addr_str))
-                                    v6cfg.append(('    network %s\n' %
-                                            str(local_node_addr)))
-
+        if service_flags.EGP in node.services:
+            tmpcfg, tmpv6cfg = cls.configure_EGP(node)
+            cfg += tmpcfg
+            v6cfg.extend(tmpv6cfg)
 
         # configure IBGP connections
         confstr_list = [cfg]
