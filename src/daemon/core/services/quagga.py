@@ -673,7 +673,10 @@ class Bgp(QuaggaService):
             service_helpers.nodewalker(node, node, rr_list,
                     cls.nodewalker_ibgp_find_route_reflectors_callback)
             if len(rr_list) > 0:
+                print(('[BGP] IBGP rr_list: %s' % str(rr_list)))
                 configure_full_mesh = False
+        print(('[BGP] IBGP config determination: full_mesh: %s, rr: %s' %
+                (str(configure_full_mesh), str(configure_route_reflector))))
 
         # configure IBGP connections
         confstr_list = [cfg]
@@ -684,7 +687,7 @@ class Bgp(QuaggaService):
         # we are a route reflector or a rr-client
         else:
             service_helpers.nodewalker(node, node, confstr_list,
-                    cls.nodewalker_ibgp_find_route_reflectors_callback)
+                    cls.nodewalker_ibgp_configure_route_reflector_net_callback)
         cfg = ''.join(confstr_list)
 
         if node.enable_ipv4 and service_flags.EGP in node.services:
@@ -733,6 +736,21 @@ class Bgp(QuaggaService):
                 service_flags.Router in currentnode.services and \
                 not startnode == currentnode and \
                 startnode.netid == currentnode.netid:
+            if (service_flags.BGPRouteReflector in startnode.services and \
+                    not service_flags.BGPRouteReflector in currentnode.services) or \
+                    service_flags.BGPRouteReflector in currentnode.services:
+                result.append(currentnode)
+
+        return result
+
+    @staticmethod
+    def nodewalker_ibgp_configure_route_reflector_net_callback(startnode, currentnode):
+        result = []
+
+        if service_flags.Router in startnode.services and \
+                service_flags.Router in currentnode.services and \
+                not startnode == currentnode and \
+                startnode.netid == currentnode.netid:
 
             startnode_ipversions = startnode.getIPversions()
             currentnode_ipversions = currentnode.getIPversions()
@@ -764,6 +782,9 @@ class Bgp(QuaggaService):
                 elif service_flags.BGPRouteReflector in startnode.services and \
                         not service_flags.BGPRouteReflector in currentnode.services:
                     result.append('  neighbor %s route-reflector-client\n' % str(currentnode_addr))
+
+                    if service_flags.EGP in startnode.services:
+                        result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
         return result
 
     @staticmethod
