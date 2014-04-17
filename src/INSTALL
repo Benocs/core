@@ -18,16 +18,20 @@ su -c "apt-get install bash bridge-utils ebtables iproute libev-dev python \
 ./configure --prefix=/usr
 
 make $BUILD_PARALLEL
+#TODO: chmod -R 775 "$CORECFG" && \
 su -c "make install && \
     mkdir -p "$CORECFG" && \
-    chmod -R 775 "$CORECFG" && \
+    chmod -R 777 "$CORECFG" && \
     addgroup core || echo \"group \\\"core\\\" already exists. this can be ignored\" && \
     chgrp -R core \"$CORECFG\" && \
     cp -v files/brite.conf \"$CORECFG/\" && \
     cp -v files/nodes.conf \"$CORECFG/\" && \
     cp -v files/ipaddrs.conf \"$CORECFG/\" && \
     cp -v files/widgets.conf \"$CORECFG/\" && \
-    ln -s \"$CORECFG\" /root/.core || echo \"link already exists. this can be ignored\"" root
+    ln -s \"$CORECFG\" /root/.core || echo \"link already exists. this can be ignored\" && \
+    (for i in /home/*; do \
+        echo \"creating link in \"\$i\"\"; ln -s \"$CORECFG\" \"\$i/.core\" || \
+        echo \"link already exists. this can be ignored\"; done)" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
