@@ -37,6 +37,11 @@ class EGP(ServiceFlag):
 
 addservice(EGP)
 
+class BGPRouteReflector(ServiceFlag):
+    _name = "BGPRouteReflector"
+
+addservice(BGPRouteReflector)
+
 class Router(ServiceFlag):
     _name = "Router"
 
