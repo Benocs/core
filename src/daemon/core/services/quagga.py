@@ -628,6 +628,12 @@ class Bgp(QuaggaService):
         v6cfg = []
         v6prefixes = []
 
+        # Assume that we want to configure a full-mesh IBGP network.
+        # But, if there is a route reflector within this AS and this node
+        # is not a route reflector, configure it as a route reflector client.
+        configure_full_mesh = True
+        configure_route_reflector = False
+
         if not node.enable_ipv4 and not node.enable_ipv6:
             return ''
 
@@ -641,18 +647,6 @@ class Bgp(QuaggaService):
         cfg += '  redistribute isis\n'
 
         cfg += '!\n'
-        # aggregate networks that are being used for internal transit and access
-        # TODO: find a more generic way. this approach works well for
-        # two-AS-networks. ideally, each network should only aggregate the address
-        # space that it allocates to it's client or the space that is being used by
-        # it's internal routers (i.e., IGP, non-EGP)
-
-        #cfg += '  aggregate-address 172.16.0.0 255.240.0.0 summary-only\n'
-        #cfg += '  aggregate-address 192.168.0.0 255.255.0.0 summary-only\n'
-
-        # don't aggregate networks that are being used for inter-AS routing
-        #cfg += '  aggregate-address 10.0.0.0 255.0.0.0 summary-only\n!\n'
-        #cfg += '!\n'
 
         if hasattr(node, 'netid') and not node.netid is None:
             netid = node.netid
@@ -666,16 +660,38 @@ class Bgp(QuaggaService):
             cfg += tmpcfg
             v6cfg.extend(tmpv6cfg)
 
+        # determine IBGP configuration
+        if service_flags.BGPRouteReflector in node.services:
+            configure_full_mesh = False
+            configure_route_reflector = True
+            # TODO: how to automatically configure a bgp cluster-id?
+            cfg += '  bgp cluster-id 1\n'
+        else:
+            configure_route_reflector = False
+            # check whether there are any route reflectors in this AS
+            rr_list = []
+            service_helpers.nodewalker(node, node, rr_list,
+                    cls.nodewalker_ibgp_find_route_reflectors_callback)
+            if len(rr_list) > 0:
+                configure_full_mesh = False
+
         # configure IBGP connections
         confstr_list = [cfg]
-        service_helpers.nodewalker(node, node, confstr_list,
-                cls.nodewalker_ibgp_find_neighbors_callback)
+        # full mesh
+        if configure_full_mesh:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    cls.nodewalker_ibgp_find_neighbors_callback)
+        # we are a route reflector or a rr-client
+        else:
+            service_helpers.nodewalker(node, node, confstr_list,
+                    cls.nodewalker_ibgp_find_route_reflectors_callback)
         cfg = ''.join(confstr_list)
+
         if node.enable_ipv4 and service_flags.EGP in node.services:
-                interface_net = Interface.getInterfaceNet_per_net(netid, 4)
-                loopback_net = Loopback.getLoopbackNet_per_net(netid, 4)
-                cfg += '  aggregate-address %s summary-only\n' % str(loopback_net)
-                cfg += '  aggregate-address %s summary-only\n' % str(interface_net)
+            interface_net = Interface.getInterfaceNet_per_net(netid, 4)
+            loopback_net = Loopback.getLoopbackNet_per_net(netid, 4)
+            cfg += '  aggregate-address %s summary-only\n' % str(loopback_net)
+            cfg += '  aggregate-address %s summary-only\n' % str(interface_net)
 
         if node.enable_ipv6:
             v6_ibgp_neighbor_list = []
@@ -708,6 +724,50 @@ class Bgp(QuaggaService):
         if node.enable_ipv6:
             cfg += 'ipv6 forwarding\n'
         return cfg
+
+    @staticmethod
+    def nodewalker_ibgp_find_route_reflectors_callback(startnode, currentnode):
+        result = []
+
+        if service_flags.Router in startnode.services and \
+                service_flags.Router in currentnode.services and \
+                not startnode == currentnode and \
+                startnode.netid == currentnode.netid:
+
+            startnode_ipversions = startnode.getIPversions()
+            currentnode_ipversions = currentnode.getIPversions()
+            ipversions = []
+            for ipversion in 4, 6:
+                if ipversion in startnode_ipversions and currentnode_ipversions:
+                    ipversions.append(ipversion)
+
+            for ipversion in ipversions:
+                if ipversion == 4:
+                    startnode_addr = startnode.getLoopbackIPv4()
+                    currentnode_addr = currentnode.getLoopbackIPv4()
+                elif ipversion == 6:
+                    startnode_addr = startnode.getLoopbackIPv6()
+                    currentnode_addr = currentnode.getLoopbackIPv6()
+
+                if (service_flags.BGPRouteReflector in startnode.services and \
+                        not service_flags.BGPRouteReflector in currentnode.services) or \
+                        service_flags.BGPRouteReflector in currentnode.services:
+                    result.extend(['  neighbor %s remote-as %s\n' % \
+                            (str(currentnode_addr), str(currentnode.netid)),
+                            '  neighbor %s update-source %s\n' % \
+                            (str(currentnode_addr), str(startnode_addr))
+                            ])
+
+                if service_flags.BGPRouteReflector in startnode.services and \
+                        service_flags.BGPRouteReflector in currentnode.services:
+                    result.append('  no neighbor %s route-reflector-client\n' % str(currentnode_addr))
+                elif service_flags.BGPRouteReflector in startnode.services and \
+                        not service_flags.BGPRouteReflector in currentnode.services:
+                    result.append('  neighbor %s route-reflector-client\n' % str(currentnode_addr))
+
+                if service_flags.EGP in startnode.services:
+                    result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
+        return result
 
     @staticmethod
     def nodewalker_ibgp_find_neighbors_callback(startnode, currentnode):
