@@ -764,9 +764,6 @@ class Bgp(QuaggaService):
                 elif service_flags.BGPRouteReflector in startnode.services and \
                         not service_flags.BGPRouteReflector in currentnode.services:
                     result.append('  neighbor %s route-reflector-client\n' % str(currentnode_addr))
-
-                if service_flags.EGP in startnode.services:
-                    result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
         return result
 
     @staticmethod
