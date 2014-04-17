@@ -198,7 +198,7 @@ class ICMPProbeService(MonitoringService):
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
+grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/1 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
 
 bash ./icmp_probe_lo.sh &
 """
@@ -216,6 +216,8 @@ now=$(date +%Y%m%d-%H%M)
 mkdir -p icmp_probe
 out=icmp_probe/icmp_probe_lo.result.${now}
 
+cmd="nice -n19 ping -c1 -w3 "
+
 function abort {
   echo "error at host: $host" >> ${out}
   error=1
@@ -225,7 +227,7 @@ if [ \! -e /tmp/icmp_probe_lo.stop ]; then
     > ${out}
 
     for host in $(cat icmp_probe_lo.hosts); do
-        nice -n19 ping -c1 -w1 $host > /dev/null || abort
+        $cmd $host || $cmd $host || $cmd $host || abort
     done
 
     [ $error -eq 0 ] && echo "all ok" > ${out}
@@ -268,7 +270,7 @@ fi
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_if" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
+grep -v "icmp_probe_if" /etc/crontab && echo "*/1 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
 
 bash ./icmp_probe_if.sh &
 """
@@ -286,6 +288,8 @@ now=$(date +%Y%m%d-%H%M)
 mkdir -p icmp_probe
 out=icmp_probe/icmp_probe_if.result.${now}
 
+cmd="nice -n19 ping -c1 -w3 "
+
 function abort {
   echo "error at host: $host" >> ${out}
   error=1
@@ -295,7 +299,7 @@ if [ \! -e /tmp/icmp_probe_lo.stop ]; then
     > ${out}
 
     for host in $(cat icmp_probe_if.hosts); do
-        nice -n19 ping -c1 -w1 $host > /dev/null || abort
+        $cmd $host || $cmd $host || $cmd $host || abort
     done
 
     [ $error -eq 0 ] && echo "all ok" > ${out}
