@@ -198,7 +198,7 @@ class ICMPProbeService(MonitoringService):
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/30 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
+grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
 
 bash ./icmp_probe_lo.sh &
 """
@@ -268,7 +268,7 @@ fi
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_if" /etc/crontab && echo "*/30 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
+grep -v "icmp_probe_if" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
 
 bash ./icmp_probe_if.sh &
 """
