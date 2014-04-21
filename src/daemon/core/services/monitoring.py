@@ -198,7 +198,7 @@ class ICMPProbeService(MonitoringService):
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/1 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
+grep -v "icmp_probe_lo.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_lo.sh)" >> /etc/crontab
 
 bash ./icmp_probe_lo.sh &
 """
@@ -270,7 +270,7 @@ fi
         confstr =  """\
 #!/bin/bash
 
-grep -v "icmp_probe_if" /etc/crontab && echo "*/1 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
+grep -v "icmp_probe_if" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/icmp_probe_if.sh)" >> /etc/crontab
 
 bash ./icmp_probe_if.sh &
 """
@@ -344,3 +344,36 @@ fi
         return result
 
 addservice(ICMPProbeService)
+
+class SNMPDService(MonitoringService):
+    _name = "snmpd"
+    _depends = ()
+    _configs = ('/etc/snmp/snmpd.conf',)
+    _dirs = (('/etc/snmp', 'union'), ('/run', 'bind'))
+    _startup = ('/etc/init.d/snmpd start',)
+    _shutdown = ('/etc/init.d/snmpd stop',)
+    _validate = ()
+    _starttime = 5
+
+    @classmethod
+    def generateconfig(cls, node, filename, services):
+        if filename == '/etc/snmp/snmpd.conf':
+            return cls.generateSnmpdConf(node)
+
+    @staticmethod
+    def generateSnmpdConf(node):
+        return """\
+agentAddress udp:161,udp6:[::1]:161
+
+rocommunity public  default
+
+com2sec readonly default public
+group MyROGroup v1 readonly
+view all included .1 80
+access MyROGroup "" any noauth exact all none none
+
+master          agentx
+agentXSocket    tcp:localhost:705
+"""
+
+addservice(SNMPDService)
