@@ -46,9 +46,9 @@ su -c "( cd ../contrib/quagga && \
     ./configure --prefix= \
         --enable-snmp=agentx \
         --enable-isisd \
-        --enable-multipath=0 && \
-        --sysconfdir=/etc/quagga && \
-        --enable-vtysh && \
+        --enable-multipath=1 \
+        --sysconfdir=/etc/quagga \
+        --enable-vtysh \
         --localstatedir=/var/run/quagga && \
     make $BUILD_PARALLEL && \
     make install && \
