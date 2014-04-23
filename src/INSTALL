@@ -59,5 +59,15 @@ su -c "( cd ../contrib/quagga && \
     update-rc.d -f quagga remove || echo \"error while deactivating quagga\'s \
         init script. check output.\")" root
 
+echo "building and installing pmacct..."
+(
+cd ../contrib/pmacct
+tar -xzf pmacct-1.5.0rc3.tar.gz
+cd pmacct-1.5.0rc3.tar
+./configure --enable-l2 --enable-ipv6 --enable-plabel --enable-v4-mapped --enable-64bit --enable-threads --enable-ulog
+make
+su -c "make install" root
+)
+
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
