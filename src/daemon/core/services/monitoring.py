@@ -362,8 +362,16 @@ class SNMPDService(MonitoringService):
 
     @staticmethod
     def generateSnmpdConf(node):
+        listenstatement = ''
+        if node.enable_ipv4:
+            listenstatement = 'agentAddress udp:161'
+        elif node.enable_ipv6:
+            listenstatement = 'agentAddress udp6:161'
+        elif node.enable_ipv4 and node.enable_ipv6:
+            listenstatement = 'agentAddress udp:161,udp6:161'
+
         return """\
-agentAddress udp:161,udp6:[::1]:161
+%s
 
 rocommunity public  default
 
@@ -374,6 +382,6 @@ access MyROGroup "" any noauth exact all none none
 
 master          agentx
 agentXSocket    tcp:localhost:705
-"""
+""" % (listenstatement)
 
 addservice(SNMPDService)
