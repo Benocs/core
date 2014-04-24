@@ -63,7 +63,7 @@ echo "building and installing pmacct..."
 (
 cd ../contrib/pmacct
 tar -xzf pmacct-1.5.0rc3.tar.gz
-cd pmacct-1.5.0rc3.tar
+cd pmacct-1.5.0rc3
 ./configure --enable-l2 --enable-ipv6 --enable-plabel --enable-v4-mapped --enable-64bit --enable-threads --enable-ulog
 make
 su -c "make install" root
