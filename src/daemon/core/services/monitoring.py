@@ -325,6 +325,8 @@ fi
         #    result.append(str(currentnode.getLoopbackIPv6()))
         if currentnode.enable_ipv4 and startnode.enable_ipv4:
             for intf in currentnode._netif.values():
+                if hasattr(intf, 'control') and intf.control == True:
+                    continue
                 for addr in intf.addrlist:
                     if isIPv4Address(addr):
                         result.extend([addr.partition('/')[0], '\n'])
