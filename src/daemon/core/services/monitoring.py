@@ -202,6 +202,9 @@ done
             # monitor IPv6
             base_sflowd_argv.append(' -6')
 
+        # export NetFlow9
+        base_sflowd_argv.append(' -v9')
+
         # transport layer protocol for exporting packets: UDP
         base_sflowd_argv.append(' -Pudp')
 
