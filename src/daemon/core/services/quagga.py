@@ -1075,6 +1075,7 @@ class ISIS(QuaggaService):
         if node.enable_ipv6:
             cfg += '  ipv6 router isis 1\n'
         cfg += '  isis passive\n'
+        cfg += '  isis metric 0\n'
         cfg += '!\n'
 
         return cfg
