@@ -1037,24 +1037,27 @@ class ISIS(QuaggaService):
                 continue
 
             # found the same AS, enable IGP/ISIS
-            if not added_ifc and node.netid == net_netif.node.netid:
+            if not added_ifc:
 
                 if node.enable_ipv4:
                     cfg += '  ip router isis 1\n'
                 if node.enable_ipv6:
                     cfg += '  ipv6 router isis 1\n'
 
-                # other end of link is not router. don't send ISIS hellos
-                if not service_flags.Router in net_netif.node.services:
-                    cfg += '  isis passive\n'
-                else:
-                    cfg += '  isis circuit-type level-2-only\n'
+                if node.netid == net_netif.node.netid:
+                    # other end of link is not router. don't send ISIS hellos
+                    if not service_flags.Router in net_netif.node.services:
+                        cfg += '  isis passive\n'
+                    else:
+                        cfg += '  isis circuit-type level-2-only\n'
 
-                    # if this interface is connected via a point-to-point-link,
-                    # set isis network point-to-point.
-                    # if this directive is not set, isis will speak mode lan
-                    if isinstance(ifc.net, nodes.PtpNet):
-                        cfg += '  isis network point-to-point\n'
+                        # if this interface is connected via a point-to-point-link,
+                        # set isis network point-to-point.
+                        # if this directive is not set, isis will speak mode lan
+                        if isinstance(ifc.net, nodes.PtpNet):
+                            cfg += '  isis network point-to-point\n'
+                elif service_flags.Router in net_netif.node.services:
+                    cfg += '  isis passive\n'
                 cfg += '!\n'
 
                 # only add each interface once
