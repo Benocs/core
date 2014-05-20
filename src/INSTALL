@@ -59,6 +59,8 @@ su -c "( cd ../contrib/quagga && \
     update-rc.d -f quagga remove || echo \"error while deactivating quagga\'s \
         init script. check output.\")" root
 
+su -c "adduser --system --shell /bin/false --no-create-home --group --disabled-password --disabled-login quagga" root
+
 echo "building and installing pmacct..."
 (
 cd ../contrib/pmacct
