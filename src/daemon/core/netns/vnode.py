@@ -180,48 +180,6 @@ class SimpleLxcNode(PyCoreNode):
             source = os.path.join(source, target[1:])
         #self.info('new  source, target: %s -> %s' % (source, target))
 
-        ### tmp. mv to config ###
-        def getDefaultMountType(target):
-            defaultmounts = {
-                # fallback to default if no specified directory matches
-                '*': 'union',
-                '/bin': 'union',
-                '/boot': 'union',
-                # TODO: introduce third mount-type for dev, proc, et al?
-                '/dev': 'bind',
-                '/etc': 'union',
-                '/home': 'bind',
-                '/lib': 'union',
-                '/lib64': 'union',
-                '/media': 'bind',
-                '/mnt': 'bind',
-                # TODO: opt: bind or union
-                '/opt': 'bind',
-                # TODO: introduce third mount-type for dev, proc, et al?
-                '/proc': 'bind',
-                '/root': 'bind',
-                '/run': 'bind',
-                '/sbin': 'union',
-                '/srv': 'bind',
-                # TODO: introduce third mount-type for dev, proc, et al?
-                '/sys': 'bind',
-                '/tmp': 'bind',
-                '/usr': 'union',
-                '/var': 'bind'
-                }
-
-            mount_type = None
-            for key in list(defaultmounts.keys()):
-                if target.startswith(key):
-                    mount_type = defaultmounts[key]
-                    break
-            if mount_type is None:
-                mount_type = defaultmounts['*']
-
-            return mount_type
-        ### /tmp ###
-
-        #for mount in self._mounts.append((source, target, mount_type))
         already_mounted = False
         for s, t, mt in self._mounts:
             if target == t:

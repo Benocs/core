@@ -30,8 +30,9 @@ su -c "make install && \
     addgroup core || echo \"group \\\"core\\\" already exists. this can be ignored\" && \
     chgrp -R core \"$CORECFG\" && \
     cp -v files/brite.conf \"$CORECFG/\" && \
-    cp -v files/nodes.conf \"$CORECFG/\" && \
     cp -v files/ipaddrs.conf \"$CORECFG/\" && \
+    cp -v files/nodes.conf \"$CORECFG/\" && \
+    cp -v files/pvfs.conf \"$CORECFG/\" && \
     cp -v files/widgets.conf \"$CORECFG/\" && \
     ln -s \"$CORECFG\" /root/.core || echo \"link already exists. this can be ignored\" && \
     (for i in /home/*; do \

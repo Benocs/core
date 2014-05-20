@@ -163,10 +163,28 @@ class NodesConf():
                     print('ERROR: could not read line: %s' % line)
         return localconfig
 
+def getDefaultMountType(target):
+    default_type = 'union'
+    mount_type = None
+
+    if not 'pvfs' in CONFIGS:
+        return default_type
+
+    for key in list(CONFIGS['pvfs'].keys()):
+         if target.startswith(key):
+             mount_type = CONFIGS['pvfs'][key]
+             break
+
+    if mount_type is None:
+        mount_type = CONFIGS['pvfs']['*']
+
+    return mount_type
+
 config_files = [
         #('core.conf', CoreConf),
         ('ipaddrs.conf', IPAddrsConf),
         ('nodes.conf', NodesConf),
+        ('pvfs.conf', KeyValueConf),
         ]
 
 for configfile, parsercls in config_files:
@@ -176,4 +194,5 @@ for configfile, parsercls in config_files:
         localconfig = parsercls.parse(fullpath)
         if len(localconfig) > 0:
             CONFIGS[configname] = localconfig
+
 
