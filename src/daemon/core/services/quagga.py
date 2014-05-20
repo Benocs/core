@@ -708,11 +708,8 @@ class Bgp(QuaggaService):
         cfg = '!\n! BGP configuration\n!\n'
         cfg += 'router bgp %s\n' % node.netid
         cfg += '  bgp router-id %s\n' % cls.routerid(node)
-        cfg += '  redistribute connected\n'
         cfg += '  redistribute kernel\n'
         cfg += '  redistribute static\n'
-        cfg += '  redistribute ospf\n'
-        cfg += '  redistribute isis\n'
 
         cfg += '!\n'
 
@@ -761,6 +758,8 @@ class Bgp(QuaggaService):
         if node.enable_ipv4 and service_flags.EGP in node.services:
             interface_net = Interface.getInterfaceNet_per_net(netid, 4)
             loopback_net = Loopback.getLoopbackNet_per_net(netid, 4)
+            cfg += '  network %s\n' % str(loopback_net)
+            cfg += '  network %s\n' % str(interface_net)
             cfg += '  aggregate-address %s summary-only\n' % str(loopback_net)
             cfg += '  aggregate-address %s summary-only\n' % str(interface_net)
 
