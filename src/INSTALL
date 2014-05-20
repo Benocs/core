@@ -87,7 +87,7 @@ su -c "make install" root
 echo "building and installing BENOCS ifindex"
 (
 cd ../contrib/BENOCS/ifindex/src
-g++ -std=c++11 -o ifindex ifindex.cpp
+g++ -o ifindex ifindex.cpp
 su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
 )
 

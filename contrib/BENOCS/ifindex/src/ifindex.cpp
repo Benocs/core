@@ -1,5 +1,6 @@
 /// (C) 2014 by BENOCS GmbH. All rights reserved.
 
+#include <cerrno>
 #include <cstring>
 #include <iostream>
 
