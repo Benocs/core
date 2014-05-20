@@ -567,7 +567,7 @@ agentXSocket    tcp:localhost:705
         overrides = []
         for localnetif in node._netif.values():
             bandwidth = localnetif.getparam('bw')
-            if not bandwidth is None:
+            if not bandwidth is None and bandwidth > 0:
                 # get SNMP idx of this interface
                 result, stdouterr = node.cmdresult(
                         ['/opt/BENOCS/bin/ifindex', str(localnetif.name)])
