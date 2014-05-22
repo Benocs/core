@@ -8,7 +8,7 @@
 TINY_ICONS =	tiny/button.play.gif \
 		tiny/select.gif tiny/marker.gif \
 		tiny/rj45.gif tiny/text.gif \
-		tiny/edit-delete.gif tiny/stop.gif \
+		tiny/edit-delete.gif tiny/stop.gif tiny/stop2.gif \
 		tiny/blank.gif tiny/mobility.gif \
 		tiny/script_play.gif tiny/arrow.gif \
 		tiny/lanswitch.gif tiny/script_pause.gif \
@@ -22,7 +22,7 @@ TINY_ICONS =	tiny/button.play.gif \
 		tiny/eraser.gif \
 		tiny/stock_connect.gif tiny/stock_disconnect.gif \
 		tiny/ping.gif tiny/link.gif \
-		tiny/start.gif \
+		tiny/start.gif tiny/start2.gif \
 		tiny/trace.gif tiny/button.stop.gif \
 		tiny/arrow.down.gif tiny/oval.gif \
 		tiny/wlan.gif tiny/delete.gif \
@@ -70,6 +70,7 @@ SVG_ICONS = 	svg/ap.svg \
 		svg/router.svg \
 		svg/router_yellow.svg \
 		svg/start.svg \
+		svg/start2.svg
 		svg/tunnel.svg \
 		svg/vlan.svg \
 		svg/xen.svg

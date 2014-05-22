@@ -145,7 +145,7 @@ proc drawToolbar { mode } {
     #
     # edit mode button bar
     #
-    set buttons [list start link]
+    set buttons [list start start2 link]
     foreach b $buttons {
         if { $mode == "exec"} { destroy .left.$b } else {
 	    # add buttons when in edit mode
@@ -207,14 +207,17 @@ proc drawToolbar { mode } {
     #
     if { "$mode" == "edit" } {
 	.left.start configure -command "startStopButton exec"
+	.left.start2 configure -command "startStopButton2 exec"
     }
-    foreach b {stop observe plot marker twonode run } {
+    foreach b {stop stop2 observe plot marker twonode run } {
 	if { "$mode" != "exec" } { destroy .left.$b } else {
 	    set cmd ""
 	    set fn "$CORE_DATA_DIR/icons/tiny/$b.gif"
 	    set image [image create photo -file $fn]
 	    if { $b == "stop" } {
 		set cmd "startStopButton edit"
+	    } elseif { $b == "stop2" } {
+		set cmd "startStopButton2 edit"
 	    } elseif { $b == "observe" } {
 	    	set cmd "popupObserverWidgets"
 	    } elseif { $b == "marker" } {
@@ -325,6 +328,22 @@ proc startStopButton { mode } {
     }
     setOperMode $mode
 }
+
+
+proc startStopButton2 { mode } {
+
+  # TODO start here for partial start of network
+  #      normal start of session with fkt setOperMode
+
+  puts "startStopButton2 pressed. parameter mode: $mode"
+
+    set c .c
+    
+    foreach img [$c find withtag "selected"] {
+	# fkt "setOperMode" and following fkts need new code 	
+    }
+}
+
 
 #****f* exec.tcl/setOperMode
 # NAME

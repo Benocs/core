@@ -214,7 +214,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     global g_prefs node_list tempAS
 
 
-    # effizienter machen wenn so funktional
+    # !effizienter machen wenn so funktional!
     set ipnets4 {}
     # hier variablen zum test aller vier bytes vorhandener ips
     # alle ips byte 0-3
@@ -255,9 +255,8 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     }
 
 
-	# TODO megadoof
-	set ipnets5 {}
-        # hier variablen zum test aller vier bytes vorhandener ips
+    set ipnets5 {}
+    # hier variablen zum test aller vier bytes vorhandener ips
     # alle ips byte 0-3
     foreach node $node_list {
         foreach ifc [ifcList $node] {

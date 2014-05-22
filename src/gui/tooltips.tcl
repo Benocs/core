@@ -6,6 +6,7 @@
 array set left_tooltips {
 	select	"selection tool"
 	start	"start the session"
+	start2	"start the network"
 	link	"link tool"
 	routers "network-layer virtual nodes"
 	hubs	"link-layer nodes"
@@ -24,6 +25,7 @@ array set left_tooltips {
 	bgobjs2	"rectangle"
 	bgobjs3	"text"
 	stop	"stop the session"
+	stop2	"stop the network"
 	marker	"marker"
 	mobility "add and remove static links"
 	twonode	"run command from one node to another"

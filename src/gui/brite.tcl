@@ -372,9 +372,53 @@ proc doStuff1 {} {
   # Buttons unten
   #
 
-  #TODO button save und cancel zusammenbringen nach oben zB
-  # und writeBriteConf auf save legen
+  # TODO huebscher machen
+  # aufruf aller vier schritte in einem uebergeordneten schritt
+  labelframe $wi.bot5 -borderwidth 4 -text "1st-4th at once"
 
+  frame $wi.bot5.line1 -borderwidth 0
+
+  button $wi.bot5.line1.buildtop -text "GO" -command "doOneToFour"
+  pack $wi.bot5.line1.buildtop -side right
+  pack $wi.bot5.line1 -side top -anchor w -padx 4 -pady 4
+  pack $wi.bot5 -side bottom -fill x
+
+  
+
+
+  # Script aufruf von .brite in .imn
+  labelframe $wi.bot4 -borderwidth 4 -text "4th: Load .imn into GUI"
+
+  frame $wi.bot4.line1 -borderwidth 0
+
+  #label $wi.bot3.line1.text_loadbrite -text "LoadBrite:"
+  #entry $wi.bot3.line1.entry_loadbrite -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom3_loadbrite)
+  #label $wi.bot3.line1.text_imnout -text "Output:"
+  #entry $wi.bot3.line1.entry_imnout -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom3_imnout)
+
+  #$wi.bot3.line1.entry_loadbrite $wi.bot3.line1.text_loadbrite $wi.bot3.line1.entry_imnout $wi.bot3.line1.text_imnout
+
+  button $wi.bot4.line1.buildtop -text "Load .imn" -command "loadIMN"
+  pack $wi.bot4.line1.buildtop -side right
+  pack $wi.bot4.line1 -side top -anchor w -padx 4 -pady 4
+  pack $wi.bot4 -side bottom -fill x
+
+
+
+  # Script aufruf von .brite in .imn
+  labelframe $wi.bot3 -borderwidth 4 -text "3rd: Build .imn out of .brite"
+
+  frame $wi.bot3.line1 -borderwidth 0
+
+  label $wi.bot3.line1.text_loadbrite -text "LoadBrite:"
+  entry $wi.bot3.line1.entry_loadbrite -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom3_loadbrite)
+  label $wi.bot3.line1.text_imnout -text "Output:"
+  entry $wi.bot3.line1.entry_imnout -bg white -width 19 -textvariable testing_prefs(gui_brite_bottom3_imnout)
+
+  button $wi.bot3.line1.buildtop -text "Build .imn" -command "buildIMN"
+  pack $wi.bot3.line1.buildtop $wi.bot3.line1.entry_loadbrite $wi.bot3.line1.text_loadbrite $wi.bot3.line1.entry_imnout $wi.bot3.line1.text_imnout -side right
+  pack $wi.bot3.line1 -side top -anchor w -padx 4 -pady 4
+  pack $wi.bot3 -side bottom -fill x
 
   # Topology Erstellungen Einstellungen
   labelframe $wi.bot2 -borderwidth 4 -text "2nd: Build Topology"
@@ -462,7 +506,7 @@ proc zurueck_stellen {} {
 
 
 proc buildTopology [] {
- global testing_prefs
+  global testing_prefs
 
 #testing_prefs(gui_brite_bottom_savedest)
 # 373   entry $wi.bot2.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_execpath)
@@ -476,6 +520,7 @@ proc buildTopology [] {
 
   # hier entscheidet sich nach auswahl ob brite mit java oder als exe aufgerufen wird
   if {[string equal "Java" $testing_prefs(gui_brite_top_executables)]} {
+    # TODO hier auch schauen
     append execdir "/Java"
 
     cd $execdir
@@ -492,6 +537,7 @@ proc buildTopology [] {
     {*}$exec_string
 
   } else {
+    # TODO schaun wie das geloest werden soll
     append execdir "/C++"
 
     cd $execdir
@@ -508,6 +554,59 @@ proc buildTopology [] {
 
 }
 
+
+proc buildIMN {} {
+
+  global testing_prefs
+
+  # aufruf script von robert mit parametern
+  # TODO script execdir anpassen
+  set execdir "/home/hanstest"
+
+  cd $execdir
+  puts [pwd]
+
+
+  set exec_string exec
+  lappend exec_string ./core_topogen.py
+  # pfad zur.brite datei
+  lappend exec_string $testing_prefs(gui_brite_bottom3_loadbrite)
+  # pfad zur imn ausgabedatei
+  lappend exec_string $testing_prefs(gui_brite_bottom3_imnout)
+
+  lappend exec_string "weitere parameter"
+
+  # ist mit und ohne & blockeriend ..
+  lappend  exec_string >@stdout 2>@stderr &
+  # ausfuehren
+  {*}$exec_string
+
+  # gui_brite_bottom3_loadbrite                 "/usr/share/core/topoOut"
+  # gui_brite_bottom3_imnout                    "/usr/share/core/topo.imn"
+}
+
+
+proc loadIMN {} {
+
+  global currentFile testing_prefs
+
+  set currentFile $testing_prefs(gui_brite_bottom3_imnout)
+  writeBriteConf
+  destroy .core_testing
+  openFile
+  
+}
+
+
+proc doOneToFour {} {
+
+  buildCfg
+  buildTopology
+
+  buildIMN
+  loadIMN
+}
+
 proc switched {} {
 
   global testing_prefs
@@ -516,7 +615,7 @@ proc switched {} {
 
   if {[string equal "1 Level: AS ONLY" $var]} {
 
-    .core_testing.as.line1.import configure -state normal
+    #.core_testing.as.line1.import configure -state normal
     .core_testing.as.line2.entry_hs configure -state normal
     .core_testing.as.line2.entry_n configure -state normal
     .core_testing.as.line3.entry_ls configure -state normal
@@ -652,7 +751,7 @@ proc switched {} {
 
   } elseif {[string equal "1 Level: ROUTER (IP) ONLY" $var]} {
 
-    .core_testing.as.line1.import configure -state disabled
+    #.core_testing.as.line1.import configure -state disabled
     .core_testing.as.line2.entry_hs configure -state disabled
     .core_testing.as.line2.entry_n configure -state disabled
     .core_testing.as.line3.entry_ls configure -state disabled
@@ -781,7 +880,7 @@ proc switched {} {
 
   } elseif {[string equal "2 Level: TOP-DOWN" $var]} {
 
-    .core_testing.as.line1.import configure -state normal
+    #.core_testing.as.line1.import configure -state normal
     .core_testing.as.line2.entry_hs configure -state normal
     .core_testing.as.line2.entry_n configure -state normal
     .core_testing.as.line3.entry_ls configure -state normal
@@ -1665,9 +1764,11 @@ proc initTestingPrefs {} {
     gui_brite_topdown_iabwd			"Constant"
     gui_brite_topdown_iabwd_is_disabled		0
     gui_brite_bottom_savedest			"/usr/share/core/out.cfg"
-    gui_brite_bottom_execpath			"/home/jw/dateien/sw/brite/BRITE2"
+    gui_brite_bottom_execpath			"/home/hanstest/jw/gitbrite/brite/BRITE"
     gui_brite_bottom2_loadcfg			"/usr/share/core/out.cfg"
     gui_brite_bottom2_briteout			"/usr/share/core/topoOut"
+    gui_brite_bottom3_loadbrite			"/usr/share/core/topoOut"
+    gui_brite_bottom3_imnout			"/usr/share/core/topo.imn"
   }
 }
 

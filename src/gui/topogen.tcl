@@ -133,6 +133,14 @@ for { set i 1 } { $i <= 12 } { incr i } {
 }
 
 
+#
+# Benocs New Testing
+#
+set m ${TOPOMENUPATH}.brite
+menu $m -tearoff 0
+${TOPOMENUPATH} add command -label "Brite" -command doStuff1
+
+
 proc newNodes { n } {
     global curcanvas grid sizex sizey activetool activetoolp CORE_DATA_DIR
     global g_last_selected_node_type
