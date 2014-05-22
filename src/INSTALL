@@ -69,5 +69,28 @@ make
 su -c "make install" root
 )
 
+echo "building and installing softflowd"
+(
+cd ../contrib/
+tar -xzf softflowd-80aac3b2fec3.tgz
+cd softflowd
+aclocal
+autoheader
+autoconf
+./configure
+make
+su -c "make install" root
+)
+
+echo "building and installing BENOCS ifindex"
+(
+cd ../contrib/BENOCS/ifindex/src
+g++ -std=c++11 -o ifindex ifindex.cpp
+su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
+)
+
+# TODO: softflowd
+# TODO: /opt/BENOCS/bin/ifindex
+
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
