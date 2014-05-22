@@ -255,14 +255,20 @@ class PyCoreNode(PyCoreObj):
         # loopback_net_per_netid
         global_loopback_prefix_str = CONFIGS['ipaddrs']['loopback_net']
         global_prefixbase, global_prefixlen = global_loopback_prefix_str.split('/')
-        global_prefixlen = int(global_prefixlen)
+        try:
+            global_prefixlen = int(global_prefixlen)
+        except ValueError:
+            raise ValueError('Could not parse loopback_net from ipaddrs.conf')
         # local means per netid (e.g., AS)
-        local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+        try:
+            local_prefixlen = int(CONFIGS['ipaddrs']['loopback_net_per_netid'])
+        except ValueError:
+            raise ValueError('Could not parse loopback_net_per_netid from ipaddrs.conf')
 
         if hasattr(self, 'netid') and not self.netid is None:
             netid = self.netid
         else:
-            # TODO: netid 0 is invalid
+            # TODO: netid 0 is invalid - instead use first unused ASN
             netid = 0
 
         global_loopback_prefix = IPv4Prefix(global_loopback_prefix_str)
