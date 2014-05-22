@@ -26,7 +26,6 @@ class BaseWebService(CoreService):
     _group = "Utility"
     _depends = ()
 
-
 class Lighttpd(BaseWebService):
     _name = "Lighttpd"
     _configs = ("/etc/lighttpd/lighttpd.conf",)
