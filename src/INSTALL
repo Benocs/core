@@ -11,7 +11,7 @@ su -c "apt-get install bash bridge-utils ebtables iproute libev-dev python \
     tcl8.5 tk8.5 libtk-img \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
     imagemagick help2man unionfs-fuse \
-    python3 python3-dev quagga dnsmasq bind9" root
+    python3 python3-dev quagga dnsmasq bind9 lighttpd" root
 
 ./bootstrap.sh
 ./configure --prefix=/usr
