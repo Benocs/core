@@ -1357,7 +1357,7 @@ proc buildCfg {} {
 
   } elseif {[string equal "2 Level: TOP-DOWN" $var_model]} {
 # Abschnitt TopDown
-# TODO: spaeter vielleicht um doppelten code zu vermeiden
+# spaeter vielleicht um doppelten code zu vermeiden
 #   teile in fktn auslagern
 
     append data "BeginModel\n"

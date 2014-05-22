@@ -209,12 +209,10 @@ proc getASiD { nodeGetAS } {
 
 proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
-    #momentan vergabe der 24er
-
+    # TODO: effizienter machen wenn so funktional!
     global g_prefs node_list tempAS
 
 
-    # !effizienter machen wenn so funktional!
     set ipnets4 {}
     # hier variablen zum test aller vier bytes vorhandener ips
     # alle ips byte 0-3
@@ -291,14 +289,6 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     #proc fuer asID
     set i [getASiD $linkNode]
 
-
-# TODO 24er muessen auch adressbereich der 30 beachten (immer 4er schritte von 0 an)
-#   und nicht die selben adressen nehmen
-
-	#puts "ip4AmSwitchNetzAddressen"
-	#foreach ip4 $ip4AmSwitchNetzAddressen {
-	#	puts $ip4
-	#}
 
 	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen
 	if { 0 == [llength $ip4AmSwitchNetzAddressen] } {
@@ -427,12 +417,6 @@ proc autoIPv4addr { node iface } {
 	}
     }
 
-    #puts "---"
-    #puts $peer
-    #puts $peer_if
-    #puts $peer_ip4addr
-    #puts $netmaskbits
-
     # first node connected to wlan should use wlan prefix
     if { [nodeType $peer_node] == "wlan" &&
     	 [llength $peer_ip4addrs] == 0 } {
@@ -469,7 +453,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node 
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL1"
 		# hier sind addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
@@ -486,7 +469,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL2"
 		# hier sind keine addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
@@ -496,8 +478,6 @@ proc autoIPv4addr { node iface } {
 		#setNodeNetId $peer_node [getASiD $node]
 	}
 	set tempAS [getASiD $node]
-#	puts "tempAS ausgehend"
-#	puts $tempAS
     }
 }
 
