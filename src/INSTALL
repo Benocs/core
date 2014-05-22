@@ -2,8 +2,11 @@
 
 set -e
 
-BUILD_PARALLEL="-j1"
+BUILD_PARALLEL="-j2"
+CORECFG="/etc/core"
+PYTHON=python3
 
+export PYTHON
 su -c "apt-get install bash bridge-utils ebtables iproute libev-dev python \
     tcl8.5 tk8.5 libtk-img \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
@@ -11,20 +14,17 @@ su -c "apt-get install bash bridge-utils ebtables iproute libev-dev python \
     python3 python3-dev quagga dnsmasq bind9" root
 
 ./bootstrap.sh
-export PYTHON=python3; ./configure --prefix=/usr
+./configure --prefix=/usr
 
 make $BUILD_PARALLEL
-su -c "make install" root
-
-CORECFG="/etc/core"
-mkdir -p "$CORECFG"
-chmod -R 775 "$CORECFG"
-addgroup core || echo "group \"core\" already exists. this can be ignored"
-chgrp -R core "$CORECFG"
-
-cp -v files/nodes.conf "$CORECFG/"
-cp -v files/ipaddrs.conf "$CORECFG/"
-cp -v files/widgets.conf "$CORECFG/"
+su -c "make install && \
+    mkdir -p "$CORECFG" && \
+    chmod -R 775 "$CORECFG" && \
+    addgroup core || echo \"group \\\"core\\\" already exists. this can be ignored\" && \
+    chgrp -R core \"$CORECFG\" && \
+    cp -v files/nodes.conf \"$CORECFG/\" && \
+    cp -v files/ipaddrs.conf \"$CORECFG/\" && \
+    cp -v files/widgets.conf \"$CORECFG/\"" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
