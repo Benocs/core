@@ -7,12 +7,17 @@ CORECFG="/etc/core"
 PYTHON=python3
 
 export PYTHON
-su -c "apt-get install bash bridge-utils ebtables iproute libev-dev python \
-    tcl8.5 tk8.5 libtk-img \
+su -c "apt-get purge quagga; apt-get install bash bridge-utils ebtables iproute libev-dev python \
+    tcl8.5 tk8.5 libtk-img gawk snmpd libsnmp-dev \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
     imagemagick help2man unionfs-fuse \
-    python3 python3-dev quagga dnsmasq bind9 lighttpd \
+    python3 python3-dev dnsmasq bind9 lighttpd \
     tmux" root
+
+daemons="dnsmasq bind9 lighttpd"
+su -c "(for daemon in $daemons; do \
+            update-rc.d -f \$daemon remove || echo \"error while deactivating \
+            \$daemon\'s \ init script. check output.\"; done)" root
 
 ./bootstrap.sh
 ./configure --prefix=/usr
@@ -32,6 +37,27 @@ su -c "make install && \
     (for i in /home/*; do \
         echo \"creating link in \"\$i\"\"; ln -s \"$CORECFG\" \"\$i/.core\" || \
         echo \"link already exists. this can be ignored\"; done)" root
+
+echo "building and installing quagga..."
+su -c "( cd ../contrib/quagga && \
+    tar -xzf quagga-0.99.22.4.tar.gz && \
+    cd quagga-0.99.22.4 && \
+    patch -p1 < ../000-vtysh.patch && \
+    ./configure --prefix= \
+        --enable-snmp=agentx \
+        --enable-isisd \
+        --enable-multipath=0 && \
+        --sysconfdir=/etc/quagga && \
+        --enable-vtysh && \
+        --localstatedir=/var/run/quagga && \
+    make $BUILD_PARALLEL && \
+    make install && \
+    cd .. && \
+    mkdir -p /etc/quagga && \
+    cp -v ./debian.conf /etc/quagga/ && \
+    cp -v ./quagga /etc/init.d/ && \
+    update-rc.d -f quagga remove || echo \"error while deactivating quagga\'s \
+        init script. check output.\")" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
