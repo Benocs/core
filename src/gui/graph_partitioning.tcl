@@ -46,12 +46,12 @@ proc writePartitions {node_weight} {
     global finalpartition;
 
     upvar $node_weight nweight;
-  
+
     #counts how many nodes are in each partition
     array set nr_nodes_partition {};
     #sum up the weight of each partition
-    array set weight_partition {}; 
- 
+    array set weight_partition {};
+
     for {set i 0} {$i<$nparts} {incr i} {
 	set nr_nodes_partition($i) 0;
 	set weight_partition($i) 0;
@@ -79,12 +79,12 @@ proc writePartitions {node_weight} {
 	set outstr "p$i: $nr_nodes_partition($i) vertices with weight $weight_partition($i)";
 	#puts [format %s $outstr];
     }
-    
+
     redrawAll;
     updateUndoLog;
     tk_dialog .dialog1 "Graph partitioning output" "Done.\n" info 0 Dismiss;
 }
- 
+
 #****f* graph_partitioning.tcl/setPartition
 # NAME
 #   setPartition -- set partition
@@ -120,7 +120,7 @@ proc setPartition { node partition } {
 # INPUTS
 #   *  node -- node id
 # RESULT
-#   * part -- the node's partition 
+#   * part -- the node's partition
 #****
 proc getNodePartition { node } {
     global $node;
@@ -174,7 +174,7 @@ proc graphPartition {partNum} {
     #puts " Starting graph partitioning...";
     #puts "+------------------------------------------------+";
     #puts "";
-  
+
     set start [clock clicks -milliseconds];
 
     #initialise the arrays for the algorithm
@@ -182,7 +182,7 @@ proc graphPartition {partNum} {
     initNodes node_weight;
     set nvertices [array size node_weight];
     initNeighbours node_neighbour edge_array edge_weight;
-  
+
     if {$nparts > $nvertices} then {
  	debug "Number of vertices should be greater then number of partitions.";
 	displayErrorMessage "Number of vertices should be greater then number of partitions.";
@@ -196,12 +196,12 @@ proc graphPartition {partNum} {
     #calculate tpwgts array
     for {set i 0} {$i < $nparts} {incr i} {
 	set tpwgts($i) [expr {1.0 / (1.0 * $nparts)}];
-    }   
-  
+    }
+
     set t [time { recursiveBisection $nvertices node_weight node_neighbour edge_array edge_weight tpwgts $nparts 0 node_map; } 1];
     set microsec [lindex $t 0];
     puts "total time: [expr {$microsec * 0.000001}] sec";
-    
+
     #compute cut
     set cut 0;
     for {set i 0} {$i < $nvertices} {incr i} {
@@ -232,13 +232,13 @@ proc graphPartition {partNum} {
     }
     set cut [expr {$cut / 2}];
     puts "end cut: $cut";
-  
+
     #save the partitions
     writePartitions node_weight;
-  
+
     set end [clock clicks -milliseconds];
     puts [format "total elapsed time: %.6f s" [expr {($end - $start) * 0.001}]];
-  
+
     puts "";
     puts " Done graph partitioning.";
     puts "+------------------------------------------------+";
@@ -258,18 +258,18 @@ proc graphPartition {partNum} {
 proc initNodes {node_weight} {
     global node_list;
     upvar $node_weight nweight;
-    
+
     set i 0;
     foreach node $node_list {
 	#if the node is pseudo, remove it
 	if {[nodeType $node] == "pseudo"} then {
-	    mergePseudoLink $node 
+	    mergePseudoLink $node
 	} else {
 	    #seve node's weight into array
 	    set nweight($i) [getNodeWeight $node];
 	    incr i;
 	}
-    }   
+    }
 }
 
 #****f* graph_partitioning.tcl/mergePseudoLink
@@ -285,7 +285,7 @@ proc initNodes {node_weight} {
 proc mergePseudoLink { pnode } {
     global node_list;
     global split_list;
-  
+
     foreach n $node_list {
 	#get the links connecting the both pseudo node's
 	set l1 [linkByPeers $pnode $n];
@@ -305,7 +305,7 @@ proc mergePseudoLink { pnode } {
 	    }
 	}
     }
-}  
+}
 
 #****f* graph_partitioning.tcl/initNeighbours
 # NAME
@@ -317,7 +317,7 @@ proc mergePseudoLink { pnode } {
 # INPUTS
 #   *  node_neighbour -- empty array
 #   *  edge_array -- empty array
-#   *  edge_weight -- empty array 
+#   *  edge_weight -- empty array
 #****
 proc initNeighbours {node_neighbour edge_array edge_weight} {
     global node_list link_list
@@ -349,10 +349,10 @@ proc initNeighbours {node_neighbour edge_array edge_weight} {
 # NAME
 #   recursiveBisection
 # SYNOPSIS
-#   recursiveBisection $nvertices node_weight node_neighbour 
+#   recursiveBisection $nvertices node_weight node_neighbour
 #   edge_array edge_weight tpart_wgts $new_parts $part_nr up_map
 # FUNCTION
-#   Recursive starts coarsening, initial partitioning and uncoarsening. 
+#   Recursive starts coarsening, initial partitioning and uncoarsening.
 #   In each recursion it bisect the graph and recalculates arrays for each
 #   part.
 # INPUTS
@@ -364,7 +364,7 @@ proc initNeighbours {node_neighbour edge_array edge_weight} {
 #   *  tpart_wgts -- array of each partition ratio of the graph
 #   *  new_parts -- number to divide the graph
 #   *  part_nr -- counts how deep the recursion is
-#   *  up_map  -- 
+#   *  up_map  --
 #****
 proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_weight tpart_wgts new_parts part_nr up_map} {
     global part_mincut;
@@ -397,7 +397,7 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
     coarseGraph $nvertices nweight nneighbour earray eweight tpwgts2;
     #minimal cut
     set cut $part_mincut;
-  
+
     #calculate for each vertex its right partition by adding to "0" and "1" partition a number
     for {set i 0} {$i < $nvertices} {incr i} {
 	if {[array size upmap] > 0} {
@@ -439,7 +439,7 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
   	array set snode_map1 {};
 
 	#save the node characteristics from both subgraphs in two different arrays
-	
+
 	for {set i 0} {$i < $sn_vtxs(0)} {incr i} {
 	    if {[info exists snode_neighbour(0,$i)]} then {
 		set snode_neighbour0($i) $snode_neighbour(0,$i);
@@ -447,7 +447,7 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
 	    if {[array size upmap] > 0} then {
 		set snode_map0($i) $upmap($snode_map_help(0,$i));
 	    } else {
-		set snode_map0($i) $snode_map_help(0,$i); 
+		set snode_map0($i) $snode_map_help(0,$i);
 	    }
 	    debug "snode_map0($i)=$snode_map0($i)";
 	    set snode_weight0($i) $snode_weight(0,$i);
@@ -467,7 +467,7 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
 	}
 
 	#save the link characteristics from both subgraphs in two different arrays
-	
+
 	for {set i 0} {$i < $sn_edges(0)} {incr i} {
 	    set sedge_array0($i) $sedge_array(0,$i);
 	    set sedge_weight0($i) $sedge_weight(0,$i);
@@ -478,7 +478,7 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
 	    set sedge_weight1($i) $sedge_weight(1,$i);
 	}
     }
-  
+
     #update the tpwgts (partition's ratio of the graph)
     mult_array 0 [expr {int($nparts / 2)}] tpwgts [expr {1 / $sum_tpwgt}];
     mult_array [expr {int($nparts / 2)}] $nparts tpwgts [expr {1.0 / (1.0 - $sum_tpwgt)}];
@@ -507,8 +507,8 @@ proc recursiveBisection {nvertices node_weight node_neighbour edge_array edge_we
 # SYNOPSIS
 #   coarseGraph $nvertices node_weight node_neighbour edge_array edge_weight tpwgts2
 # FUNCTION
-#   Coarsening and uncoarsening phase. Procedure first recursivly coarse the graph. 
-#   The coarsest graph is partitionend. In "backrolling" of recurson, the coarse 
+#   Coarsening and uncoarsening phase. Procedure first recursivly coarse the graph.
+#   The coarsest graph is partitionend. In "backrolling" of recurson, the coarse
 #   graph is uncoarsen and refined.
 # INPUTS
 #   *  nvertices -- number of vertices
@@ -530,11 +530,11 @@ proc coarseGraph {nvertices node_weight node_neighbour edge_array edge_weight tp
     upvar  $tpwgts2 tpwgts;
 
     debug "MatchRm... $nvertices";
-  
+
     array set cnweight {};
     array set nmap {};
     array set nmatch {};
-  
+
     set matched "";
     set cnvertices 0;
 
@@ -584,7 +584,7 @@ proc coarseGraph {nvertices node_weight node_neighbour edge_array edge_weight tp
     array set cnneighbour {};
     set used_nodes  "";
     set cngb 0;
-  
+
     #coarse graph
     for {set i 0} {[llength $used_nodes] < $cnvertices} {incr i} {
 	set parent1 $i;
@@ -616,7 +616,7 @@ proc coarseGraph {nvertices node_weight node_neighbour edge_array edge_weight tp
 	    set cnneighbour($cnode)  $temp_ngb_list;
 	}
     }
-  
+
     ##############  EDGES	###############
 
     array set cearray {};
@@ -627,10 +627,10 @@ proc coarseGraph {nvertices node_weight node_neighbour edge_array edge_weight tp
 	set twin 0;
 	set node1 [lindex $earray($i) 0];
 	set node2 [lindex $earray($i) 1];
- 
+
 	set cnode1 $nmap($node1);
 	set cnode2 $nmap($node2);
- 
+
 	if {$cnode1 == $cnode2} then {
 	    #edge between two coarsed nodes disappears
 	} else {
@@ -651,21 +651,21 @@ proc coarseGraph {nvertices node_weight node_neighbour edge_array edge_weight tp
 	    }
 	}
     }
-  
+
     #repeat coarsening
     if {$cnvertices > $COARSEN_TO && $nvertices > $cnvertices} {
 	coarseGraph $cnvertices cnweight cnneighbour cearray ceweight tpwgts;
     } else {
 	#enough coarsed, partition the coarsest graph
 	makePartitions $cnvertices cnweight cnneighbour cearray ceweight tpwgts
-    } 
+    }
     debug "match Over !!!";
 
     #balance, refine and uncoarse the graph
     balance $cnvertices cnneighbour cnweight cearray ceweight tpwgts 4;
     FMRefinement $cnvertices cnneighbour cnweight cearray ceweight tpwgts 4;
     project2waypartition $nvertices earray eweight nneighbour nmap nweight $cnvertices cnweight;
-}	
+}
 
 #****f* graph_partitioning.tcl/makePartitions
 # NAME
@@ -690,7 +690,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
     global part_id;
     global part_ed;
     global part_mincut;
-  
+
     upvar $node_weight nweight;
     upvar $node_neighbour nneighbour;
     upvar $edge_array earray;
@@ -704,7 +704,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
     array set visited {};
     array set part_ed {};
     array set part_id {};
-  
+
     set part_mincut 0;
 
     #calculate the sum of all edge-weights in graph
@@ -719,7 +719,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 	set bestpartitions($i) -1;
     }
     set bestcut $wsum;
-  
+
     if {$nvertices <= $COARSEN_TO} then {
 	set nbfs 4;
     } else {
@@ -764,14 +764,14 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 	    # take the first node from queue
 	    set i [lindex $queue 0];
 	    set queue [lreplace $queue 0 0];
-		
+
 	    if {$part_pwgts(0) > 0 && [expr {$part_pwgts(1) - $nweight($i)}] < $tpwgts(1)} then {
 		debug "preveliko, dalje...";
 		continue;
 	    }
 	    #change partition of i from 1 to 0
 	    set part_partition($i) 0;
-		
+
 	    #update the partitions weight
 	    set part_pwgts(0) [expr {$part_pwgts(0) + $nweight($i)}];
 	    set part_pwgts(1) [expr {$part_pwgts(1) - $nweight($i)}];
@@ -781,10 +781,10 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 		debug "tpwgts(1)=$tpwgts(1)";
 		break;
 	    }
-		
+
 	    #search for the not visited neighbors, and attach them to the queue
 	    if {[info exists nneighbour($i)]} then {
-		foreach ngb $nneighbour($i) {			
+		foreach ngb $nneighbour($i) {
 		    if {$visited($ngb) == 0} {
 			set visited($ngb) 1;
 			lappend queue $ngb;
@@ -794,11 +794,11 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 
 	};#while
 
-    
+
 	array set pwgts2 {};
 	set pwgts2(0) 0;
 	set pwgts2(1) 0;
-    
+
 	#calculate ID and ED for each vertex
 	for {set i 0} {$i < $nvertices} {incr i} {
 	    set part_id($i) 0;
@@ -822,7 +822,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 		if {$part_ed($i) > 0 || [llength $nneighbour($i)] == 0} then {
 		    #vanjski node, ili nema susjeda
 		    incr part_mincut $part_ed($i);
-		    lappend part_boundary $i;	
+		    lappend part_boundary $i;
 		}
 	    }
 	}
@@ -833,16 +833,16 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 	for {set k 0} {$k < $nvertices} {incr k} {
 	    incr sum $nweight($k);
 	}
-	
+
 	if {$pwgts2(0) + $pwgts2(1) != $sum} {
 	    error "refine: partition weigth wrong!";
 	}
-    
+
 	#balance the graph
 	balance $nvertices nneighbour nweight earray eweight tpwgts 4;
 	# edge - based FM refinement
 	FMRefinement $nvertices nneighbour nweight earray eweight tpwgts 4;
-    
+
 	#save the partitions if better then current saved
 	if {$bestcut > $part_mincut} then {
 	    set bestcut $part_mincut;
@@ -853,7 +853,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 		set bestpartitions($i) $part_partition($i); #save the best partitions
 		set bestid($i) $part_id($i);
 		set bested($i) $part_ed($i);
-		
+
 	    }
 	    if {$part_mincut == 0} then {
 		break;
@@ -879,7 +879,7 @@ proc makePartitions {nvertices node_weight node_neighbour edge_array edge_weight
 # SYNOPSIS
 #   balance $nvertices node_neighbour node_weight edge_array edge_weight tpart_wgts $npasses
 # FUNCTION
-#   Procedure swaps vertices between two partitions, to make the partitions balanced. 
+#   Procedure swaps vertices between two partitions, to make the partitions balanced.
 #   The vertices from the bigger partition
 #   are swapped to the smaller partition. After swapping, the ed and id arrays are
 #   for all neighbor vertices updated.
@@ -899,7 +899,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
     global part_id;
     global part_ed;
     global part_mincut;
-  
+
     upvar $node_neighbour nneighbour;
     upvar $node_weight nweight;
     upvar $edge_array earray;
@@ -909,7 +909,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
     set move_from -1;
     set move_to -1;
 
-    #there is no boundary nodes		  
+    #there is no boundary nodes
     if {[llength $part_boundary] == 0} then {
 	return;
     }
@@ -942,7 +942,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
 
 
     for {set pass 0} {$pass < $npasses} {incr pass} {
-	# doesn't exists, if nodes are not connected 
+	# doesn't exists, if nodes are not connected
 	if {![info exists queue($move_from)]} then {
 	    break;
 	}
@@ -953,7 +953,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
 	    debug "queue($move_from) empty.";
 	    break;
 	}
-    
+
 	#if the size of the partition, in which the node should be moved
 	#is to small, dont move it
 	if {$part_pwgts($move_to) + $nweight($hi_gain) > $tpwgts($move_to)}  then {
@@ -963,9 +963,9 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
 	#update partitions weight
 	incr part_pwgts($move_from) [expr {-$nweight($hi_gain)}];
 	incr part_pwgts($move_to) $nweight($hi_gain);
-    
+
 	set part_partition($hi_gain) $move_to;
- 
+
 	#all the "extern" links are now "intern", and umgekehrt
 	set tmp $part_ed($hi_gain);
 	set part_ed($hi_gain) $part_id($hi_gain);
@@ -990,7 +990,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
 		    incr part_ed($ngb) $eweight($edgeBetween);
 		    incr part_id($ngb) -$eweight($edgeBetween);
 		}
-	
+
 		if {$is_bnd_node > 0} then {
 		    #node "ngb" is no longer an boundary node
 		    if {$part_ed($ngb) == 0} then {
@@ -1038,7 +1038,7 @@ proc balance {nvertices node_neighbour node_weight edge_array edge_weight tpart_
 #   *  edge_array -- array of edges
 #   *  edge_weight -- array of edge weights
 #   *  tpart_wgts -- array of each partition size of the graph
-#   *  npasses -- number of swap tries 
+#   *  npasses -- number of swap tries
 #****
 proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight tpart_wgt npasses} {
     global part_pwgts;
@@ -1047,7 +1047,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
     global part_id;
     global part_ed;
     global part_mincut;
-  
+
     upvar $node_weight nweight;
     upvar $node_neighbour nneighbour;
     upvar $edge_array earray;
@@ -1069,7 +1069,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
     } else {
 	set avg_pwgt $avg2;
     }
-	
+
     set swap_limit [expr {int(0.01 * $nvertices)}];
     if {$swap_limit < 15} then {
 	set swap_limit 15;
@@ -1085,7 +1085,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
     set bak_pwgts(0) $part_pwgts(0);
     set bak_pwgts(1) $part_pwgts(1);
 
-	
+
     # set all vertices free to move
     for {set i 0} {$i < $nvertices} {incr i} {
 	set moved($i) -1;
@@ -1108,12 +1108,12 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
 	    set id($i) $part_id($i);
 	    set ed($i) $part_ed($i);
 	}
-		
+
 	# insert boundary nodes in the priority queue
 	set permList [makePermArray bndy];
 	array set permArray $permList;
 	set mincutorder -1;
-	
+
 	for {set i 0} {$i < [array size permArray]} {incr i} {
 	    set node $permArray($i);
 	    #calculate the node's gain
@@ -1133,21 +1133,21 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
 		set move_from 1;
 		set move_to 0;
 	    }
-	
+
 	    # chose the node with the highest gain
 	    set hi_gain [pop queue($move_from)];
 	    if {$hi_gain == ""} {
 		break;
 	    }
-	
+
 	    # update the cut and partitions weight
 	    set newcut [expr {$newcut - $ed($hi_gain) + $id($hi_gain)}];
 	    incr pwgts($move_from) [expr {-$nweight($hi_gain)}];
 	    incr pwgts($move_to) $nweight($hi_gain);
-	
+
 	    #check if the new cut better is than the old one
 	    set new_diff [expr {abs ($tpwgts(0) - $pwgts(0))}];
-	    if {($newcut < $mincut) && ($new_diff <= $orig_diff + $avg_pwgt) || 
+	    if {($newcut < $mincut) && ($new_diff <= $orig_diff + $avg_pwgt) ||
 		($newcut == $mincut) && ($new_diff < $min_diff)} then {
 		set mincutorder $nswaps;
 		set mincut $newcut;
@@ -1158,7 +1158,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
 		incr pwgts($move_from) $nweight($hi_gain);
 		break;
 	    }
-	
+
 	    #move node to the other partion
 	    set part($hi_gain) $move_to;
 	    set moved($hi_gain) $nswaps;
@@ -1193,7 +1193,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
 			if {$ed($ngb) == 0} then {
 			    #remove it from the boundary list
 			    set bndy [lreplace $bndy [lsearch $bndy $ngb] [lsearch $bndy $ngb]];
-			    if {$moved($ngb) == -1} then { 
+			    if {$moved($ngb) == -1} then {
 				#if not moved -> remove it from the queue
 				removeFromQueue queue($part($ngb)) $ngb;
 			    }
@@ -1228,7 +1228,7 @@ proc FMRefinement {nvertices node_neighbour node_weight edge_array edge_weight t
 		    set bak_part($j) $part($j);
 		}
 		set bak_pwgts(0) $pwgts(0);
-		set bak_pwgts(1) $pwgts(1);		    
+		set bak_pwgts(1) $pwgts(1);
 	    }
 	};#inner loop
     };#outer loop
@@ -1269,7 +1269,7 @@ proc project2waypartition {nvertices edge_array edge_weight node_neighbour node_
     global part_id;
     global part_ed;
     global part_boundary;
-  
+
     upvar $cnvw cnw;
     upvar $node_weight nweight;
     upvar $edge_array earray;
@@ -1281,8 +1281,8 @@ proc project2waypartition {nvertices edge_array edge_weight node_neighbour node_
     array set part_id {};
     set part_boundary "";
     array set pwgts2 {};
-	
-    #sum the weight of nodes in finer graph	
+
+    #sum the weight of nodes in finer graph
     set n 0; set p 0;
     for {set i 0} {$i < $nvertices} {incr i} {
 	incr n $nweight($i);
@@ -1323,7 +1323,7 @@ proc project2waypartition {nvertices edge_array edge_weight node_neighbour node_
 	}
 	set part_partition($i) $partition($i);
 	incr pwgts2($partition($i)) $nweight($i);
-    };#for   
+    };#for
 }
 
 #****f* graph_partitioning.tcl/splitGraph
@@ -1392,7 +1392,7 @@ proc splitGraph {nvertices node_neighbour node_weight edge_array edge_weight sno
 		if {$p == $p_i} then {
 		    set twin 0;
 		    set sngb $snmap($p_i,$ngb);
-		    lappend snneighbour($p_i,$s_i) $sngb; 
+		    lappend snneighbour($p_i,$s_i) $sngb;
 		    for {set a 0} {$a < $snedges($p_i)} {incr a} {
 			if {$searray($p_i,$a) == "$s_i $sngb" || $searray($p_i,$a) == "$sngb $s_i"} then {
 			    set twin 1;
@@ -1451,10 +1451,10 @@ proc sum_array {end arr} {
 # INPUTS
 #   *  start -- the position in array from where to start multipling
 #   *  end -- the position in array until which to multiply
-#   *  arr -- array 
-#   *  prod -- 
+#   *  arr -- array
+#   *  prod --
 # RESULT
-#   * 
+#   *
 #****
 proc mult_array {start end arr prod} {
     upvar 1 $arr a;
@@ -1486,14 +1486,14 @@ proc makePermList {num} {
   	for {set i 0} {$i < $num} {incr i 16} {
 	    set rand1 [expr {int(rand() * ($num -  4))}]
 	    set rand2 [expr {int(rand() * ($num -  4))}]
-    
+
 	    swap permList $rand1 $rand2;
 	    swap permList [expr $rand1+1] [expr $rand2+1];
 	    swap permList [expr $rand1+2] [expr $rand2+2];
 	    swap permList [expr $rand1+3] [expr $rand2+3];
   	}
     }
-  
+
     return [array get permList];
 }
 
@@ -1521,14 +1521,14 @@ proc makePermArray {arr} {
   	for {set i 0} {$i < $a_size} {incr i 16} {
 	    set rand1 [expr {int(rand() * ($a_size -  4))}]
 	    set rand2 [expr {int(rand() * ($a_size -  4))}]
-    
+
 	    swap permList $rand1 $rand2;
 	    swap permList [expr $rand1+1] [expr $rand2+1];
 	    swap permList [expr $rand1+2] [expr $rand2+2];
 	    swap permList [expr $rand1+3] [expr $rand2+3];
   	}
     }
-  
+
     return [array get permList];
 }
 
@@ -1621,7 +1621,7 @@ proc pop {queue_name} {
 #****
 proc removeFromQueue {queue_name node } {
     upvar 1 $queue_name queue;
-	
+
     foreach q $queue {
 	set n [lindex $q 0];
 	if {$n == $node} then {

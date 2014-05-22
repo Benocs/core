@@ -48,46 +48,46 @@
 #    global variables
 # FUNCTION
 #    GUI-related global varibles
-# 
+#
 #    * newlink -- helps when creating a new link. If there is no
 #      link currently created, this value is set to an empty string.
 #    * selectbox -- the value of the box representing all the selected items
 #    * selected -- containes the list of node_id's of all selected nodes.
-#    * newCanvas -- 
+#    * newCanvas --
 #
-#    * animatephase -- starting dashoffset. With this value the effect of 
-#      rotating line around selected itme is achived. 
+#    * animatephase -- starting dashoffset. With this value the effect of
+#      rotating line around selected itme is achived.
 #    * undolevel -- control variable for undo.
 #    * redolevel -- control variable for redo.
 #    * undolog -- control variable for saving all the past configurations.
-#    * changed -- control variable for indicating that there something changed 
+#    * changed -- control variable for indicating that there something changed
 #      in active configuration.
 #    * badentry -- control variable indicating that there has been a bad entry
 #      in the text box.
 #    * cursorstate -- control variable for animating cursor.
 #    * clock_seconds -- control variable for animating cursor.
-#    * oper_mode -- control variable reresenting operating mode, possible 
+#    * oper_mode -- control variable reresenting operating mode, possible
 #      values are edit and exec.
-#    * grid -- control variable representing grid distance. All new 
-#      elements on the 
+#    * grid -- control variable representing grid distance. All new
+#      elements on the
 #      canvas are snaped to grid. Default value is 24.
 #    * sizex -- X size of the canvas.
 #    * sizey -- Y size of the canvas.
 #    * curcanvas -- the value of the current canvas.
-#    * autorearrange_enabled -- control variable indicating is 
+#    * autorearrange_enabled -- control variable indicating is
 #      autorearrange enabled.
 #
 #    * defLinkColor -- defines the default link color, default link color is set
 #      to red.
 #    * defLinkWidth -- defines the width of the link, default is 2.
-#    * defEthBandwidth -- defines the ethernet bandwidth, default is set to 
+#    * defEthBandwidth -- defines the ethernet bandwidth, default is set to
 #      100000000.
 #    * defSerBandwidth -- defines the serail link bandwidth, default is 2048000.
 #    * defSerDelay -- defines the serail link delay, default is 2500.
 #    * showIfNames -- control variable for showing interface names, default is 1
-#    * showIfIPaddrs -- control variable for showing interface IPv4 addresses, 
+#    * showIfIPaddrs -- control variable for showing interface IPv4 addresses,
 #      default is 1 (addresses are visible).
-#    * showIfIPv6addrs -- control variable for showing interface IPv4 
+#    * showIfIPv6addrs -- control variable for showing interface IPv4
 #      addresses, default is 1 (addresses are visible).
 #    * showNodeLabels -- control variable for showing node labels, default is 1.
 #    * showLinkLabels -- control variable for showing link labels, default is 1.
@@ -123,19 +123,19 @@ set resizemode false
 set thruplotResize false
 
 # dictionary that maps cursor style to resize mode
-set cursorToResizemode [dict create top_left_corner lu] 
+set cursorToResizemode [dict create top_left_corner lu]
     dict set cursorToResizemode bottom_left_corner ld
     dict set cursorToResizemode left_side l
     dict set cursorToResizemode top_right_corner ru
     dict set cursorToResizemode bottom_right_corner rd
     dict set cursorToResizemode right_side r
     dict set cursorToResizemode top_side u
-    dict set cursorToResizemode bottom_side d 
+    dict set cursorToResizemode bottom_side d
 
-# dictionary that maps thruplot to color 
+# dictionary that maps thruplot to color
 set thruPlotColor [dict create default blue]
 set thruPlotDragStart false
-set thruPlotCur null 
+set thruPlotCur null
 
 set curPlotLineColor blue
 set curPlotFillColor "#7f9eee"
@@ -148,7 +148,7 @@ set defThruPlotMaxKBPS 10
 #
 # Initialize a few variables to default values
 #
-set defLinkColor Red 
+set defLinkColor Red
 set defFillColor Gray
 set defLinkWidth 2
 set defEthBandwidth 0
@@ -243,11 +243,12 @@ bind . <Control-s> "fileSaveDialogBox {}"
 
 .menubar.file add separator
 .menubar.file add command -label "Export Python script..." -command exportPython
-.menubar.file add command -label "Execute Python script..." -command execPython
+.menubar.file add command -label "Execute XML or Python script..." \
+	-command execPython
 
 .menubar.file add separator
 .menubar.file add command -label "Open current file in editor..." \
-	-underline 21 -command { 
+	-underline 21 -command {
 	global currentFile
 	set ed [get_text_editor false]
 	set t [get_term_prog false]
@@ -298,7 +299,7 @@ bind . <Control-s> "fileSaveDialogBox {}"
 foreach f $g_mrulist {
     .menubar.file add command -label "$f" -command "mrufile \"$f\""
 }
-# end Boeing changes 
+# end Boeing changes
 .menubar.file add separator
 .menubar.file add command -label Quit -underline 0 -command { exit }
 
@@ -440,10 +441,10 @@ menu .menubar.tools.experimental
     	toplevel .ns2im-dialog
     	wm transient .ns2im-dialog .
 	wm title .ns2im-dialog "ns2imunes converter"
-    
+
 	set f1 [frame .ns2im-dialog.entry1]
 	set f2 [frame .ns2im-dialog.buttons]
-    
+
 	label $f1.l -text "ns2 file:"
 	entry $f1.e -width 25 -textvariable ns2srcfile
 	button $f1.b -text "Browse" -width 8 \
@@ -452,13 +453,13 @@ menu .menubar.tools.experimental
 		    -initialfile $ns2srcfile]
 		$f1.e delete 0 end
 		$f1.e insert 0 "$srcfile"
-	}    
+	}
 	button $f2.b1 -text "OK" -command {
 	    ns2im $srcfile
 	    destroy .ns2im-dialog
 	}
 	button $f2.b2 -text "Cancel" -command { destroy .ns2im-dialog}
-    
+
 	pack $f1.b $f1.e -side right
 	pack $f1.l -side right -fill x -expand true
 	pack $f2.b1 -side left -expand true -anchor e
@@ -607,9 +608,9 @@ menu .menubar.session -tearoff 1
 #
 menu .menubar.help -tearoff 0
 .menubar.help add command -label "Online manual (www)" -command \
-  "_launchBrowser http://pf.itd.nrl.navy.mil/core/core-html/"
+  "_launchBrowser http://downloads.pf.itd.nrl.navy.mil/docs/core/core-html/"
 .menubar.help add command -label "CORE website (www)" -command \
-  "_launchBrowser http://cs.itd.nrl.navy.mil/work/core/index.php"
+  "_launchBrowser http://www.nrl.navy.mil/itd/ncs/products/core"
 .menubar.help add command -label "Mailing list (www)" -command \
   "_launchBrowser http://pf.itd.nrl.navy.mil/mailman/listinfo/core-users"
 .menubar.help add command -label "About" -command popupAbout
@@ -698,7 +699,7 @@ pack .bottom -side bottom -fill x
 label .bottom.textbox -relief sunken -bd 1 -anchor w -width 999
 label .bottom.zoom -relief sunken -bd 1 -anchor w -width 10
 label .bottom.cpu_load -relief sunken -bd 1 -anchor w -width 9
-label .bottom.mbuf -relief sunken -bd 1 -anchor w -width 9 
+label .bottom.mbuf -relief sunken -bd 1 -anchor w -width 9
 label .bottom.indicators -relief sunken -bd 1 -anchor w -width 5
 pack .bottom.indicators .bottom.mbuf .bottom.cpu_load \
     .bottom.zoom .bottom.textbox -side right -padx 0 -fill both
@@ -820,7 +821,7 @@ set ::tk::dialog::file::showHiddenBtn 1
 #
 switchCanvas first
 
-focus -force . 
+focus -force .
 
 #
 # Fire up the animation loop - used basically for selectbox

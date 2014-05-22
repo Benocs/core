@@ -43,19 +43,19 @@
 #   set ipnet [findFreeIPv4Net $mask]
 # FUNCTION
 #   Finds a free IPv4 network. Network is concidered to be free
-#   if there are no simulated nodes attached to it. 
+#   if there are no simulated nodes attached to it.
 # INPUTS
 #   * mask -- this parameter is left unused for now
 # RESULT
-#   * ipnet -- returns the free IPv4 network address in the form 10.a.b 
+#   * ipnet -- returns the free IPv4 network address in the form 10.a.b
 #****
-#global tempAS 
+#global tempAS
 
 proc findFreeIPv4Net { quarknode mask } {
 
     # vergabe der 30er
 
-    global g_prefs node_list tempAS 
+    global g_prefs node_list tempAS
 
     set ipnets5 {}
 
@@ -81,7 +81,7 @@ proc findFreeIPv4Net { quarknode mask } {
 
     set ipnets4 {}
 
-    # alle ips byte 0-3 -> zB 10.14.54.2 -> 10 14 54 2 
+    # alle ips byte 0-3 -> zB 10.14.54.2 -> 10 14 54 2
     foreach node $node_list {
 	foreach ifc [ifcList $node] {
 	    set ipnet4 [lrange [split [getIfcIPv4addr $node $ifc] "./"] 0 3]
@@ -103,7 +103,7 @@ proc findFreeIPv4Net { quarknode mask } {
 
     set ipnets3 {}
 
-    # alle ips byte 0-2 -> zB 10.14.54 -> 10 14 54 
+    # alle ips byte 0-2 -> zB 10.14.54 -> 10 14 54
     foreach node $node_list {
         foreach ifc [ifcList $node] {
             set ipnet3 [lrange [split [getIfcIPv4addr $node $ifc] .] 0 2]
@@ -126,7 +126,7 @@ proc findFreeIPv4Net { quarknode mask } {
     set abcd [split $g_prefs(gui_ipv4_addr) .]
 
 
-    set a [lindex $abcd 0] 
+    set a [lindex $abcd 0]
     set b [lindex $abcd 1]
     set c [lindex $abcd 2]
     set d [lindex $abcd 3]
@@ -140,11 +140,11 @@ proc findFreeIPv4Net { quarknode mask } {
 		}
 	}
 
-	#  
+	#
 	#  30er muessen immer vierer bloecke am stueck nehmen
 	#   zB  0 <1 2> 3   4 <5 6> 7   8 <9 10> 11   12 <13 14> 15   16 <17 18> 19   20 <21 22> 23
 	#   zB 6 und 9 fuer node ips darf bei 30er nicht vorkommen..
-	# wenn geht logik vereinfachen	
+	#TODO wenn geht logik vereinfachen
 	# testen ob 3. byte als 24er vergeben -> wenn ja incr j
         for { set j $c } { $j < 255 } { incr j } {
 		if {[lsearch $ipnets3 "$a $i $j"] != -1} {
@@ -179,7 +179,7 @@ proc findFreeIPv4Net { quarknode mask } {
 			}
 	  	}
         }
-    
+
 }
 
 
@@ -290,7 +290,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
     # neu test auf 30er netmask mit asID
     #proc fuer asID
-    set i [getASiD $linkNode] 
+    set i [getASiD $linkNode]
 
 
 # TODO 24er muessen auch adressbereich der 30 beachten (immer 4er schritte von 0 an)
@@ -301,7 +301,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 	#	puts $ip4
 	#}
 
-	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen	
+	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen
 	if { 0 == [llength $ip4AmSwitchNetzAddressen] } {
 	 	#fall neues 24er
         	for { set j $c } { $j <= 255 } { incr j } {
@@ -315,7 +315,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 	 	#fall bestehendes 24er von peers uebernehmen und hochzaehlen
 		set peers {}
 	        foreach peerIP $ip4AmSwitchNetzAddressen {
-		   
+
 	            	set ippeer [lrange [split $peerIP .] 0 3]
 
 	    		if {[lsearch $peers $ippeer] == -1} {
@@ -324,7 +324,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 	        }
 
 		# setze c als 3. byteblock von der
-		#   letzten ip der peers..) 
+		#   letzten ip der peers..)
 		#set c [lrange [lrange $peers 0 0] 0 0]
 		set c [lindex [lindex $peers end] 2]
 
@@ -338,9 +338,9 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 		#puts "i nacher"
 		#puts $i
 
-		# wenn 255 erreicht -> fehler! 
+		# wenn 255 erreicht -> fehler!
 		for { set k 1 } { $k <= 255 } { incr k } {
-			
+
 			if { $k == 255 } { puts "WARNING: switch 24er voll!" }
 			 # hier verhindern dass net oder broadcast ips in verwendung
 		  	 #  benutzt werden (effektiv nur broadcast verhindern, wenn
@@ -361,18 +361,18 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 }
 
 
-#****f* ipv4.tcl/autoIPv4addr 
+#****f* ipv4.tcl/autoIPv4addr
 # NAME
 #   autoIPv4addr -- automaticaly assign an IPv4 address
 # SYNOPSIS
-#   autoIPv4addr $node $iface 
+#   autoIPv4addr $node $iface
 # FUNCTION
-#   automaticaly assignes an IPv4 address to the interface $iface of 
-#   of the node $node  
+#   automaticaly assignes an IPv4 address to the interface $iface of
+#   of the node $node
 # INPUTS
-#   * node -- the node containing the interface to which a new 
+#   * node -- the node containing the interface to which a new
 #     IPv4 address should be assigned
-#   * iface -- the interface to witch a new, automatilacy generated, IPv4  
+#   * iface -- the interface to witch a new, automatilacy generated, IPv4
 #     address will be assigned
 #****
 
@@ -396,8 +396,8 @@ proc autoIPv4addr { node iface } {
 
     set peer_node [logicalPeerByIfc $node $iface]
     # find addresses of NETWORK layer peer nodes
-    
-  
+
+
     if { [[typemodel $peer_node].layer] == "LINK" } {
 	#puts "FOUND LIIIIIINK NODE"
 	#puts "NODE:"
@@ -428,8 +428,14 @@ proc autoIPv4addr { node iface } {
 	}
     }
 
+    #puts "---"
+    #puts $peer
+    #puts $peer_if
+    #puts $peer_ip4addr
+    #puts $netmaskbits
+
     # first node connected to wlan should use wlan prefix
-    if { [nodeType $peer_node] == "wlan" && 
+    if { [nodeType $peer_node] == "wlan" &&
     	 [llength $peer_ip4addrs] == 0 } {
 	# use the special "wireless" pseudo-interface
 	set peer_ip4addr [getIfcIPv4addr $peer_node wireless]
@@ -461,7 +467,7 @@ proc autoIPv4addr { node iface } {
 	#   und fall wenn router an schon bestehendes switchnetz
 	#   angeschlossen wird
 	#puts "hinverbunden zu"
-	#puts $node 
+	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
 		#puts "LINKFALL1"
@@ -491,21 +497,21 @@ proc autoIPv4addr { node iface } {
 	}
 	set tempAS [getASiD $node]
 #	puts "tempAS ausgehend"
-#	puts $tempAS 
+#	puts $tempAS
     }
 }
 
 
-#****f* ipv4.tcl/autoIPv4defaultroute 
+#****f* ipv4.tcl/autoIPv4defaultroute
 # NAME
-#   autoIPvdefaultroute -- automaticaly assign a default route 
+#   autoIPvdefaultroute -- automaticaly assign a default route
 # SYNOPSIS
-#   autoIPv4defaultroute $node $iface 
+#   autoIPv4defaultroute $node $iface
 # FUNCTION
 #   searches the interface of the node for a router, if a router is found
-#   then it is a new default gateway. 
+#   then it is a new default gateway.
 # INPUTS
-#   * node  -- default gateway is provided for this node 
+#   * node  -- default gateway is provided for this node
 #   * iface -- the interface on witch we search for a new default gateway
 #****
 # schauen ob mit autoIPv4addr interferiert
@@ -526,7 +532,7 @@ proc autoIPv4defaultroute { node iface } {
 	foreach l2node [listLANnodes $peer_node {}] {
 	    foreach ifc [ifcList $l2node] {
 		set peer [logicalPeerByIfc $l2node $ifc]
-		if { [nodeType $peer] != "router" && 
+		if { [nodeType $peer] != "router" &&
 		     [nodeType $peer] != "ine" } {
 		    continue
 		}
@@ -540,7 +546,7 @@ proc autoIPv4defaultroute { node iface } {
 	    }
 	}
     } else {
-	if { [nodeType $peer_node] != "router" && 
+	if { [nodeType $peer_node] != "router" &&
 	     [nodeType $peer_node] != "ine" } {
 	    return
 	}
@@ -555,16 +561,16 @@ proc autoIPv4defaultroute { node iface } {
 }
 
 
-#****f* ipv4.tcl/checkIPv4Addr 
+#****f* ipv4.tcl/checkIPv4Addr
 # NAME
-#   checkIPv4Addr -- check the IPv4 address 
+#   checkIPv4Addr -- check the IPv4 address
 # SYNOPSIS
 #   set valid [checkIPv4Addr $str]
 # FUNCTION
-#   Checks if the provided string is a valid IPv4 address. 
+#   Checks if the provided string is a valid IPv4 address.
 # INPUTS
 #   * str -- string to be evaluated. Valid IPv4 address is writen in form
-#     a.b.c.d 
+#     a.b.c.d
 # RESULT
 #   * valid -- function returns 0 if the input string is not in the form
 #     of a valid IP address, 1 otherwise
@@ -601,15 +607,15 @@ proc checkIPv4Addr { str } {
 }
 
 
-#****f* ipv4.tcl/checkIPv4Net 
+#****f* ipv4.tcl/checkIPv4Net
 # NAME
-#   checkIPv4Net -- check the IPv4 network 
+#   checkIPv4Net -- check the IPv4 network
 # SYNOPSIS
 #   set valid [checkIPv4Net $str]
 # FUNCTION
-#   Checks if the provided string is a valid IPv4 network. 
+#   Checks if the provided string is a valid IPv4 network.
 # INPUTS
-#   * str -- string to be evaluated. Valid string is in form a.b.c.d/m 
+#   * str -- string to be evaluated. Valid string is in form a.b.c.d/m
 # RESULT
 #   * valid -- function returns 0 if the input string is not in the form
 #     of a valid IP address, 1 otherwise
@@ -644,7 +650,7 @@ proc ipv4ToString { ip } {
 # Boeing
 # ***** ipv4.tcl/stringToIPv4
 # NAME
-#  stringToIPv4 -- convert dotted decimal string to 32-bit integer 
+#  stringToIPv4 -- convert dotted decimal string to 32-bit integer
 proc stringToIPv4 { ip } {
     set parts [split $ip .]
     set a [lindex $parts 0]; set b [lindex $parts 1];

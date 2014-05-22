@@ -7,7 +7,7 @@ proc doStuff1 {} {
 
   # mit http://community.activestate.com/node/10009 dem hier super
   # konkret bei jedem combomenu mit welchem sich etwas aendert wird disabled und enabled.
- 
+
   # fenster initalisierung
   set wi .core_testing
   catch { destroy $wi }
@@ -22,10 +22,10 @@ proc doStuff1 {} {
   #   fenster abbricht
   global testing_prefs testing_prefs_old
   array set testing_prefs_old [array get testing_prefs]
-  
+
 
   # dropdownmenue eintraege definition
-  #immer der entsprechende wert aus brite als 
+  #immer der entsprechende wert aus brite als
   #  standart eintrag ausgeawaehlt: variable vordefinieren
   set TOPOTYPES {{1 Level: AS ONLY} {1 Level: ROUTER (IP) ONLY} {2 Level: TOP-DOWN} {2 Level: BOTTOM-UP}}
   set MODELS {{Waxman} {BA} {BA-2} {GLP}}
@@ -59,7 +59,7 @@ proc doStuff1 {} {
 
 #; zurueck_stellen; destroy $wi"
   button $wi.top.line1.cancel -text "Cancel" -command {
-    # im falle eines abbruchs die bisherigen einstellungen wieder herstellen 
+    # im falle eines abbruchs die bisherigen einstellungen wieder herstellen
     global testing_prefs testing_prefs_old
     array set testing_prefs [array get testing_prefs_old]
     destroy .core_testing
@@ -77,7 +77,7 @@ proc doStuff1 {} {
   }
 
   #
-  # AS 
+  # AS
   #
   labelframe $wi.as -borderwidth 4 -text "AS"
 
@@ -88,10 +88,10 @@ proc doStuff1 {} {
   #$wi.as.line1.import
   pack $wi.as.line1.label -side left
   pack $wi.as.line1 -side top -anchor w -padx 4 -pady 4
-   
+
   frame $wi.as.line2
   label $wi.as.line2.label_hs -text "HS:"
-  entry $wi.as.line2.entry_hs -bg white -width 8 -textvariable testing_prefs(gui_brite_as_hs) 
+  entry $wi.as.line2.entry_hs -bg white -width 8 -textvariable testing_prefs(gui_brite_as_hs)
   label $wi.as.line2.label_n -text "N:"
   entry $wi.as.line2.entry_n -bg white -width 8 -textvariable testing_prefs(gui_brite_as_n)
   pack $wi.as.line2.label_hs $wi.as.line2.entry_hs $wi.as.line2.label_n $wi.as.line2.entry_n -side left
@@ -124,7 +124,7 @@ proc doStuff1 {} {
   set np $NODEPLACEM
   ttk::combobox $wi.as.line5.combo -width 10 -exportselection 0 \
     -values $np -textvariable testing_prefs(gui_brite_as_nodeplacement)
-  label $wi.as.line5.label_alpha -text "alpha:" 
+  label $wi.as.line5.label_alpha -text "alpha:"
   entry $wi.as.line5.entry_alpha -bg white -width 8 -textvariable testing_prefs(gui_brite_as_alpha)
   label $wi.as.line5.label_p -text "p (add):"
   entry $wi.as.line5.entry_p -bg white -width 8 -textvariable testing_prefs(gui_brite_as_p)
@@ -399,7 +399,7 @@ proc doStuff1 {} {
   button $wi.bot.line1.buildtop -text "Build Cfg" -command "buildCfg"
 
   label $wi.bot.line1.text_savedest -text "SaveCfg:"
-  entry $wi.bot.line1.entry_savedest -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_savedest) 
+  entry $wi.bot.line1.entry_savedest -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_savedest)
   label $wi.bot.line1.text_execpath -text "BritePath:"
   entry $wi.bot.line1.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_execpath)
 
@@ -466,7 +466,7 @@ proc buildTopology [] {
 
 #testing_prefs(gui_brite_bottom_savedest)
 # 373   entry $wi.bot2.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_execpath)
-# 375   entry $wi.bot2.entry_loadcfg -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_loadcfg) 
+# 375   entry $wi.bot2.entry_loadcfg -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom2_loadcfg)
 
 #  puts [pwd]
 #  cd /home/jw/dateien/sw/brite/BRITE/Java
@@ -480,7 +480,7 @@ proc buildTopology [] {
 
     cd $execdir
     puts [pwd]
- 
+
     set exec_string exec
     lappend exec_string java
     lappend exec_string -Xms2048M -Xmx2048M
@@ -492,11 +492,11 @@ proc buildTopology [] {
     {*}$exec_string
 
   } else {
-    append execdir "/C++" 
+    append execdir "/C++"
 
     cd $execdir
     puts [pwd]
- 
+
     set exec_string exec
     lappend exec_string ./cppgen
     lappend exec_string $testing_prefs(gui_brite_bottom2_loadcfg)
@@ -573,7 +573,7 @@ proc switched {} {
       .core_testing.as.line6.entry_q configure -state disabled
       set testing_prefs(gui_brite_as_p_is_disabled) 0
       set testing_prefs(gui_brite_as_q_is_disabled) 1
-    }  
+    }
 
     .core_testing.as.line6.combo configure -state normal
     .core_testing.as.line7.combo configure -state normal
@@ -597,7 +597,7 @@ proc switched {} {
     .core_testing.router.line9.combo configure -state disabled
     .core_testing.router.line9.entry_maxBW configure -state disabled
     .core_testing.router.line10.entry_minBW configure -state disabled
-  
+
     .core_testing.topdown.line2.combo configure -state disabled
     .core_testing.topdown.line2.entry_k configure -state disabled
     .core_testing.topdown.line3.combo1 configure -state disabled
@@ -623,7 +623,7 @@ proc switched {} {
     set testing_prefs(gui_brite_as_m_is_disabled) 0
     set testing_prefs(gui_brite_as_maxBW_is_disabled) 0
     set testing_prefs(gui_brite_as_minBW_is_disabled) 0
-    set testing_prefs(gui_brite_router_models_is_disabled) 1 
+    set testing_prefs(gui_brite_router_models_is_disabled) 1
     set testing_prefs(gui_brite_router_nodeplacement_is_disabled) 1
     set testing_prefs(gui_brite_router_growthtype_is_disabled) 1
     set testing_prefs(gui_brite_router_prefconn_is_disabled) 1
@@ -670,7 +670,7 @@ proc switched {} {
     .core_testing.as.line9.combo configure -state disabled
     .core_testing.router.line9.entry_maxBW configure -state disabled
     .core_testing.as.line10.entry_minBW configure -state disabled
-  
+
     .core_testing.router.line1.import configure -state normal
     .core_testing.router.line2.entry_hs configure -state normal
     .core_testing.router.line2.entry_n configure -state normal
@@ -678,7 +678,7 @@ proc switched {} {
     .core_testing.router.line3.combo configure -state normal
     .core_testing.router.line5.combo configure -state normal
     .core_testing.router.line6.combo configure -state normal
-     
+
     set var_router_alpha_beta [.core_testing.router.line3.combo get]
     if {[string equal "Waxman" $var_router_alpha_beta]} {
       .core_testing.router.line5.entry_alpha configure -state normal
@@ -718,7 +718,7 @@ proc switched {} {
       set testing_prefs(gui_brite_router_p_is_disabled) 0
       set testing_prefs(gui_brite_router_q_is_disabled) 1
     }
- 
+
     .core_testing.router.line7.combo configure -state normal
     .core_testing.router.line7.entry_gamma configure -state disabled
     .core_testing.router.line8.combo configure -state disabled
@@ -726,7 +726,7 @@ proc switched {} {
     .core_testing.router.line9.combo configure -state normal
     .core_testing.router.line9.entry_maxBW configure -state normal
     .core_testing.router.line10.entry_minBW configure -state normal
-  
+
     .core_testing.topdown.line2.combo configure -state disabled
     .core_testing.topdown.line2.entry_k configure -state disabled
     .core_testing.topdown.line3.combo1 configure -state disabled
@@ -787,7 +787,7 @@ proc switched {} {
     .core_testing.as.line3.entry_ls configure -state normal
     .core_testing.as.line3.combo configure -state normal
     .core_testing.as.line5.combo configure -state normal
-    
+
     set var_as_alpha_beta [.core_testing.as.line3.combo get]
     if {[string equal "Waxman" $var_as_alpha_beta]} {
       .core_testing.as.line5.entry_alpha configure -state normal
@@ -829,7 +829,7 @@ proc switched {} {
       set testing_prefs(gui_brite_as_p_is_disabled) 0
       set testing_prefs(gui_brite_as_q_is_disabled) 1
     }
- 
+
     .core_testing.as.line6.combo configure -state normal
     .core_testing.as.line7.combo configure -state normal
     .core_testing.as.line7.entry_gamma configure -state disabled
@@ -838,7 +838,7 @@ proc switched {} {
     .core_testing.as.line9.combo configure -state disabled
     .core_testing.as.line9.entry_maxBW configure -state disabled
     .core_testing.as.line10.entry_minBW configure -state disabled
-  
+
     .core_testing.router.line1.import configure -state normal
     .core_testing.router.line2.entry_hs configure -state normal
     .core_testing.router.line2.entry_n configure -state normal
@@ -895,7 +895,7 @@ proc switched {} {
     .core_testing.router.line9.combo configure -state disabled
     .core_testing.router.line9.entry_maxBW configure -state disabled
     .core_testing.router.line10.entry_minBW configure -state disabled
-  
+
     .core_testing.topdown.line2.combo configure -state normal
 
     set var_topdown_k [.core_testing.topdown.line2.combo get]
@@ -971,7 +971,7 @@ proc switched {} {
 #    .core_testing.as.line9.combo configure -state
 #    .core_testing.router.line9.entry_maxBW configure -state
 #    .core_testing.as.line10.entry_minBW configure -state
-#  
+#
 #    .core_testing.router.line1.import configure -state
 #    .core_testing.router.line2.entry_hs configure -state
 #    .core_testing.router.line2.entry_n configure -state
@@ -988,7 +988,7 @@ proc switched {} {
 #    .core_testing.router.line9.combo configure -state
 #    .core_testing.router.line9.entry_maxBW configure -state
 #    .core_testing.router.line10.entry_minBW configure -state
-#  
+#
 #    .core_testing.topdown.line2.combo configure -state
 #    .core_testing.topdown.line2.entry_k configure -state
 #    .core_testing.topdown.line3.combo1 configure -state
@@ -1000,45 +1000,45 @@ proc switched {} {
 #    .core_testing.topdown.line6.buttonleft configure -state
 #    .core_testing.topdown.line6.buttonright configure -state
 #
-#    set testing_prefs(gui_brite_top_topotypes_is_disabled) 0        
-#    set testing_prefs(gui_brite_as_models_is_disabled) 0             
+#    set testing_prefs(gui_brite_top_topotypes_is_disabled) 0
+#    set testing_prefs(gui_brite_as_models_is_disabled) 0
 #    set testing_prefs(gui_brite_as_nodeplacement_is_disabled) 0
-#    set testing_prefs(gui_brite_as_growthtype_is_disabled) 0         
-#    set testing_prefs(gui_brite_as_prefconn_is_disabled) 0           
-#    set testing_prefs(gui_brite_as_connlocali_is_disabled) 0         
-#    set testing_prefs(gui_brite_as_bandwidthd_is_disabled) 0         
-#    set testing_prefs(gui_brite_as_hs_is_disabled) 0                 
-#    set testing_prefs(gui_brite_as_n_is_disabled) 0                  
-#    set testing_prefs(gui_brite_as_ls_is_disabled) 0                 
-#    set testing_prefs(gui_brite_as_alpha_is_disabled) 0              
-#    set testing_prefs(gui_brite_as_beta_is_disabled) 0               
-#    set testing_prefs(gui_brite_as_gamma_is_disabled) 0              
-#    set testing_prefs(gui_brite_as_m_is_disabled) 0                  
-#    set testing_prefs(gui_brite_as_maxBW_is_disabled) 0              
-#    set testing_prefs(gui_brite_as_minBW_is_disabled) 0              
-#    set testing_prefs(gui_brite_router_models_is_disabled) 0        
-#    set testing_prefs(gui_brite_router_nodeplacement_is_disabled) 0  
-#    set testing_prefs(gui_brite_router_growthtype_is_disabled) 0     
-#    set testing_prefs(gui_brite_router_prefconn_is_disabled) 0       
-#    set testing_prefs(gui_brite_router_connlocali_is_disabled) 0    
-#    set testing_prefs(gui_brite_router_bandwidthd_is_disabled) 0    
-#    set testing_prefs(gui_brite_router_hs_is_disabled) 0            
-#    set testing_prefs(gui_brite_router_n_is_disabled) 0             
-#    set testing_prefs(gui_brite_router_ls_is_disabled) 0            
-#    set testing_prefs(gui_brite_router_alpha_is_disabled) 0        
-#    set testing_prefs(gui_brite_router_beta_is_disabled) 0          
-#    set testing_prefs(gui_brite_router_gamma_is_disabled) 0         
-#    set testing_prefs(gui_brite_router_m_is_disabled) 0              
-#    set testing_prefs(gui_brite_router_maxBW_is_disabled) 0          
-#    set testing_prefs(gui_brite_router_minBW_is_disabled) 0          
-#    set testing_prefs(gui_brite_topdown_k_is_disabled) 0             
-#    set testing_prefs(gui_brite_topdown_rightMaxBW_is_disabled) 0    
-#    set testing_prefs(gui_brite_topdown_leftMaxBW_is_disabled) 0    
-#    set testing_prefs(gui_brite_topdown_rightMinBW_is_disabled) 0  
-#    set testing_prefs(gui_brite_topdown_leftMinBW_is_disabled) 0    
-#    set testing_prefs(gui_brite_topdown_ecm_is_disabled) 0        
+#    set testing_prefs(gui_brite_as_growthtype_is_disabled) 0
+#    set testing_prefs(gui_brite_as_prefconn_is_disabled) 0
+#    set testing_prefs(gui_brite_as_connlocali_is_disabled) 0
+#    set testing_prefs(gui_brite_as_bandwidthd_is_disabled) 0
+#    set testing_prefs(gui_brite_as_hs_is_disabled) 0
+#    set testing_prefs(gui_brite_as_n_is_disabled) 0
+#    set testing_prefs(gui_brite_as_ls_is_disabled) 0
+#    set testing_prefs(gui_brite_as_alpha_is_disabled) 0
+#    set testing_prefs(gui_brite_as_beta_is_disabled) 0
+#    set testing_prefs(gui_brite_as_gamma_is_disabled) 0
+#    set testing_prefs(gui_brite_as_m_is_disabled) 0
+#    set testing_prefs(gui_brite_as_maxBW_is_disabled) 0
+#    set testing_prefs(gui_brite_as_minBW_is_disabled) 0
+#    set testing_prefs(gui_brite_router_models_is_disabled) 0
+#    set testing_prefs(gui_brite_router_nodeplacement_is_disabled) 0
+#    set testing_prefs(gui_brite_router_growthtype_is_disabled) 0
+#    set testing_prefs(gui_brite_router_prefconn_is_disabled) 0
+#    set testing_prefs(gui_brite_router_connlocali_is_disabled) 0
+#    set testing_prefs(gui_brite_router_bandwidthd_is_disabled) 0
+#    set testing_prefs(gui_brite_router_hs_is_disabled) 0
+#    set testing_prefs(gui_brite_router_n_is_disabled) 0
+#    set testing_prefs(gui_brite_router_ls_is_disabled) 0
+#    set testing_prefs(gui_brite_router_alpha_is_disabled) 0
+#    set testing_prefs(gui_brite_router_beta_is_disabled) 0
+#    set testing_prefs(gui_brite_router_gamma_is_disabled) 0
+#    set testing_prefs(gui_brite_router_m_is_disabled) 0
+#    set testing_prefs(gui_brite_router_maxBW_is_disabled) 0
+#    set testing_prefs(gui_brite_router_minBW_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_k_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_rightMaxBW_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_leftMaxBW_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_rightMinBW_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_leftMinBW_is_disabled) 0
+#    set testing_prefs(gui_brite_topdown_ecm_is_disabled) 0
 #    set testing_prefs(gui_brite_topdown_iebwd_is_disabled) 0
-#    set testing_prefs(gui_brite_topdown_iabwd_is_disabled) 0         
+#    set testing_prefs(gui_brite_topdown_iabwd_is_disabled) 0
 
 
   } else {
@@ -1053,7 +1053,7 @@ proc switched {} {
 # bisher sehr rudimentaer ohne große intelligenz
 proc buildCfg {} {
 
-  global testing_prefs 
+  global testing_prefs
 
 #  wie im bsp saveDotfile als speicherdialog BZW anderen mit entry feld.
 
@@ -1091,7 +1091,7 @@ proc buildCfg {} {
   append data "\n"
 
  set var_model [.core_testing.top.line1.combo get]
- 
+
  if {[string equal "1 Level: AS ONLY" $var_model]} {
 # Abschnitt AS ONLY
     append data "BeginModel\n"
@@ -1109,14 +1109,14 @@ proc buildCfg {} {
     }
 
     # ueberlegen ob besser wenn entry felder ausgelesen oder testing_prefs variable
-    append data "	 N = " $testing_prefs(gui_brite_as_n)\n 
+    append data "	 N = " $testing_prefs(gui_brite_as_n)\n
     append data "	 HS = " $testing_prefs(gui_brite_as_hs)\n
     append data "	 LS = " $testing_prefs(gui_brite_as_ls)\n
-    
+
     set var_as_node_placement [.core_testing.as.line5.combo get]
     if {[string equal "Random" $var_as_node_placement]} {
       append data "	 NodePlacement = 1\n"
-    } else { 
+    } else {
       append data "	 NodePlacement = 2\n"
     }
 
@@ -1124,7 +1124,7 @@ proc buildCfg {} {
       set var_as_growth_type [.core_testing.as.line6.combo get]
       if {[string equal "Incremental" $var_as_growth_type]} {
         append data "	 GrowthType = 1\n"
-      } else { 
+      } else {
         append data "	 GrowthType = 2\n"
       }
     } else {
@@ -1158,10 +1158,10 @@ proc buildCfg {} {
     append data "	 BWMin = " $testing_prefs(gui_brite_as_minBW)\n
     append data "	 BWMax = " $testing_prefs(gui_brite_as_maxBW)\n
 
-    if {[string equal "BA-2" $var_as_alpha_beta]} {   
+    if {[string equal "BA-2" $var_as_alpha_beta]} {
       append data "	  q = " $testing_prefs(gui_brite_as_p)\n
       append data "	  p = " $testing_prefs(gui_brite_as_q)\n
-    } elseif {[string equal "GLP" $var_as_alpha_beta]} {  
+    } elseif {[string equal "GLP" $var_as_alpha_beta]} {
       append data "	  p = " $testing_prefs(gui_brite_as_p)\n
       append data "	  beta = " $testing_prefs(gui_brite_as_beta)\n
     } else {
@@ -1192,14 +1192,14 @@ proc buildCfg {} {
 
     # ueberlegen ob besser wenn entry felder ausgelesen oder testing_prefs variable
     #    append data "	" N = ".core_testing.as.line2.entry_n\n"
-    append data "	 N = " $testing_prefs(gui_brite_router_n)\n 
+    append data "	 N = " $testing_prefs(gui_brite_router_n)\n
     append data "	 HS = " $testing_prefs(gui_brite_router_hs)\n
     append data "	 LS = " $testing_prefs(gui_brite_router_ls)\n
-    
+
     set var_router_node_placement [.core_testing.router.line5.combo get]
     if {[string equal "Random" $var_router_node_placement]} {
       append data "	 NodePlacement = 1\n"
-    } else { 
+    } else {
       append data "	 NodePlacement = 2\n"
     }
 
@@ -1207,7 +1207,7 @@ proc buildCfg {} {
       set var_router_growth_type [.core_testing.router.line6.combo get]
       if {[string equal "Incremental" $var_router_growth_type]} {
         append data "	 GrowthType = 1\n"
-      } else { 
+      } else {
         append data "	 GrowthType = 2\n"
       }
     } else {
@@ -1255,8 +1255,8 @@ proc buildCfg {} {
     append data "\n"
 
   } elseif {[string equal "2 Level: TOP-DOWN" $var_model]} {
-# Abschnitt TopDown 
-# spaeter vielleicht um doppelten code zu vermeiden
+# Abschnitt TopDown
+# TODO: spaeter vielleicht um doppelten code zu vermeiden
 #   teile in fktn auslagern
 
     append data "BeginModel\n"
@@ -1337,14 +1337,14 @@ proc buildCfg {} {
 
     # ueberlegen ob besser wenn entry felder ausgelesen oder testing_prefs variable
     #    append data "	" N = ".core_testing.as.line2.entry_n\n"
-    append data "	 N = " $testing_prefs(gui_brite_as_n)\n 
+    append data "	 N = " $testing_prefs(gui_brite_as_n)\n
     append data "	 HS = " $testing_prefs(gui_brite_as_hs)\n
     append data "	 LS = " $testing_prefs(gui_brite_as_ls)\n
-    
+
     set var_as_node_placement [.core_testing.as.line5.combo get]
     if {[string equal "Random" $var_as_node_placement]} {
       append data "	 NodePlacement = 1\n"
-    } else { 
+    } else {
       append data "	 NodePlacement = 2\n"
     }
 
@@ -1354,7 +1354,7 @@ proc buildCfg {} {
       set var_as_growth_type [.core_testing.as.line6.combo get]
       if {[string equal "Incremental" $var_as_growth_type]} {
         append data "	 GrowthType = 1\n"
-      } else { 
+      } else {
         append data "	 GrowthType = 2\n"
       }
     } else {
@@ -1424,14 +1424,14 @@ proc buildCfg {} {
 
     # ueberlegen ob besser wenn entry felder ausgelesen oder testing_prefs variable
     #    append data "	" N = ".core_testing.as.line2.entry_n\n"
-    append data "	 N = " $testing_prefs(gui_brite_router_n)\n 
+    append data "	 N = " $testing_prefs(gui_brite_router_n)\n
     append data "	 HS = " $testing_prefs(gui_brite_router_hs)\n
     append data "	 LS = " $testing_prefs(gui_brite_router_ls)\n
-    
+
     set var_router_node_placement [.core_testing.router.line5.combo get]
     if {[string equal "Random" $var_router_node_placement]} {
       append data "	 NodePlacement = 1\n"
-    } else { 
+    } else {
       append data "	 NodePlacement = 2\n"
     }
 
@@ -1439,7 +1439,7 @@ proc buildCfg {} {
       set var_router_growth_type [.core_testing.router.line6.combo get]
       if {[string equal "Incremental" $var_router_growth_type]} {
         append data "	 GrowthType = 1\n"
-      } else { 
+      } else {
         append data "	 GrowthType = 2\n"
       }
     } else {
@@ -1506,7 +1506,7 @@ proc buildCfg {} {
 #  Auschnitt aus dem Original Configfile
 #        BRITE = 1        #1/0=enable/disable output in BRITE format
 #        OTTER = 0        #1/0=enable/disable visualization in otter
-#        DML = 0          #1/0=enable/disable output to SSFNet's DML format 
+#        DML = 0          #1/0=enable/disable output to SSFNet's DML format
 #        NS = 0   #1/0=enable/disable output to NS-2
 #        Javasim = 0      #1/0=enable/disable output to Javasim
 #
@@ -1574,7 +1574,7 @@ proc initTestingPrefs {} {
 
   # allgemeine vordefinition
   # zur besseren auswertbarkeit gibt es fuer die felder noch
-  #  ein is_disabled 
+  #  ein is_disabled
   array set testing_prefs {
     gui_brite_top_topotypes			"1 Level: AS ONLY"
     gui_brite_top_topotypes_is_disabled		0
@@ -1583,7 +1583,7 @@ proc initTestingPrefs {} {
     gui_brite_as_models				"Waxman"
     gui_brite_as_models_is_disabled		0
     gui_brite_as_nodeplacement			"Random"
-    gui_brite_as_nodeplacement_is_disabled	0	
+    gui_brite_as_nodeplacement_is_disabled	0
     gui_brite_as_growthtype			"Incremental"
     gui_brite_as_growthtype_is_disabled 	0
     gui_brite_as_prefconn			"None"
@@ -1605,8 +1605,8 @@ proc initTestingPrefs {} {
     gui_brite_as_p				0.6
     gui_brite_as_p_is_disabled			1
     gui_brite_as_q				0.2
-    gui_brite_as_q_is_disabled			1	
-    gui_brite_as_gamma				-1	
+    gui_brite_as_q_is_disabled			1
+    gui_brite_as_gamma				-1
     gui_brite_as_gamma_is_disabled		0
     gui_brite_as_m				2
     gui_brite_as_m_is_disabled			0

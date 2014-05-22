@@ -64,7 +64,7 @@ proc popupServiceConfig_IPsec { parent w node service btn } {
     ttk::labelframe $f.t -text "IPsec Tunnel Endpoints"
     set h "(1) Define tunnel endpoints (select peer node using the button"
     set h "$h, then select address from the list)"
-    ttk::label $f.t.lab1 -text $h 
+    ttk::label $f.t.lab1 -text $h
     pack $f.t.lab1 -side top -anchor w -padx 4 -pady 4
     ttk::frame $f.t.ep
     ttk::label $f.t.ep.lab1 -text "Local:"
@@ -91,7 +91,7 @@ proc popupServiceConfig_IPsec { parent w node service btn } {
     	$f.t.ep.add -side left -padx 4 -pady 4
     pack $f.t.ep -side top -anchor w
 
-    set h "(2) Select endpoints below and add the subnets to be encrypted" 
+    set h "(2) Select endpoints below and add the subnets to be encrypted"
     ttk::label $f.t.lab2 -text $h
     pack $f.t.lab2 -side top -anchor w -padx 4 -pady 4
 
@@ -110,7 +110,7 @@ proc popupServiceConfig_IPsec { parent w node service btn } {
     set net_list [ipv4SubnetList $node_list]
     $f.t.sub.combo1 configure -values $net_list
     $f.t.sub.combo2 configure -values $net_list
-   
+
     ttk::treeview $f.t.tree -height 5 -selectmode browse -show tree
 
     pack $f.t.tree -side top -padx 4 -pady 4 -fill both
@@ -154,7 +154,7 @@ proc populateComboWithIPs { combo node } {
 proc selectTwoNodeIPsecCallback {} {
     set w .popupServicesCustomize
     set f $w.note.ipsec
-    
+
     if { ![winfo exists $w] } { return }; # user has closed window
     catch {destroy .nodeselect}
 

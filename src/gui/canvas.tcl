@@ -33,21 +33,21 @@
 # NAME
 #  canvas.tcl -- file used for manipultaion with canvases in IMUNES
 # FUNCTION
-#  This module is used to define all the actions used for configuring 
+#  This module is used to define all the actions used for configuring
 #  canvases in IMUNES. On each canvas a part of the simulation is presented
-#  If there is no additional canvas defined, simulation is presented on the 
+#  If there is no additional canvas defined, simulation is presented on the
 #  defalut canvas.
 #
 #****
 
 #****f* canvas.tcl/removeCanvas
 # NAME
-#   removeCanvas -- remove canvas 
+#   removeCanvas -- remove canvas
 # SYNOPSIS
 #   removeCanvas $canvas_id
 # FUNCTION
-#   Removes the canvas from simulation. This function does not change the 
-#   configuration of the nodes, i.e. nodes attached to the removed canvas 
+#   Removes the canvas from simulation. This function does not change the
+#   configuration of the nodes, i.e. nodes attached to the removed canvas
 #   remain attached to the same non existing canvas.
 # INPUTS
 #   * canvas_id -- canvas id
@@ -63,7 +63,7 @@ proc removeCanvas { canvas } {
 
 #****f* canvas.tcl/newCanvas
 # NAME
-#   newCanvas -- craete new canvas 
+#   newCanvas -- craete new canvas
 # SYNOPSIS
 #   set canvas_id [newCanvas $canvas_name]
 # FUNCTION
@@ -214,7 +214,7 @@ proc manageCanvasPopup { x y } {
     $w.name.ent insert 0 [getCanvasName $curcanvas]
     pack $w.name.lab $w.name.ent -side left -fill x
     pack $w.name -side top -padx 4 -pady 4
-    
+
     global canvas_list
     ttk::frame $w.canv
     listbox $w.canv.cl -bg white -yscrollcommand "$w.canv.scroll set"
@@ -370,7 +370,7 @@ proc getCanvasRefPoint { canvas } {
     set altitude [string trim $entry \{\}]
     if { $altitude == "" } {
 	if { ![info exists g_prefs(gui_canvas_refpt)] } {
-	    return $DEFAULT_REFPT 
+	    return $DEFAULT_REFPT
 	}
 	return "$g_prefs(gui_canvas_refpt)"
     } else {

@@ -138,11 +138,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
@@ -379,7 +379,7 @@ dist_bin_SCRIPTS = core-gui
 # Tcl/Tk scripts (/usr/local/lib/core)
 #
 coredir = $(CORE_LIB_DIR)
-dist_core_DATA = $(TCL_FILES) 
+dist_core_DATA = $(TCL_FILES)
 dist_core_SCRIPTS = $(OTHER_FILES)
 
 #
@@ -392,7 +392,7 @@ dist_coreaddons_DATA = $(ADDONS_FILES)
 # Sample configs (/usr/local/share/core/examples/configs)
 #
 coreconfigsdir = $(datadir)/core/examples/configs
-dist_coreconfigs_DATA = $(CONFIG_FILES) 
+dist_coreconfigs_DATA = $(CONFIG_FILES)
 
 # extra cruft to remove
 DISTCLEANFILES = Makefile.in

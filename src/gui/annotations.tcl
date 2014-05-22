@@ -32,19 +32,19 @@
 # NAME
 #  annotations.tcl -- oval, rectangle, text, background, ...
 # FUNCTION
-#  This module is used for configuration/image annotations, such as oval, 
+#  This module is used for configuration/image annotations, such as oval,
 #  rectangle, text, background or some other.
 #****
 
 #****f* annotations.tcl/annotationConfig
 # NAME
-#   annotationConfig -- 
+#   annotationConfig --
 # SYNOPSIS
 #   annotationConfig $canvas $target
 # FUNCTION
 #   . . .
 # INPUTS
-#   * canvas -- 
+#   * canvas --
 #   * target -- oval or rectangle object
 #****
 
@@ -74,15 +74,15 @@ proc annotationConfig { c target } {
 #   popupOvalDialog $canvas $modify $color $label $lcolor
 # FUNCTION
 #   Called from:
-#   - editor.tcl/button1-release when new oval is drawn 
-#   - annotationConfig which is called from popupConfigDialog bound to 
+#   - editor.tcl/button1-release when new oval is drawn
+#   - annotationConfig which is called from popupConfigDialog bound to
 #     Double-1 on various objects
 #   - configureOval called from button3annotation procedure which creates
-#     a menu for configuration and deletion (bound to 3 on oval, 
-#     rectangle and text) 
+#     a menu for configuration and deletion (bound to 3 on oval,
+#     rectangle and text)
 # INPUTS
-#   * canvas -- 
-#   * modify -- create new oval "newoval" if modify=false or 
+#   * canvas --
+#   * modify -- create new oval "newoval" if modify=false or
 #     modify an existing oval "newoval" if modify=true
 #   * color  -- oval color
 #   * label  -- label text
@@ -98,7 +98,7 @@ proc annotationConfig { c target } {
 # FUNCTION
 #   . . .
 # INPUTS
-#   * canvas -- 
+#   * canvas --
 #****
 
 proc destroyNewoval { c } {
@@ -152,7 +152,7 @@ proc button3annotation { type c x y } {
 
 proc deleteAnnotation { c type target } {
     global changed annotation_list
-    
+
     $c delete -withtags "$type && $target"
     $c delete -withtags "new$type"
     set i [lsearch -exact $annotation_list $target]
@@ -278,7 +278,7 @@ proc roundRect { w x0 y0 x3 y3 radius args } {
     set y2 [expr { $y3 - $d }]
 
     set cmd [list $w create polygon]
-    lappend cmd $x0 $y0 $x1 $y0 $x2 $y0 $x3 $y0 $x3 $y1 $x3 $y2 
+    lappend cmd $x0 $y0 $x1 $y0 $x2 $y0 $x3 $y0 $x3 $y1 $x3 $y2
     lappend cmd $x3 $y3 $x2 $y3 $x1 $y3 $x0 $y3 $x0 $y2 $x0 $y1
     lappend cmd -smooth 1
     return [eval $cmd $args]
@@ -349,7 +349,7 @@ proc drawRect {rectangle} {
 
 
 proc popupAnnotationDialog { c target modify } {
-    global $target newrect newoval 
+    global $target newrect newoval
     global width rad fontfamily fontsize
     global defFillColor defTextColor defTextFontFamily defTextFontSize
 
@@ -417,12 +417,12 @@ proc popupAnnotationDialog { c target modify } {
     if { [lsearch $effects italic ] != -1} {set textItalic 1}
     if { [lsearch $effects underline ] != -1} {set textUnderline 1}
 
-    set x1 [lindex $coords 0] 
+    set x1 [lindex $coords 0]
     set y1 [lindex $coords 1]
     set x2 [lindex $coords 2]
     set y2 [lindex $coords 3]
-    set xx [expr {abs($x2 - $x1)}] 
-    set yy [expr {abs($y2 - $y1)}] 
+    set xx [expr {abs($x2 - $x1)}]
+    set yy [expr {abs($y2 - $y1)}]
     if { $xx > $yy } {
 	set maxrad [expr $yy * 3.0 / 8.0]
     } else {
@@ -453,13 +453,13 @@ proc popupAnnotationDialog { c target modify } {
 	-padx 2 -pady 2 -fill x
     pack $wi.text.lab -side top -fill x
 
-    frame $wi.text.format 
+    frame $wi.text.format
 
     set fontmenu [tk_optionMenu $wi.text.format.fontmenu fontfamily "$fontfamily"]
     set sizemenu [tk_optionMenu $wi.text.format.fontsize fontsize "$fontsize"]
 
 
-    # color selection 
+    # color selection
     if { $color == "" } {
 	set color $defTextColor
     }
@@ -501,14 +501,14 @@ proc popupAnnotationDialog { c target modify } {
 	    -variable fontfamily \
 	    -command [list fontupdate $wi.text.lab.name fontfamily $f]
     }
- 
+
     $sizemenu delete 0
     foreach f {8 9 10 11 12 14 16 18 20 22 24 26 28 36 48 72} {
 	$sizemenu add radiobutton -value "$f" -label $f \
 	    -variable fontsize \
 	    -command [list fontupdate $wi.text.lab.name fontsize $f]
     }
- 
+
 if { "$annotationType" == "rectangle" || "$annotationType" == "oval" } {
 
     # fill color, border color
@@ -564,12 +564,12 @@ if { $annotationType == "rectangle" } {
 	set cancelcmd "destroy $wi; destroyNewRect $c"
 	set applytext "Add $annotationType"
     }
-    
+
     frame $wi.butt -borderwidth 6
     button $wi.butt.apply -text $applytext -command "popupAnnotationApply $c $wi $target $annotationType"
 
     button $wi.butt.cancel -text "Cancel" -command $cancelcmd
-    bind $wi <Key-Escape> "$cancelcmd" 
+    bind $wi <Key-Escape> "$cancelcmd"
     bind $wi <Key-Return> "popupAnnotationApply $c $wi $target $annotationType"
     pack $wi.butt.cancel $wi.butt.apply -side right
     pack $wi.butt -side bottom
@@ -624,16 +624,16 @@ proc popupAnnotationApply { c wi target type } {
     lappend $target $iconcoords "label {$caption}" "labelcolor $labelcolor" \
 	"fontfamily {$fontfamily}" "fontsize $fontsize"
     if {"$type" == "rectangle" || "$type" == "oval" } {
-	lappend $target "color $color" "width $width" "border $bordercolor" 
+	lappend $target "color $color" "width $width" "border $bordercolor"
     }
     if {"$type" == "rectangle" } {
 	lappend $target "rad $rad"
     }
 
     set ef {}
-    if {"$textBold" == 1}   { lappend ef bold} 
-    if {"$textItalic" == 1} { lappend ef italic} 
-    if {"$textUnderline" == 1}   { lappend ef underline} 
+    if {"$textBold" == 1}   { lappend ef bold}
+    if {"$textItalic" == 1} { lappend ef italic}
+    if {"$textUnderline" == 1}   { lappend ef underline}
     if {"$ef" != ""} { lappend $target "effects {$ef}"}
 
     # draw it
@@ -650,7 +650,7 @@ proc popupAnnotationApply { c wi target type } {
     set changed 1
     updateUndoLog
     redrawAll
-    destroy $wi 
+    destroy $wi
 }
 
 proc selectmarkEnter {c x y} {
@@ -660,23 +660,23 @@ proc selectmarkEnter {c x y} {
         set obj [lindex [$c gettags current] 1]
         set type [nodeType $obj]
         if {$type != "oval" && $type != "rectangle"} { return }
-    } else { 
+    } else {
         set obj $c
-        set c .c 
+        set c .c
         set isThruplot true
     }
     set bbox [$c bbox $obj]
-    
+
     set x1 [lindex $bbox 0]
     set y1 [lindex $bbox 1]
     set x2 [lindex $bbox 2]
     set y2 [lindex $bbox 3]
-  
+
     if {$isThruplot == true} {
         set x [expr $x+$x1]
-        set y [expr $y+$y1] 
+        set y [expr $y+$y1]
 
-    } 
+    }
     set l 0 ;# left
     set r 0 ;# right
     set u 0 ;# up
@@ -691,22 +691,22 @@ proc selectmarkEnter {c x y} {
     if { $y > [expr $y2-($y2-$y1)/8.0]} { set d 1 }
 
     if {$l==1} {
-	if {$u==1} { 
+	if {$u==1} {
 	    $c config -cursor top_left_corner
-	} elseif {$d==1} { 
+	} elseif {$d==1} {
 	    $c config -cursor bottom_left_corner
-	} else { 
+	} else {
 	    $c config -cursor left_side
-	} 
+	}
     } elseif {$r==1} {
-	if {$u==1} { 
+	if {$u==1} {
 	    $c config -cursor top_right_corner
-	} elseif {$d==1} { 
+	} elseif {$d==1} {
 	    $c config -cursor bottom_right_corner
-	} else { 
+	} else {
 	    $c config -cursor right_side
-	} 
-    } elseif {$u==1} { 
+	}
+    } elseif {$u==1} {
 	$c config -cursor top_side
     } elseif {$d==1} {
 	$c config -cursor bottom_side
@@ -718,8 +718,8 @@ proc selectmarkEnter {c x y} {
 proc selectmarkLeave {c x y} {
     global thruplotResize
     .bottom.textbox config -text {}
-   
-    # cursor options for thruplot resize 
+
+    # cursor options for thruplot resize
     if {$thruplotResize == true} {
 
     } else {

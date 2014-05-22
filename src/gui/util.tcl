@@ -9,7 +9,7 @@ set g_imageFileTypes {{"images" {.gif}} {"images" {.jpg}} {"images" {.png}}
 			{"images" {.xbm}} {"All files"  {*}   }}
 
 global execMode
-if { $execMode == "interactive"} { 
+if { $execMode == "interactive"} {
     if { [catch { package require Img }] } {
 	puts "warning: Tcl/Tk Img package not found"
 	puts "  Thumbnails and other image types (JPG, PNG, etc.) will not be supported."
@@ -51,7 +51,7 @@ proc checkOS {} {
 	set machine [exec uname -m]
 	set kernel [exec uname -v]
 
-        set x11 0  
+        set x11 0
   	catch { set x11 [winfo server .c] }
 
 	set os_ident "$os_name $os_ver"
@@ -203,7 +203,7 @@ proc upgradeNetworkConfigToServices { } {
 	    puts "updating Quagga services on node $node"
 	} ;# end quagga services
 	#
-	# convert static model to router 
+	# convert static model to router
 	#
 	if { [getNodeModel $node] == "static" } {
 	    setNodeModel $node "router"
@@ -223,7 +223,7 @@ proc upgradeNetworkConfigToServices { } {
 	    setCustomConfig $node "service:UserDefined" "UserDefined" \
 	    	$statvals 0
             setCustomConfig $node "service:UserDefined:$cfgname" $cfgname $cfg 0
-	    set services [getNodeServices $node true] 
+	    set services [getNodeServices $node true]
 	    lappend services "UserDefined"
             setNodeServices $node $services
 	    puts "adding user-defined static routing service on node $node"
@@ -240,7 +240,7 @@ proc getCPUUsage { } {
     }
 
     array set cpu {}
-   
+
     while { [ gets $f line ] >= 0 } {
 	set cpun [lindex $line 0]
 	set user [lindex $line 1]; set nice [lindex $line 2]
@@ -264,14 +264,14 @@ proc getCPUUsage { } {
 
 	set usage_time [expr {($u-$lu) + ($n-$ln) + ($s-$ls)}]
 	set total_time [expr {$usage_time + ($i-$li)}]
-	if { $total_time <= 0 } { 
+	if { $total_time <= 0 } {
 	    set cpuusage "" ;# avoid div by zero
  	} else {
 	    set cpuusage [expr { 100 * $usage_time / $total_time }]
 	}
 	lappend cpuusages $cpuusage
     }
-    return $cpuusages 
+    return $cpuusages
 }
 
 # Node selection dialog display given message 'msg' with initial node selection
@@ -294,7 +294,7 @@ proc popupSelectNodes { msg initsel callback } {
     listbox $wi.nodes.fr.nodelist -width 40 \
     	-listvariable node_list -yscrollcommand "$wi.nodes.fr.scroll set" \
 	-activestyle dotbox -selectmode extended
-    scrollbar $wi.nodes.fr.scroll -command "$wi.nodes.fr.nodelist yview" 
+    scrollbar $wi.nodes.fr.scroll -command "$wi.nodes.fr.nodelist yview"
     pack $wi.nodes.fr.nodelist -fill both -expand true -side left
     pack $wi.nodes.fr.scroll -fill y -expand true -side left
     pack $wi.nodes.label $wi.nodes.fr -side top -padx 4 -pady 4 \
@@ -352,7 +352,7 @@ proc popupRenumberNodes { } {
     listbox $wi.nodes.left.fr.from -selectmode single -width 20 \
     	-listvariable node_list -yscrollcommand "$wi.nodes.left.fr.scroll set" \
 	-activestyle dotbox
-    scrollbar $wi.nodes.left.fr.scroll -command "$wi.nodes.left.fr.from yview" 
+    scrollbar $wi.nodes.left.fr.scroll -command "$wi.nodes.left.fr.from yview"
     pack $wi.nodes.left.fr.from $wi.nodes.left.fr.scroll -fill y -side left
     pack $wi.nodes.left.label $wi.nodes.left.fr -side top -padx 4 -pady 4 \
 	-anchor w
@@ -540,7 +540,7 @@ proc popupBuildHostsFile { } {
     pack $wi.top.help -side top -fill both -expand true
     pack $wi.top -padx 4 -pady 4 -side top
 
-    # text box 
+    # text box
     frame $wi.mid
     text $wi.mid.hosts -relief sunken -bd 2 \
 	-yscrollcommand "$wi.mid.scroll set" -setgrid 1 -height 30 -undo 1 \
@@ -585,7 +585,7 @@ proc popupBuildHostsFile { } {
         set wi .buildhostsdialog
 	set hosts [string trim [$wi.mid.hosts get 0.0 end]]
 	set filename [$wi.fil.filename get]
-	set fileId [open $filename a] 
+	set fileId [open $filename a]
         puts $fileId $hosts
 	close $fileId
 	destroy $wi
@@ -696,7 +696,7 @@ proc popupASConfig { } {
  frame $wi.asid.frame
 
  label $wi.asid.frame.label -text "AS NetID: " -anchor w
- entry $wi.asid.frame.entry -bg white -width 30 -textvariable g_prefs(gui_asid_standard) 
+ entry $wi.asid.frame.entry -bg white -width 30 -textvariable g_prefs(gui_asid_standard)
  pack $wi.asid.frame.entry -side right
 
  pack $wi.asid.frame -side top -anchor e
@@ -743,7 +743,7 @@ proc addressConfigHelper { wi fam cmd } {
     }
 }
 
-# set the default addresses for automatic allocation in the g_prefs array 
+# set the default addresses for automatic allocation in the g_prefs array
 # for the given address family
 proc setDefaultAddrs { fam } {
     global g_prefs
@@ -773,8 +773,8 @@ proc popupMacAddressConfig { } {
     frame $wi.top
     set helptext "MAC addresses are automatically assigned starting with\n"
     set helptext "$helptext 00:00:00:aa:00:nn, where nn starts with the below"
-    set helptext "$helptext value.\n You should change this value when tunneling" 
-    set helptext "$helptext between \nemulations to prevent MAC address conflicts." 
+    set helptext "$helptext value.\n You should change this value when tunneling"
+    set helptext "$helptext between \nemulations to prevent MAC address conflicts."
 
     label $wi.top.help -text $helptext
     pack $wi.top.help -side top -fill both -expand true
@@ -899,7 +899,7 @@ proc _launchBrowser url {
 
 # helper for registering a callback with a tk_optionMenu variable, when a user
 # clicks on the menu and changes the value; if the global variable var is
-# cleared, this callback is cancelled 
+# cleared, this callback is cancelled
 # NOTE: when closing the window that calls this, ensure that var is cleared
 proc tkOptionMenuCallback { ctl var cb args } {
     if { ![winfo exists $ctl] } { return }
@@ -1018,7 +1018,16 @@ proc exportPython { } {
 
 # ask the daemon to execute the selected file
 proc execPython { } {
-    set fn [tk_getOpenFile -filetypes {{ "CORE Python scripts" {.py} }} ]
+    global fileDialogBox_initial g_prefs
+    set ft {{ "CORE XML or Python scripts" {.py .xml} } { "All files" {*}}}
+
+    if { $fileDialogBox_initial == 0 } {
+	set fileDialogBox_initial 1
+	set dir $g_prefs(default_conf_path)
+        set fn [tk_getOpenFile -filetypes $ft -initialdir $dir]
+    } else {
+        set fn [tk_getOpenFile -filetypes $ft]
+    }
     if { $fn == "" } { return }
     set flags 0x10 ;# status request flag
     sendRegMessage -1 $flags [list "exec" $fn]
@@ -1067,7 +1076,7 @@ proc get_text_editor { want_default } {
 	if { $want_default } {
 	    return "EDITOR"
 	} else {
-	    return $ed 
+	    return $ed
 	}
     }
     # return the first installed editor from EDITORS global
@@ -1170,7 +1179,7 @@ proc delAddrsFromNodes { fam nodes } {
 # fix for Tcl/Tk 8.5.8 and lower which doesn't have ttk::spinbox
 #    set spinbox [getspinbox]
 #    $spinbox $var -justify right -width 10 ...
-# 
+#
 proc getspinbox {} {
     if { [info command ttk::spinbox] == "" } {
 	return spinbox
@@ -1275,7 +1284,7 @@ proc findButton { w } {
     if { $first == "" } {
 	$tree insert {} end -id none -values [list "" "" "" "no results found"]
     } else {
-	$tree selection set $first 
+	$tree selection set $first
     }
 
     . config -cursor left_ptr

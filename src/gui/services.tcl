@@ -42,9 +42,9 @@ proc popupServicesConfig { channel node types values captions possible_values gr
 	set parent "."
     }
     wm title $wi $title
-    wm transient $wi $parent 
+    wm transient $wi $parent
 
-    label $wi.top -text $toptitle 
+    label $wi.top -text $toptitle
     pack $wi.top -side top -padx 4 -pady 4
 
     frame $wi.vals -relief raised -borderwidth 1
@@ -93,7 +93,7 @@ proc popupServicesConfig { channel node types values captions possible_values gr
 		    -command "customizeService $wi $node $servicename $btn"
 	    setCustomButtonColor $btn $node $servicename $needcustom
 	    pack $wi.vals.$gn.item$n.custom -side right -padx 4 -pady 4
-	    # this causes the button for services that require customization to 
+	    # this causes the button for services that require customization to
 	    # turn yellow when the service is selected
 	    $wi.vals.$gn.item$n.ent configure -command \
 		"setCustomButtonColor $btn $node $servicename $needcustom"
@@ -139,7 +139,7 @@ proc popupServicesConfigApply { wi channel node session } {
 	global g_node_types g_node_type_services_hint
 	set type $g_node_type_services_hint
 	set idx [getNodeTypeIndex $type]
-	if { $idx < 0 } { 
+	if { $idx < 0 } {
 	    puts "warning: skipping unknown node type $type"
 	} else {
 	    set typedata $g_node_types($idx)
@@ -201,7 +201,7 @@ proc customizeService { wi node service btn } {
     set w .popupServicesCustomize
     catch {destroy $w}
     toplevel $w
-    wm transient $w .popupServicesConfig   
+    wm transient $w .popupServicesConfig
     wm title $w "$service on node [getNodeName $node] ($node)"
 
     ttk::frame $w.top
@@ -264,7 +264,7 @@ proc customizeService { wi node service btn } {
     ttk::entry $f.name -width 45
     ttk::button $f.btn -image $plugin_img_open -command \
 	"customizeServiceFileOpt $w copy true; fileButtonPopup $f.name {}"
-    pack $f.opt $f.name $f.btn -side left -anchor w 
+    pack $f.opt $f.name $f.btn -side left -anchor w
     pack $f -side top -anchor w -padx 4 -pady 4 -fill x
     bind $f.btn <Button> "customizeServiceFileOpt $w copy true"
 
@@ -343,7 +343,7 @@ proc customizeService { wi node service btn } {
     ttk::entry $w.note.ss.st.timeval -width 5 \
 	-textvariable g_service_startup_time
     set txt "(seconds after runtime; leave empty for default)"
-    ttk::label $w.note.ss.st.help -text $txt 
+    ttk::label $w.note.ss.st.help -text $txt
     pack $w.note.ss.st.timelab $w.note.ss.st.timeval $w.note.ss.st.help \
 	-side left -padx 4 -pady 4
     pack $w.note.ss.st -side top -padx 4 -pady 4 -fill x
@@ -454,7 +454,7 @@ proc customizeServiceCopy { cnode } {
 # customize dialog
 proc customizeServiceCopyApply { w node } {
     global g_service_configs_tmp g_service_configs_last
-    global g_service_startup_index g_service_startup_time 
+    global g_service_startup_index g_service_startup_time
     set tgt .popupServicesCustomize
 
     set tree $w.nodes.tree
@@ -465,7 +465,7 @@ proc customizeServiceCopyApply { w node } {
 	set parts [split $s :]
 	set node [lindex $parts 0]; set service [lindex $parts 1]
 	set item [lindex $parts 2]
-	# customized file 
+	# customized file
 	set f [getCustomService $node "$service:$item"]
 	if { $f != "" } {
 	    set filedata [join $f "\n"]
@@ -529,7 +529,7 @@ proc customizeServiceCopyView { w node } {
 	set parts [split $s :]
 	set node [lindex $parts 0]; set service [lindex $parts 1]
 	set item [lindex $parts 2]
-	# customized file 
+	# customized file
 	set f [getCustomService $node "$service:$item"]
 	if { $f != "" } {
 	    set fn [file join "/tmp" "services.tmp-$node-[file tail $item]"]
@@ -891,7 +891,7 @@ proc setServiceValuesItem { values key value } {
 # this helper is invoked upon receiving a File Message in reply to the Config
 # Message sent from customizeServiceRefresh; it populates the config file entry
 proc customizeServiceFile { node name type data generated} {
-    global g_service_configs_tmp g_service_configs_tmp_orig 
+    global g_service_configs_tmp g_service_configs_tmp_orig
     global g_service_configs_last
 
     set w .popupServicesCustomize

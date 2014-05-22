@@ -226,13 +226,13 @@ proc popupTraffic2Dialog { name } {
     frame $sf.patt -borderwidth 4
     label $sf.patt.patl -text "pattern"
     set trafficpresetsMenu [tk_optionMenu $sf.patt.pat g_traffic_pat presets]
-    entry $sf.patt.p -bg white -width 20 
+    entry $sf.patt.p -bg white -width 20
     pack $sf.patt.patl $sf.patt.pat $sf.patt.p -side left
     pack $sf.patt -side top
 
     frame $sf.log -borderwidth 4
     label $sf.log.l -text "log file"
-    entry $sf.log.file -bg white -width 30 
+    entry $sf.log.file -bg white -width 30
     pack $sf.log.l $sf.log.file -side left
     pack $sf.log -side top
 
@@ -370,7 +370,7 @@ proc popdownTrafficDialog { wi cmd oldname } {
     set num [$wi.e.flow.num get]
     set name [$wi.e.flow.name get]
     set start [$wi.e.flow.timestart get]
-    if { $start == "" || $start < 0.0 } { set start 0.0 } 
+    if { $start == "" || $start < 0.0 } { set start 0.0 }
     set stop [$wi.e.flow.timestop get]
 
     foreach n [list src dst] {
@@ -386,7 +386,7 @@ proc popdownTrafficDialog { wi cmd oldname } {
     set extra [$wi.e.extra.txt get]
 
     if { $oldname != "" } { removeTrafficFlow $oldname }
-    
+
     set trafficentry [list "$name" $num "$start" "$stop" "$srcnode" "$dstnode" \
     	"$srcip" "$srcport" "$srclog" \
 	"$dstip" "$dstport" "$dstlog" \
@@ -405,7 +405,7 @@ proc popdownTrafficDialog { wi cmd oldname } {
 # search for IP address and populate
 proc selectTwoNodeTrafficCallback { } {
     set wi .traffic
-    
+
     if { ![winfo exists $wi] } { return }; # user has closed window
     foreach n [list src dst] {
         set node$n [string trim [$wi.e.nodes.$n.n.$n cget -text]]
@@ -450,7 +450,7 @@ proc popupAddressPicker { ctl dstentry } {
     # populate the address list
     if { $node == "" || $node == "(none)" } { return }
     set dst [$dstentry get]
-    set i 0; set selected 0 
+    set i 0; set selected 0
     foreach ifc [ifcList $node] {
 	set addr [lindex [split [getIfcIPv4addr $node $ifc] /] 0]
 	$wi.a.addrs insert end $addr
@@ -524,7 +524,7 @@ proc getTrafficScripts { flow } {
 	    if { [set ${n}port] != "" } {
 		set n${n} "[set ${n}ip]/[set ${n}port]"
 	    } else {
-		set n${n} [set ${n}ip] 
+		set n${n} [set ${n}ip]
 	    }
 	} else { set n${n} [set ${n}port] }
     }
@@ -569,7 +569,7 @@ proc sendTrafficScript { flow sock } {
     set srcnode [lindex $scripts 0]
     set dstnode [lindex $scripts 1]
     set flownum [lindex $flow 1]
-    set name "flow$flownum.mgn" 
+    set name "flow$flownum.mgn"
     if { $srcnode != "" } {
         set data [lindex $scripts 2]
         set data_len [string length $data]

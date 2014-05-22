@@ -31,8 +31,8 @@
 # This work was supported in part by Croatian Ministry of Science
 # and Technology through the research contract #IP-2003-143.
 #
-case $1 in 
--h | --help) 
+case $1 in
+-h | --help)
     echo ""
     echo "Usage: `basename $0` [-h|-v] [-b|-c <sessionid>] [-s] [-a address] [-p port]"
     echo "                [<configfile.imn>]"
@@ -52,11 +52,11 @@ case $1 in
     echo "With no parameters, starts the GUI in edit mode with a blank canvas."
     echo ""
     exit 0
-    ;; 
--v | --version) 
+    ;;
+-v | --version)
     exec echo "`basename $0` version @CORE_VERSION@ (@CORE_VERSION_DATE@)"
     exit 0
-    ;; 
+    ;;
 esac
 
 SHELL=/bin/sh
@@ -147,15 +147,15 @@ then
     if [ $? != 0 ]; then echo "error moving $CONFDIR.tmp to $CONFDIR/prefs.conf!"; exit 1; fi
 fi;
 
-case $1 in 
+case $1 in
 -b | --batch)
-    TCLBIN=`echo ${WISH} | sed s/wish/tclsh/g` 
-    exec ${TCLBIN} $core "$@" 
-    ;; 
+    TCLBIN=`echo ${WISH} | sed s/wish/tclsh/g`
+    exec ${TCLBIN} $core "$@"
+    ;;
 -c | --closebatch)
-    TCLBIN=`echo ${WISH} | sed s/wish/tclsh/g` 
-    exec ${TCLBIN} $core "$@" 
-    ;; 
+    TCLBIN=`echo ${WISH} | sed s/wish/tclsh/g`
+    exec ${TCLBIN} $core "$@"
+    ;;
 -s)
     shift
     exec ${WISH} $core -- "--start" "$@"
@@ -170,7 +170,7 @@ case $1 in
     ;;
 *)
     exec ${WISH} $core -- $@
-    ;; 
-esac 
+    ;;
+esac
 
 cd $CORE_START_DIR

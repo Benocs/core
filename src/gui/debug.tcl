@@ -20,14 +20,14 @@ proc popupDebugger {} {
     wm transient $wi .
     wm resizable $wi 300 200
     wm title $wi "CORE Debugger"
-   
+
     frame $wi.dbg -borderwidth 4
     label $wi.dbg.label1 \
 	-text "Enter TCL/Tk commands below, press Run to evaluate:"
     text $wi.dbg.cmd -bg white -width 100 -height 3
 
     pack $wi.dbg.label1 $wi.dbg.cmd -side top -anchor w -padx 4 -pady 4
-    pack $wi.dbg -side top 
+    pack $wi.dbg -side top
 
     $wi.dbg.cmd insert end "$g_last_debug_cmd"
 

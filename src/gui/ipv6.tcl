@@ -43,11 +43,11 @@
 #   set ipnet [findFreeIPv4Net $mask]
 # FUNCTION
 #   Finds a free IPv6 network. Network is concidered to be free
-#   if there are no simulated nodes attached to it. 
+#   if there are no simulated nodes attached to it.
 # INPUTS
 #   * mask -- this parameter is left unused for now
 # RESULT
-#   * ipnet -- returns the free IPv6 network address in the form "a $i". 
+#   * ipnet -- returns the free IPv6 network address in the form "a $i".
 #****
 
 proc findFreeIPv6Net { quarknode mask } {
@@ -121,7 +121,7 @@ proc findFreeIPv6Net { quarknode mask } {
 
 
 # hier werden die letzten 64bit erzeugt
-#   parameter: 
+#   parameter:
 #   return: hintere 64bit in der form: >N<ode< >I<nterface
 #            NNNN:NNFF:FEII:IIII
 proc buildInterfaceID { cur_node } {
@@ -137,8 +137,8 @@ proc buildInterfaceID { cur_node } {
   foreach node $node_list {
 
       # soll XX:XX:XX:00:00:00 x ausmachen
-      incr zaehler1 
-    
+      incr zaehler1
+
       if { $node == $cur_node } {
         foreach ifc [ifcList $node] {
           # soll 00:00:00:XX:XX:XX x ausmachen
@@ -160,7 +160,7 @@ proc buildInterfaceID { cur_node } {
 
   for { set z2 0 } { $z2 < $zaehler2 } { incr z2 } {
     set lsb1 $z2
-   
+
     for { set var1 0 } { $var1 < 255 && $z2 < $zaehler2 } { incr var1 } {
       set lsb0 $var1
 
@@ -182,7 +182,7 @@ proc buildInterfaceID { cur_node } {
     set ipv6_0_1 "[format %x $lsb1]"
   }
 
-  set ipv6_0 "00:$ipv6_0_1$ipv6_0_0" 
+  set ipv6_0 "00:$ipv6_0_1$ipv6_0_0"
 
 
   # hier vordere bytes nach selben muster
@@ -214,9 +214,9 @@ proc buildInterfaceID { cur_node } {
     set ipv6_1_1 "[format %x $lsb4]"
   }
 
-  set ipv6_1 "00$ipv6_1_1:$ipv6_1_0" 
+  set ipv6_1 "00$ipv6_1_1:$ipv6_1_0"
 
-  set temp "$ipv6_1" 
+  set temp "$ipv6_1"
   append temp "FF:FE$ipv6_0"
   return $temp
 
@@ -229,11 +229,11 @@ proc buildInterfaceID { cur_node } {
 #   set ipnet [findFreeIPv4NetLink $mask]
 # FUNCTION
 #   Finds a free IPv6 network. Network is concidered to be free
-#   if there are no simulated nodes attached to it. 
+#   if there are no simulated nodes attached to it.
 # INPUTS
 #   * mask -- this parameter is left unused for now
 # RESULT
-#   * ipnet -- returns the free IPv6 network address in the form "a $i". 
+#   * ipnet -- returns the free IPv6 network address in the form "a $i".
 #****
 proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
   global g_prefs node_list tempAS
@@ -283,17 +283,17 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
       set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
       # noch nicht vorhanden -> == 0
       if { [llength $ls_r] == 0 } {
-        
+
         set as [string toupper [format %x $i]]
 
         set subnet [string toupper [format %x $j]]
 
         # interface komponente von buildInterfaceID ist hier immer 0
         set ipnet "FDAA:$as:AAAA:$subnet:[buildInterfaceID $linkNode]"
-        
+
         return $ipnet
       }
-      
+
     }
 
   } else {
@@ -315,18 +315,18 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
 }
 
 
-#****f* ipv6.tcl/autoIPv6addr 
+#****f* ipv6.tcl/autoIPv6addr
 # NAME
 #   autoIPv6addr -- automaticaly assign an IPv6 address
 # SYNOPSIS
-#   autoIPv6addr $node_id $iface 
+#   autoIPv6addr $node_id $iface
 # FUNCTION
-#   automaticaly assignes an IPv6 address to the interface $iface of 
+#   automaticaly assignes an IPv6 address to the interface $iface of
 #   of the node $node.
 # INPUTS
-#   * node_id -- the node containing the interface to witch a new 
+#   * node_id -- the node containing the interface to witch a new
 #     IPv6 address should be assigned
-#   * iface -- the interface to witch a new, automatilacy generated, IPv6  
+#   * iface -- the interface to witch a new, automatilacy generated, IPv6
 #     address will be assigned
 #****
 proc autoIPv6addr { node iface } {
@@ -362,7 +362,7 @@ proc autoIPv6addr { node iface } {
 	}
     }
     # Boeing: first node connected to wlan should use wlan prefix
-    if { [nodeType $peer_node] == "wlan" && 
+    if { [nodeType $peer_node] == "wlan" &&
     	 [llength $peer_ip6addrs] == 0 } {
 	# use the special "wireless" pseudo-interface
 	set peer_ip6addr [getIfcIPv6addr $peer_node wireless]
@@ -414,16 +414,16 @@ proc autoIPv6addr { node iface } {
     }
 }
 
-#****f* ipv6.tcl/autoIPv6defaultroute 
+#****f* ipv6.tcl/autoIPv6defaultroute
 # NAME
-#   autoIPv6defaultroute -- automaticaly assign a default route 
+#   autoIPv6defaultroute -- automaticaly assign a default route
 # SYNOPSIS
-#   autoIPv6defaultroute $node_id $iface 
+#   autoIPv6defaultroute $node_id $iface
 # FUNCTION
 #   searches the interface of the node for a router, if a router is found
-#   then it is a new default gateway. 
+#   then it is a new default gateway.
 # INPUTS
-#   * node_id -- default gateway is provided for this node 
+#   * node_id -- default gateway is provided for this node
 #   * iface -- the interface on witch we search for a new default gateway
 #****
 #TODO schauen ob das mit autoIPv6addr interferiert
@@ -443,7 +443,7 @@ proc autoIPv6defaultroute { node iface } {
 	foreach l2node [listLANnodes $peer_node {}] {
 	    foreach ifc [ifcList $l2node] {
 		set peer [logicalPeerByIfc $l2node $ifc]
-		if { [nodeType $peer] != "router" && 
+		if { [nodeType $peer] != "router" &&
 		     [nodeType $peer] != "ine" } {
 		    continue
 		}
@@ -457,7 +457,7 @@ proc autoIPv6defaultroute { node iface } {
 	    }
 	}
     } else {
-	if { [nodeType $peer_node] != "router" && 
+	if { [nodeType $peer_node] != "router" &&
 	     [nodeType $peer_node] != "ine" } {
 	    return
 	}
@@ -471,13 +471,13 @@ proc autoIPv6defaultroute { node iface } {
     }
 }
 
-#****f* ipv6.tcl/checkIPv6Addr 
+#****f* ipv6.tcl/checkIPv6Addr
 # NAME
-#   checkIPv6Addr -- check the IPv6 address 
+#   checkIPv6Addr -- check the IPv6 address
 # SYNOPSIS
 #   set valid [checkIPv6Addr $str]
 # FUNCTION
-#   Checks if the provided string is a valid IPv6 address. 
+#   Checks if the provided string is a valid IPv6 address.
 # INPUTS
 #   * str -- string to be evaluated.
 # RESULT
@@ -520,15 +520,15 @@ proc checkIPv6Addr { str } {
     return 1
 }
 
-#****f* ipv6.tcl/checkIPv6Net 
+#****f* ipv6.tcl/checkIPv6Net
 # NAME
-#   checkIPv6Net -- check the IPv6 network 
+#   checkIPv6Net -- check the IPv6 network
 # SYNOPSIS
 #   set valid [checkIPv6Net $str]
 # FUNCTION
-#   Checks if the provided string is a valid IPv6 network. 
+#   Checks if the provided string is a valid IPv6 network.
 # INPUTS
-#   * str -- string to be evaluated. Valid string is in form ipv6addr/m 
+#   * str -- string to be evaluated. Valid string is in form ipv6addr/m
 # RESULT
 #   * valid -- function returns 0 if the input string is not in the form
 #     of a valid IP address, 1 otherwise.
@@ -581,7 +581,7 @@ proc ipv6ToString { ip } {
 	    if { $twobytes == 0 } {
 	        if { !$have_double_colon && $prevword == 0} {
 		    # replace last 0 with :
-		    set ipv6nums [lreplace $ipv6nums end end ""] 
+		    set ipv6nums [lreplace $ipv6nums end end ""]
 		    set have_double_colon 1
 		    set prevword ":"
 		    continue ;# don't add current 0 word to list
@@ -651,11 +651,11 @@ proc expandIPv6 { ip } {
 # Boeing
 # ***** ipv6.tcl/ipv6ToNet
 # NAME
-#  ipv6ToNet -- convert IPv6 address a:b:c:d:e:f:g:h to a:b:c:d 
+#  ipv6ToNet -- convert IPv6 address a:b:c:d:e:f:g:h to a:b:c:d
 # ****
 
 proc ipv6ToNet { ip mask } {
-	set ipv6nums [split $ip :] 
+	set ipv6nums [split $ip :]
 	# last remove last to nums of :: num
 	set ipv6parts [lrange $ipv6nums 0 [expr [llength $ipv6nums] - 3]]
     	return [join $ipv6parts :]
@@ -664,7 +664,7 @@ proc ipv6ToNet { ip mask } {
 
 
 
-# 
+#
 # Boeing
 # ***** ipv6.tcl/autoIPv6wlanaddr
 # NAME

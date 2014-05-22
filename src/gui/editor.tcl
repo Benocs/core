@@ -34,7 +34,7 @@
 #****h* imunes/editor.tcl
 # NAME
 #  editor.tcl -- file used for defining functions that can be used in
-#  edit mode as well as all the functions which change the appearance 
+#  edit mode as well as all the functions which change the appearance
 #  of the imunes GUI.
 # FUNCTION
 #  This module is used for defining all possible actions in imunes
@@ -71,8 +71,8 @@ proc animateCursor {} {
 #   split links and links connecting nodes on different canvases.
 # INPUTS
 #   * link_id -- the link id
-#   * atomic -- defines if the remove was atomic action or a part 
-#     of a composed, non-atomic action (relevant for updating log 
+#   * atomic -- defines if the remove was atomic action or a part
+#     of a composed, non-atomic action (relevant for updating log
 #     for undo).
 #****
 
@@ -137,7 +137,7 @@ proc removeGUINode { node } {
 # SYNOPSIS
 #   updateUndoLog
 # FUNCTION
-#   Updates the undo log. Writes the current configuration to the 
+#   Updates the undo log. Writes the current configuration to the
 #   undolog array and updates the undolevel variable.
 #****
 
@@ -161,7 +161,7 @@ proc updateUndoLog {} {
 # NAME
 #   undo -- undo function
 # SYNOPSIS
-#   undo 
+#   undo
 # FUNCTION
 #   Undo the change. Reads the undolog and updates the current
 #   configuration. Reduces the value of undolevel.
@@ -185,10 +185,10 @@ proc undo {} {
 # SYNOPSIS
 #   redo
 # FUNCTION
-#   Redo the change if possible (redolevel is greater than 
+#   Redo the change if possible (redolevel is greater than
 #   undolevel). Reads the configuration from undolog and
-#   updates the current configuration. Increases the value 
-#   of undolevel. 
+#   updates the current configuration. Increases the value
+#   of undolevel.
 #****
 
 proc redo {} {
@@ -244,7 +244,7 @@ proc redrawAll {} {
 	"-$border -$border [expr {$e_sizex + $border}] \
 	[expr {$e_sizey + $border}]"
 
- 
+
     saveRestoreWlanLinks .c save
     .c delete all
     set background [.c create rectangle 0 0 $e_sizex $e_sizey \
@@ -264,7 +264,7 @@ proc redrawAll {} {
            if { [getNodeCanvas $obj] == $curcanvas } {
                drawAnnotation $obj
            }
-       } 
+       }
     }
 
     # Grid
@@ -303,7 +303,7 @@ proc redrawAll {} {
  	}
       }
 
-      redrawAllThruplots  
+      redrawAllThruplots
       foreach link $link_list {
  	set nodes [linkPeers $link]
  	if { [getNodeCanvas [lindex $nodes 0]] != $curcanvas ||
@@ -330,7 +330,7 @@ proc redrawAll {} {
 #   Draws the specified node. Draws node's image (router pc
 #   host lanswitch rj45 hub pseudo) and label.
 #   The visibility of the label depends on the showNodeLabels
-#   variable for all types of nodes and on invisible variable 
+#   variable for all types of nodes and on invisible variable
 #   for pseudo nodes.
 # INPUTS
 #   * node_id -- node id
@@ -342,7 +342,7 @@ proc drawNode { c node } {
     global curcanvas zoom
     global wlan
     if { $c == "" } { set c .c } ;# default canvas
-  
+
     set type [nodeType $node]
     set coords [getNodeCoords $node]
     set x [expr {[lindex $coords 0] * $zoom}]
@@ -361,7 +361,7 @@ proc drawNode { c node } {
     if { $tmp != "" } { set cimg $tmp }
     if { $cimg != "" } {
 	# name of global variable storing the image is the filename without path
-	set img [file tail $cimg] 
+	set img [file tail $cimg]
 	# create the variable if the image hasn't been loaded before
 	global [set img]
 	if { ![info exists $img] } {
@@ -433,9 +433,9 @@ proc drawNode { c node } {
 # SYNOPSIS
 #   drawLink link_id
 # FUNCTION
-#   Draws the specified link. An arrow is displayed for links 
+#   Draws the specified link. An arrow is displayed for links
 #   connected to pseudo nodes. If the variable invisible
-#   is specified link connecting a pseudo node stays hidden. 
+#   is specified link connecting a pseudo node stays hidden.
 # INPUTS
 #   * link_id -- link id
 #****
@@ -486,7 +486,7 @@ proc drawLink { link } {
     }
     foreach n [list $lnode1 $lnode2] {
 	if { [getNodeHidden $n] } {
-	    hideNode $n 
+	    hideNode $n
 	    statline "Hidden node(s) exist."
 	}
     }
@@ -527,7 +527,7 @@ proc drawWlanLink { node1 node2 wlan } {
 #   set ifcName [chooseIfName $lnode1 $lnode2]
 # FUNCTION
 #   Choose intreface name. The name can be:
-#   * eth -- for interface connecting pc, host and router  
+#   * eth -- for interface connecting pc, host and router
 #   * e -- for interface connecting hub and lanswitch
 # INPUTS
 #   * link_id -- link id
@@ -557,7 +557,7 @@ proc chooseIfName { lnode1 lnode2 } {
 	    return eth
 	}
 	rj45 {
-	    return 
+	    return
 	}
 	tunnel {
 	    return e
@@ -582,8 +582,8 @@ proc chooseIfName { lnode1 lnode2 } {
 # SYNOPSIS
 #   set l2peers [listLANNodes $l2node $l2peers]
 # FUNCTION
-#   Recursive function for finding all link layer nodes that are 
-#   connected to node l2node. Returns the list of all link layer 
+#   Recursive function for finding all link layer nodes that are
+#   connected to node l2node. Returns the list of all link layer
 #   nodes that are on the same LAN as l2node.
 # INPUTS
 #   * l2node -- node id of a link layer node
@@ -617,7 +617,7 @@ proc listLANnodes { l2node l2peers } {
 # FUNCTION
 #   Calculates dx and dy variables of the calling function.
 # INPUTS
-#   * lnode -- node id of a node whose dx and dy coordinates are 
+#   * lnode -- node id of a node whose dx and dy coordinates are
 #   calculated
 #****
 
@@ -675,8 +675,8 @@ proc calcDxDy { lnode } {
 #   address and IPv6 address.
 # INPUTS
 #   * lnode1 -- node id of a node where the interface resides
-#   * lnode2 -- node id of the node that is connected by this 
-#   interface. 
+#   * lnode2 -- node id of the node that is connected by this
+#   interface.
 #****
 proc updateIfcLabel { lnode1 lnode2 } {
     global showIfNames showIfIPaddrs showIfIPv6addrs
@@ -710,7 +710,7 @@ proc updateIfcLabel { lnode1 lnode2 } {
     .c itemconfigure "interface && $lnode1 && $link" \
 	-text "$labelstr"
     # Boeing: hide ifc label on wlans
-    if { [nodeType $lnode1] == "wlan" } { 
+    if { [nodeType $lnode1] == "wlan" } {
     	.c itemconfigure "interface && $lnode1 && $link" -state hidden
     }
 }
@@ -730,25 +730,23 @@ proc updateIfcLabel { lnode1 lnode2 } {
 proc updateLinkLabel { link } {
     global showLinkLabels
 
-    set labelstr ""
+    set bwstr  [getLinkBandwidthString $link]
     set delstr [getLinkDelayString $link]
-    set ber [getLinkBER $link]
-    set dup [getLinkDup $link]
-    set labelstr "$labelstr[getLinkBandwidthString $link]
-"
+    set berstr [getLinkBERString $link]
+    set dupstr [getLinkDupString $link]
+    set labelstr ""
+    if { "$bwstr" != "" } {
+	set labelstr "$labelstr$bwstr"
+    }
     if { "$delstr" != "" } {
 	set labelstr "$labelstr$delstr
 "
     }
-    if { "$ber" != "" } {
-	set berstr "loss=$ber%" 
-	set labelstr "$labelstr$berstr
-"
+    if { "$berstr" != "" } {
+	set labelstr "$labelstr$berstr"
     }
-    if { "$dup" != "" } {
-	set dupstr "dup=$dup%"
-	set labelstr "$labelstr$dupstr
-"
+    if { "$dupstr" != "" } {
+	set labelstr "$labelstr$dupstr"
     }
     set labelstr \
 	[string range $labelstr 0 [expr {[string length $labelstr] - 2}]]
@@ -869,11 +867,11 @@ proc redrawWlanLink { link } {
 
 #****f* editor.tcl/splitGUILink
 # NAME
-#   splitGUILink -- splits a links 
+#   splitGUILink -- splits a links
 # SYNOPSIS
 #   splitGUILink $link
 # FUNCTION
-#   Splits the link and draws new links and new pseudo nodes 
+#   Splits the link and draws new links and new pseudo nodes
 #   on the canvas.
 # INPUTS
 #   * link -- link id
@@ -918,7 +916,7 @@ proc splitGUILink { link } {
 
 #****f* editor.tcl/selectNode
 # NAME
-#   selectNode -- select node 
+#   selectNode -- select node
 # SYNOPSIS
 #   selectNode $c $obj
 # FUNCTION
@@ -1012,11 +1010,11 @@ proc selectAdjacent {} {
 
 #****f* editor.tcl/button3link
 # NAME
-#   button3link 
+#   button3link
 # SYNOPSIS
 #   button3link $c $x $y
 # FUNCTION
-#   This procedure is called when a right mouse button is 
+#   This procedure is called when a right mouse button is
 #   clicked on the canvas. If there is a link on the place of
 #   mouse click this procedure creates and configures a popup
 #   menu. The options in the menu are:
@@ -1092,7 +1090,7 @@ proc button3link { c x y } {
 
 #****f* editor.tcl/movetoCanvas
 # NAME
-#   movetoCanvas -- move to canvas 
+#   movetoCanvas -- move to canvas
 # SYNOPSIS
 #   movetoCanvas $canvas
 # FUNCTION
@@ -1169,7 +1167,7 @@ proc mergeGUINode { node } {
 # SYNOPSIS
 #   button3node $c $x $y
 # FUNCTION
-#   This procedure is called when a right mouse button is 
+#   This procedure is called when a right mouse button is
 #   clicked on the canvas. Also called when double-clicking
 #   on a node during runtime.
 #   If there is a node on the place of
@@ -1183,18 +1181,18 @@ proc mergeGUINode { node } {
 #   that have mirror nodes on the same canvas (Pseudo nodes
 #   created by splitting a link).
 #   * Delete -- delete the node
-#   * Shell window -- specifies the shell window to open in 
-#   exec mode. This option is available only to nodes on a 
+#   * Shell window -- specifies the shell window to open in
+#   exec mode. This option is available only to nodes on a
 #   network layer
-#   * Ethereal -- opens a Ethereal program for the specified 
-#   node and the specified interface. This option is available 
+#   * Ethereal -- opens a Ethereal program for the specified
+#   node and the specified interface. This option is available
 #   only for network layer nodes in exec mode.
 # INPUTS
 #   * c -- tk canvas
 #   * x -- x coordinate for popup menu
 #   * y -- y coordinate for popup menu
 #****
-#old proc button3node { c x y } 
+#old proc button3node { c x y }
 #Boeing
 proc button3node { c x y button } {
     global oper_mode env eid canvas_list node_list curcanvas systype g_prefs
@@ -1235,7 +1233,7 @@ proc button3node { c x y button } {
 	if { $button == "shift" } {	;# normal bash shell
 	    spawnShell $node $shell
 	} else { 			;# right-click vtysh shell
-	    set cmd [[typemodel $node].shellcmd $node] 
+	    set cmd [[typemodel $node].shellcmd $node]
 	    if { $cmd != "/bin/sh" && $cmd != "" } { spawnShell $node $cmd }
 	}
 	return ;# open shell, don't post a menu
@@ -1431,7 +1429,7 @@ proc button3node { c x y button } {
 	addInterfaceCommand $node .button3menu "Wireshark" "wireshark -k -i" \
 		$execstate 0
 	# wireshark on host veth pair -- need veth pair name
-	#wireshark -k -i 
+	#wireshark -k -i
 	if { [lindex $systype 0] == "Linux" } {
 	    set name [getNodeName $node]
 	    .button3menu add command -label "View log..." -state $execstate \
@@ -1458,7 +1456,7 @@ proc button3node { c x y button } {
 #   This procedure spawns a new shell for a specified node.
 #   The shell is specified in cmd parameter.
 # INPUTS
-#   * node -- node id of the node for which the shell 
+#   * node -- node id of the node for which the shell
 #   is spawned.
 #   * cmd -- the path to the shell.
 #****
@@ -1478,7 +1476,7 @@ proc addInterfaceCommand { node parentmenu txt cmd state isnodecmd } {
     $parentmenu add cascade -label $txt -menu $childmenu -state $state
     if { ! $isnodecmd } {
 	if { $g_current_session == 0 } { set state disabled }
-	set ssid [shortSessionID $g_current_session] 
+	set ssid [shortSessionID $g_current_session]
     }
     foreach ifc [ifcList $node] {
         set addr [lindex [getIfcIPv4addr $node $ifc] 0]
@@ -1518,9 +1516,9 @@ proc raiseAll {c} {
 # SYNOPSIS
 #   button1 $c $x $y $button
 # FUNCTION
-#   This procedure is called when a left mouse button is 
+#   This procedure is called when a left mouse button is
 #   clicked on the canvas. This procedure selects a new
-#   node or creates a new node, depending on the selected 
+#   node or creates a new node, depending on the selected
 #   tool.
 # INPUTS
 #   * c -- tk canvas
@@ -1556,7 +1554,7 @@ proc button1 { c x y button } {
     set curobj [$c find withtag current]
     set curtype [lindex [$c gettags current] 0]
 
-   
+
     if { $curtype == "node" || \
 	 $curtype == "oval" || $curtype == "rectangle" || $curtype == "text" \
 	|| ( $curtype == "nodelabel" && \
@@ -1661,7 +1659,7 @@ proc button1 { c x y button } {
 	    set newlink [$c create line $lastX $lastY $x $y \
 		-fill $defLinkColor -width $defLinkWidth \
 		-tags "link"]
-	# twonode tool support		
+	# twonode tool support
 	} elseif {$g_twoNodeSelect != "" && $curtype == "node"} {
     	    set curnode [lindex [$c gettags $curobj] 1]
 	    selectTwoNode $curnode
@@ -1678,14 +1676,14 @@ proc setResizeMode { c x y } {
     set isThruplot false
     set type1 notset
 
-    if {$c == ".c"} { 
+    if {$c == ".c"} {
         set t1 [$c gettags current]
         set o1 [lindex $t1 1]
         set type1 [nodeType $o1]
     } else {
         set o1 $c
         set c .c
-        set isThruplot true    
+        set isThruplot true
     }
     #DYL
     #puts "RESIZE NODETYPE = $type1"
@@ -1738,11 +1736,11 @@ proc setResizeMode { c x y } {
 # NAME
 #   button1-motion
 # SYNOPSIS
-#   button1-motion $c $x $y 
+#   button1-motion $c $x $y
 # FUNCTION
-#   This procedure is called when a left mouse button is 
-#   pressed and the mouse is moved around the canvas. 
-#   This procedure creates new select box, moves the 
+#   This procedure is called when a left mouse button is
+#   pressed and the mouse is moved around the canvas.
+#   This procedure creates new select box, moves the
 #   selected nodes or draws a new link.
 # INPUTS
 #   * c -- tk canvas
@@ -1762,8 +1760,8 @@ proc button1-motion { c x y } {
 
     if {$thruPlotDragStart == "dragging"} {
         #puts "active tool is $activetool"
-        thruPlotDrag $c $thruPlotCur $x $y null true 
-        return 
+        thruPlotDrag $c $thruPlotCur $x $y null true
+        return
     }
 
     # fix occasional error
@@ -1795,7 +1793,7 @@ proc button1-motion { c x y } {
 	set dx [expr {$x-$lastX} ]
 	set dy [expr {$y-$lastY} ]
 	# this provides smoother drawing
-	if { $dx > $markersize || $dy > $markersize } { 
+	if { $dx > $markersize || $dy > $markersize } {
 	    set mark [$c create line $lastX $lastY $x $y \
 			-width $markersize -fill $markercolor -tags "marker"]
             $c raise $mark \
@@ -1881,7 +1879,7 @@ proc button1-motion { c x y } {
 	}
     # resizing an annotation
     } elseif { $curtype == "selectmark" } {
-	foreach o [$c find withtag "selected"] { 
+	foreach o [$c find withtag "selected"] {
 	    set node [lindex [$c gettags $o] 1]
 	    set tagovi [$c gettags $o]
 	    set koord [getNodeCoords $node]
@@ -1987,12 +1985,12 @@ proc button1-motion { c x y } {
 
 #****f* editor.tcl/pseudo.layer
 # NAME
-#   pseudo.layer  
+#   pseudo.layer
 # SYNOPSIS
 #   set layer [pseudo.layer]
 # FUNCTION
 #   Returns the layer on which the pseudo node operates
-#   i.e. returns no layer. 
+#   i.e. returns no layer.
 # RESULT
 #   * layer -- returns an empty string
 #****
@@ -2006,8 +2004,8 @@ proc pseudo.layer {} {
 # SYNOPSIS
 #   newGUILink $lnode1 $lnode2
 # FUNCTION
-#   This procedure is called to create a new link between 
-#   nodes lnode1 and lnode2. Nodes can be on the same canvas 
+#   This procedure is called to create a new link between
+#   nodes lnode1 and lnode2. Nodes can be on the same canvas
 #   or on different canvases. The result of this function
 #   is directly visible in GUI.
 # INPUTS
@@ -2047,10 +2045,10 @@ proc newGUILink { lnode1 lnode2 } {
 # NAME
 #   button1-release
 # SYNOPSIS
-#   button1-release $c $x $y 
+#   button1-release $c $x $y
 # FUNCTION
-#   This procedure is called when a left mouse button is 
-#   released. 
+#   This procedure is called when a left mouse button is
+#   released.
 #   The result of this function depends on the actions
 #   during the button1-motion procedure.
 # INPUTS
@@ -2197,7 +2195,7 @@ proc button1-release { c x y } {
 	nodeEnter $c
 
     # $changed!=1
-    } elseif {$activetool == "select" } { 
+    } elseif {$activetool == "select" } {
 	if {$selectbox == ""} {
 	    set x1 $x
 	    set y1 $y
@@ -2238,10 +2236,10 @@ proc button1-release { c x y } {
 	} else {
 	    # select tool resizing an object by dragging its handles
 	    # DYL bugfix. if x,y does not change, do not resize!
-            # fixes a bug where the object dissappears 
-            if { $x != $x1 || $y != $y1 } { 
+            # fixes a bug where the object dissappears
+            if { $x != $x1 || $y != $y1 } {
                 setNodeCoords $resizeobj "$x $y $x1 $y1"
-	    } 
+	    }
             set redrawNeeded 1
 	    set resizemode false
 	}
@@ -2264,11 +2262,11 @@ proc button1-release { c x y } {
 # SYNOPSIS
 #   nodeEnter $c
 # FUNCTION
-#   This procedure prints the node id, node name and 
+#   This procedure prints the node id, node name and
 #   node model (if exists), as well as all the interfaces
-#   of the node in the status line. 
+#   of the node in the status line.
 #   Information is presented for the node above which is
-#   the mouse pointer.  
+#   the mouse pointer.
 # INPUTS
 #   * c -- tk canvas
 #****
@@ -2310,7 +2308,7 @@ proc nodeEnter { c } {
 #   This procedure prints the link id, link bandwidth
 #   and link delay in the status line.
 #   Information is presented for the link above which is
-#   the mouse pointer.  
+#   the mouse pointer.
 # INPUTS
 #   * c -- tk canvas
 #****
@@ -2347,13 +2345,13 @@ proc anyLeave {c} {
 }
 
 
-#****f* editor.tcl/checkIntRange 
+#****f* editor.tcl/checkIntRange
 # NAME
 #   checkIntRange -- check integer range
 # SYNOPSIS
 #   set check [checkIntRange $str $low $high]
 # FUNCTION
-#   This procedure checks the input string to see if it is 
+#   This procedure checks the input string to see if it is
 #   an integer between the low and high value.
 # INPUTS
 #   str -- string to check
@@ -2403,14 +2401,14 @@ proc checkHostname { str } {
 }
 
 
-#****f* editor.tcl/focusAndFlash 
+#****f* editor.tcl/focusAndFlash
 # NAME
 #   focusAndFlash -- focus and flash
 # SYNOPSIS
 #   focusAndFlash $W $count
 # FUNCTION
 #   This procedure sets the focus on the bad entry field
-#   and on this filed it provides an effect of flashing 
+#   and on this filed it provides an effect of flashing
 #   for approximately 1 second.
 # INPUTS
 #   * W -- textbox field that caused the bed entry
@@ -2450,7 +2448,7 @@ proc focusAndFlash {W {count 9}} {
 # SYNOPSIS
 #   popupConfigDialog $c
 # FUNCTION
-#   Dynamically creates a popup dialog box for configuring 
+#   Dynamically creates a popup dialog box for configuring
 #   links or nodes in IMUNES.
 # INPUTS
 #   * c -- canvas id
@@ -2536,10 +2534,10 @@ proc popupConfigDialog { c } {
 	$wi.ftop.name insert 0 [getNodeName $target]
 	set img [getNodeImage $target]
 	ttk::button $wi.ftop.img -image $img -command "popupCustomImage $target"
-	
+
 	if { $type == "rj45" } {
 	    rj45ifclist $wi $target 0
-	} 
+	}
 	# execution server
 	global exec_servers node_location
 	set node_location [getNodeLocation $target]
@@ -2614,7 +2612,7 @@ proc popupConfigDialog { c } {
 		global conntype
 		set conntype [netconfFetchSection $target "tunnel-type"]
 		if { $conntype == "" } { set conntype "UDP" }
-	
+
 
 		# TODO: clean this up
 		ttk::frame  $wi.linfo
@@ -2751,7 +2749,7 @@ proc popupConfigDialog { c } {
 		bind $ctl <Down> "$wi.ifaces.c yview scroll 1 units"
 	    }
         }
-        
+
     }
     oval {
 	destroy $wi
@@ -2779,22 +2777,39 @@ proc popupConfigDialog { c } {
 	pack $wi.ftop -side top
 
 	set spinbox [getspinbox]
-	ttk::frame $wi.bandwidth -borderwidth 4
+        global g_link_config_uni_state
+        set g_link_config_uni_state "bid"
+
+	ttk::frame $wi.preset -borderwidth 4
 	global link_preset_val
 	set link_preset_val unlimited
-	set linkpreMenu [tk_optionMenu $wi.bandwidth.linkpre link_preset_val a]
-	pack $wi.bandwidth.linkpre -side top
+	set linkpreMenu [tk_optionMenu $wi.preset.linkpre link_preset_val a]
+	# unidirectional links not always supported
+        if { [isUniSupported $n0 $n1] } {
+	    set unistate normal
+	} else {
+	    set unistate disabled
+	}
+	ttk::button $wi.preset.uni -text "  >>  " -state $unistate \
+	    -command "linkConfigUni $wi"
+	pack $wi.preset.uni $wi.preset.linkpre -side right
 	linkPresets $wi $linkpreMenu init
-	ttk::label $wi.bandwidth.label -anchor e \
-	-text "Bandwidth (bps):"
+	pack $wi.preset -side top -anchor e
+
+	ttk::frame $wi.unilabel -borderwidth 4
+	ttk::label $wi.unilabel.updown -text "Symmetric link effects:"
+	pack $wi.unilabel.updown -side left -anchor w
+	pack $wi.unilabel -side top -anchor w
+
+	ttk::frame $wi.bandwidth -borderwidth 4
+	ttk::label $wi.bandwidth.label -anchor e -text "Bandwidth (bps):"
 	$spinbox $wi.bandwidth.value -justify right -width 10 \
 	    -validate focus -invalidcommand "focusAndFlash %W"
 	$wi.bandwidth.value insert 0 [getLinkBandwidth $target]
 	$wi.bandwidth.value configure \
 	    -validatecommand {checkIntRange %P 0 1000000000} \
 	    -from 0 -to 1000000000 -increment 1000000
-	pack $wi.bandwidth.value $wi.bandwidth.label \
-	-side right
+	pack $wi.bandwidth.value $wi.bandwidth.label -side right
 	pack $wi.bandwidth -side top -anchor e
 
 	ttk::frame $wi.delay -borderwidth 4
@@ -2808,11 +2823,22 @@ proc popupConfigDialog { c } {
 	pack $wi.delay.value $wi.delay.label -side right
 	pack $wi.delay -side top -anchor e
 
+	ttk::frame $wi.jitter -borderwidth 4
+	ttk::label $wi.jitter.label -anchor e -text "Jitter (us):"
+	$spinbox $wi.jitter.value -justify right -width 10 \
+	    -validate focus -invalidcommand "focusAndFlash %W"
+	$wi.jitter.value insert 0 [getLinkJitter $target]
+	$wi.jitter.value configure \
+	    -validatecommand {checkIntRange %P 0 10000000} \
+	    -from 0 -to 10000000 -increment 5
+	pack $wi.jitter.value $wi.jitter.label -side right
+	pack $wi.jitter -side top -anchor e
+
 	ttk::frame $wi.ber -borderwidth 4
 	if { [lindex $systype 0] == "Linux" } {
 	    set bertext "Loss (%):"
-	    set berinc 1
-	    set bermax 100
+	    set berinc 0.1
+	    set bermax 100.0
 	} else { ;# netgraph uses BER
 	    set bertext "BER (1/N):"
 	    set berinc 1000
@@ -2823,8 +2849,8 @@ proc popupConfigDialog { c } {
 	    -validate focus -invalidcommand "focusAndFlash %W"
 	$wi.ber.value insert 0 [getLinkBER $target]
 	$wi.ber.value configure \
-	    -validatecommand "checkFloatRange %P 0 $bermax" \
-	    -from 0 -to $bermax -increment $berinc
+	    -validatecommand "checkFloatRange %P 0.0 $bermax" \
+	    -from 0.0 -to $bermax -increment $berinc
 	pack $wi.ber.value $wi.ber.label -side right
 	pack $wi.ber -side top -anchor e
 
@@ -2857,6 +2883,7 @@ proc popupConfigDialog { c } {
 	set link_color [getLinkColor $target]
 	tk_optionMenu $wi.color.value link_color \
 	    Red Green Blue Yellow Magenta Cyan Black
+	$wi.color.value configure -width 8
 	pack $wi.color.value $wi.color.label -side right
 	pack $wi.color -side top -anchor e
 
@@ -2870,6 +2897,26 @@ proc popupConfigDialog { c } {
 	    -from 1 -to 8 -increment 1
 	pack $wi.width.value $wi.width.label -side right
 	pack $wi.width -side top -anchor e
+
+	# auto-expand upstream if values exist
+	set bw [getLinkBandwidth $target up]
+	set dl [getLinkDelay $target up]
+	set jt [getLinkJitter $target up]
+	set ber [getLinkBER $target up]
+	set dup [getLinkDup $target up]
+	if { $bw > 0 || $dl > 0 || $jt > 0 || $ber > 0 || $dup > 0 } {
+            linkConfigUni $wi
+	    $wi.bandwidth.value2 delete 0 end
+	    $wi.bandwidth.value2 insert 0 $bw
+	    $wi.delay.value2 delete 0 end
+	    $wi.delay.value2 insert 0 $dl
+	    $wi.jitter.value2 delete 0 end
+	    $wi.jitter.value2 insert 0 $jt
+	    $wi.ber.value2 delete 0 end
+	    $wi.ber.value2 insert 0 $ber
+	    $wi.dup.value2 delete 0 end
+	    $wi.dup.value2 insert 0 $dup
+	}
     }
     } ;# end switch
 
@@ -2880,7 +2927,7 @@ proc popupConfigDialog { c } {
     ttk::frame $wi.netid.frame
 
     ttk::label $wi.netid.frame.label -text "NetID: " -anchor w
-    ttk::entry $wi.netid.frame.entry -width 30 
+    ttk::entry $wi.netid.frame.entry -width 30
     $wi.netid.frame.entry insert 0 [getNodeNetId $target]
     #$wi.netid.frame.entry configure -validatecommand {testFkt %P}
     pack $wi.netid.frame.entry -side right
@@ -2897,11 +2944,11 @@ proc popupConfigDialog { c } {
     "popupConfigApply $wi $object_type $target 0"
     focus $wi.butt.apply
     # Boeing: remove range circles upon cancel
-    if {$type == "wlan"} { 
+    if {$type == "wlan"} {
     	set cancelcmd "set badentry -1 ; destroy $wi;"
-	set cancelcmd "$cancelcmd updateRangeCircles $target 0" 
+	set cancelcmd "$cancelcmd updateRangeCircles $target 0"
     } else {
-    	set cancelcmd "set badentry -1 ; destroy $wi" 
+    	set cancelcmd "set badentry -1 ; destroy $wi"
     }
     ttk::button $wi.butt.cancel -text "Cancel" -command $cancelcmd
     #end Boeing
@@ -2911,6 +2958,116 @@ proc popupConfigDialog { c } {
 #    bind $wi <Key-Return> "popupConfigApply $wi $object_type $target 0"
 }
 
+proc linkConfigUni { wi } {
+    global g_link_config_uni_state
+
+    set capt [lindex [$wi.preset.uni configure -text] 4]
+
+    if { $capt == "  >>  " } {
+   set g_link_config_uni_state "uni"
+   $wi.preset.uni configure -text "  <<  "
+   set txt "Asymmetric effects: downstream  /  upstream"
+   $wi.unilabel.updown configure -text $txt
+
+   set spinbox [getspinbox]
+   if { ![winfo exists $wi.bandwidth.value2] } {
+       $spinbox $wi.bandwidth.value2 -justify right \
+           -width 10 -validate focus -invalidcommand "focusAndFlash %W"
+       $wi.bandwidth.value2 configure \
+       -validatecommand {checkIntRange %P 0 1000000000} \
+       -from 0 -to 1000000000 -increment 1000000
+   }
+   $wi.bandwidth.value2 delete 0 end
+   $wi.bandwidth.value2 insert 0 [$wi.bandwidth.value get]
+   pack $wi.bandwidth.value2 -side right
+   pack $wi.bandwidth.value2 -before $wi.bandwidth.value
+
+   if { ![winfo exists $wi.delay.value2] } {
+       $spinbox $wi.delay.value2 -justify right -width 10 \
+       -validate focus -invalidcommand "focusAndFlash %W"
+       $wi.delay.value2 configure \
+       -validatecommand {checkIntRange %P 0 10000000} \
+       -from 0 -to 10000000 -increment 5
+   }
+   $wi.delay.value2 delete 0 end
+   $wi.delay.value2 insert 0 [$wi.delay.value get]
+   pack $wi.delay.value2 -side right
+   pack $wi.delay.value2 -before $wi.delay.value
+   pack $wi.delay.value2 -side right
+   pack $wi.delay.value2 -before $wi.delay.value
+
+   if { ![winfo exists $wi.jitter.value2] } {
+       $spinbox $wi.jitter.value2 -justify right -width 10 \
+       -validate focus -invalidcommand "focusAndFlash %W"
+       $wi.jitter.value2 configure \
+       -validatecommand {checkIntRange %P 0 10000000} \
+       -from 0 -to 10000000 -increment 5
+   }
+   $wi.jitter.value2 delete 0 end
+   $wi.jitter.value2 insert 0 [$wi.jitter.value get]
+   pack $wi.jitter.value2 -side right
+   pack $wi.jitter.value2 -before $wi.jitter.value
+
+   if { ![winfo exists $wi.ber.value2] } {
+       $spinbox $wi.ber.value2 -justify right -width 10 \
+       -validate focus -invalidcommand "focusAndFlash %W"
+       $wi.ber.value2 configure \
+       -validatecommand "checkFloatRange %P 0.0 100.0" \
+       -from 0.0 -to 100.0 -increment 0.1
+   }
+   $wi.ber.value2 delete 0 end
+   $wi.ber.value2 insert 0 [$wi.ber.value get]
+   pack $wi.ber.value2 -side right
+   pack $wi.ber.value2 -before $wi.ber.value
+
+   if { ![winfo exists $wi.dup.value2] } {
+       $spinbox $wi.dup.value2 -justify right -width 10 \
+       -validate focus -invalidcommand "focusAndFlash %W"
+       $wi.dup.value2 configure \
+       -validatecommand {checkFloatRange %P 0 50} \
+       -from 0 -to 50 -increment 1
+   }
+   $wi.dup.value2 delete 0 end
+   $wi.dup.value2 insert 0 [$wi.dup.value get]
+   pack $wi.dup.value2 -side right
+   pack $wi.dup.value2 -before $wi.dup.value
+   pack $wi.dup.value2 -side right
+   pack $wi.dup.value2 -before $wi.dup.value
+    } else {
+   set g_link_config_uni_state "bid"
+   $wi.preset.uni configure -text "  >>  "
+   $wi.unilabel.updown configure -text "Symmetric link effects:"
+   pack forget $wi.bandwidth.value2
+   pack forget $wi.delay.value2
+   pack forget $wi.jitter.value2
+   pack forget $wi.ber.value2
+   pack forget $wi.dup.value2
+    }
+}
+
+# unidirectional links are not always supported
+proc isUniSupported { n1 n2 } {
+    set blacklist [list "hub" "lanswitch"]
+    set type1 [nodeType $n1]
+    set type2 [nodeType $n2]
+    # not yet supported for GRE tap device
+    if { $type1 == "tunnel" || $type2 == "tunnel" } {
+   return false
+    }
+    # unidirectional links are supported between two switches/hubs
+    if { [lsearch $blacklist $type1] != -1 && \
+    [lsearch $blacklist $type2] != -1 } {
+   return true
+    }
+    # unidirectional links not supported between hub/switch and something else
+    if { [lsearch $blacklist $type1] != -1 || \
+    [lsearch $blacklist $type2] != -1 } {
+   return false
+    }
+    # unidirectional links are supported between routers, rj45s, etc.
+    # WLANs not included here because they have no link dialog
+    return true
+}
 
 # toggle the state of the mac address entry, and insert MAC address template
 proc macEntryHelper { wi ifc } {
@@ -2930,18 +3087,18 @@ proc macEntryHelper { wi ifc } {
 # SYNOPSIS
 #   popupConfigApply $w $object_type $target $phase
 # FUNCTION
-#   This procedure is called when the button apply is pressed in 
+#   This procedure is called when the button apply is pressed in
 #   popup configuration dialog box. It reads different
 #   configuration parameters depending on the object_type.
 # INPUTS
 #   * w -- widget
-#   * object_type -- describes the object type that is currently 
+#   * object_type -- describes the object type that is currently
 #   configured. It can be either link or node.
 #   * target -- node id of the configured node or link id of the
 #   configured link
-#   * phase --  This procedure is invoked in two diffenet phases 
-#   to enable validation of the entry that was the last made. 
-#   When calling this function always use the phase parameter 
+#   * phase --  This procedure is invoked in two diffenet phases
+#   to enable validation of the entry that was the last made.
+#   When calling this function always use the phase parameter
 #   set to 0.
 #****
 proc popupConfigApply { wi object_type target phase } {
@@ -2993,12 +3150,12 @@ proc popupConfigApply { wi object_type target phase } {
 
 # Boeing - added wlan, remote, tunnel, ktunnel items
 	if { $type == "wlan" } {
-	    wlanConfigDialogHelper $wi $target 1	
+	    wlanConfigDialogHelper $wi $target 1
 	} elseif { $type == "tunnel" } {
 		#
 		# apply tunnel items
 		#
-	        set ipaddr "$name/24" ;# tunnel name == IP address of peer 
+	        set ipaddr "$name/24" ;# tunnel name == IP address of peer
 	        set oldipaddr [getIfcIPv4addr $target e0]
 		if { $ipaddr != $oldipaddr } {
 		    setIfcIPv4addr $target e0 $ipaddr
@@ -3038,7 +3195,7 @@ proc popupConfigApply { wi object_type target phase } {
 		if { $oldlocal != $local } {
 		    netconfInsertSection $target [list "local-hook" $local]
 		}
-# Boeing changing to interface name for RJ45 
+# Boeing changing to interface name for RJ45
 #	    } elseif { $type == "rj45" } {
 #		#
 #		# apply rj45 items
@@ -3100,39 +3257,25 @@ proc popupConfigApply { wi object_type target phase } {
     }
 
     link {
+	global g_link_config_uni_state
 	set mirror [getLinkMirror $target]
-	set bw [$wi.bandwidth.value get]
-	if { $bw != [getLinkBandwidth $target] } {
-	    setLinkBandwidth $target [$wi.bandwidth.value get]
-	    if { $mirror != "" } {
-		setLinkBandwidth $mirror [$wi.bandwidth.value get]
-	    }
+
+        if { [setIfChanged $target $mirror $wi "bandwidth" "LinkBandwidth"] } {
 	    set changed 1
 	}
-	set dly [$wi.delay.value get]
-	if { $dly != [getLinkDelay $target] } {
-	    setLinkDelay $target [$wi.delay.value get]
-	    if { $mirror != "" } {
-		setLinkDelay $mirror [$wi.delay.value get]
-	    }
+        if { [setIfChanged $target $mirror $wi "delay" "LinkDelay"] } {
 	    set changed 1
 	}
-	set ber [$wi.ber.value get]
-	if { $ber != [getLinkBER $target] } {
-	    setLinkBER $target [$wi.ber.value get]
-	    if { $mirror != "" } {
-		setLinkBER $mirror [$wi.ber.value get]
-	    }
+        if { [setIfChanged $target $mirror $wi "ber" "LinkBER"] } {
 	    set changed 1
 	}
-	set dup [$wi.dup.value get]
-	if { $dup != [getLinkDup $target] } {
-	    setLinkDup $target [$wi.dup.value get]
-	    if { $mirror != "" } {
-		setLinkDup $mirror [$wi.dup.value get]
-	    }
+        if { [setIfChanged $target $mirror $wi "dup" "LinkDup"] } {
 	    set changed 1
 	}
+        if { [setIfChanged $target $mirror $wi "jitter" "LinkJitter"] } {
+	    set changed 1
+	}
+
 	if { $link_color != [getLinkColor $target] } {
 	    setLinkColor $target $link_color
 	    if { $mirror != "" } {
@@ -3142,9 +3285,9 @@ proc popupConfigApply { wi object_type target phase } {
 	}
 	set width [$wi.width.value get]
 	if { $width != [getLinkWidth $target] } {
-	    setLinkWidth $target [$wi.width.value get]
+	    setLinkWidth $target $width
 	    if { $mirror != "" } {
-		setLinkWidth $mirror [$wi.width.value get]
+		setLinkWidth $mirror $width
 	    }
 	    set changed 1
 	}
@@ -3158,6 +3301,30 @@ proc popupConfigApply { wi object_type target phase } {
     popdownConfig $wi
 }
 
+# helper for Link Config dialog
+# ctl must exist as $wi.$ctl.value{2}, and {get,set}$procname must be valid
+# returns true when value has changed, false otherwise
+proc setIfChanged { target mirror wi ctl procname } {
+    global g_link_config_uni_state
+
+    set val [$wi.$ctl.value get]
+    if { $g_link_config_uni_state == "uni" } {
+	set val [list $val [$wi.$ctl.value2 get]]
+    }
+    set oldval [get$procname $target]
+    set oldval2 [get$procname $target "up"]
+    if { $oldval2 != "" } {
+	set oldval [list $oldval $oldval2]
+    }
+    if { $val != $oldval } {
+	set$procname $target $val
+	if { $mirror != "" } {
+	    set$procname $mirror $val
+	}
+	return true
+    }
+    return false
+}
 
 #****f* editor.tcl/printCanvas
 # NAME
@@ -3166,7 +3333,7 @@ proc popupConfigApply { wi object_type target phase } {
 #   printCanvas $w
 # FUNCTION
 #   This procedure is called when the print button in
-#   print dialog box is pressed. 
+#   print dialog box is pressed.
 # INPUTS
 #   * w -- print dialog widget
 #****
@@ -3187,12 +3354,12 @@ proc printCanvas { w } {
 # SYNOPSIS
 #   deleteSelection
 # FUNCTION
-#   By calling this procedure all the selected nodes in imunes will 
+#   By calling this procedure all the selected nodes in imunes will
 #   be deleted.
 #****
 proc deleteSelection { } {
     global changed
-    global background 
+    global background
     global viewid
     catch {unset viewid}
     .c config -cursor watch; update
@@ -3264,7 +3431,7 @@ proc align2grid {} {
 # FUNCTION
 #   This procedure rearranges the position of nodes in imunes.
 #   It can be used to rearrange all the nodes or only the selected
-#   nodes. 
+#   nodes.
 # INPUTS
 #   * mode -- when set to "selected" only the selected nodes will be
 #   rearranged.
@@ -3308,7 +3475,7 @@ proc rearrange { mode } {
     set intervall 0
 
     set bla 0
-    # wird solange wie enabled 
+    # wird solange wie enabled
     while { $autorearrange_enabled } {
 
         # aktuelle zeit in ntime
@@ -3374,7 +3541,7 @@ proc rearrange { mode } {
 	    set fx_t($node) $fx
 	    set fy_t($node) $fy
 	}
-         
+
 
         # wie wird neu ausgerichtet <<<<<
         # alle markierten nodes bzw alle wenn gewaehlt werden durchlaufen
@@ -3407,7 +3574,7 @@ proc rearrange { mode } {
                 # (?) werte werden irgendwie skaliert
 		set p_fx [expr {1000.0 * $dx / ($d2 * $d + 100)}]
 		set p_fy [expr {1000.0 * $dy / ($d2 * $d + 100)}]
-                # wenn link verbindung besteht und 
+                # wenn link verbindung besteht und
                 #   zieht einen kleinen wert von p_fx und p_fy ab
                 #   groeserer wert (.0...) bewirkt schnelleres ordnen und weniger abstaende
 		# anpassung: vorher:                    .0000000005 neu:   .000000002
@@ -3428,7 +3595,7 @@ proc rearrange { mode } {
                 # liefert zwei nodes vom ende eines links in liste
 		set nodes [linkPeers $link]
                 # (?) wenn node nicht im momentanen canvas ist
-                # oder link nicht vorhanden springe ein "nesting level" rauf 
+                # oder link nicht vorhanden springe ein "nesting level" rauf
 		if { [getNodeCanvas [lindex $nodes 0]] != $curcanvas ||
 		    [getNodeCanvas [lindex $nodes 1]] != $curcanvas ||
 		    [getLinkMirror $link] != "" } {
@@ -3439,7 +3606,7 @@ proc rearrange { mode } {
                 # hole beide coordinaten der end nodes
 		set coords0 [getNodeCoords [lindex $peers 0]]
 		set coords1 [getNodeCoords [lindex $peers 1]]
-                # jeweils x und y koordinaten mit verschiedener gewichtung 
+                # jeweils x und y koordinaten mit verschiedener gewichtung
                 #   zusammen rechnen
 		# faktor bewirkt drehung des netztes komplett. hoeher schneller
 		# <0.5 links oben / >0.5rechts unten
@@ -3479,11 +3646,11 @@ proc rearrange { mode } {
 			set ges_x($node) 0
                 	set ges_y($node) 0
 		#}
-	} 
-        
+	}
+
 
         # was wird neu ausgerichtet <<<<<<<<<
-        # alle markierten nodes werden durchlaufen bzw. alle wenn so im menue gewahlt 
+        # alle markierten nodes werden durchlaufen bzw. alle wenn so im menue gewahlt
 	foreach obj $objects {
             # node wird erstes (zweites) element aus tags der aktuellen node
 	    set node [lindex [.c gettags $obj] 1]
@@ -3517,8 +3684,8 @@ proc rearrange { mode } {
             # node und node caption werden gesetzt und im laufe davon auch in dateien (?) geschrieben
 	    #  markierung in rot oder gruen um den node.
 	    setNodeCoords $node "$x $y"
-	    
-	    # idee fuer jeden node (und alles was dranhaengt) bewegung sammeln und nur in intervallen ausfuehren 
+
+	    # idee fuer jeden node (und alles was dranhaengt) bewegung sammeln und nur in intervallen ausfuehren
 	    set e_dx [expr {$dx * $zoom}]
 	    set e_dy [expr {$dy * $zoom}]
 
@@ -3528,7 +3695,7 @@ proc rearrange { mode } {
 
 	# hier nodes malen
 	foreach obj $objects {
- 
+
            set node [lindex [.c gettags $obj] 1]
 
             # alle items in $obj (der aktuell behandelte node) werden an momentane
@@ -3541,12 +3708,12 @@ proc rearrange { mode } {
 
             # node label (namen) wird versetzt
            set img [.c find withtag "nodelabel && $node"]
-          
+
            .c move $img $ges_x($node) $ges_y($node)
             # img enthaelt coordinaten x wird erstes/ zoom . y wird zweites / zoom
            set x [expr {[lindex [.c coords $img] 0] / $zoom}]
            set y [expr {[lindex [.c coords $img] 1] / $zoom}]
-            # node label wird gesetzt 
+            # node label wird gesetzt
            setNodeLabelCoords $node "$x $y"
             # jedes item in canvas mit link oder nodenamen erhaelt tag need_redraw
            .c addtag need_redraw withtag "link && $node"
@@ -3561,7 +3728,7 @@ proc rearrange { mode } {
 	} else {
 		set optimier 500
 	}
- 
+
 	#hier paar ms rausholen durch spaeteres updaten der links
 	if {$intervall > $optimier} {
         	# alle verbindungen mit dem tag need_redraw werden durchlaufen
@@ -3575,9 +3742,9 @@ proc rearrange { mode } {
 	#.c dtag link need_redraw
 
         # dadurch bleibt canvas bedienbar
-	
+
 	  update
-	
+
     }
 
     rearrange_off
@@ -3588,7 +3755,7 @@ proc rearrange { mode } {
     foreach link [.c find withtag "link && need_redraw"] {
             redrawLink [lindex [.c gettags $link] 1]
     }
-    
+
     .c dtag link need_redraw
 }
 
@@ -3602,16 +3769,16 @@ proc rearrange_off { } {
 }
 
 
-#****f* editor.tcl/switchCanvas 
+#****f* editor.tcl/switchCanvas
 # NAME
 #   switchCanvas -- switch canvas
 # SYNOPSIS
 #   switchCanvas $direction
 # FUNCTION
-#   This procedure switches the canvas in one of the defined 
+#   This procedure switches the canvas in one of the defined
 #   directions (previous, next, first and last).
 # INPUTS
-#   * direction -- the direction of switching canvas. Can be: prev -- 
+#   * direction -- the direction of switching canvas. Can be: prev --
 #   previus, next -- next, first -- first, last -- last.
 #****
 proc switchCanvas { direction } {
@@ -3714,7 +3881,7 @@ proc resizeCanvasPopup {} {
 
     labelframe $w.size -text "Size"
     frame $w.size.pixels
-    pack $w.size $w.size.pixels -side top -padx 4 -pady 4 -fill x 
+    pack $w.size $w.size.pixels -side top -padx 4 -pady 4 -fill x
     spinbox $w.size.pixels.x -bg white -width 5
     $w.size.pixels.x insert 0 $x
     $w.size.pixels.x configure -from 300 -to 5000 -increment 2
@@ -3725,10 +3892,10 @@ proc resizeCanvasPopup {} {
     label $w.size.pixels.label2 -text "H pixels"
     pack $w.size.pixels.x $w.size.pixels.label $w.size.pixels.y \
         $w.size.pixels.label2 -side left -pady 2 -padx 2 -fill x
-    
+
     frame $w.size.meters
-    pack $w.size.meters -side top -padx 4 -pady 4 -fill x 
-    spinbox $w.size.meters.x -bg white -width 7 
+    pack $w.size.meters -side top -padx 4 -pady 4 -fill x
+    spinbox $w.size.meters.x -bg white -width 7
     $w.size.meters.x configure -from 300 -to 10000 -increment 100
     label $w.size.meters.label -text "x"
     spinbox $w.size.meters.y -bg white -width 7
@@ -3797,7 +3964,7 @@ proc resizeCanvasPopup {} {
     checkbutton $w.default.save -text "Save as default" \
 	-variable resize_canvas_save_default
     pack $w.default.save -side left -pady 2 -padx 2 -fill x
-    pack $w.default -side bottom -fill x 
+    pack $w.default -side bottom -fill x
 
     # update the size in meters based on pixels
     syncSizeScale $w xp
@@ -3892,7 +4059,7 @@ proc resizeCanvasApply { w } {
 # SYNOPSIS
 #   animate
 # FUNCTION
-#   This function animates the selectbox. The animation looks 
+#   This function animates the selectbox. The animation looks
 #   different for edit and exec mode.
 #****
 proc animate {} {
@@ -3937,7 +4104,7 @@ proc zoom { dir } {
 			set newzoom $z
 		    }
 		}
-		set zoom $newzoom 
+		set zoom $newzoom
 	    }
 	    redrawAll
 	}
@@ -3953,7 +4120,7 @@ proc zoom { dir } {
 			break
 		    }
 		}
-		set zoom $newzoom 
+		set zoom $newzoom
 	    }
 	    redrawAll
 	}
@@ -3973,7 +4140,7 @@ proc zoom { dir } {
 # SYNOPSIS
 #  double1onGrid $c %x %y
 # FUNCTION
-#  As grid is layered above annotations this procedure is used to find 
+#  As grid is layered above annotations this procedure is used to find
 #  annotation object closest to cursor
 #****
 
@@ -3985,7 +4152,7 @@ proc double1onGrid { c x y } {
 	return
     }
     # Is this really necessary?
-    set coords [getNodeCoords $node] 
+    set coords [getNodeCoords $node]
     set x1 [lindex $coords 0]
     set y1 [lindex $coords 1]
     set x2 [lindex $coords 2]
@@ -4073,7 +4240,7 @@ proc configRemoteServers {} {
     frame $wi.s -borderwidth 4
     listbox $wi.s.servers -selectmode single -width 60 \
 	-yscrollcommand "$wi.s.servers_scroll set" -exportselection 0
-    scrollbar $wi.s.servers_scroll -command "$wi.s.servers yview" 
+    scrollbar $wi.s.servers_scroll -command "$wi.s.servers yview"
     pack $wi.s.servers $wi.s.servers_scroll -fill both -side left
     pack $wi.s -fill both -side top
     # add scrollbar
@@ -4103,9 +4270,9 @@ proc configRemoteServers {} {
     button $wi.c.c.add -image $plugin_img_add \
 	-command "configRemoteServersHelper $wi 1"
     button $wi.c.c.mod -image $plugin_img_save \
-	-command "configRemoteServersHelper $wi 2" 
+	-command "configRemoteServersHelper $wi 2"
     button $wi.c.c.del -image $plugin_img_del \
-	-command "configRemoteServersHelper $wi 3" 
+	-command "configRemoteServersHelper $wi 3"
     pack $wi.c.c.add $wi.c.c.mod $wi.c.c.del -side left
     pack $wi.c -fill x -side top
     # assignment buttons
@@ -4142,7 +4309,7 @@ proc configRemoteServers {} {
     # apply/cancel buttons
     frame $wi.b -borderwidth 4
     button $wi.b.apply -text "Apply" -command \
-    	"writeServersConf; redrawAll; destroy $wi" 
+    	"writeServersConf; redrawAll; destroy $wi"
     button $wi.b.cancel -text "Cancel" -command "loadServersConf;  destroy $wi"
     pack $wi.b.cancel $wi.b.apply -side right
     pack $wi.b -side bottom
@@ -4177,7 +4344,7 @@ proc configRemoteServersHelper { wi action } {
     set newserver [$wi.c.c.name get]
     $wi.s.servers insert $index $newserver
     # update the array
-    set conf [list [$wi.c.c.ip get] [$wi.c.c.port get]] 
+    set conf [list [$wi.c.c.ip get] [$wi.c.c.port get]]
     array set exec_servers [list $newserver $conf]
     $wi.s.servers selection set $index
     set last_server_selected $index
@@ -4191,7 +4358,7 @@ proc selectRemoteServer { wi } {
 
     # clear entries
     $wi.c.c.name delete 0 end; $wi.c.c.ip delete 0 end;
-    $wi.c.c.port delete 0 end 
+    $wi.c.c.port delete 0 end
 
     set server [$wi.s.servers get $selected]
     if { ![info exists exec_servers($server)] } { return }
@@ -4223,7 +4390,7 @@ proc popupCustomImage { node } {
     set wi .customimagedialog
     catch {destroy $wi}
     toplevel $wi -takefocus 1
-    wm transient $wi .popup 
+    wm transient $wi .popup
     wm resizable $wi 0 0
     wm title $wi "[getNodeName $node] ($node) image"
     grab $wi
@@ -4236,11 +4403,11 @@ proc popupCustomImage { node } {
 
     global configwin
     set configwin $wi
-    button $wi.ftop.filebtn -text "..." -command { 
+    button $wi.ftop.filebtn -text "..." -command {
 	global configwin g_imageFileTypes
 	set f [tk_getOpenFile -filetypes $g_imageFileTypes \
 		-initialdir "$CORE_DATA_DIR/icons/normal"]
-	if { $f != "" } { 
+	if { $f != "" } {
 	    set node [string trim [lindex [wm title $configwin] 1] "()"]
 	    $configwin.ftop.filename delete 0 end
 	    $configwin.ftop.filename insert 0 $f
@@ -4279,7 +4446,7 @@ proc popupCustomImagePreview { wi node } {
 
     setNodeCoords $node "150 50"
     setNodeLabelCoords $node "150 78"
-    if { $img_save != $img_new } { setCustomImage $node $img_new } 
+    if { $img_save != $img_new } { setCustomImage $node $img_new }
     $wi.fmid.c delete all
     drawNode $wi.fmid.c $node
 
@@ -4371,9 +4538,9 @@ proc markerOptions { show } {
 # Boeing: draw the marker sizes tool on a small canvas
 proc drawMarkerSizes { c sel } {
 	# determine the coordinates of the selection box based on value of sel
-	if       { $sel == 1 } { set coords {0 0 16 16}   
-	} elseif { $sel == 2 } { set coords {16 0 32 16}  
-	} elseif { $sel == 3 } { set coords {0 16 16 32}  
+	if       { $sel == 1 } { set coords {0 0 16 16}
+	} elseif { $sel == 2 } { set coords {16 0 32 16}
+	} elseif { $sel == 3 } { set coords {0 16 16 32}
 	} else { set coords {16 16 32 32} }
 	# draw the selection box
 	$c create rectangle $coords -fill gray -tag square -width 0
@@ -4401,18 +4568,18 @@ proc markerSize { x y } {
     drawMarkerSizes .left.markeropt.sizes $sel
 }
 
-# Boeing: set canvas wallpaper 
+# Boeing: set canvas wallpaper
 proc wallpaperPopup {} {
     global curcanvas
 
     set w .wallpaperDlg
     catch {destroy $w}
     toplevel $w
-   
+
     wm transient $w .
     wm title $w "Set Canvas Wallpaper"
     grab $w
-    
+
     # preview
     canvas $w.preview -background white -relief sunken -width 200 -height 100 \
     	-borderwidth 1
@@ -4429,7 +4596,7 @@ proc wallpaperPopup {} {
     # file browse button
     global configwin
     set configwin $w
-    button $w.f.filebtn -text "..." -command { 
+    button $w.f.filebtn -text "..." -command {
 	global configwin showGrid adjustCanvas fileDialogBox_initial
 	global g_imageFileTypes
 	# use default conf file path upon first run
@@ -4451,7 +4618,7 @@ proc wallpaperPopup {} {
     }
 
     # clear wallpaper button
-    button $w.f.clear -text "clear" -command { 
+    button $w.f.clear -text "clear" -command {
 		global configwin wallpaperStyle
 		$configwin.f.file delete 0 end
 		$configwin.preview delete "wallpaper"
@@ -4501,11 +4668,11 @@ proc wallpaperPopup {} {
 
     # buttons
     frame $w.btns
-    button $w.btns.apply -text "Apply" -command { 
+    button $w.btns.apply -text "Apply" -command {
 		global configwin wallpaperStyle curcanvas adjustCanvas
 		set f [$configwin.f.file get]
-		if {$adjustCanvas} { 
-			wallpaperAdjustCanvas $curcanvas $f $wallpaperStyle 
+		if {$adjustCanvas} {
+			wallpaperAdjustCanvas $curcanvas $f $wallpaperStyle
 		}
 		setCanvasWallpaper $curcanvas $f $wallpaperStyle
 		redrawAll
@@ -4544,7 +4711,7 @@ proc wallpaperAdjustCanvas { c f style } {
 
     #puts -nonewline  "wallpaperAdjustCanvas img($imgx, $imgy) $cx, $cy -> "
 
-    # For scaled and tiled styles, expand canvas x and y to a multiple of 
+    # For scaled and tiled styles, expand canvas x and y to a multiple of
     # imgx, imgy for better stretching. If the image is larger than the canvas,
     # just increase the canvas size to accomodate it.
     if {$style == "scaled" || $style == "tiled"} {
@@ -4600,8 +4767,8 @@ proc drawWallpaper { c f style } {
 	set cy [expr [lindex [getCanvasSize $curcanvas] 1]-2]
     }
     set f [absPathname $f]
-    if { [ catch { set img [image create photo -file $f] } ] } {
-	puts "Error: couldn't open wallpaper file $f"
+    if { [ catch { set img [image create photo -file $f] } e ] } {
+	puts "Error: couldn't open wallpaper file $f: $e"
 	return
     }
     set imgx [image width $img]
@@ -4613,13 +4780,13 @@ proc drawWallpaper { c f style } {
 	# grow image
 	if { $cx >= $imgx || $cy > $imgy } {
 	    set x [expr 1+($cx / $imgx)]
-	    set y [expr 1+($cy / $imgy)] 
+	    set y [expr 1+($cy / $imgy)]
 	    $img2 copy $img -zoom $x $y
 	# shrink image
 	} else {
 	    $img2 copy $img -subsample \
 		[expr { int($imgx / $cx) }] \
-		[expr { int($imgy / $cy) }] 
+		[expr { int($imgy / $cy) }]
 	}
         $c create image [expr 1+$cx/2] [expr 1+$cy/2] -image $img2 \
 		-tags "background wallpaper"
@@ -4643,7 +4810,7 @@ proc drawWallpaper { c f style } {
     }
 
     raiseAll $c
-    
+
 }
 
 # helper for close/cancel buttons
@@ -4673,7 +4840,7 @@ proc rj45ifclist { wi node wasclicked } {
     listbox $wi.ftop.ifc.ifc_list -height 4 -width 30 \
 	-selectmode browse -yscrollcommand "$wi.ftop.ifc.ifc_scroll set"
     scrollbar $wi.ftop.ifc.ifc_scroll \
-	-command "$wi.ftop.ifc.ifc_list yview" 
+	-command "$wi.ftop.ifc.ifc_list yview"
 
     set ifname ""
     set ifip ""
@@ -4711,18 +4878,19 @@ proc rj45ifclist { wi node wasclicked } {
 
 # link preset values - bandwidth delay ber duplicate
 array set link_presets {
-	"unlimited" { 0 0 0 0 }
-	"1000M" { 1000000000 100 0 0}
-	"100M"  { 100000000 110 0 0}
-	"10M"   { 10000000 160 0 0}
-	"512kbps" { 512000 50000 0 0}
-	"256kbps" { 256000 75000 0 0}
-	"64kbps"  { 64000 80000 0 0}
+	"unlimited" { 0 0 0 0 0 }
+	"1000M" { 1000000000 100 0 0.0 0.0}
+	"100M"  {  100000000 110 0 0.0 0.0}
+	"10M"   {   10000000 160 0 0.0 0.0}
+	"512kbps" { 512000 50000 0 0.0 0.0}
+	"256kbps" { 256000 75000 0 0.0 0.0}
+	"64kbps"  {  64000 80000 0 0.0 0.0}
 }
 
 # link presets
 proc linkPresets { wi linkpreMenu cmd } {
     global link_presets link_preset_val
+    global g_link_config_uni_state
 
     if { $cmd == "init" } { ;# populate the list with presets and exit
     	$linkpreMenu delete 0
@@ -4738,12 +4906,26 @@ proc linkPresets { wi linkpreMenu cmd } {
     set params $link_presets($link_preset_val)
     $wi.bandwidth.value delete 0 end
     $wi.delay.value delete 0 end
+    $wi.jitter.value delete 0 end
     $wi.ber.value delete 0 end
     $wi.dup.value delete 0 end
     $wi.bandwidth.value insert 0 [lindex $params 0]
     $wi.delay.value insert 0 [lindex $params 1]
-    $wi.ber.value insert 0 [lindex $params 2]
-    $wi.dup.value insert 0 [lindex $params 3]
+    $wi.jitter.value insert 0 [lindex $params 2]
+    $wi.ber.value insert 0 [lindex $params 3]
+    $wi.dup.value insert 0 [lindex $params 4]
+    if { $g_link_config_uni_state == "uni" } {
+	$wi.bandwidth.value2 delete 0 end
+	$wi.delay.value2 delete 0 end
+	$wi.jitter.value2 delete 0 end
+	$wi.ber.value2 delete 0 end
+	$wi.dup.value2 delete 0 end
+	$wi.bandwidth.value2 insert 0 [lindex $params 0]
+	$wi.delay.value2 insert 0 [lindex $params 1]
+	$wi.jitter.value2 insert 0 [lindex $params 2]
+	$wi.ber.value2 insert 0 [lindex $params 3]
+	$wi.dup.value2 insert 0 [lindex $params 4]
+    }
 }
 
 set last_nodeHighlights [clock clicks -milliseconds]
@@ -4917,7 +5099,7 @@ proc popupHookScript { name } {
 	    "genericOpenSaveButtonPress $c $wi.mid.script $wi.n.name"
     }
     ttk::combobox $wi.n.state -width 15 -state readonly -exportselection 0 \
-	-values $CORE_STATES 
+	-values $CORE_STATES
     pack $wi.n.lab $wi.n.name -padx 4 -pady 4 -side left
     pack $wi.n.open $wi.n.save -pady 4 -side left
     pack $wi.n.state -padx 4 -pady 4 -side left
@@ -5074,7 +5256,7 @@ proc popupFileView { pathname } {
     ttk::label $wi.top.fnl -text "File:"
     ttk::entry $wi.top.fn
     #ttk::entry $wi.top.fn -state readonly
-    pack $wi.top.fnl -padx 4 -side left 
+    pack $wi.top.fnl -padx 4 -side left
     pack $wi.top.fn  -padx 4 -side left -fill both -expand true
     pack $wi.top -padx 4 -pady 4 -side top -fill both -expand true
     $wi.top.fn insert 0 $pathname
@@ -5203,7 +5385,7 @@ proc copySelection {} {
 }
 
 # while copied the as number is the same
-#   the ip increments 
+#   the ip increments
 proc pasteSelection {} {
     global clipboard
     global node_list link_list annotation_list curcanvas

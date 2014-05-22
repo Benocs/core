@@ -34,7 +34,7 @@
 #  ns2imunes.tcl -- file used for converting from ns2 scripts to IMUNES conf
 #  file
 # FUNCTION
-#  This module implements functionality for converting ns2 scripts into 
+#  This module implements functionality for converting ns2 scripts into
 #  IMUNES conf file. Now, only basic ns2 functionalities are implemented, those
 #  that can't be written in IMUNES config file or those that are not implemented
 #  yet are ignored.
@@ -42,11 +42,11 @@
 
 #****f* ns2imunes.tcl/ns2im
 # NAME
-#   ns2im -- converts ns2 script into IMUNES and draws topology 
+#   ns2im -- converts ns2 script into IMUNES and draws topology
 # SYNOPSIS
 #   ns2im $ns2script
 # FUNCTION
-#   Implements basic logic for converting between formats. 
+#   Implements basic logic for converting between formats.
 # INPUTS
 #   * srcfile -- ns2 scripy
 #****
@@ -65,8 +65,8 @@ proc ns2im { srcfile } {
     foreach node $node_list {
 	setNodeCanvas $node $curcanvas
     }
-    changeNodeType    
-    setDefaultRoutes 
+    changeNodeType
+    setDefaultRoutes
     arrangeNodes
     dumpCfg string cfg
     loadCfg $cfg
@@ -78,13 +78,13 @@ proc ns2im { srcfile } {
 
 #****f* ns2imunes.tcl/new
 # NAME
-#   new -- basic/main ns2 function, invoked in ns2 script 
+#   new -- basic/main ns2 function, invoked in ns2 script
 # SYNOPSIS
 #   set ns [new Simulator]
 # FUNCTION
 #   Points to our main function: root-func.
 # INPUTS
-#   * object -- can be Simulator, Agent, Application. 
+#   * object -- can be Simulator, Agent, Application.
 #****
 
 proc new {object} {
@@ -100,11 +100,11 @@ proc new {object} {
     } else {
     	return nullfunc
     }
-} 
+}
 
 #****f* ns2imunes.tcl/nullfunc
 # NAME
-#   nullfunc -- does nothing; needed for avoiding errors. 
+#   nullfunc -- does nothing; needed for avoiding errors.
 # SYNOPSIS
 #   nullfunc args
 # INPUTS
@@ -116,14 +116,14 @@ proc nullfunc {args} {
 
 #****f* ns2imunes.tcl/root-func
 # NAME
-#   root-func -- calls other functions 
+#   root-func -- calls other functions
 # SYNOPSIS
 #   root-func ns_command $args
 # FUNCTION
 #   For input node this procedure enables or disables custom configuration.
 # INPUTS
 #   * ns_command -- first arg is always name of the function
-#   * args -- argument for function; there can be any number of arguments 
+#   * args -- argument for function; there can be any number of arguments
 # RESULT
 #   Returns result of function $ns_command
 #****
@@ -143,7 +143,7 @@ proc root-func {ns_command args} {
 
 #****f* ns2imunes.tcl/node
 # NAME
-#   node -- creates new node, ns_command invoked from root-func 
+#   node -- creates new node, ns_command invoked from root-func
 # SYNOPSIS
 #   set node [node]
 # RESULT
@@ -177,17 +177,17 @@ proc duplex-link { linkdata } {
     set dly [lindex $linkdata 3]
     set type [lindex $linkdata 4]
     set link [newLink $node1 $node2]
-    
+
     set bandwidth [getBandwidth $bw]
     setLinkBandwidth $link $bandwidth
-    
+
     set delay [getDelay $dly]
     setLinkDelay $link $delay
 
     set queueingDiscipline [getQueingDiscipline $type]
 }
 
-    
+
 #****f* ns2imunes.tcl/changeNodeType
 # NAME
 #   changeNodeType -- passes through list node_list and changes type of node.
@@ -211,14 +211,14 @@ proc changeNodeType {} {
 
 #****f* ns2imunes.tcl/setDefaultRoutes
 # NAME
-#   setDefaultRoutes -- sets default routes for non router nodes 
+#   setDefaultRoutes -- sets default routes for non router nodes
 # SYNOPSIS
 #   setDefaultRoutes
 #****
 proc setDefaultRoutes {} {
     global node_list
     foreach node $node_list {
-	set type [nodeType $node] 
+	set type [nodeType $node]
 	if { $type == "pc" || $type == "host" } {
 	    set interfaces [ifcList $node]
 	    foreach ifc $interfaces {
@@ -232,7 +232,7 @@ proc setDefaultRoutes {} {
 
 #****f* ns2imunes.tcl/getBandwidth
 # NAME
-#   getBandwith -- returns bandwidth value in bits 
+#   getBandwith -- returns bandwidth value in bits
 # SYNOPSIS
 #   getBandwith $bandwith
 # FUNCTION
@@ -252,7 +252,7 @@ proc getBandwidth { bw } {
 
 #****f* ns2imunes.tcl/getDelay
 # NAME
-#   getDelay -- returns delay value in microseconds 
+#   getDelay -- returns delay value in microseconds
 # SYNOPSIS
 #   getDelay $dly
 # FUNCTION
@@ -271,7 +271,7 @@ proc getDelay { dly } {
 
 #****f* ns2imunes.tcl/getQueingDiscipline
 # NAME
-#   getQueingDiscipline -- returns queing discipline 
+#   getQueingDiscipline -- returns queing discipline
 # SYNOPSIS
 #   getQueingDiscipline $type
 # INPUTS
@@ -285,7 +285,7 @@ proc getQueingDiscipline { type } {
 	return "fair-queue"
     } elseif {[string match "DRR" $type]} {
     	return "drr-queue"
-    }   
+    }
 }
 
 
@@ -318,14 +318,14 @@ proc arrangeNodes {} {
     set rnum [llength $routers]
     set pi [expr 2*asin(1.0)]
 #next foreach loop: we arrange nodes that we have denoted as
-#layer3/router nodes; we place them in a elipse circle and their 
+#layer3/router nodes; we place them in a elipse circle and their
 #regular peers (pc or host) are placed above them
     foreach rnode $routers {
 	set fi [expr $i*(2*$pi)/$rnum]
 	set r [expr 200*(1.0-0.4*abs(sin($fi)))]
 	set ximage [expr [lindex $center 0] - $r*cos($fi)]
 	set yimage [expr [lindex $center 1] - $r*sin($fi)]
-	
+
 	setNodeCoords $rnode "$ximage $yimage"
 	setNodeLabelCoords $rnode "$ximage [expr $yimage + 24]"
 	set regularPeers [getRegularPeers $rnode]
@@ -384,7 +384,7 @@ proc getRegularPeers { node } {
 
 #****f* ns2imunes.tcl/hasCoords
 # NAME
-#   hasCoords -- detects existence of coords 
+#   hasCoords -- detects existence of coords
 # SYNOPSIS
 #   getRegularPeers $node_id
 # INPUTS

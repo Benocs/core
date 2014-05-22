@@ -36,7 +36,7 @@
 # NAME
 #  nodecfg.tcl -- file used for manipultaion with nodes in IMUNES
 # FUNCTION
-#  This module is used to define all the actions used for configuring 
+#  This module is used to define all the actions used for configuring
 #  nodes in IMUNES. The definition of nodes is presented in NOTES
 #  section.
 #
@@ -203,7 +203,7 @@
 #	Returns id of the logical node on the other side of the interface.
 #
 # ifcByPeer { local_node_id peer_node_id }
-#	Returns the name of the interface connected to the specified peer 
+#	Returns the name of the interface connected to the specified peer
 #       if the peer is on the same canvas, otherwise returns an empty string.
 #
 # ifcByLogicalPeer { local_node_id peer_node_id }
@@ -217,11 +217,11 @@
 #	configured, otherwise returns false.
 #
 # removeNode { node_id }
-#	Removes the specified node as well as all the links that bind 
+#	Removes the specified node as well as all the links that bind
 #       that node to any other node.
 #
 # newIfc { ifc_type node_id }
-#	Returns the first available name for a new interface of the 
+#	Returns the first available name for a new interface of the
 #       specified type.
 #
 # All of the above functions are independent to any Tk objects. This means
@@ -229,7 +229,7 @@
 # GUI any updating of related Tk objects (such as text labels etc.) will
 # have to be implemented by additional Tk code.
 #
-# Additionally, an alternative configuration can be specified in 
+# Additionally, an alternative configuration can be specified in
 # "custom-config" section.
 #
 # getCustomConfig { node_id }
@@ -243,12 +243,12 @@
 
 #****f* nodecfg.tcl/typemodel
 # NAME
-#   typemodel -- find node's type and routing model 
+#   typemodel -- find node's type and routing model
 # SYNOPSIS
 #   set typemod [typemodel $node_id]
 # FUNCTION
-#   For input node this procedure returns the node's  
-#   type and routing model (if exists) 
+#   For input node this procedure returns the node's
+#   type and routing model (if exists)
 # INPUTS
 #   * node_id -- node id
 # RESULT
@@ -265,7 +265,7 @@ proc typemodel { node } {
 # SYNOPSIS
 #   set location [getNodeLocation $node_id]
 # FUNCTION
-#   For input node this procedure returns the name of the CORE box 
+#   For input node this procedure returns the name of the CORE box
 #   controlling the node.
 # INPUTS
 #   * node_id -- node id
@@ -288,7 +288,7 @@ proc getNodeLocation { node } {
 # SYNOPSIS
 #   setNodeLocation $node_id $location
 # FUNCTION
-#   For input node this procedure sets the name of the CORE box 
+#   For input node this procedure sets the name of the CORE box
 #   controlling the node.
 # INPUTS
 #   * node_id -- node id
@@ -304,7 +304,7 @@ proc setNodeLocation { node location } {
     }
 
     if { $location == "" } { return }
-    
+
     lappend $node [list location $location]
 
     return
@@ -330,7 +330,7 @@ proc nodePeerHasLocation { node location } {
 #   setConfig $strlist $str
 # FUNCTION
 #   Procedure returns requested element that belongs
-#	to *-config structure. 
+#	to *-config structure.
 # INPUTS
 #    * strlist -- *-config structure
 #    * cfg -- current *-config that will be extended
@@ -367,7 +367,7 @@ proc setConfig { strlist cfg str } {
 #   getConfig $strlist $str
 # FUNCTION
 #	Procedure returns requested element that belongs
-#		to *-config structure. 
+#		to *-config structure.
 # INPUTS
 #   * strlist -- *-config structure
 #	* str -- an element of the *-config structure
@@ -381,16 +381,16 @@ proc getConfig { strlist str } {
 
 #****f* nodecfg.tcl/getCustomEnabled
 # NAME
-#   getCustomEnabled -- get custom configuration enabled state 
+#   getCustomEnabled -- get custom configuration enabled state
 # SYNOPSIS
 #   set enabled [getCustomEnabled $node_id]
 # FUNCTION
 #   For input node this procedure returns true if custom configuration
-#   is enabled for the specified node. 
+#   is enabled for the specified node.
 # INPUTS
 #   * node_id -- node id
 # RESULT
-#   * enabled -- returns true if custom configuration is enabled 
+#   * enabled -- returns true if custom configuration is enabled
 #****
 
 proc getCustomEnabled { node } {
@@ -405,14 +405,14 @@ proc getCustomEnabled { node } {
 
 #****f* nodecfg.tcl/setCustomEnabled
 # NAME
-#   setCustomEnabled -- set custom configuration enabled state 
+#   setCustomEnabled -- set custom configuration enabled state
 # SYNOPSIS
 #   setCustomEnabled $node_id $enabled
 # FUNCTION
 #   For input node this procedure enables or disables custom configuration.
 # INPUTS
 #   * node_id -- node id
-#   * enabled -- true if enabling custom configuration, false if disabling 
+#   * enabled -- true if enabling custom configuration, false if disabling
 #****
 
 proc setCustomEnabled { node enabled } {
@@ -429,7 +429,7 @@ proc setCustomEnabled { node enabled } {
 
 #****f* nodecfg.tcl/getCustomCmd
 # NAME
-#   getCustomCmd -- get custom configuration command 
+#   getCustomCmd -- get custom configuration command
 # SYNOPSIS
 #   set command [getCustomCmd $node_id]
 # FUNCTION
@@ -437,7 +437,7 @@ proc setCustomEnabled { node enabled } {
 # INPUTS
 #   * node_id -- node id
 # RESULT
-#   * command -- custom configuration command 
+#   * command -- custom configuration command
 #****
 
 proc getCustomCmd { node } {
@@ -448,14 +448,14 @@ proc getCustomCmd { node } {
 
 #****f* nodecfg.tcl/setCustomCmd
 # NAME
-#   setCustomEnabled -- set custom configuration command 
+#   setCustomEnabled -- set custom configuration command
 # SYNOPSIS
 #   setCustomCmd $node_id $command
 # FUNCTION
 #   For input node this procedure sets custom command.
 # INPUTS
 #   * node_id -- node id
-#   * command -- custom configuration command 
+#   * command -- custom configuration command
 #****
 
 proc setCustomCmd { node cmd } {
@@ -465,13 +465,13 @@ proc setCustomCmd { node cmd } {
     if { $i >= 0 } {
 	set $node [lreplace [set $node] $i $i]
     }
-	
+
     lappend $node [list custom-command $cmd]
 }
 
 #****f* nodecfg.tcl/getCustomConfig
 # NAME
-#   getCustomConfig -- get custom configuration section 
+#   getCustomConfig -- get custom configuration section
 # SYNOPSIS
 #   set cfg [getCustomConfig $node_id]
 # FUNCTION
@@ -479,13 +479,13 @@ proc setCustomCmd { node cmd } {
 # INPUTS
 #   * node_id -- node id
 # RESULT
-#   * cfg -- returns custom configuration section 
+#   * cfg -- returns custom configuration section
 #****
 
 proc getCustomConfig { node } {
     global $node
     set customCfgList {}
-	
+
     set customcmd ""
     set customcfg ""
     set customcmd [lsearch -inline [set $node] "custom-command *"]
@@ -520,7 +520,7 @@ proc getCustomConfigByID { node id } {
 
 #****f* nodecfg.tcl/setCustomConfig
 # NAME
-#   setCustomConfig -- set custom configuration command 
+#   setCustomConfig -- set custom configuration command
 # SYNOPSIS
 #   setCustomConfig $node_id $cfg
 # FUNCTION
@@ -529,10 +529,10 @@ proc getCustomConfigByID { node id } {
 #   * node_id -- node id
 #   * id -- custom-config id
 #   * cmd -- custom command
-#   * cfg -- custom configuration section 
+#   * cfg -- custom configuration section
 #   * delete -- if delete is set to 1, setCustomConfig is invoked
 #	to delete custom-config with custom-config-id $id
-#   * 
+#   *
 #****
 
 proc setCustomConfig { node id cmd cfg delete } {
@@ -548,7 +548,7 @@ proc setCustomConfig { node id cmd cfg delete } {
 	set j [lsearch [set $node] "custom-config *"]
 	set $node [lreplace [set $node] $j $j]
     }
-	
+
     # removes existing custom-config if custom-config-id matches
     set cnt 0
     set indices [lsearch -all [set $node] "custom-config *"]
@@ -561,7 +561,7 @@ proc setCustomConfig { node id cmd cfg delete } {
 	    set $node [lreplace [set $node] $i $i]
 	}
     }
-	
+
     # adds the new config specified in the dialog box
     if { $delete == 0 } {
 	if { $cfg != {} && $cmd != {} && $id != {} } {
@@ -569,7 +569,7 @@ proc setCustomConfig { node id cmd cfg delete } {
 	    set viewcustomid [lindex $newid 1]
 	    set newcmd [list custom-command $cmd]
 	    set newcfg [list config $cfg]
-	    # Boeing: insert the new custom config so it's the first (active) 
+	    # Boeing: insert the new custom config so it's the first (active)
 	    # custom config in the list, or just add it to the end
 	    set first [lindex $indices 0]
 	    if { $first < 0 } {
@@ -584,7 +584,7 @@ proc setCustomConfig { node id cmd cfg delete } {
 
 #****f* nodecfg.tcl/netconfFetchSection
 # NAME
-#   netconfFetchSection -- fetch the network configuration section 
+#   netconfFetchSection -- fetch the network configuration section
 # SYNOPSIS
 #   set section [netconfFetchSection $node_id $sectionhead]
 # FUNCTION
@@ -631,7 +631,7 @@ proc netconfFetchSection { node sectionhead } {
         if { "$line" == "$sectionhead" } {
             set cfgmode section
         # Boeing: search the first part of $line for $sectionhead
-        } elseif { "router bgp" == "$sectionhead" } { 
+        } elseif { "router bgp" == "$sectionhead" } {
             if { [string first $sectionhead $line 0] == 0 } {
                 set cfgmode section
                 lappend section "$line"
@@ -649,7 +649,7 @@ proc netconfFetchSection { node sectionhead } {
 #   Removes the appropriate section from the network part of the configuration.
 # INPUTS
 #   * node_id     -- node id
-#   * sectionhead -- represents the first line of the section that is to be removed from network-config 
+#   * sectionhead -- represents the first line of the section that is to be removed from network-config
 #     part of the configuration.
 #****
 
@@ -1433,7 +1433,7 @@ proc writeNodeCoords { node coords } {
     if { [nodeType $node] != "router" } { return }
 
     set fn "/tmp/pycore.$g_current_session/$node.xy"
-    catch { 
+    catch {
 	set f [open $fn w]
 	puts $f $coords
 	close $f
@@ -1532,7 +1532,7 @@ proc ifcList { node } {
 # SYNOPSIS
 #   set peer [peerByIfc $node_id $ifc]
 # FUNCTION
-#   Returns id of the node on the other side of the interface. If the node 
+#   Returns id of the node on the other side of the interface. If the node
 #   on the other side of the interface is situated on the other canvas or connected
 #   via split link, this function returns a pseudo node.
 # INPUTS
@@ -1639,7 +1639,7 @@ proc ifcByLogicalPeer { node peer } {
 	}
 	return ""
     } else {
-	return $ifc    
+	return $ifc
     }
 }
 
@@ -1695,7 +1695,7 @@ proc hasIPv6Addr { node } {
 # SYNOPSIS
 #   removeNode $node_id
 # FUNCTION
-#   Removes the specified node as well as all the links binding that node to 
+#   Removes the specified node as well as all the links binding that node to
 #   the other nodes.
 # INPUTS
 #   * node_id -- node id
@@ -1826,7 +1826,7 @@ proc newNode { type } {
     } else {
     set node [newObjectId node]
     }
-	
+
     global $node
     set $node {}
     lappend $node "type $type"
@@ -1842,7 +1842,7 @@ proc newNode { type } {
 		! ]
     # set wlan default parameters upon creation
     } elseif { $type == "wlan" } {
-	global DEFAULT_WLAN_MODEL DEFAULT_WLAN_MODEL_TYPES 
+	global DEFAULT_WLAN_MODEL DEFAULT_WLAN_MODEL_TYPES
 	global DEFAULT_WLAN_MODEL_VALS
 	set nconfig [list \
 		"hostname $type[string range $node 1 end]" \
@@ -1875,8 +1875,8 @@ proc newNode { type } {
 #   set mirror_node_id [getNodeMirror $node_id]
 # FUNCTION
 #   Returns the node id of a mirror pseudo node of the node. Mirror node is the
-#   corresponding pseudo node. The pair of pseudo nodes, node and his mirror node, are 
-#   introduced to form a split in a link. This split can be used for avoiding crossed 
+#   corresponding pseudo node. The pair of pseudo nodes, node and his mirror node, are
+#   introduced to form a split in a link. This split can be used for avoiding crossed
 #   links or for displaying a link between the nodes on a different canvas.
 # INPUTS
 #   * node_id -- node id
@@ -1897,8 +1897,8 @@ proc getNodeMirror { node } {
 #   setNodeMirror $node_id $mirror_node_id
 # FUNCTION
 #   Sets the node id of a mirror pseudo node of the specified node. Mirror node is the
-#   corresponding pseudo node. The pair of pseudo nodes, node and his mirror node, are 
-#   introduced to form a split in a link. This split can be used for avoiding crossed 
+#   corresponding pseudo node. The pair of pseudo nodes, node and his mirror node, are
+#   introduced to form a split in a link. This split can be used for avoiding crossed
 #   links or for displaying a link between the nodes on a different canvas.
 # INPUTS
 #   * node_id -- node id
@@ -1997,7 +1997,7 @@ proc getNodeServices { node want_defaults } {
     global $node
 
     set i [lsearch [set $node] "services *"]
-    set s [lindex [lindex [set $node] $i] 1] 
+    set s [lindex [lindex [set $node] $i] 1]
     if { $want_defaults && $i < 0 } {
 	set s [getNodeTypeServices [getNodeModel $node]]
     }

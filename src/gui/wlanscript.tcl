@@ -17,7 +17,7 @@ proc wlanRunMobilityScript { wlan } {
     global script_${wlan}
     # the end time of the script
     set script_${wlan}(max_time) 1
-    # script filename 
+    # script filename
     set fn [file tail [getKeyValue "file" $scriptcfg 50]]
     set script_${wlan}(filename) $fn
     # resolution for timer firing in milliseconds
@@ -66,9 +66,9 @@ proc showMobilityScriptPopup { wlan } {
     ttk::label $w.fsc.lab -textvariable script_${wlan}(time)
     # -state disabled
     pack $w.fsc.timescale -side left -fill x -expand true
-    pack $w.fsc.lab -side left 
+    pack $w.fsc.lab -side left
     pack $w.fsc -side top -anchor w -padx 4 -fill x -expand true
-    
+
     #
     # control frame
     #
@@ -97,7 +97,7 @@ proc showMobilityScriptPopup { wlan } {
     pack $w.fctl -side bottom -anchor w
 
     #$w.fctl.res insert 0 [set script_${wlan}(res)]
-    
+
 }
 
 #
@@ -135,7 +135,7 @@ proc mobility_script_loop {} {
 	    continue
 	}
 	if { [set script_${wlan}(state)] == "init" } {
-	    if { ![info exists .scriptpopup$wlan] } { 
+	    if { ![info exists .scriptpopup$wlan] } {
 	        showMobilityScriptPopup $wlan
 	    }
 	    set script_${wlan}(state) stop
@@ -152,11 +152,11 @@ proc mobility_script_loop {} {
 	    set t [expr {$t + $dt}]
 	    set script_${wlan}(time) [format "%.03f" $t]
 	}
-#	if { [set script_${wlan}(res)] < $refresh_ms } { 
-#		set refresh_ms [set script_${wlan}(res)] 
+#	if { [set script_${wlan}(res)] < $refresh_ms } {
+#		set refresh_ms [set script_${wlan}(res)]
 #	}
     }
-    
+
     after 90 { mobility_script_loop }
 }
 

@@ -35,11 +35,11 @@
 # NAME
 #  linkcfg.tcl -- file used for manipultaion with links in IMUNES
 # FUNCTION
-#  This module is used to define all the actions used for configuring 
-#  links in IMUNES. 
+#  This module is used to define all the actions used for configuring
+#  links in IMUNES.
 #
 # NOTES
-# 
+#
 # linkPeers { link_id }
 #	Returns node_ids of link endpoints
 #
@@ -53,7 +53,7 @@
 #	... in bits per second
 #
 # getLinkBandwidthString { link_id }
-#	... as string 
+#	... as string
 #
 # getLinkDelay { link_id }
 #	... in microseconds
@@ -83,7 +83,7 @@
 # INPUTS
 #   * link_id -- link id
 # RESULT
-#   * link_peers -- returns nodes_ids of a link endpoints 
+#   * link_peers -- returns nodes_ids of a link endpoints
 #     in a list {node1_id node2_id}
 #****
 
@@ -100,14 +100,14 @@ proc linkPeers { link } {
 # SYNOPSIS
 #   set link_id [linkByPeers $node1_id $node2_id]
 # FUNCTION
-#   Returns link_id whose peers are node1 and node2. 
+#   Returns link_id whose peers are node1 and node2.
 #   The order of input nodes is irrelevant.
 # INPUTS
 #   * node1_id -- node id of the first node
 #   * node2_id -- node id of the second node
 # RESULT
-#   * link_id -- returns id of a link connecting endpoints 
-#     node1_id node2_id. 
+#   * link_id -- returns id of a link connecting endpoints
+#     node1_id node2_id.
 #****
 
 proc linkByPeers { node1 node2 } {
@@ -144,7 +144,7 @@ proc linkByPeersMirror { node1 node2 } {
 #   removeLink $link_id
 # FUNCTION
 #   Removes the link and related entries in peering node's configs.
-#   Updates the default route for peer nodes. 
+#   Updates the default route for peer nodes.
 # INPUTS
 #   * link_id -- link id
 #****
@@ -179,11 +179,13 @@ proc removeLink { link } {
 #   * bandwidth -- The value of link bandwidth in bits per second.
 #****
 
-proc getLinkBandwidth { link } {
+proc getLinkBandwidth { link {dir "down"} } {
     global $link
 
     set entry [lsearch -inline [set $link] "bandwidth *"]
-    return [lindex $entry 1]
+    set val [lindex $entry 1] ;# one or more values
+    if { $dir == "up" } { return [lindex $val 1] }
+    return [lindex $val 0]
 }
 
 #****f* linkcfg.tcl/getLinkBandwidthString
@@ -197,30 +199,44 @@ proc getLinkBandwidth { link } {
 # INPUTS
 #   * link_id -- link id
 # RESULT
-#   * bandwidth_str -- The value of link bandwidth formated in a sting 
+#   * bandwidth_str -- The value of link bandwidth formated in a sting
 #     containing a measure unit.
 #****
 
 proc getLinkBandwidthString { link } {
     global $link
     set bandstr ""
+    set sep ""
     set bandwidth [getLinkBandwidth $link]
-    if { $bandwidth > 0 } {
-	if { $bandwidth >= 660000000 } {
-	    set bandstr "[format %.2f [expr {$bandwidth / 1000000000.0}]] Gbps"
-	} elseif { $bandwidth >= 99000000 } {
-	    set bandstr "[format %d [expr {$bandwidth / 1000000}]] Mbps"
-	} elseif { $bandwidth >= 9900000 } {
-	    set bandstr "[format %.2f [expr {$bandwidth / 1000000.0}]] Mbps"
-	} elseif { $bandwidth >= 990000 } {
-	    set bandstr "[format %d [expr {$bandwidth / 1000}]] Kbps"
-	} elseif { $bandwidth >= 9900 } {
-	    set bandstr "[format %.2f [expr {$bandwidth / 1000.0}]] Kbps"
-	} else {
-	    set bandstr "$bandwidth bps"
-	}
+    set bandwidthup [getLinkBandwidth $link up]
+    if { $bandwidthup > 0 } {
+	set bandwidth [list $bandwidth $bandwidthup]
+	set sep " / "
+    }
+    foreach bw $bandwidth {
+	if { $bandstr != "" } { set bandstr "$bandstr$sep" }
+	set bandstr "$bandstr[getSIStringValue $bw "bps"]"
     }
     return $bandstr
+}
+
+proc getSIStringValue { val suffix } {
+    if { $val <= 0 } {
+	return ""
+    }
+    if { $val >= 660000000 } {
+	return "[format %.2f [expr {$val / 1000000000.0}]] G$suffix"
+    } elseif { $val >= 99000000 } {
+	return "[format %d [expr {$val / 1000000}]] M$suffix"
+    } elseif { $val >= 9900000 } {
+	return "[format %.2f [expr {$val / 1000000.0}]] M$suffix"
+    } elseif { $val >= 990000 } {
+	return "[format %d [expr {$val / 1000}]] K$suffix"
+    } elseif { $val >= 9900 } {
+	return "[format %.2f [expr {$val / 1000.0}]] K$suffix"
+    } else {
+	return "$val $suffix"
+    }
 }
 
 #****f* linkcfg.tcl/setLinkBandwidth
@@ -242,13 +258,11 @@ proc setLinkBandwidth { link value } {
     if { $value <= 0 } {
 	set $link [lreplace [set $link] $i $i]
     } else {
+	if { [llength $value] > 1 } { set value "{$value}" }
 	set $link [lreplace [set $link] $i $i "bandwidth $value"]
     }
 }
 
-#
-# Marko - XXX document!
-#
 proc getLinkColor { link } {
     global $link defLinkColor
 
@@ -298,11 +312,13 @@ proc setLinkWidth { link value } {
 #   * delay -- The value of link delay in microseconds.
 #****
 
-proc getLinkDelay { link } {
+proc getLinkDelay { link {dir "down"} } {
     global $link
 
     set entry [lsearch -inline [set $link] "delay *"]
-    return [lindex $entry 1]
+    set val [lindex $entry 1] ;# one or more values
+    if { $dir == "up" } { return [lindex $val 1] }
+    return [lindex $val 0]
 }
 
 #****f* linkcfg.tcl/getLinkDelayString
@@ -316,26 +332,55 @@ proc getLinkDelay { link } {
 # INPUTS
 #   * link_id -- link id
 # RESULT
-#   * delay -- The value of link delay formated in a string 
+#   * delay -- The value of link delay formated in a string
 #     containing a measure unit.
 #****
 
 proc getLinkDelayString { link } {
     global $link
-
+    set plusminus "\261"
+    set delaystr ""
+    set sep ""
     set delay [getLinkDelay $link]
-    if { "$delay" != "" } {
-	if { $delay >= 10000 } {
-	    set delstr "[expr {$delay / 1000}] ms"
-	} elseif { $delay >= 1000 } {
-	    set delstr "[expr {$delay * .001}] ms"
-	} else {
-	    set delstr "$delay us"
-	}
-    } else {
-	set delstr ""
+    set delayup [getLinkDelay $link up]
+    set jitter [getLinkJitter $link]
+    set jitterup [getLinkJitter $link up]
+    if { $jitter > 0 && $delay == "" } { set delay 0 }
+    if { $jitterup > 0 && $delayup == "" } { set delayup 0 }
+    if { $delayup > 0 || $jitterup > 0 } {
+	set delay [list $delay $delayup]
+	set jitter [list $jitter $jitterup]
+	set sep " / "
     }
-    return $delstr
+    set i 0
+    foreach d $delay {
+	if { $delaystr != "" } { set delaystr "$delaystr$sep" }
+	if { [lindex $jitter $i] != "" } {
+	    set jstr " ($plusminus"
+	    set jstr "$jstr[getSIMicrosecondValue [lindex $jitter $i]])"
+	} else {
+	    set jstr ""
+	}
+	#set dstr "[getSIMicrosecondValue $d]"
+	#if { $dstr == "" && $jstr != "" } { set dstr "0 us" }
+	#set delaystr "$delaystr$dstr$jstr"
+	set delaystr "$delaystr[getSIMicrosecondValue $d]$jstr"
+	incr i
+    }
+    return $delaystr
+}
+
+proc getSIMicrosecondValue { val } {
+    if { $val == "" } {
+	return ""
+    }
+    if { $val >= 10000 } {
+	return "[expr {$val / 1000}] ms"
+    } elseif { $val >= 1000 } {
+	return "[expr {$val * .001}] ms"
+    } else {
+	return "$val us"
+    }
 }
 
 #****f* linkcfg.tcl/setLinkDelay
@@ -354,9 +399,10 @@ proc setLinkDelay { link value } {
     global $link
 
     set i [lsearch [set $link] "delay *"]
-    if { $value <= 0 } {
+    if { [checkEmptyZeroValues $value] } {
 	set $link [lreplace [set $link] $i $i]
     } else {
+	if { [llength $value] > 1 } { set value "{$value}" }
 	set $link [lreplace [set $link] $i $i "delay $value"]
     }
 }
@@ -374,11 +420,27 @@ proc setLinkDelay { link value } {
 #   * BER -- The value of 1/BER of the link.
 #****
 
-proc getLinkBER { link } {
+proc getLinkBER { link {dir "down"} } {
     global $link
 
     set entry [lsearch -inline [set $link] "ber *"]
-    return [lindex $entry 1]
+    set val [lindex $entry 1] ;# one or more values
+    if { $dir == "up" } { return [lindex $val 1] }
+    return [lindex $val 0]
+}
+
+proc getLinkBERString { link } {
+    set ber [getLinkBER $link]
+    set berup [getLinkBER $link up]
+    if { $ber == "" && $berup == "" } { return "" }
+    set berstr "loss="
+    if { $ber != "" } {
+	set berstr "$berstr$ber%"
+    }
+    if { $berup != "" } {
+	set berstr "$berstr / $berup%"
+    }
+    return $berstr
 }
 
 #****f* linkcfg.tcl/setLinkBER
@@ -397,16 +459,20 @@ proc setLinkBER { link value } {
     global $link
 
     set i [lsearch [set $link] "ber *"]
-    if { $value <= 0 } {
+    if { [llength $value] > 1 && [lindex $value 0] <= 0 && \
+	 [lindex $value 1] <= 0 } {
+	set $link [lreplace [set $link] $i $i]
+    } elseif { $value <= 0 } {
 	set $link [lreplace [set $link] $i $i]
     } else {
+	if { [llength $value] > 1 } { set value "{$value}" }
 	set $link [lreplace [set $link] $i $i "ber $value"]
     }
 }
 
 #****f* linkcfg.tcl/getLinkDup
 # NAME
-#   getLinkDup -- get link packet duplicate value 
+#   getLinkDup -- get link packet duplicate value
 # SYNOPSIS
 #   set duplicate [getLinkDup $link_id]
 # FUNCTION
@@ -417,16 +483,32 @@ proc setLinkBER { link value } {
 #   * duplicate -- The percentage of the link packet duplicate value.
 #****
 
-proc getLinkDup { link } {
+proc getLinkDup { link {dir "down"} } {
     global $link
 
     set entry [lsearch -inline [set $link] "duplicate *"]
-    return [lindex $entry 1]
+    set val [lindex $entry 1] ;# one or more values
+    if { $dir == "up" } { return [lindex $val 1] }
+    return [lindex $val 0]
+}
+
+proc getLinkDupString { link } {
+    set dup [getLinkDup $link]
+    set dupup [getLinkDup $link up]
+    if { $dup == "" && $dupup == "" } { return "" }
+    set dupstr "dup="
+    if { $dup != "" } {
+	set dupstr "$dupstr$dup%"
+    }
+    if { $dupup != "" } {
+	set dupstr "$dupstr / $dupup%"
+    }
+    return $dupstr
 }
 
 #****f* linkcfg.tcl/setLinkDup
 # NAME
-#   setLinkDup -- set link packet duplicate value 
+#   setLinkDup -- set link packet duplicate value
 # SYNOPSIS
 #   setLinkDup $link_id $value
 # FUNCTION
@@ -440,16 +522,32 @@ proc setLinkDup { link value } {
     global $link
 
     set i [lsearch [set $link] "duplicate *"]
-    if { $value <= 0 || $value > 50 } {
+    if { [checkEmptyZeroValues $value] } {
 	set $link [lreplace [set $link] $i $i]
     } else {
+	if { [llength $value] > 1 } { set value "{$value}" }
 	set $link [lreplace [set $link] $i $i "duplicate $value"]
+    }
+}
+
+# Returns true if link has unidirectional link effects, where
+# upstream values may differ from downstream.
+proc isLinkUni { link } {
+    set bw [getLinkBandwidth $link up]
+    set dl [getLinkDelay $link up]
+    set jt [getLinkJitter $link up]
+    set ber [getLinkBER $link up]
+    set dup [getLinkDup $link up]
+    if { $bw > 0 || $dl > 0 || $jt > 0 || $ber > 0 || $dup > 0 } {
+	return true
+    } else {
+	return false
     }
 }
 
 #****f* linkcfg.tcl/getLinkMirror
 # NAME
-#   getLinkMirror -- get link's mirror link 
+#   getLinkMirror -- get link's mirror link
 # SYNOPSIS
 #   set mirror_link_id [getLinkMirror $link_id]
 # FUNCTION
@@ -471,7 +569,7 @@ proc getLinkMirror { link } {
 
 #****f* linkcfg.tcl/setLinkMirror
 # NAME
-#   setLinkMirror -- set link's mirror link 
+#   setLinkMirror -- set link's mirror link
 # SYNOPSIS
 #   setLinkMirror $link_id $mirror_link_id
 # FUNCTION
@@ -501,7 +599,7 @@ proc setLinkMirror { link value } {
 # SYNOPSIS
 #   set nodes [splitLink  $link_id $nodetype]
 # FUNCTION
-#   Splits the link in two parts. Each part of the split link is one 
+#   Splits the link in two parts. Each part of the split link is one
 #   pseudo link.
 # INPUTS
 #   * link_id -- link id
@@ -576,7 +674,7 @@ proc splitLink { link nodetype } {
 # SYNOPSIS
 #   set new_link_id [mergeLink  $link_id]
 # FUNCTION
-#   Rebuilts a link from two pseudo link. 
+#   Rebuilts a link from two pseudo link.
 # INPUTS
 #   * link_id -- pseudo link id
 # RESULT
@@ -588,7 +686,7 @@ proc mergeLink { link } {
 
     set mirror_link [getLinkMirror $link]
     if { $mirror_link == "" } {
-	puts "XXX mergeLink called for non-pseudo link!!!"
+	puts "error: mergeLink called for non-pseudo link"
 	return
     }
     set link1_peers [linkPeers $link]
@@ -793,14 +891,14 @@ proc newLink { lnode1 lnode2 } {
 	[[typemodel $lnode2].layer] == "NETWORK" } {
 	if { $ipv4_addr2 == "" && $do_auto_addressing } {
 	#puts "2 NETWORK!!!"
-	    autoIPv4addr $lnode2 $ifname2 
+	    autoIPv4addr $lnode2 $ifname2
 	}
 	if { $ipv6_addr2 == "" && $do_auto_addressing } {
 	    autoIPv6addr $lnode2 $ifname2
 	}
     }
 
-    # tunnel address based on its name 
+    # tunnel address based on its name
     if { [nodeType $lnode1] == "tunnel" } {
 	set ipaddr "[getNodeName $lnode1]/24"
 	setIfcIPv4addr $lnode1 e0 $ipaddr
@@ -821,7 +919,7 @@ proc newLink { lnode1 lnode2 } {
 # FUNCTION
 #   Returns the link id of the link connecting the node's interface
 # INPUTS
-#   * node_id -- node id 
+#   * node_id -- node id
 #   * ifc -- interface
 # RESULT
 #   * link_id -- link id.
@@ -850,23 +948,40 @@ proc linkByIfc { node ifc } {
     return [list $link $dir]
 }
 
-# Boeing: jitter
-proc getLinkJitter { link } {
+proc getLinkJitter { link {dir "down"} } {
     global $link
 
     set entry [lsearch -inline [set $link] "jitter *"]
-    return [lindex $entry 1]
+    set val [lindex $entry 1] ;# one or more values
+    if { $dir == "up" } { return [lindex $val 1] }
+    return [lindex $val 0]
 }
 
 proc setLinkJitter { link value } {
     global $link
 
     set i [lsearch [set $link] "jitter *"]
-    if { $value <= 0 } {
+    if { [llength $value] <= 1 && $value <= 0 } {
+	set $link [lreplace [set $link] $i $i]
+    } elseif { [llength $value] > 1 && [lindex $value 0] <= 0 && \
+	[lindex $value 1] <= 0 } {
 	set $link [lreplace [set $link] $i $i]
     } else {
+	if { [llength $value] > 1 } { set value "{$value}" }
 	set $link [lreplace [set $link] $i $i "jitter $value"]
     }
+}
+
+# Check for empty or zero values in value.
+# Value may be a single value or list where the first two values will be
+# inspected; returns true for empty or zero values, false otherwise.
+proc checkEmptyZeroValues { value } {
+    set isempty true
+    foreach v $value {
+	if { $v == "" } { continue } ;# this catches common case "{} {}"
+	if { $v > 0 } { set isempty false }
+    }
+    return $isempty
 }
 
 # get any type of link attribute
@@ -911,7 +1026,7 @@ proc updateLinkGuiAttr { link attr } {
 	    }
 	    color {
 		setLinkColor $link $value
-		.c itemconfigure "link && $link" -fill [getLinkColor $link] 
+		.c itemconfigure "link && $link" -fill [getLinkColor $link]
 	    }
 	    dash {
 		.c itemconfigure "link && $link" -dash $value

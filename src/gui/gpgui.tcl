@@ -40,28 +40,28 @@ array set node_weights {};
 
 #****f* gpgui.tcl/dialog
 # NAME
-#   dialog 
+#   dialog
 # SYNOPSIS
 #   dialog
 # FUNCTION
 #   Procedure opens a new dialog with a text field for entering the number of parts
 #   in which the graph is to be partition, and with the node and link weights, which can be
-#   changed.  
+#   changed.
 #****
 proc dialog { } {
 #    package require BWidget
     global partition_list
-    
+
     readNodeWeights;
-	    
+
     set wi .popup
     toplevel $wi
     wm transient $wi .
     wm resizable $wi 0 0
     wm title $wi "Graph partition settings"
-    
+
     #number of partitions parameter
-    labelframe $wi.pnum -pady 0 -padx 4 
+    labelframe $wi.pnum -pady 0 -padx 4
     frame $wi.pnum.l
     label $wi.pnum.l.p -text "Number of partitions:" -anchor w
     pack $wi.pnum.l.p -side top
@@ -69,26 +69,26 @@ proc dialog { } {
     entry $wi.pnum.e.p -bg white -width 10 -validate focus
     pack $wi.pnum.e.p -side top
     pack $wi.pnum.l $wi.pnum.e -side left
-    pack $wi.pnum -side top -anchor w -fill both     
-    
+    pack $wi.pnum -side top -anchor w -fill both
+
     #buttons for detail node and link weights
     labelframe $wi.weight -pady 4 -padx 4 -text "Weights"
     frame $wi.weight.wl
     label $wi.weight.l -text "Detailed:"
     button $wi.weight.wl.lns -text "Link weights" -command \
-    "displayAllLinkWeights $wi"  
+    "displayAllLinkWeights $wi"
 
     frame $wi.weight.wn
     button $wi.weight.wn.nds -text "Nodes weights" -command \
-    "displayAllNodeWeights $wi"    
-    
+    "displayAllNodeWeights $wi"
+
     pack $wi.weight.l $wi.weight.wn.nds $wi.weight.wl.lns -side left
     pack $wi.weight.wn $wi.weight.wl  -side left
-    
-    #pack $wi.custom -side top -anchor w -fill both   
+
+    #pack $wi.custom -side top -anchor w -fill both
     pack $wi.weight -side top -anchor w -fill x
-    
-    #buttons Ok & Cancel   
+
+    #buttons Ok & Cancel
     frame $wi.button -borderwidth 6
     button $wi.button.ok -text "OK" -command \
     "popupApply $wi"
@@ -97,8 +97,8 @@ proc dialog { } {
     "destroy $wi"
     pack $wi.button.cancel $wi.button.ok -side right
     pack $wi.button -side bottom
-    
-    return;   
+
+    return;
     #grab .popup
 }
 
@@ -126,25 +126,25 @@ proc displayAllNodeWeights {wi} {
     #weights settings
     labelframe $nw.more -pady 4 -padx 4 -text "Node Weights"
     frame $nw.more.weights
-    
+
     set i 1;
-    set j 1;  
+    set j 1;
     #weights from the file
     foreach node $node_list {
 	#read for each node its weight
 	set wgt [getNodeWeight $node];
-      
-	label $nw.more.weights.$node -text "$node" -anchor w    
+
+	label $nw.more.weights.$node -text "$node" -anchor w
 	spinbox $nw.more.weights.w$node -bg white -width 3 \
 	    -validate focus -invcmd "focusAndFlash %W"
 	$nw.more.weights.w$node insert 0 $wgt;
 	$nw.more.weights.w$node configure \
 	    -vcmd {checkIntRange %P 0 100} \
 	    -from 0 -to 100 -increment 1
-  
+
 	grid $nw.more.weights.$node -row $i -column $j
 	grid $nw.more.weights.w$node -row $i -column [expr {int($j+1)}];
-    
+
 	incr i;
 	if {[expr {$i % 10}] == 0} then {
 	    set j [expr {$j + 2}];
@@ -153,14 +153,14 @@ proc displayAllNodeWeights {wi} {
     }
     pack $nw.more.weights -side top -anchor w
     pack $nw.more -side top -anchor w -fill x
-  
-    #buttons Apply & Cancel   
+
+    #buttons Apply & Cancel
     frame $nw.button -borderwidth 6
     button $nw.button.apply -text "Apply" -command "applyNodeWeights $nw"
     focus $nw.button.apply
     button $nw.button.cancel -text "Cancel" -command "destroy $nw"
     pack $nw.button.cancel $nw.button.apply -side right
-    pack $nw.button -side bottom 
+    pack $nw.button -side bottom
 }
 
 
@@ -171,7 +171,7 @@ proc displayAllNodeWeights {wi} {
 #   displayAllLinkWeights wi
 # FUNCTION
 #   Procedure reads for each link its characteristics and writes them
-#   on the new window.   
+#   on the new window.
 # INPUTS
 #   *  wi -- parent window id
 #****
@@ -187,12 +187,12 @@ proc displayAllLinkWeights {wi} {
     #weights settings
     labelframe $lw.more -pady 4 -padx 4 -text "Link Weights"
     frame $lw.more.weights
-    
+
     set i 1;
-    set j 1;  
+    set j 1;
     foreach link $link_list {
 
-	label $lw.more.weights.$link -text "$link" -anchor w    
+	label $lw.more.weights.$link -text "$link" -anchor w
 	#bandwidth
 	label $lw.more.weights.bl$link -text "Bandwidth:" -anchor w
 	spinbox $lw.more.weights.b$link -bg white -width 9 \
@@ -217,7 +217,7 @@ proc displayAllLinkWeights {wi} {
 	$lw.more.weights.r$link configure \
 	    -vcmd {checkIntRange %P 0 10000000000000} \
 	    -from 0 -to 10000000000000 -increment 1000
-    
+
 	grid $lw.more.weights.$link -row $i -column 1;
 	grid $lw.more.weights.bl$link -row $i -column 2;
 	grid $lw.more.weights.b$link -row $i -column 3;
@@ -225,13 +225,13 @@ proc displayAllLinkWeights {wi} {
 	grid $lw.more.weights.d$link -row $i -column 5;
 	grid $lw.more.weights.rl$link -row $i -column 6;
 	grid $lw.more.weights.r$link -row $i -column 7;
-    
+
 	incr i;
     }
     pack $lw.more.weights -side top -anchor w
     pack $lw.more -side top -anchor w -fill x
-  
-    #buttons Apply & Cancel   
+
+    #buttons Apply & Cancel
     frame $lw.button -borderwidth 6
     button $lw.button.apply -text "Apply" -command \
 	"applyLinkWeights $lw"
@@ -239,7 +239,7 @@ proc displayAllLinkWeights {wi} {
     button $lw.button.cancel -text "Cancel" -command \
 	"destroy $lw"
     pack $lw.button.cancel $lw.button.apply -side right
-    pack $lw.button -side bottom 
+    pack $lw.button -side bottom
 }
 
 #****f* gpgui.tcl/readNodeWeights
@@ -253,7 +253,7 @@ proc displayAllLinkWeights {wi} {
 #****
 proc readNodeWeights {} {
     global node_weights;
-  
+
     #get the weight settings out of the file
     set file [openWeightFile "r"];
     # Boeing: attempt to recover with default weights
@@ -266,16 +266,16 @@ proc readNodeWeights {} {
 	return
     }
     # end Boeing
-    
+
     set n [gets $file line];
 
     set i 0;
     while {[gets $file line] >= 0} {
 	set node_weights($i) $line;
 	incr i;
-    }    
+    }
     close $file;
-  
+
     if {$i != 6} then {
 	puts stdout "Bad file $file.";
 	return;
@@ -300,7 +300,7 @@ proc openWeightFile { op } {
     if {[catch {open $WEIGHT_FILE $op} fileId]} then {
 	puts stdout "graph_partitioning: Cannot open $WEIGHT_FILE.";
 	return;
-    } 
+    }
     return $fileId;
 }
 
@@ -387,7 +387,7 @@ proc writeWeightToNode {node weight} {
 proc getNodeWeight {node} {
     global $node;
     global node_weights;
-  
+
     set wgt [lindex [lsearch -inline [set $node] "weight *"] 1];
 
     if {$wgt == ""} then {
@@ -409,11 +409,11 @@ proc getNodeWeight {node} {
 	    }
 	    rj45 {
 		set wgt $node_weights(5);
-	    }      
+	    }
 	    default {
 		set wgt 0;
 	    }
-	}	
+	}
     }
     return $wgt;
 }
@@ -425,25 +425,25 @@ proc getNodeWeight {node} {
 #   changeDefaultWeights wi
 # FUNCTION
 #   Procedure opens a file with node weights, and writes
-#   in it the weight for each group of nodes (pc,router,...).  
+#   in it the weight for each group of nodes (pc,router,...).
 # INPUTS
 #   *  wi -- window id, parent window
 #****
 #save node weights to the file
 proc changeDefaultWeights {wi} {
     global node_weights;
-    set file [openWeightFile "w"]; 
-    
+    set file [openWeightFile "w"];
+
     set node_weights(0) [$wi.weight.pcs get];
     set node_weights(1) [$wi.weight.hosts get];
     set node_weights(2) [$wi.weight.routers get];
     set node_weights(3) [$wi.weight.switchs get];
     set node_weights(4) [$wi.weight.hubs get];
     set node_weights(5) [$wi.weight.rj45s get];
-	
+
     debug $file [format "%d %d %d %d %d %d" $node_weights(0) $node_weights(1) $node_weights(2) $node_weights(3) $]node_weights(4) $node_weights(5);
-    close $file; 
-    destroy $wi; 
+    close $file;
+    destroy $wi;
 }
 
 
@@ -460,14 +460,14 @@ proc changeDefaultWeights {wi} {
 proc popupApply { wi } {
     global node_list;
     set partNum [$wi.pnum.e.p get]
-    
+
     foreach node $node_list {
 	#read for each node its weight
-	set wgt [getNodeWeight $node];  
+	set wgt [getNodeWeight $node];
 	#write it to the node_list
 	writeWeightToNode $node $wgt
     }
-    
+
     destroy $wi
     #graphPartition $partNum;
     test_partitioning $partNum;

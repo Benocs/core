@@ -8,7 +8,7 @@ proc doStuff3 {} {
   set kill_string exec
   lappend kill_string killall
   lappend kill_string java
-  lappend kill_string >@stdout 2>@stderr 
+  lappend kill_string >@stdout 2>@stderr
   {*}$kill_string
 
 

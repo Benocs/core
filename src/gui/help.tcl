@@ -95,7 +95,7 @@ proc popupAbout {} {
     set os_info [lindex [checkOS] 1]
     label .about.text3 -justify left -text "$os_info"
 
-    set txt4 "Portions of the GUI are derived from IMUNES having the following" 
+    set txt4 "Portions of the GUI are derived from IMUNES having the following"
     set txt4 "$txt4 license and copyright:"
     label .about.text4 -text $txt4
     pack .about.text2 .about.text3 .about.text4 -side top -anchor w \

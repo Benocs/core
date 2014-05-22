@@ -44,7 +44,7 @@ dist_bin_SCRIPTS = core-gui
 # Tcl/Tk scripts (/usr/local/lib/core)
 #
 coredir			= $(CORE_LIB_DIR)
-dist_core_DATA		= $(TCL_FILES) 
+dist_core_DATA		= $(TCL_FILES)
 dist_core_SCRIPTS	= $(OTHER_FILES)
 
 #
@@ -57,7 +57,7 @@ dist_coreaddons_DATA = $(ADDONS_FILES)
 # Sample configs (/usr/local/share/core/examples/configs)
 #
 coreconfigsdir		= $(datadir)/core/examples/configs
-dist_coreconfigs_DATA	= $(CONFIG_FILES) 
+dist_coreconfigs_DATA	= $(CONFIG_FILES)
 
 
 dist-hook:

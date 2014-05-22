@@ -111,7 +111,7 @@ proc floatingInfo { c node caption } {
 	return
     }
     # this controls the rectangle padding
-    set offset 5 
+    set offset 5
 
     set coords [getNodeCoords $node]
     set x [expr {15 + [lindex $coords 0] * $zoom}]
@@ -295,7 +295,7 @@ proc ::balloon::balloon {args} {
  };# balloon::autoclear
 
 # Boeing
-# this is a modified form of ::balloon::show but accepts 
+# this is a modified form of ::balloon::show but accepts
 # x,y coordinates and a caption for the tooltip
  proc ::balloon::show2 {w x y caption} {
     variable tips
@@ -316,10 +316,10 @@ proc ::balloon::balloon {args} {
  if {[catch { bind Balloon <Enter> {after [::balloon::delay] \
 					  [list ::balloon::show %W]}} err]} {
     # DISPLAY variable probably not set!
-    if { ![info exists tk_patchLevel] } { 
+    if { ![info exists tk_patchLevel] } {
 	puts ""
 	puts -nonewline " Error initializing Tcl/Tk. Make sure that you are "
-	puts "running CORE from X.org or" 
+	puts "running CORE from X.org or"
 	puts " that you have X11 forwarding turned on (via SSH). "
 	puts ""
     }
