@@ -25,3 +25,7 @@ config.*
 compile
 __pycache__
 *.swp
+contrib/BENOCS/ifindex/src/ifindex
+contrib/pmacct/pmacct-*/
+contrib/quagga/quagga-*/
+contrib/softflowd/
