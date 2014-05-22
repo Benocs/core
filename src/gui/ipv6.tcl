@@ -116,9 +116,7 @@ proc findFreeIPv6Net { quarknode mask } {
 
       return $ipnet
     }
-
   }
-
 }
 
 
@@ -204,14 +202,11 @@ proc buildInterfaceID { cur_node } {
     }
   }
 
-
   if { $lsb3 < 15 } {
     set ipv6_1_0 "0[format %x $lsb3]"
   } else {
     set ipv6_1_0 "[format %x $lsb3]"
   }
-
-
 
   if { $lsb4 < 15 } {
     set ipv6_1_1 "0[format %x $lsb4]"
@@ -286,7 +281,6 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
 
       # decimal j in hex -> treffer von ipnetsv63rds in ls_r speichern als HEX
       set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
-
       # noch nicht vorhanden -> == 0
       if { [llength $ls_r] == 0 } {
         
@@ -432,7 +426,7 @@ proc autoIPv6addr { node iface } {
 #   * node_id -- default gateway is provided for this node 
 #   * iface -- the interface on witch we search for a new default gateway
 #****
-# schauen ob das mit autoIPv6addr interferiert
+#TODO schauen ob das mit autoIPv6addr interferiert
 # -> fall tritt nur ein wenn Typ nicht NETWORK und nicht LINK
 proc autoIPv6defaultroute { node iface } {
     if { [[typemodel $node].layer] != "NETWORK" } {
