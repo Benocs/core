@@ -113,8 +113,24 @@ g++ -o ifindex ifindex.cpp
 su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
 )
 
-# TODO: softflowd
-# TODO: /opt/BENOCS/bin/ifindex
+
+echo "Installing BRITE dependencies.."
+su -c "apt-get install default-jre python-pydot" root
+
+britedir=/usr/lib/brite
+echo "Installing BRITE to ${britedir}.."
+su -c "cp -ax ../contrib/BRITE ${britedir}" root
+
+PYTHON=python3
+PYTHON_MINOR=$(python3 -V 2>&1 | awk '{print $2}' | cut -d"." -f2)
+DESTDIR="/usr"
+pythondir="/lib/${PYTHON}.${PYTHON_MINOR}/dist-packages"
+pyexecdir="/lib/${PYTHON}.${PYTHON_MINOR}/dist-packages"
+
+echo "Installing core-topogen.."
+su -c "(cd topogen && ${PYTHON} ./setup.py install --prefix=${DESTDIR} \
+    --install-purelib=${DESTDIR}/${pythondir} \
+    --install-platlib=${DESTDIR}/${pyexecdir})" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
