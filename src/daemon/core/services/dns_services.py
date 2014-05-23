@@ -834,9 +834,10 @@ class Bind9(DNSServices):
         if service_flags.DNSRootServer in currentnode.services:
             server_name = '%s' % (currentnode.name)
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                servers.append((server_name, server_addr))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    servers.append((server_name, server_addr))
 
         return servers
 
@@ -859,20 +860,22 @@ class Bind9(DNSServices):
             server_name = '%s' % (currentnode.name)
 
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                zone = "."
-                servers.append((server_name, server_addr, zone))
-                zone = "virtual."
-                servers.append((server_name, server_addr, zone))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    zone = "."
+                    servers.append((server_name, server_addr, zone))
+                    zone = "virtual."
+                    servers.append((server_name, server_addr, zone))
 
         if service_flags.DNSASRootServer in currentnode.services:
             server_name = currentnode.name
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -899,10 +902,11 @@ class Bind9(DNSServices):
 
             server_name = currentnode.name
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -923,10 +927,11 @@ class Bind9(DNSServices):
 
             server_name = currentnode.name
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                zone = "AS%s.virtual." % str(netid)
-                servers.append((server_name, server_addr, zone))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    zone = "AS%s.virtual." % str(netid)
+                    servers.append((server_name, server_addr, zone))
 
         return servers
 
@@ -1435,9 +1440,10 @@ class DNSResolvconf(DNSServices):
             #print(('[DNSResolvconf] startnode: %s, found potential resolver node: %s' %
             #        (startnode.name, currentnode.name)))
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                cfgitems.extend(['nameserver ', server_addr, '\n'])
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    cfgitems.extend(['nameserver ', server_addr, '\n'])
 
         return cfgitems
 
@@ -1449,9 +1455,11 @@ class DNSResolvconf(DNSServices):
                 not service_flags.DNSRootServer in currentnode.services and \
                 startnode.netid == currentnode.netid:
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                cfgitems.extend(['nameserver ', server_addr, '\n'])
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    cfgitems.extend(['nameserver ', server_addr, '\n'])
+
         return cfgitems
 
     @staticmethod
@@ -1461,9 +1469,11 @@ class DNSResolvconf(DNSServices):
         if service_flags.DNSResolver in currentnode.services and \
                 startnode.netid == currentnode.netid:
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                cfgitems.extend(['nameserver ', server_addr, '\n'])
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    cfgitems.extend(['nameserver ', server_addr, '\n'])
+
         return cfgitems
 
 addservice(DNSResolvconf)
