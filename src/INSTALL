@@ -7,8 +7,9 @@ CORECFG="/etc/core"
 PYTHON=python3
 
 export PYTHON
-su -c "apt-get update; apt-get purge quagga; apt-get install bash bridge-utils ebtables iproute libev-dev python \
-    tcl8.5 tk8.5 libtk-img gawk snmpd libsnmp-dev \
+su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
+    apt-get install bash bridge-utils ebtables iproute libev-dev python \
+    tcl8.5 tk8.5 libtk-img gawk \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
     imagemagick help2man unionfs-fuse libpcap-dev \
     python3 python3-dev bind9 lighttpd \
