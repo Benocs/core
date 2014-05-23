@@ -1,0 +1,792 @@
+
+#BRITE topology output to DML
+Net definitions go here.
+
+#NOTE:  Interfaces 0-5 are available for custom use.
+
+brite-out_networks.dml [ 
+
+	as0 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  10
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  11
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  12
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  13
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  14
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  15
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  16
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  17
+	   interface [idrange [from 6 to 14 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  18
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  19
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+
+
+	 #links: 
+
+	 link [attach 10(6)  attach 17(6)  delay 2.567067754167381 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 10(7)  attach 16(6)  delay 0.8389982466980022 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 11(6)  attach 17(7)  delay 1.5301687070244878 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 11(7)  attach 19(6)  delay 2.593378788535563 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 11(8)  attach 28(6)  delay 2.538126878929145 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 12(6)  attach 17(8)  delay 2.7789713041082225 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 12(7)  attach 10(8)  delay 1.6158589833392714 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 13(6)  attach 11(9)  delay 0.2369244506755372 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 13(7)  attach 12(8)  delay 1.5809002759213493 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 14(6)  attach 10(9)  delay 0.3725330072511264 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 14(7)  attach 19(7)  delay 0.9356220166823485 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 15(6)  attach 16(7)  delay 1.4479602044334485 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 15(7)  attach 19(8)  delay 0.7471388981455191 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 16(8)  attach 13(8)  delay 2.5027200918302954 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 16(9)  attach 12(9)  delay 1.1695596290532595 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 17(9)  attach 13(9)  delay 1.7411822113820306 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 17(10)  attach 15(8)  delay 2.371643062596767 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 18(6)  attach 19(9)  delay 1.0537352594167797 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 18(7)  attach 17(11)  delay 1.1938146660177533 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 19(10)  attach 17(12)  delay 1.8723615560606186 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 19(11)  attach 16(10)  delay 2.1170627536268416 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 19(12)  attach 80(6)  delay 1.2401094822537364 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(6)  attach 15(9)  delay 0.8995414127570747 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 48(6)  attach 17(13)  delay 3.4692975113640308 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 50(6)  attach 17(14)  delay 1.011760991820919 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 64(6)  attach 15(10)  delay 1.609826078978051 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as1 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  20
+	   interface [idrange [from 6 to 13 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  21
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  22
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  23
+	   interface [idrange [from 6 to 13 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  24
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  25
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  26
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  27
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  28
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  29
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+
+
+	 #links: 
+
+	 link [attach 11(10)  attach 28(7)  delay 2.538126878929145 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 20(6)  attach 26(6)  delay 0.57583056814009 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 20(7)  attach 27(6)  delay 1.8348966428975144 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 21(6)  attach 26(7)  delay 1.4365773388400682 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 21(7)  attach 25(6)  delay 2.362408685147645 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 22(6)  attach 20(8)  delay 1.6279602415341092 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 22(7)  attach 23(6)  delay 1.749825866408824 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 23(7)  attach 20(9)  delay 0.3718005419093705 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 23(8)  attach 21(8)  delay 1.67767818362029 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 23(9)  attach 82(6)  delay 1.7384706557080227 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 24(6)  attach 23(10)  delay 0.5898050864693893 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 24(7)  attach 20(10)  delay 0.2854848798201536 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 25(7)  attach 23(11)  delay 0.7911096826797153 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 25(8)  attach 20(11)  delay 0.8650378848338032 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 26(8)  attach 27(7)  delay 1.2695871888935533 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 26(9)  attach 23(12)  delay 0.24486876387307852 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 27(8)  attach 25(9)  delay 1.7973503199838574 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 27(9)  attach 23(13)  delay 1.4673218770830598 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 28(8)  attach 29(6)  delay 1.7394048289347595 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 28(9)  attach 26(10)  delay 1.4087703521095405 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 28(10)  attach 64(7)  delay 1.9900669861884674 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 29(7)  attach 21(9)  delay 0.8640919780991726 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 29(8)  attach 20(12)  delay 1.270638418409094 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(7)  attach 20(13)  delay 1.2539259548360941 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 42(6)  attach 24(8)  delay 0.3651879457465521 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as2 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  30
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  31
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  32
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  33
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  34
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  35
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  36
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  37
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  38
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  39
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+
+
+	 #links: 
+
+	 link [attach 30(6)  attach 36(6)  delay 0.8804638967920476 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 30(7)  attach 32(6)  delay 2.4831264935821404 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 31(6)  attach 39(8)  delay 0.24908104529560207 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 31(7)  attach 33(6)  delay 1.2732190014557119 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 32(7)  attach 34(6)  delay 0.5416181194149033 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 32(8)  attach 35(6)  delay 1.2152083802358689 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 33(7)  attach 32(9)  delay 0.24820844788944804 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 33(8)  attach 34(7)  delay 0.5632592981772505 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 34(8)  attach 31(8)  delay 1.1169666547632129 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 34(9)  attach 37(6)  delay 3.0101844881983593 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 35(7)  attach 33(9)  delay 1.0980745599661008 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 35(8)  attach 36(7)  delay 1.411665950710108 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 36(8)  attach 33(10)  delay 1.3624164033112083 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 36(9)  attach 32(10)  delay 1.6105378181443974 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 37(7)  attach 38(6)  delay 0.6933801909636362 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 37(8)  attach 39(9)  delay 2.134990013591234 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 38(7)  attach 32(11)  delay 3.690060247066546 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 38(8)  attach 35(9)  delay 3.1736866394504832 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(10)  attach 35(10)  delay 2.2142350461270968 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(11)  attach 34(10)  delay 1.3411184942467516 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(12)  attach 15(11)  delay 0.8995414127570747 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 39(13)  attach 20(14)  delay 1.2539259548360941 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 83(6)  attach 34(11)  delay 2.260070905487098 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 97(6)  attach 34(12)  delay 1.9006978561833368 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 106(6)  attach 37(9)  delay 2.715895987808858 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as3 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  40
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  41
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  42
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  43
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  44
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  45
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  46
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  47
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  48
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  49
+	   interface [idrange [from 6 to 13 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+
+
+	 #links: 
+
+	 link [attach 40(6)  attach 49(6)  delay 1.4737116917542927 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 40(7)  attach 48(7)  delay 2.8189718574043523 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 41(6)  attach 40(8)  delay 0.20761518049390604 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 41(7)  attach 42(7)  delay 2.5783986730959922 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 42(8)  attach 48(8)  delay 1.0637504909547775 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 42(9)  attach 49(7)  delay 1.4915388545312547 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 42(10)  attach 24(9)  delay 0.3651879457465521 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 43(6)  attach 42(11)  delay 1.0984848591538026 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 43(7)  attach 49(8)  delay 2.5045866162945716 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 44(6)  attach 46(6)  delay 0.4381894797609511 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 44(7)  attach 43(8)  delay 1.317557064211966 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 45(6)  attach 49(9)  delay 0.4738019367936122 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 45(7)  attach 48(9)  delay 1.5085249507859202 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 46(7)  attach 42(12)  delay 1.5887773757408687 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 46(8)  attach 40(9)  delay 2.8236826207413728 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 47(6)  attach 46(9)  delay 0.23191701901678524 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 47(7)  attach 43(9)  delay 0.9334134273690228 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 48(10)  attach 47(8)  delay 2.8253193916162243 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 48(11)  attach 43(10)  delay 2.0656480096957517 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 48(12)  attach 17(15)  delay 3.4692975113640308 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 49(10)  attach 41(8)  delay 1.6571120476118477 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 49(11)  attach 46(10)  delay 2.641060999181983 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 52(6)  attach 49(12)  delay 1.3332094126749536 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 77(6)  attach 47(9)  delay 1.643086758515356 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 88(6)  attach 49(13)  delay 2.104292471967304 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as4 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  50
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  51
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  52
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  53
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  54
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  55
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  56
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  57
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  58
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  59
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+
+
+	 #links: 
+
+	 link [attach 50(7)  attach 53(6)  delay 1.4182594606891548 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 50(8)  attach 56(6)  delay 1.4899826857526446 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 50(9)  attach 17(16)  delay 1.011760991820919 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 51(6)  attach 58(6)  delay 3.2116801060579543 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 51(7)  attach 57(6)  delay 1.1812220042364427 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 52(7)  attach 50(10)  delay 1.6757604155939134 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 52(8)  attach 53(7)  delay 0.5145651891054035 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 52(9)  attach 49(14)  delay 1.3332094126749536 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 53(8)  attach 55(6)  delay 1.5323812550401283 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 53(9)  attach 54(6)  delay 1.5903173299416307 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 54(7)  attach 51(8)  delay 1.0919372356356467 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 54(8)  attach 50(11)  delay 2.3906750699184323 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 55(7)  attach 50(12)  delay 0.446053901477734 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 55(8)  attach 51(9)  delay 2.6806788805304027 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 56(7)  attach 58(7)  delay 1.1314905156465502 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 56(8)  attach 59(6)  delay 0.9312414188537529 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 57(7)  attach 53(10)  delay 1.4640766144527053 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 57(8)  attach 59(7)  delay 0.45757894132943866 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 58(8)  attach 53(11)  delay 2.5355172091460085 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 58(9)  attach 50(13)  delay 1.76262350631607 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 59(8)  attach 52(10)  delay 1.3757446630279935 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 59(9)  attach 54(9)  delay 0.5204134415481707 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 69(6)  attach 51(10)  delay 3.094964350774594 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 70(6)  attach 59(10)  delay 2.8331081400756584 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as5 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  60
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  61
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  62
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  63
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  64
+	   interface [idrange [from 6 to 13 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  65
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  66
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  67
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  68
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  69
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+
+
+	 #links: 
+
+	 link [attach 28(11)  attach 64(8)  delay 1.9900669861884674 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 60(6)  attach 65(6)  delay 0.8850958430962331 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 60(7)  attach 66(6)  delay 0.475595027197657 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 61(6)  attach 66(7)  delay 0.9637289597133614 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 61(7)  attach 64(9)  delay 1.6398059773844895 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 62(6)  attach 67(6)  delay 0.5723711055813593 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 62(7)  attach 64(10)  delay 1.849428671458802 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 63(6)  attach 69(7)  delay 0.862771124922729 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 63(7)  attach 66(8)  delay 2.302046632667692 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 64(11)  attach 68(6)  delay 0.8640082766432589 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 64(12)  attach 69(8)  delay 2.8780319160475547 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 64(13)  attach 15(12)  delay 1.609826078978051 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 65(7)  attach 69(9)  delay 0.966668517681253 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 65(8)  attach 68(7)  delay 1.9540024120638528 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 66(9)  attach 64(14)  delay 0.9872708352342282 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 66(10)  attach 69(10)  delay 2.1809404173716653 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 67(7)  attach 64(15)  delay 2.2895354499510616 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 67(8)  attach 65(9)  delay 1.6209979556977316 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 68(8)  attach 63(8)  delay 3.355132526981048 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 68(9)  attach 66(11)  delay 1.5725875642035245 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 69(11)  attach 62(8)  delay 1.660238006089112 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 69(12)  attach 67(9)  delay 1.9720381527543038 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 69(13)  attach 51(11)  delay 3.094964350774594 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as6 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  70
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  71
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  72
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  73
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  74
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  75
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  76
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  77
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  78
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  79
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+
+
+	 #links: 
+
+	 link [attach 70(7)  attach 78(6)  delay 1.9725176757164684 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 70(8)  attach 73(6)  delay 1.3552106164817723 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 70(9)  attach 59(11)  delay 2.8331081400756584 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 71(6)  attach 74(6)  delay 0.5246296258942909 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 71(7)  attach 77(7)  delay 0.7053362457461366 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 72(6)  attach 79(6)  delay 0.9062697677165996 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 72(7)  attach 78(7)  delay 1.188317114931586 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 73(7)  attach 71(8)  delay 1.3256980310534268 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 73(8)  attach 76(6)  delay 1.8973581975633704 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 74(7)  attach 73(9)  delay 1.6489844873395976 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 74(8)  attach 70(10)  delay 2.619805693322836 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 75(6)  attach 71(9)  delay 0.587678974780486 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 75(7)  attach 74(9)  delay 0.14619852111697304 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 76(7)  attach 71(10)  delay 0.8210082401887587 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 76(8)  attach 70(11)  delay 2.205451536316714 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 77(8)  attach 70(12)  delay 1.6688475371664995 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 77(9)  attach 76(9)  delay 0.5661556571720594 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 77(10)  attach 47(10)  delay 1.643086758515356 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 78(8)  attach 77(11)  delay 0.8115553426479176 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 78(9)  attach 71(11)  delay 1.4196238656874427 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 79(7)  attach 71(12)  delay 1.8982376247533086 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 79(8)  attach 77(12)  delay 1.637096422333942 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as7 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  80
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  81
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  82
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  83
+	   interface [idrange [from 6 to 11 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  84
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  85
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  86
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  87
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  88
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  89
+	   interface [idrange [from 6 to 7 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+
+
+	 #links: 
+
+	 link [attach 19(13)  attach 80(7)  delay 1.2401094822537364 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 23(14)  attach 82(7)  delay 1.7384706557080227 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 80(8)  attach 84(6)  delay 2.8895142569512737 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 80(9)  attach 87(6)  delay 0.592440258745229 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 81(6)  attach 86(6)  delay 0.27687829250790735 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 81(7)  attach 85(6)  delay 1.344300549743682 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 82(8)  attach 83(7)  delay 0.32247212939845077 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 82(9)  attach 86(7)  delay 0.9697999617867403 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 83(8)  attach 80(10)  delay 0.8672730621856108 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 83(9)  attach 87(7)  delay 0.3388919278853577 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 83(10)  attach 34(13)  delay 2.260070905487098 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 84(7)  attach 81(8)  delay 0.9558866839389447 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 84(8)  attach 88(7)  delay 0.837783927012057 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 85(7)  attach 82(10)  delay 2.1572933896336752 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 85(8)  attach 83(11)  delay 2.285108825759166 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 86(8)  attach 84(9)  delay 1.2327122782929147 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 86(9)  attach 87(8)  delay 1.2515411976481647 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 87(9)  attach 85(9)  delay 2.5625908290886037 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 87(10)  attach 84(10)  delay 2.4840516153777954 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 88(8)  attach 82(11)  delay 1.9589614706085798 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 88(9)  attach 85(10)  delay 1.8303795937680494 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 88(10)  attach 49(15)  delay 2.104292471967304 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 89(6)  attach 83(12)  delay 1.3263021848808247 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 89(7)  attach 81(9)  delay 1.3798631846751164 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 92(6)  attach 88(11)  delay 1.5705485610972703 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as8 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  90
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  91
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  92
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  93
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  94
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  95
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  96
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  97
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  98
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  99
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+
+
+	 #links: 
+
+	 link [attach 90(6)  attach 92(7)  delay 1.3997972643255252 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 90(7)  attach 94(6)  delay 0.781209674636336 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 91(6)  attach 96(6)  delay 0.6570789357079149 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 91(7)  attach 97(7)  delay 1.383748344700969 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 92(8)  attach 96(7)  delay 1.2261963139101895 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 92(9)  attach 97(8)  delay 1.0604872923129802 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 92(10)  attach 88(12)  delay 1.5705485610972703 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 93(6)  attach 97(9)  delay 0.28045183626146986 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 93(7)  attach 98(6)  delay 1.5504452412464758 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 94(7)  attach 97(10)  delay 0.898730872782038 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 94(8)  attach 95(6)  delay 2.468383319695678 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 95(7)  attach 93(8)  delay 2.331250323816243 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 95(8)  attach 98(7)  delay 0.953835847687894 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 96(8)  attach 98(8)  delay 0.5761782686154678 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 96(9)  attach 99(6)  delay 1.2345026455122083 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 97(11)  attach 96(10)  delay 1.233745326103597 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 97(12)  attach 99(7)  delay 2.2804174687945626 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 97(13)  attach 34(14)  delay 1.9006978561833368 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 98(9)  attach 91(8)  delay 1.1745861781941782 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 98(10)  attach 90(8)  delay 2.2121738424088258 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 99(8)  attach 92(11)  delay 2.4572356282386942 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 99(9)  attach 95(9)  delay 0.5226854644653949 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 107(6)  attach 91(9)  delay 1.3218316417090488 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+	as9 [ 
+	  Net [  
+	   AS_status boundary
+	   ospf_area 0
+	  router [ id  100
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  101
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  102
+	   interface [idrange [from 6 to 12 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  103
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  104
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  105
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  106
+	   interface [idrange [from 6 to 10 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  107
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.BorderRouter ]
+
+
+	  router [ id  108
+	   interface [idrange [from 6 to 8 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+	  router [ id  109
+	   interface [idrange [from 6 to 9 ] ]
+	   _extends .dictionary.Routers.SimpleRouter ]
+
+
+
+	 #links: 
+
+	 link [attach 100(6)  attach 103(6)  delay 2.273294983685452 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 100(7)  attach 102(6)  delay 2.3722505306161388 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 101(6)  attach 102(7)  delay 1.2216144595091838 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 101(7)  attach 103(7)  delay 1.7138216781424203 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 102(8)  attach 104(6)  delay 0.3965346213403029 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 102(9)  attach 106(7)  delay 1.6973300084653047 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 103(8)  attach 105(6)  delay 0.39531215560962796 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 103(9)  attach 109(6)  delay 2.0658203687629513 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 104(7)  attach 101(8)  delay 1.614991138024283 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 104(8)  attach 106(8)  delay 1.6195730531975403 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 105(7)  attach 102(10)  delay 0.5540076876383492 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 105(8)  attach 104(9)  delay 0.16880452581472205 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 106(9)  attach 100(8)  delay 1.3507657339150136 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 106(10)  attach 101(9)  delay 2.2511252031586793 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 106(11)  attach 37(10)  delay 2.715895987808858 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 107(7)  attach 109(7)  delay 1.921343665895109 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 107(8)  attach 108(6)  delay 2.630230622402534 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 107(9)  attach 91(10)  delay 1.3218316417090488 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 108(7)  attach 101(10)  delay 0.797804151759987 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 108(8)  attach 102(11)  delay 0.9917573541705647 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 109(8)  attach 102(12)  delay 2.1269256211496446 _extends .dictionary.Links.IntraASLink ]
+	 link [attach 109(9)  attach 100(9)  delay 0.26903138505811525 _extends .dictionary.Links.IntraASLink ]
+	 ] #end of router-net
+	]  #end of as def
+
+
+] #end of net definitions

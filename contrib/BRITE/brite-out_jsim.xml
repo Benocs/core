@@ -1,0 +1,5506 @@
+<?xml version="1.0"?>
+
+<node name="brite-out_jsim.xml" class="drcl.comp.Component">
+
+	<node name="network0" class="drcl.inet.Network" posX="1850" posY="5110">
+
+		<node name="node10" class="drcl.inet.Node" posX="1850" posY="5110">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node11" class="drcl.inet.Node" posX="8830" posY="7860">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node12" class="drcl.inet.Node" posX="3810" posY="9540">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node13" class="drcl.inet.Node" posX="8420" posY="8440">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node14" class="drcl.inet.Node" posX="2170" posY="4040">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node15" class="drcl.inet.Node" posX="2220" posY="3310">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node16" class="drcl.inet.Node" posX="980" posY="7470">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node17" class="drcl.inet.Node" posX="9330" posY="3300">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+			<port name="7" group=""></port>
+			<port name="8" group=""></port>
+		</node>
+
+		<node name="node18" class="drcl.inet.Node" posX="6860" posY="710">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node19" class="drcl.inet.Node" posX="3910" posY="1840">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link0" class="drcl.inet.Link" posX="5590" posY="4205">
+			<property name="propDelay" value="769"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node0" port1="3@" node2="link0" port2="0@">
+		</connection>
+
+		<connection node2="node0" port2="3@" node1="link0" port1="0@">
+		</connection>
+
+		<connection node1="node7" port1="8@" node2="link0" port2="1@">
+		</connection>
+
+		<connection node2="node7" port2="8@" node1="link0" port1="1@">
+		</connection>
+
+		<node name="link1" class="drcl.inet.Link" posX="1415" posY="6290">
+			<property name="propDelay" value="251"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node0" port1="2@" node2="link1" port2="0@">
+		</connection>
+
+		<connection node2="node0" port2="2@" node1="link1" port1="0@">
+		</connection>
+
+		<connection node1="node6" port1="4@" node2="link1" port2="1@">
+		</connection>
+
+		<connection node2="node6" port2="4@" node1="link1" port1="1@">
+		</connection>
+
+		<node name="link2" class="drcl.inet.Link" posX="9080" posY="5580">
+			<property name="propDelay" value="458"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node1" port1="3@" node2="link2" port2="0@">
+		</connection>
+
+		<connection node2="node1" port2="3@" node1="link2" port1="0@">
+		</connection>
+
+		<connection node1="node7" port1="7@" node2="link2" port2="1@">
+		</connection>
+
+		<connection node2="node7" port2="7@" node1="link2" port1="1@">
+		</connection>
+
+		<node name="link3" class="drcl.inet.Link" posX="6370" posY="4850">
+			<property name="propDelay" value="777"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node1" port1="2@" node2="link3" port2="0@">
+		</connection>
+
+		<connection node2="node1" port2="2@" node1="link3" port1="0@">
+		</connection>
+
+		<connection node1="node9" port1="6@" node2="link3" port2="1@">
+		</connection>
+
+		<connection node2="node9" port2="6@" node1="link3" port1="1@">
+		</connection>
+
+		<node name="link4" class="drcl.inet.Link" posX="6105" posY="5205">
+			<property name="propDelay" value="253.33333333333334"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node1" port1="1@" node2="link4" port2="0@">
+		</connection>
+
+		<connection node2="node1" port2="1@" node1="link4" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link4" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link4" port1="1@">
+		</connection>
+
+		<node name="link5" class="drcl.inet.Link" posX="6570" posY="6420">
+			<property name="propDelay" value="833"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node2" port1="3@" node2="link5" port2="0@">
+		</connection>
+
+		<connection node2="node2" port2="3@" node1="link5" port1="0@">
+		</connection>
+
+		<connection node1="node7" port1="6@" node2="link5" port2="1@">
+		</connection>
+
+		<connection node2="node7" port2="6@" node1="link5" port1="1@">
+		</connection>
+
+		<node name="link6" class="drcl.inet.Link" posX="2830" posY="7325">
+			<property name="propDelay" value="484"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node2" port1="2@" node2="link6" port2="0@">
+		</connection>
+
+		<connection node2="node2" port2="2@" node1="link6" port1="0@">
+		</connection>
+
+		<connection node1="node0" port1="1@" node2="link6" port2="1@">
+		</connection>
+
+		<connection node2="node0" port2="1@" node1="link6" port1="1@">
+		</connection>
+
+		<node name="link7" class="drcl.inet.Link" posX="8625" posY="8150">
+			<property name="propDelay" value="71"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node3" port1="3@" node2="link7" port2="0@">
+		</connection>
+
+		<connection node2="node3" port2="3@" node1="link7" port1="0@">
+		</connection>
+
+		<connection node1="node1" port1="0@" node2="link7" port2="1@">
+		</connection>
+
+		<connection node2="node1" port2="0@" node1="link7" port1="1@">
+		</connection>
+
+		<node name="link8" class="drcl.inet.Link" posX="6115" posY="8990">
+			<property name="propDelay" value="473"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node3" port1="2@" node2="link8" port2="0@">
+		</connection>
+
+		<connection node2="node3" port2="2@" node1="link8" port1="0@">
+		</connection>
+
+		<connection node1="node2" port1="1@" node2="link8" port2="1@">
+		</connection>
+
+		<connection node2="node2" port2="1@" node1="link8" port1="1@">
+		</connection>
+
+		<node name="link9" class="drcl.inet.Link" posX="2010" posY="4575">
+			<property name="propDelay" value="111"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node4" port1="1@" node2="link9" port2="0@">
+		</connection>
+
+		<connection node2="node4" port2="1@" node1="link9" port1="0@">
+		</connection>
+
+		<connection node1="node0" port1="0@" node2="link9" port2="1@">
+		</connection>
+
+		<connection node2="node0" port2="0@" node1="link9" port1="1@">
+		</connection>
+
+		<node name="link10" class="drcl.inet.Link" posX="3040" posY="2940">
+			<property name="propDelay" value="280"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node4" port1="0@" node2="link10" port2="0@">
+		</connection>
+
+		<connection node2="node4" port2="0@" node1="link10" port1="0@">
+		</connection>
+
+		<connection node1="node9" port1="5@" node2="link10" port2="1@">
+		</connection>
+
+		<connection node2="node9" port2="5@" node1="link10" port1="1@">
+		</connection>
+
+		<node name="link11" class="drcl.inet.Link" posX="1600" posY="5390">
+			<property name="propDelay" value="434"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node5" port1="4@" node2="link11" port2="0@">
+		</connection>
+
+		<connection node2="node5" port2="4@" node1="link11" port1="0@">
+		</connection>
+
+		<connection node1="node6" port1="3@" node2="link11" port2="1@">
+		</connection>
+
+		<connection node2="node6" port2="3@" node1="link11" port1="1@">
+		</connection>
+
+		<node name="link12" class="drcl.inet.Link" posX="3065" posY="2575">
+			<property name="propDelay" value="223"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node5" port1="3@" node2="link12" port2="0@">
+		</connection>
+
+		<connection node2="node5" port2="3@" node1="link12" port1="0@">
+		</connection>
+
+		<connection node1="node9" port1="4@" node2="link12" port2="1@">
+		</connection>
+
+		<connection node2="node9" port2="4@" node1="link12" port1="1@">
+		</connection>
+
+		<node name="link13" class="drcl.inet.Link" posX="4700" posY="7955">
+			<property name="propDelay" value="750"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node6" port1="2@" node2="link13" port2="0@">
+		</connection>
+
+		<connection node2="node6" port2="2@" node1="link13" port1="0@">
+		</connection>
+
+		<connection node1="node3" port1="1@" node2="link13" port2="1@">
+		</connection>
+
+		<connection node2="node3" port2="1@" node1="link13" port1="1@">
+		</connection>
+
+		<node name="link14" class="drcl.inet.Link" posX="2395" posY="8505">
+			<property name="propDelay" value="350"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node6" port1="1@" node2="link14" port2="0@">
+		</connection>
+
+		<connection node2="node6" port2="1@" node1="link14" port1="0@">
+		</connection>
+
+		<connection node1="node2" port1="0@" node2="link14" port2="1@">
+		</connection>
+
+		<connection node2="node2" port2="0@" node1="link14" port1="1@">
+		</connection>
+
+		<node name="link15" class="drcl.inet.Link" posX="8875" posY="5870">
+			<property name="propDelay" value="521"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node7" port1="5@" node2="link15" port2="0@">
+		</connection>
+
+		<connection node2="node7" port2="5@" node1="link15" port1="0@">
+		</connection>
+
+		<connection node1="node3" port1="0@" node2="link15" port2="1@">
+		</connection>
+
+		<connection node2="node3" port2="0@" node1="link15" port1="1@">
+		</connection>
+
+		<node name="link16" class="drcl.inet.Link" posX="5775" posY="3305">
+			<property name="propDelay" value="711"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node7" port1="4@" node2="link16" port2="0@">
+		</connection>
+
+		<connection node2="node7" port2="4@" node1="link16" port1="0@">
+		</connection>
+
+		<connection node1="node5" port1="2@" node2="link16" port2="1@">
+		</connection>
+
+		<connection node2="node5" port2="2@" node1="link16" port1="1@">
+		</connection>
+
+		<node name="link17" class="drcl.inet.Link" posX="5385" posY="1275">
+			<property name="propDelay" value="315"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node8" port1="1@" node2="link17" port2="0@">
+		</connection>
+
+		<connection node2="node8" port2="1@" node1="link17" port1="0@">
+		</connection>
+
+		<connection node1="node9" port1="3@" node2="link17" port2="1@">
+		</connection>
+
+		<connection node2="node9" port2="3@" node1="link17" port1="1@">
+		</connection>
+
+		<node name="link18" class="drcl.inet.Link" posX="8095" posY="2005">
+			<property name="propDelay" value="357"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node8" port1="0@" node2="link18" port2="0@">
+		</connection>
+
+		<connection node2="node8" port2="0@" node1="link18" port1="0@">
+		</connection>
+
+		<connection node1="node7" port1="3@" node2="link18" port2="1@">
+		</connection>
+
+		<connection node2="node7" port2="3@" node1="link18" port1="1@">
+		</connection>
+
+		<node name="link19" class="drcl.inet.Link" posX="6620" posY="2570">
+			<property name="propDelay" value="561"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node9" port1="2@" node2="link19" port2="0@">
+		</connection>
+
+		<connection node2="node9" port2="2@" node1="link19" port1="0@">
+		</connection>
+
+		<connection node1="node7" port1="2@" node2="link19" port2="1@">
+		</connection>
+
+		<connection node2="node7" port2="2@" node1="link19" port1="1@">
+		</connection>
+
+		<node name="link20" class="drcl.inet.Link" posX="2445" posY="4655">
+			<property name="propDelay" value="634"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node9" port1="1@" node2="link20" port2="0@">
+		</connection>
+
+		<connection node2="node9" port2="1@" node1="link20" port1="0@">
+		</connection>
+
+		<connection node1="node6" port1="0@" node2="link20" port2="1@">
+		</connection>
+
+		<connection node2="node6" port2="0@" node1="link20" port1="1@">
+		</connection>
+
+		<node name="link21" class="drcl.inet.Link" posX="5630" posY="1135">
+			<property name="propDelay" value="123.66666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node9" port1="0@" node2="link21" port2="0@">
+		</connection>
+
+		<connection node2="node9" port2="0@" node1="link21" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link21" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link21" port1="1@">
+		</connection>
+
+		<node name="link64" class="drcl.inet.Link" posX="1970" posY="4635">
+			<property name="propDelay" value="89.66666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node5" port1="1@" node2="link64" port2="0@">
+		</connection>
+
+		<connection node2="node5" port2="1@" node1="link64" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link64" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link64" port1="1@">
+		</connection>
+
+		<node name="link85" class="drcl.inet.Link" posX="4770" posY="5800">
+			<property name="propDelay" value="346.6666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node7" port1="1@" node2="link85" port2="0@">
+		</connection>
+
+		<connection node2="node7" port2="1@" node1="link85" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link85" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link85" port1="1@">
+		</connection>
+
+		<node name="link90" class="drcl.inet.Link" posX="8735" posY="4695">
+			<property name="propDelay" value="101.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node7" port1="0@" node2="link90" port2="0@">
+		</connection>
+
+		<connection node2="node7" port2="0@" node1="link90" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-3@" node2="link90" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-3@" node1="link90" port1="1@">
+		</connection>
+
+		<node name="link120" class="drcl.inet.Link" posX="1490" posY="5610">
+			<property name="propDelay" value="160.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node5" port1="0@" node2="link120" port2="0@">
+		</connection>
+
+		<connection node2="node5" port2="0@" node1="link120" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-4@" node2="link120" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-4@" node1="link120" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network1" class="drcl.inet.Network" posX="4670" posY="8290">
+
+		<node name="node20" class="drcl.inet.Node" posX="4670" posY="8290">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+			<port name="7" group=""></port>
+		</node>
+
+		<node name="node21" class="drcl.inet.Node" posX="70" posY="4790">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node22" class="drcl.inet.Node" posX="9540" posY="8610">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node23" class="drcl.inet.Node" posX="4490" posY="7190">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+			<port name="7" group=""></port>
+		</node>
+
+		<node name="node24" class="drcl.inet.Node" posX="4080" posY="8910">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node25" class="drcl.inet.Node" posX="6840" posY="6870">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node26" class="drcl.inet.Node" posX="3910" posY="6740">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node27" class="drcl.inet.Node" posX="3060" posY="3030">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node28" class="drcl.inet.Node" posX="3380" posY="2550">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node29" class="drcl.inet.Node" posX="1020" posY="7200">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link4" class="drcl.inet.Link" posX="6105" posY="5205">
+			<property name="propDelay" value="253.33333333333334"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node18" port1="3@" node2="link4" port2="0@">
+		</connection>
+
+		<connection node2="node18" port2="3@" node1="link4" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link4" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link4" port1="1@">
+		</connection>
+
+		<node name="link22" class="drcl.inet.Link" posX="4290" posY="7515">
+			<property name="propDelay" value="172"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node10" port1="7@" node2="link22" port2="0@">
+		</connection>
+
+		<connection node2="node10" port2="7@" node1="link22" port1="0@">
+		</connection>
+
+		<connection node1="node16" port1="4@" node2="link22" port2="1@">
+		</connection>
+
+		<connection node2="node16" port2="4@" node1="link22" port1="1@">
+		</connection>
+
+		<node name="link23" class="drcl.inet.Link" posX="3865" posY="5660">
+			<property name="propDelay" value="550"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node10" port1="6@" node2="link23" port2="0@">
+		</connection>
+
+		<connection node2="node10" port2="6@" node1="link23" port1="0@">
+		</connection>
+
+		<connection node1="node17" port1="3@" node2="link23" port2="1@">
+		</connection>
+
+		<connection node2="node17" port2="3@" node1="link23" port1="1@">
+		</connection>
+
+		<node name="link24" class="drcl.inet.Link" posX="1990" posY="5765">
+			<property name="propDelay" value="430"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node11" port1="3@" node2="link24" port2="0@">
+		</connection>
+
+		<connection node2="node11" port2="3@" node1="link24" port1="0@">
+		</connection>
+
+		<connection node1="node16" port1="3@" node2="link24" port2="1@">
+		</connection>
+
+		<connection node2="node16" port2="3@" node1="link24" port1="1@">
+		</connection>
+
+		<node name="link25" class="drcl.inet.Link" posX="3455" posY="5830">
+			<property name="propDelay" value="708"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node11" port1="2@" node2="link25" port2="0@">
+		</connection>
+
+		<connection node2="node11" port2="2@" node1="link25" port1="0@">
+		</connection>
+
+		<connection node1="node15" port1="3@" node2="link25" port2="1@">
+		</connection>
+
+		<connection node2="node15" port2="3@" node1="link25" port1="1@">
+		</connection>
+
+		<node name="link26" class="drcl.inet.Link" posX="7105" posY="8450">
+			<property name="propDelay" value="488"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node12" port1="1@" node2="link26" port2="0@">
+		</connection>
+
+		<connection node2="node12" port2="1@" node1="link26" port1="0@">
+		</connection>
+
+		<connection node1="node10" port1="5@" node2="link26" port2="1@">
+		</connection>
+
+		<connection node2="node10" port2="5@" node1="link26" port1="1@">
+		</connection>
+
+		<node name="link27" class="drcl.inet.Link" posX="7015" posY="7900">
+			<property name="propDelay" value="524"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node12" port1="0@" node2="link27" port2="0@">
+		</connection>
+
+		<connection node2="node12" port2="0@" node1="link27" port1="0@">
+		</connection>
+
+		<connection node1="node13" port1="7@" node2="link27" port2="1@">
+		</connection>
+
+		<connection node2="node13" port2="7@" node1="link27" port1="1@">
+		</connection>
+
+		<node name="link28" class="drcl.inet.Link" posX="4580" posY="7740">
+			<property name="propDelay" value="111"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node13" port1="6@" node2="link28" port2="0@">
+		</connection>
+
+		<connection node2="node13" port2="6@" node1="link28" port1="0@">
+		</connection>
+
+		<connection node1="node10" port1="4@" node2="link28" port2="1@">
+		</connection>
+
+		<connection node2="node10" port2="4@" node1="link28" port1="1@">
+		</connection>
+
+		<node name="link29" class="drcl.inet.Link" posX="2280" posY="5990">
+			<property name="propDelay" value="502"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node13" port1="5@" node2="link29" port2="0@">
+		</connection>
+
+		<connection node2="node13" port2="5@" node1="link29" port1="0@">
+		</connection>
+
+		<connection node1="node11" port1="1@" node2="link29" port2="1@">
+		</connection>
+
+		<connection node2="node11" port2="1@" node1="link29" port1="1@">
+		</connection>
+
+		<node name="link30" class="drcl.inet.Link" posX="5540" posY="4805">
+			<property name="propDelay" value="173.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node13" port1="4@" node2="link30" port2="0@">
+		</connection>
+
+		<connection node2="node13" port2="4@" node1="link30" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link30" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link30" port1="1@">
+		</connection>
+
+		<node name="link31" class="drcl.inet.Link" posX="4285" posY="8050">
+			<property name="propDelay" value="176"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node14" port1="2@" node2="link31" port2="0@">
+		</connection>
+
+		<connection node2="node14" port2="2@" node1="link31" port1="0@">
+		</connection>
+
+		<connection node1="node13" port1="3@" node2="link31" port2="1@">
+		</connection>
+
+		<connection node2="node13" port2="3@" node1="link31" port1="1@">
+		</connection>
+
+		<node name="link32" class="drcl.inet.Link" posX="4375" posY="8600">
+			<property name="propDelay" value="85"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node14" port1="1@" node2="link32" port2="0@">
+		</connection>
+
+		<connection node2="node14" port2="1@" node1="link32" port1="0@">
+		</connection>
+
+		<connection node1="node10" port1="3@" node2="link32" port2="1@">
+		</connection>
+
+		<connection node2="node10" port2="3@" node1="link32" port1="1@">
+		</connection>
+
+		<node name="link33" class="drcl.inet.Link" posX="5665" posY="7030">
+			<property name="propDelay" value="237"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node15" port1="2@" node2="link33" port2="0@">
+		</connection>
+
+		<connection node2="node15" port2="2@" node1="link33" port1="0@">
+		</connection>
+
+		<connection node1="node13" port1="2@" node2="link33" port2="1@">
+		</connection>
+
+		<connection node2="node13" port2="2@" node1="link33" port1="1@">
+		</connection>
+
+		<node name="link34" class="drcl.inet.Link" posX="5755" posY="7580">
+			<property name="propDelay" value="259"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node15" port1="1@" node2="link34" port2="0@">
+		</connection>
+
+		<connection node2="node15" port2="1@" node1="link34" port1="0@">
+		</connection>
+
+		<connection node1="node10" port1="2@" node2="link34" port2="1@">
+		</connection>
+
+		<connection node2="node10" port2="2@" node1="link34" port1="1@">
+		</connection>
+
+		<node name="link35" class="drcl.inet.Link" posX="3485" posY="4885">
+			<property name="propDelay" value="380"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node16" port1="2@" node2="link35" port2="0@">
+		</connection>
+
+		<connection node2="node16" port2="2@" node1="link35" port1="0@">
+		</connection>
+
+		<connection node1="node17" port1="2@" node2="link35" port2="1@">
+		</connection>
+
+		<connection node2="node17" port2="2@" node1="link35" port1="1@">
+		</connection>
+
+		<node name="link36" class="drcl.inet.Link" posX="4200" posY="6965">
+			<property name="propDelay" value="73"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node16" port1="1@" node2="link36" port2="0@">
+		</connection>
+
+		<connection node2="node16" port2="1@" node1="link36" port1="0@">
+		</connection>
+
+		<connection node1="node13" port1="1@" node2="link36" port2="1@">
+		</connection>
+
+		<connection node2="node13" port2="1@" node1="link36" port1="1@">
+		</connection>
+
+		<node name="link37" class="drcl.inet.Link" posX="4950" posY="4950">
+			<property name="propDelay" value="538"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node17" port1="1@" node2="link37" port2="0@">
+		</connection>
+
+		<connection node2="node17" port2="1@" node1="link37" port1="0@">
+		</connection>
+
+		<connection node1="node15" port1="0@" node2="link37" port2="1@">
+		</connection>
+
+		<connection node2="node15" port2="0@" node1="link37" port1="1@">
+		</connection>
+
+		<node name="link38" class="drcl.inet.Link" posX="3775" posY="5110">
+			<property name="propDelay" value="439"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node17" port1="0@" node2="link38" port2="0@">
+		</connection>
+
+		<connection node2="node17" port2="0@" node1="link38" port1="0@">
+		</connection>
+
+		<connection node1="node13" port1="0@" node2="link38" port2="1@">
+		</connection>
+
+		<connection node2="node13" port2="0@" node1="link38" port1="1@">
+		</connection>
+
+		<node name="link39" class="drcl.inet.Link" posX="2200" posY="4875">
+			<property name="propDelay" value="521"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node18" port1="2@" node2="link39" port2="0@">
+		</connection>
+
+		<connection node2="node18" port2="2@" node1="link39" port1="0@">
+		</connection>
+
+		<connection node1="node19" port1="2@" node2="link39" port2="1@">
+		</connection>
+
+		<connection node2="node19" port2="2@" node1="link39" port1="1@">
+		</connection>
+
+		<node name="link40" class="drcl.inet.Link" posX="3645" posY="4645">
+			<property name="propDelay" value="422"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node18" port1="1@" node2="link40" port2="0@">
+		</connection>
+
+		<connection node2="node18" port2="1@" node1="link40" port1="0@">
+		</connection>
+
+		<connection node1="node16" port1="0@" node2="link40" port2="1@">
+		</connection>
+
+		<connection node2="node16" port2="0@" node1="link40" port1="1@">
+		</connection>
+
+		<node name="link41" class="drcl.inet.Link" posX="2070" posY="5230">
+			<property name="propDelay" value="198.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node18" port1="0@" node2="link41" port2="0@">
+		</connection>
+
+		<connection node2="node18" port2="0@" node1="link41" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link41" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link41" port1="1@">
+		</connection>
+
+		<node name="link42" class="drcl.inet.Link" posX="545" posY="5995">
+			<property name="propDelay" value="259"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node19" port1="1@" node2="link42" port2="0@">
+		</connection>
+
+		<connection node2="node19" port2="1@" node1="link42" port1="0@">
+		</connection>
+
+		<connection node1="node11" port1="0@" node2="link42" port2="1@">
+		</connection>
+
+		<connection node2="node11" port2="0@" node1="link42" port1="1@">
+		</connection>
+
+		<node name="link43" class="drcl.inet.Link" posX="2845" posY="7745">
+			<property name="propDelay" value="380"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node19" port1="0@" node2="link43" port2="0@">
+		</connection>
+
+		<connection node2="node19" port2="0@" node1="link43" port1="0@">
+		</connection>
+
+		<connection node1="node10" port1="1@" node2="link43" port2="1@">
+		</connection>
+
+		<connection node2="node10" port2="1@" node1="link43" port1="1@">
+		</connection>
+
+		<node name="link65" class="drcl.inet.Link" posX="3195" posY="7125">
+			<property name="propDelay" value="125.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node10" port1="0@" node2="link65" port2="0@">
+		</connection>
+
+		<connection node2="node10" port2="0@" node1="link65" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link65" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link65" port1="1@">
+		</connection>
+
+		<node name="link72" class="drcl.inet.Link" posX="3735" posY="8485">
+			<property name="propDelay" value="36.333333333333336"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node14" port1="0@" node2="link72" port2="0@">
+		</connection>
+
+		<connection node2="node14" port2="0@" node1="link72" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-3@" node2="link72" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-3@" node1="link72" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network2" class="drcl.inet.Network" posX="6110" posY="6850">
+
+		<node name="node30" class="drcl.inet.Node" posX="6110" posY="6850">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node31" class="drcl.inet.Node" posX="1820" posY="5220">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node32" class="drcl.inet.Node" posX="1690" posY="860">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node33" class="drcl.inet.Node" posX="2180" posY="1420">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node34" class="drcl.inet.Node" posX="630" posY="2090">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<node name="node35" class="drcl.inet.Node" posX="5300" posY="370">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node36" class="drcl.inet.Node" posX="4780" posY="4570">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node37" class="drcl.inet.Node" posX="7970" posY="7340">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node38" class="drcl.inet.Node" posX="9060" posY="9110">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node39" class="drcl.inet.Node" posX="1720" posY="5960">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link44" class="drcl.inet.Link" posX="5445" posY="5710">
+			<property name="propDelay" value="263"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node20" port1="1@" node2="link44" port2="0@">
+		</connection>
+
+		<connection node2="node20" port2="1@" node1="link44" port1="0@">
+		</connection>
+
+		<connection node1="node26" port1="3@" node2="link44" port2="1@">
+		</connection>
+
+		<connection node2="node26" port2="3@" node1="link44" port1="1@">
+		</connection>
+
+		<node name="link45" class="drcl.inet.Link" posX="3900" posY="3855">
+			<property name="propDelay" value="744"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node20" port1="0@" node2="link45" port2="0@">
+		</connection>
+
+		<connection node2="node20" port2="0@" node1="link45" port1="0@">
+		</connection>
+
+		<connection node1="node22" port1="5@" node2="link45" port2="1@">
+		</connection>
+
+		<connection node2="node22" port2="5@" node1="link45" port1="1@">
+		</connection>
+
+		<node name="link46" class="drcl.inet.Link" posX="1770" posY="5590">
+			<property name="propDelay" value="74"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node21" port1="2@" node2="link46" port2="0@">
+		</connection>
+
+		<connection node2="node21" port2="2@" node1="link46" port1="0@">
+		</connection>
+
+		<connection node1="node29" port1="5@" node2="link46" port2="1@">
+		</connection>
+
+		<connection node2="node29" port2="5@" node1="link46" port1="1@">
+		</connection>
+
+		<node name="link47" class="drcl.inet.Link" posX="2000" posY="3320">
+			<property name="propDelay" value="381"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node21" port1="1@" node2="link47" port2="0@">
+		</connection>
+
+		<connection node2="node21" port2="1@" node1="link47" port1="0@">
+		</connection>
+
+		<connection node1="node23" port1="4@" node2="link47" port2="1@">
+		</connection>
+
+		<connection node2="node23" port2="4@" node1="link47" port1="1@">
+		</connection>
+
+		<node name="link48" class="drcl.inet.Link" posX="1160" posY="1475">
+			<property name="propDelay" value="162"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node22" port1="4@" node2="link48" port2="0@">
+		</connection>
+
+		<connection node2="node22" port2="4@" node1="link48" port1="0@">
+		</connection>
+
+		<connection node1="node24" port1="6@" node2="link48" port2="1@">
+		</connection>
+
+		<connection node2="node24" port2="6@" node1="link48" port1="1@">
+		</connection>
+
+		<node name="link49" class="drcl.inet.Link" posX="3495" posY="615">
+			<property name="propDelay" value="364"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node22" port1="3@" node2="link49" port2="0@">
+		</connection>
+
+		<connection node2="node22" port2="3@" node1="link49" port1="0@">
+		</connection>
+
+		<connection node1="node25" port1="4@" node2="link49" port2="1@">
+		</connection>
+
+		<connection node2="node25" port2="4@" node1="link49" port1="1@">
+		</connection>
+
+		<node name="link50" class="drcl.inet.Link" posX="1935" posY="1140">
+			<property name="propDelay" value="74"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node23" port1="3@" node2="link50" port2="0@">
+		</connection>
+
+		<connection node2="node23" port2="3@" node1="link50" port1="0@">
+		</connection>
+
+		<connection node1="node22" port1="2@" node2="link50" port2="1@">
+		</connection>
+
+		<connection node2="node22" port2="2@" node1="link50" port1="1@">
+		</connection>
+
+		<node name="link51" class="drcl.inet.Link" posX="1405" posY="1755">
+			<property name="propDelay" value="168"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node23" port1="2@" node2="link51" port2="0@">
+		</connection>
+
+		<connection node2="node23" port2="2@" node1="link51" port1="0@">
+		</connection>
+
+		<connection node1="node24" port1="5@" node2="link51" port2="1@">
+		</connection>
+
+		<connection node2="node24" port2="5@" node1="link51" port1="1@">
+		</connection>
+
+		<node name="link52" class="drcl.inet.Link" posX="1225" posY="3655">
+			<property name="propDelay" value="334"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node24" port1="4@" node2="link52" port2="0@">
+		</connection>
+
+		<connection node2="node24" port2="4@" node1="link52" port1="0@">
+		</connection>
+
+		<connection node1="node21" port1="0@" node2="link52" port2="1@">
+		</connection>
+
+		<connection node2="node21" port2="0@" node1="link52" port1="1@">
+		</connection>
+
+		<node name="link53" class="drcl.inet.Link" posX="4300" posY="4715">
+			<property name="propDelay" value="902"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node24" port1="3@" node2="link53" port2="0@">
+		</connection>
+
+		<connection node2="node24" port2="3@" node1="link53" port1="0@">
+		</connection>
+
+		<connection node1="node27" port1="3@" node2="link53" port2="1@">
+		</connection>
+
+		<connection node2="node27" port2="3@" node1="link53" port1="1@">
+		</connection>
+
+		<node name="link54" class="drcl.inet.Link" posX="3740" posY="895">
+			<property name="propDelay" value="329"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node25" port1="3@" node2="link54" port2="0@">
+		</connection>
+
+		<connection node2="node25" port2="3@" node1="link54" port1="0@">
+		</connection>
+
+		<connection node1="node23" port1="1@" node2="link54" port2="1@">
+		</connection>
+
+		<connection node2="node23" port2="1@" node1="link54" port1="1@">
+		</connection>
+
+		<node name="link55" class="drcl.inet.Link" posX="5040" posY="2470">
+			<property name="propDelay" value="423"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node25" port1="2@" node2="link55" port2="0@">
+		</connection>
+
+		<connection node2="node25" port2="2@" node1="link55" port1="0@">
+		</connection>
+
+		<connection node1="node26" port1="2@" node2="link55" port2="1@">
+		</connection>
+
+		<connection node2="node26" port2="2@" node1="link55" port1="1@">
+		</connection>
+
+		<node name="link56" class="drcl.inet.Link" posX="3480" posY="2995">
+			<property name="propDelay" value="408"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node26" port1="1@" node2="link56" port2="0@">
+		</connection>
+
+		<connection node2="node26" port2="1@" node1="link56" port1="0@">
+		</connection>
+
+		<connection node1="node23" port1="0@" node2="link56" port2="1@">
+		</connection>
+
+		<connection node2="node23" port2="0@" node1="link56" port1="1@">
+		</connection>
+
+		<node name="link57" class="drcl.inet.Link" posX="3235" posY="2715">
+			<property name="propDelay" value="482"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node26" port1="0@" node2="link57" port2="0@">
+		</connection>
+
+		<connection node2="node26" port2="0@" node1="link57" port1="0@">
+		</connection>
+
+		<connection node1="node22" port1="1@" node2="link57" port2="1@">
+		</connection>
+
+		<connection node2="node22" port2="1@" node1="link57" port1="1@">
+		</connection>
+
+		<node name="link58" class="drcl.inet.Link" posX="8515" posY="8225">
+			<property name="propDelay" value="207"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node27" port1="2@" node2="link58" port2="0@">
+		</connection>
+
+		<connection node2="node27" port2="2@" node1="link58" port1="0@">
+		</connection>
+
+		<connection node1="node28" port1="2@" node2="link58" port2="1@">
+		</connection>
+
+		<connection node2="node28" port2="2@" node1="link58" port1="1@">
+		</connection>
+
+		<node name="link59" class="drcl.inet.Link" posX="4845" posY="6650">
+			<property name="propDelay" value="640"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node27" port1="1@" node2="link59" port2="0@">
+		</connection>
+
+		<connection node2="node27" port2="1@" node1="link59" port1="0@">
+		</connection>
+
+		<connection node1="node29" port1="4@" node2="link59" port2="1@">
+		</connection>
+
+		<connection node2="node29" port2="4@" node1="link59" port1="1@">
+		</connection>
+
+		<node name="link60" class="drcl.inet.Link" posX="5375" posY="4985">
+			<property name="propDelay" value="1106"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node28" port1="1@" node2="link60" port2="0@">
+		</connection>
+
+		<connection node2="node28" port2="1@" node1="link60" port1="0@">
+		</connection>
+
+		<connection node1="node22" port1="0@" node2="link60" port2="1@">
+		</connection>
+
+		<connection node2="node22" port2="0@" node1="link60" port1="1@">
+		</connection>
+
+		<node name="link61" class="drcl.inet.Link" posX="7180" posY="4740">
+			<property name="propDelay" value="951"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node28" port1="0@" node2="link61" port2="0@">
+		</connection>
+
+		<connection node2="node28" port2="0@" node1="link61" port1="0@">
+		</connection>
+
+		<connection node1="node25" port1="1@" node2="link61" port2="1@">
+		</connection>
+
+		<connection node2="node25" port2="1@" node1="link61" port1="1@">
+		</connection>
+
+		<node name="link62" class="drcl.inet.Link" posX="3510" posY="3165">
+			<property name="propDelay" value="663"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node29" port1="3@" node2="link62" port2="0@">
+		</connection>
+
+		<connection node2="node29" port2="3@" node1="link62" port1="0@">
+		</connection>
+
+		<connection node1="node25" port1="0@" node2="link62" port2="1@">
+		</connection>
+
+		<connection node2="node25" port2="0@" node1="link62" port1="1@">
+		</connection>
+
+		<node name="link63" class="drcl.inet.Link" posX="1175" posY="4025">
+			<property name="propDelay" value="402"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node29" port1="2@" node2="link63" port2="0@">
+		</connection>
+
+		<connection node2="node29" port2="2@" node1="link63" port1="0@">
+		</connection>
+
+		<connection node1="node24" port1="2@" node2="link63" port2="1@">
+		</connection>
+
+		<connection node2="node24" port2="2@" node1="link63" port1="1@">
+		</connection>
+
+		<node name="link64" class="drcl.inet.Link" posX="1970" posY="4635">
+			<property name="propDelay" value="89.66666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node29" port1="1@" node2="link64" port2="0@">
+		</connection>
+
+		<connection node2="node29" port2="1@" node1="link64" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link64" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link64" port1="1@">
+		</connection>
+
+		<node name="link65" class="drcl.inet.Link" posX="3195" posY="7125">
+			<property name="propDelay" value="125.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node29" port1="0@" node2="link65" port2="0@">
+		</connection>
+
+		<connection node2="node29" port2="0@" node1="link65" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link65" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link65" port1="1@">
+		</connection>
+
+		<node name="link162" class="drcl.inet.Link" posX="3985" posY="2560">
+			<property name="propDelay" value="225.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node24" port1="1@" node2="link162" port2="0@">
+		</connection>
+
+		<connection node2="node24" port2="1@" node1="link162" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link162" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link162" port1="1@">
+		</connection>
+
+		<node name="link193" class="drcl.inet.Link" posX="1795" posY="4690">
+			<property name="propDelay" value="189.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node24" port1="0@" node2="link193" port2="0@">
+		</connection>
+
+		<connection node2="node24" port2="0@" node1="link193" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link193" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link193" port1="1@">
+		</connection>
+
+		<node name="link212" class="drcl.inet.Link" posX="4015" posY="6375">
+			<property name="propDelay" value="271.3333333333333"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node27" port1="0@" node2="link212" port2="0@">
+		</connection>
+
+		<connection node2="node27" port2="0@" node1="link212" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-3@" node2="link212" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-3@" node1="link212" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network3" class="drcl.inet.Network" posX="3780" posY="640">
+
+		<node name="node40" class="drcl.inet.Node" posX="3780" posY="640">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node41" class="drcl.inet.Node" posX="4350" posY="390">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node42" class="drcl.inet.Node" posX="3390" posY="8060">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node43" class="drcl.inet.Node" posX="6240" posY="9710">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node44" class="drcl.inet.Node" posX="9160" posY="7050">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node45" class="drcl.inet.Node" posX="2550" posY="4430">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node46" class="drcl.inet.Node" posX="8150" posY="7890">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node47" class="drcl.inet.Node" posX="8680" posY="8340">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node48" class="drcl.inet.Node" posX="210" posY="8300">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node49" class="drcl.inet.Node" posX="1150" posY="4190">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+			<port name="7" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link66" class="drcl.inet.Link" posX="2465" posY="2415">
+			<property name="propDelay" value="441"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node30" port1="3@" node2="link66" port2="0@">
+		</connection>
+
+		<connection node2="node30" port2="3@" node1="link66" port1="0@">
+		</connection>
+
+		<connection node1="node39" port1="7@" node2="link66" port2="1@">
+		</connection>
+
+		<connection node2="node39" port2="7@" node1="link66" port1="1@">
+		</connection>
+
+		<node name="link67" class="drcl.inet.Link" posX="1995" posY="4470">
+			<property name="propDelay" value="845"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node30" port1="2@" node2="link67" port2="0@">
+		</connection>
+
+		<connection node2="node30" port2="2@" node1="link67" port1="0@">
+		</connection>
+
+		<connection node1="node38" port1="5@" node2="link67" port2="1@">
+		</connection>
+
+		<connection node2="node38" port2="5@" node1="link67" port1="1@">
+		</connection>
+
+		<node name="link68" class="drcl.inet.Link" posX="4065" posY="515">
+			<property name="propDelay" value="62"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node31" port1="2@" node2="link68" port2="0@">
+		</connection>
+
+		<connection node2="node31" port2="2@" node1="link68" port1="0@">
+		</connection>
+
+		<connection node1="node30" port1="1@" node2="link68" port2="1@">
+		</connection>
+
+		<connection node2="node30" port2="1@" node1="link68" port1="1@">
+		</connection>
+
+		<node name="link69" class="drcl.inet.Link" posX="3870" posY="4225">
+			<property name="propDelay" value="772"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node31" port1="1@" node2="link69" port2="0@">
+		</connection>
+
+		<connection node2="node31" port2="1@" node1="link69" port1="0@">
+		</connection>
+
+		<connection node1="node32" port1="5@" node2="link69" port2="1@">
+		</connection>
+
+		<connection node2="node32" port2="5@" node1="link69" port1="1@">
+		</connection>
+
+		<node name="link70" class="drcl.inet.Link" posX="1800" posY="8180">
+			<property name="propDelay" value="318"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node32" port1="4@" node2="link70" port2="0@">
+		</connection>
+
+		<connection node2="node32" port2="4@" node1="link70" port1="0@">
+		</connection>
+
+		<connection node1="node38" port1="4@" node2="link70" port2="1@">
+		</connection>
+
+		<connection node2="node38" port2="4@" node1="link70" port1="1@">
+		</connection>
+
+		<node name="link71" class="drcl.inet.Link" posX="2270" posY="6125">
+			<property name="propDelay" value="447"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node32" port1="3@" node2="link71" port2="0@">
+		</connection>
+
+		<connection node2="node32" port2="3@" node1="link71" port1="0@">
+		</connection>
+
+		<connection node1="node39" port1="6@" node2="link71" port2="1@">
+		</connection>
+
+		<connection node2="node39" port2="6@" node1="link71" port1="1@">
+		</connection>
+
+		<node name="link72" class="drcl.inet.Link" posX="3735" posY="8485">
+			<property name="propDelay" value="36.333333333333336"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node32" port1="2@" node2="link72" port2="0@">
+		</connection>
+
+		<connection node2="node32" port2="2@" node1="link72" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link72" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link72" port1="1@">
+		</connection>
+
+		<node name="link73" class="drcl.inet.Link" posX="4815" posY="8885">
+			<property name="propDelay" value="329"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node33" port1="4@" node2="link73" port2="0@">
+		</connection>
+
+		<connection node2="node33" port2="4@" node1="link73" port1="0@">
+		</connection>
+
+		<connection node1="node32" port1="1@" node2="link73" port2="1@">
+		</connection>
+
+		<connection node2="node32" port2="1@" node1="link73" port1="1@">
+		</connection>
+
+		<node name="link74" class="drcl.inet.Link" posX="3695" posY="6950">
+			<property name="propDelay" value="750"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node33" port1="3@" node2="link74" port2="0@">
+		</connection>
+
+		<connection node2="node33" port2="3@" node1="link74" port1="0@">
+		</connection>
+
+		<connection node1="node39" port1="5@" node2="link74" port2="1@">
+		</connection>
+
+		<connection node2="node39" port2="5@" node1="link74" port1="1@">
+		</connection>
+
+		<node name="link75" class="drcl.inet.Link" posX="8655" posY="7470">
+			<property name="propDelay" value="131"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node34" port1="1@" node2="link75" port2="0@">
+		</connection>
+
+		<connection node2="node34" port2="1@" node1="link75" port1="0@">
+		</connection>
+
+		<connection node1="node36" port1="4@" node2="link75" port2="1@">
+		</connection>
+
+		<connection node2="node36" port2="4@" node1="link75" port1="1@">
+		</connection>
+
+		<node name="link76" class="drcl.inet.Link" posX="7700" posY="8380">
+			<property name="propDelay" value="394"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node34" port1="0@" node2="link76" port2="0@">
+		</connection>
+
+		<connection node2="node34" port2="0@" node1="link76" port1="0@">
+		</connection>
+
+		<connection node1="node33" port1="2@" node2="link76" port2="1@">
+		</connection>
+
+		<connection node2="node33" port2="2@" node1="link76" port1="1@">
+		</connection>
+
+		<node name="link77" class="drcl.inet.Link" posX="1850" posY="4310">
+			<property name="propDelay" value="142"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node35" port1="1@" node2="link77" port2="0@">
+		</connection>
+
+		<connection node2="node35" port2="1@" node1="link77" port1="0@">
+		</connection>
+
+		<connection node1="node39" port1="4@" node2="link77" port2="1@">
+		</connection>
+
+		<connection node2="node39" port2="4@" node1="link77" port1="1@">
+		</connection>
+
+		<node name="link78" class="drcl.inet.Link" posX="1380" posY="6365">
+			<property name="propDelay" value="452"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node35" port1="0@" node2="link78" port2="0@">
+		</connection>
+
+		<connection node2="node35" port2="0@" node1="link78" port1="0@">
+		</connection>
+
+		<connection node1="node38" port1="3@" node2="link78" port2="1@">
+		</connection>
+
+		<connection node2="node38" port2="3@" node1="link78" port1="1@">
+		</connection>
+
+		<node name="link79" class="drcl.inet.Link" posX="5770" posY="7975">
+			<property name="propDelay" value="476"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node36" port1="3@" node2="link79" port2="0@">
+		</connection>
+
+		<connection node2="node36" port2="3@" node1="link79" port1="0@">
+		</connection>
+
+		<connection node1="node32" port1="0@" node2="link79" port2="1@">
+		</connection>
+
+		<connection node2="node32" port2="0@" node1="link79" port1="1@">
+		</connection>
+
+		<node name="link80" class="drcl.inet.Link" posX="5965" posY="4265">
+			<property name="propDelay" value="846"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node36" port1="2@" node2="link80" port2="0@">
+		</connection>
+
+		<connection node2="node36" port2="2@" node1="link80" port1="0@">
+		</connection>
+
+		<connection node1="node30" port1="0@" node2="link80" port2="1@">
+		</connection>
+
+		<connection node2="node30" port2="0@" node1="link80" port1="1@">
+		</connection>
+
+		<node name="link81" class="drcl.inet.Link" posX="8415" posY="8115">
+			<property name="propDelay" value="69"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node37" port1="3@" node2="link81" port2="0@">
+		</connection>
+
+		<connection node2="node37" port2="3@" node1="link81" port1="0@">
+		</connection>
+
+		<connection node1="node36" port1="1@" node2="link81" port2="1@">
+		</connection>
+
+		<connection node2="node36" port2="1@" node1="link81" port1="1@">
+		</connection>
+
+		<node name="link82" class="drcl.inet.Link" posX="7460" posY="9025">
+			<property name="propDelay" value="279"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node37" port1="2@" node2="link82" port2="0@">
+		</connection>
+
+		<connection node2="node37" port2="2@" node1="link82" port1="0@">
+		</connection>
+
+		<connection node1="node33" port1="1@" node2="link82" port2="1@">
+		</connection>
+
+		<connection node2="node33" port2="1@" node1="link82" port1="1@">
+		</connection>
+
+		<node name="link83" class="drcl.inet.Link" posX="4445" posY="8320">
+			<property name="propDelay" value="847"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node38" port1="2@" node2="link83" port2="0@">
+		</connection>
+
+		<connection node2="node38" port2="2@" node1="link83" port1="0@">
+		</connection>
+
+		<connection node1="node37" port1="1@" node2="link83" port2="1@">
+		</connection>
+
+		<connection node2="node37" port2="1@" node1="link83" port1="1@">
+		</connection>
+
+		<node name="link84" class="drcl.inet.Link" posX="3225" posY="9005">
+			<property name="propDelay" value="619"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node38" port1="1@" node2="link84" port2="0@">
+		</connection>
+
+		<connection node2="node38" port2="1@" node1="link84" port1="0@">
+		</connection>
+
+		<connection node1="node33" port1="0@" node2="link84" port2="1@">
+		</connection>
+
+		<connection node2="node33" port2="0@" node1="link84" port1="1@">
+		</connection>
+
+		<node name="link85" class="drcl.inet.Link" posX="4770" posY="5800">
+			<property name="propDelay" value="346.6666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node38" port1="0@" node2="link85" port2="0@">
+		</connection>
+
+		<connection node2="node38" port2="0@" node1="link85" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link85" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link85" port1="1@">
+		</connection>
+
+		<node name="link86" class="drcl.inet.Link" posX="2750" posY="2290">
+			<property name="propDelay" value="496"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node39" port1="3@" node2="link86" port2="0@">
+		</connection>
+
+		<connection node2="node39" port2="3@" node1="link86" port1="0@">
+		</connection>
+
+		<connection node1="node31" port1="0@" node2="link86" port2="1@">
+		</connection>
+
+		<connection node2="node31" port2="0@" node1="link86" port1="1@">
+		</connection>
+
+		<node name="link87" class="drcl.inet.Link" posX="4650" posY="6040">
+			<property name="propDelay" value="791"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node39" port1="2@" node2="link87" port2="0@">
+		</connection>
+
+		<connection node2="node39" port2="2@" node1="link87" port1="0@">
+		</connection>
+
+		<connection node1="node36" port1="0@" node2="link87" port2="1@">
+		</connection>
+
+		<connection node2="node36" port2="0@" node1="link87" port1="1@">
+		</connection>
+
+		<node name="link95" class="drcl.inet.Link" posX="2240" posY="5865">
+			<property name="propDelay" value="133.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node39" port1="1@" node2="link95" port2="0@">
+		</connection>
+
+		<connection node2="node39" port2="1@" node1="link95" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link95" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link95" port1="1@">
+		</connection>
+
+		<node name="link149" class="drcl.inet.Link" posX="6640" posY="6960">
+			<property name="propDelay" value="164.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node37" port1="0@" node2="link149" port2="0@">
+		</connection>
+
+		<connection node2="node37" port2="0@" node1="link149" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link149" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link149" port1="1@">
+		</connection>
+
+		<node name="link173" class="drcl.inet.Link" posX="3560" posY="6225">
+			<property name="propDelay" value="210.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node39" port1="0@" node2="link173" port2="0@">
+		</connection>
+
+		<connection node2="node39" port2="0@" node1="link173" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-3@" node2="link173" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-3@" node1="link173" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network4" class="drcl.inet.Network" posX="8140" posY="6090">
+
+		<node name="node50" class="drcl.inet.Node" posX="8140" posY="6090">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<node name="node51" class="drcl.inet.Node" posX="330" posY="8470">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node52" class="drcl.inet.Node" posX="3330" posY="7540">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node53" class="drcl.inet.Node" posX="4590" posY="8430">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node54" class="drcl.inet.Node" posX="1020" posY="5270">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node55" class="drcl.inet.Node" posX="7530" posY="4900">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node56" class="drcl.inet.Node" posX="4360" posY="3710">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node57" class="drcl.inet.Node" posX="1640" posY="5180">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node58" class="drcl.inet.Node" posX="6490" posY="1070">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node59" class="drcl.inet.Node" posX="1570" posY="3810">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link88" class="drcl.inet.Link" posX="6365" posY="7260">
+			<property name="propDelay" value="425"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node40" port1="6@" node2="link88" port2="0@">
+		</connection>
+
+		<connection node2="node40" port2="6@" node1="link88" port1="0@">
+		</connection>
+
+		<connection node1="node43" port1="5@" node2="link88" port2="1@">
+		</connection>
+
+		<connection node2="node43" port2="5@" node1="link88" port1="1@">
+		</connection>
+
+		<node name="link89" class="drcl.inet.Link" posX="6250" posY="4900">
+			<property name="propDelay" value="446"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node40" port1="5@" node2="link89" port2="0@">
+		</connection>
+
+		<connection node2="node40" port2="5@" node1="link89" port1="0@">
+		</connection>
+
+		<connection node1="node46" port1="2@" node2="link89" port2="1@">
+		</connection>
+
+		<connection node2="node46" port2="2@" node1="link89" port1="1@">
+		</connection>
+
+		<node name="link90" class="drcl.inet.Link" posX="8735" posY="4695">
+			<property name="propDelay" value="101.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node40" port1="4@" node2="link90" port2="0@">
+		</connection>
+
+		<connection node2="node40" port2="4@" node1="link90" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link90" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link90" port1="1@">
+		</connection>
+
+		<node name="link91" class="drcl.inet.Link" posX="3410" posY="4770">
+			<property name="propDelay" value="962"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node41" port1="4@" node2="link91" port2="0@">
+		</connection>
+
+		<connection node2="node41" port2="4@" node1="link91" port1="0@">
+		</connection>
+
+		<connection node1="node48" port1="3@" node2="link91" port2="1@">
+		</connection>
+
+		<connection node2="node48" port2="3@" node1="link91" port1="1@">
+		</connection>
+
+		<node name="link92" class="drcl.inet.Link" posX="985" posY="6825">
+			<property name="propDelay" value="354"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node41" port1="3@" node2="link92" port2="0@">
+		</connection>
+
+		<connection node2="node41" port2="3@" node1="link92" port1="0@">
+		</connection>
+
+		<connection node1="node47" port1="2@" node2="link92" port2="1@">
+		</connection>
+
+		<connection node2="node47" port2="2@" node1="link92" port1="1@">
+		</connection>
+
+		<node name="link93" class="drcl.inet.Link" posX="5735" posY="6815">
+			<property name="propDelay" value="502"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node42" port1="3@" node2="link93" port2="0@">
+		</connection>
+
+		<connection node2="node42" port2="3@" node1="link93" port1="0@">
+		</connection>
+
+		<connection node1="node40" port1="3@" node2="link93" port2="1@">
+		</connection>
+
+		<connection node2="node40" port2="3@" node1="link93" port1="1@">
+		</connection>
+
+		<node name="link94" class="drcl.inet.Link" posX="3960" posY="7985">
+			<property name="propDelay" value="154"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node42" port1="2@" node2="link94" port2="0@">
+		</connection>
+
+		<connection node2="node42" port2="2@" node1="link94" port1="0@">
+		</connection>
+
+		<connection node1="node43" port1="4@" node2="link94" port2="1@">
+		</connection>
+
+		<connection node2="node43" port2="4@" node1="link94" port1="1@">
+		</connection>
+
+		<node name="link95" class="drcl.inet.Link" posX="2240" posY="5865">
+			<property name="propDelay" value="133.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node42" port1="1@" node2="link95" port2="0@">
+		</connection>
+
+		<connection node2="node42" port2="1@" node1="link95" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link95" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link95" port1="1@">
+		</connection>
+
+		<node name="link96" class="drcl.inet.Link" posX="6060" posY="6665">
+			<property name="propDelay" value="459"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node43" port1="3@" node2="link96" port2="0@">
+		</connection>
+
+		<connection node2="node43" port2="3@" node1="link96" port1="0@">
+		</connection>
+
+		<connection node1="node45" port1="2@" node2="link96" port2="1@">
+		</connection>
+
+		<connection node2="node45" port2="2@" node1="link96" port1="1@">
+		</connection>
+
+		<node name="link97" class="drcl.inet.Link" posX="2805" posY="6850">
+			<property name="propDelay" value="476"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node43" port1="2@" node2="link97" port2="0@">
+		</connection>
+
+		<connection node2="node43" port2="2@" node1="link97" port1="0@">
+		</connection>
+
+		<connection node1="node44" port1="3@" node2="link97" port2="1@">
+		</connection>
+
+		<connection node2="node44" port2="3@" node1="link97" port1="1@">
+		</connection>
+
+		<node name="link98" class="drcl.inet.Link" posX="675" posY="6870">
+			<property name="propDelay" value="327"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node44" port1="2@" node2="link98" port2="0@">
+		</connection>
+
+		<connection node2="node44" port2="2@" node1="link98" port1="0@">
+		</connection>
+
+		<connection node1="node41" port1="2@" node2="link98" port2="1@">
+		</connection>
+
+		<connection node2="node41" port2="2@" node1="link98" port1="1@">
+		</connection>
+
+		<node name="link99" class="drcl.inet.Link" posX="4580" posY="5680">
+			<property name="propDelay" value="716"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node44" port1="1@" node2="link99" port2="0@">
+		</connection>
+
+		<connection node2="node44" port2="1@" node1="link99" port1="0@">
+		</connection>
+
+		<connection node1="node40" port1="2@" node2="link99" port2="1@">
+		</connection>
+
+		<connection node2="node40" port2="2@" node1="link99" port1="1@">
+		</connection>
+
+		<node name="link100" class="drcl.inet.Link" posX="7835" posY="5495">
+			<property name="propDelay" value="133"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node45" port1="1@" node2="link100" port2="0@">
+		</connection>
+
+		<connection node2="node45" port2="1@" node1="link100" port1="0@">
+		</connection>
+
+		<connection node1="node40" port1="1@" node2="link100" port2="1@">
+		</connection>
+
+		<connection node2="node40" port2="1@" node1="link100" port1="1@">
+		</connection>
+
+		<node name="link101" class="drcl.inet.Link" posX="3930" posY="6685">
+			<property name="propDelay" value="803"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node45" port1="0@" node2="link101" port2="0@">
+		</connection>
+
+		<connection node2="node45" port2="0@" node1="link101" port1="0@">
+		</connection>
+
+		<connection node1="node41" port1="1@" node2="link101" port2="1@">
+		</connection>
+
+		<connection node2="node41" port2="1@" node1="link101" port1="1@">
+		</connection>
+
+		<node name="link102" class="drcl.inet.Link" posX="5425" posY="2390">
+			<property name="propDelay" value="339"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node46" port1="1@" node2="link102" port2="0@">
+		</connection>
+
+		<connection node2="node46" port2="1@" node1="link102" port1="0@">
+		</connection>
+
+		<connection node1="node48" port1="2@" node2="link102" port2="1@">
+		</connection>
+
+		<connection node2="node48" port2="2@" node1="link102" port1="1@">
+		</connection>
+
+		<node name="link103" class="drcl.inet.Link" posX="2965" posY="3760">
+			<property name="propDelay" value="279"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node46" port1="0@" node2="link103" port2="0@">
+		</connection>
+
+		<connection node2="node46" port2="0@" node1="link103" port1="0@">
+		</connection>
+
+		<connection node1="node49" port1="4@" node2="link103" port2="1@">
+		</connection>
+
+		<connection node2="node49" port2="4@" node1="link103" port1="1@">
+		</connection>
+
+		<node name="link104" class="drcl.inet.Link" posX="3115" posY="6805">
+			<property name="propDelay" value="438"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node47" port1="1@" node2="link104" port2="0@">
+		</connection>
+
+		<connection node2="node47" port2="1@" node1="link104" port1="0@">
+		</connection>
+
+		<connection node1="node43" port1="1@" node2="link104" port2="1@">
+		</connection>
+
+		<connection node2="node43" port2="1@" node1="link104" port1="1@">
+		</connection>
+
+		<node name="link105" class="drcl.inet.Link" posX="1605" posY="4495">
+			<property name="propDelay" value="137"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node47" port1="0@" node2="link105" port2="0@">
+		</connection>
+
+		<connection node2="node47" port2="0@" node1="link105" port1="0@">
+		</connection>
+
+		<connection node1="node49" port1="3@" node2="link105" port2="1@">
+		</connection>
+
+		<connection node2="node49" port2="3@" node1="link105" port1="1@">
+		</connection>
+
+		<node name="link106" class="drcl.inet.Link" posX="5540" posY="4750">
+			<property name="propDelay" value="760"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node48" port1="1@" node2="link106" port2="0@">
+		</connection>
+
+		<connection node2="node48" port2="1@" node1="link106" port1="0@">
+		</connection>
+
+		<connection node1="node43" port1="0@" node2="link106" port2="1@">
+		</connection>
+
+		<connection node2="node43" port2="0@" node1="link106" port1="1@">
+		</connection>
+
+		<node name="link107" class="drcl.inet.Link" posX="7315" posY="3580">
+			<property name="propDelay" value="528"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node48" port1="0@" node2="link107" port2="0@">
+		</connection>
+
+		<connection node2="node48" port2="0@" node1="link107" port1="0@">
+		</connection>
+
+		<connection node1="node40" port1="0@" node2="link107" port2="1@">
+		</connection>
+
+		<connection node2="node40" port2="0@" node1="link107" port1="1@">
+		</connection>
+
+		<node name="link108" class="drcl.inet.Link" posX="2450" posY="5675">
+			<property name="propDelay" value="412"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node49" port1="2@" node2="link108" port2="0@">
+		</connection>
+
+		<connection node2="node49" port2="2@" node1="link108" port1="0@">
+		</connection>
+
+		<connection node1="node42" port1="0@" node2="link108" port2="1@">
+		</connection>
+
+		<connection node2="node42" port2="0@" node1="link108" port1="1@">
+		</connection>
+
+		<node name="link109" class="drcl.inet.Link" posX="1295" posY="4540">
+			<property name="propDelay" value="156"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node49" port1="1@" node2="link109" port2="0@">
+		</connection>
+
+		<connection node2="node49" port2="1@" node1="link109" port1="0@">
+		</connection>
+
+		<connection node1="node44" port1="0@" node2="link109" port2="1@">
+		</connection>
+
+		<connection node2="node44" port2="0@" node1="link109" port1="1@">
+		</connection>
+
+		<node name="link131" class="drcl.inet.Link" posX="4330" posY="6120">
+			<property name="propDelay" value="309.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node41" port1="0@" node2="link131" port2="0@">
+		</connection>
+
+		<connection node2="node41" port2="0@" node1="link131" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link131" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link131" port1="1@">
+		</connection>
+
+		<node name="link134" class="drcl.inet.Link" posX="5395" posY="5655">
+			<property name="propDelay" value="283.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node49" port1="0@" node2="link134" port2="0@">
+		</connection>
+
+		<connection node2="node49" port2="0@" node1="link134" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link134" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link134" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network5" class="drcl.inet.Network" posX="3150" posY="4430">
+
+		<node name="node60" class="drcl.inet.Node" posX="3150" posY="4430">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node61" class="drcl.inet.Node" posX="20" posY="3050">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node62" class="drcl.inet.Node" posX="6290" posY="8310">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node63" class="drcl.inet.Node" posX="7630" posY="1280">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node64" class="drcl.inet.Node" posX="760" posY="7910">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+			<port name="7" group=""></port>
+		</node>
+
+		<node name="node65" class="drcl.inet.Node" posX="5730" posY="5050">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node66" class="drcl.inet.Node" posX="1950" posY="5200">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node67" class="drcl.inet.Node" posX="7410" posY="9610">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node68" class="drcl.inet.Node" posX="2430" posY="9890">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node69" class="drcl.inet.Node" posX="8330" posY="3770">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link41" class="drcl.inet.Link" posX="2070" posY="5230">
+			<property name="propDelay" value="198.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node54" port1="7@" node2="link41" port2="0@">
+		</connection>
+
+		<connection node2="node54" port2="7@" node1="link41" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link41" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link41" port1="1@">
+		</connection>
+
+		<node name="link110" class="drcl.inet.Link" posX="4440" posY="4740">
+			<property name="propDelay" value="265"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node50" port1="1@" node2="link110" port2="0@">
+		</connection>
+
+		<connection node2="node50" port2="1@" node1="link110" port1="0@">
+		</connection>
+
+		<connection node1="node55" port1="3@" node2="link110" port2="1@">
+		</connection>
+
+		<connection node2="node55" port2="3@" node1="link110" port1="1@">
+		</connection>
+
+		<node name="link111" class="drcl.inet.Link" posX="2550" posY="4815">
+			<property name="propDelay" value="142"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node50" port1="0@" node2="link111" port2="0@">
+		</connection>
+
+		<connection node2="node50" port2="0@" node1="link111" port1="0@">
+		</connection>
+
+		<connection node1="node56" port1="5@" node2="link111" port2="1@">
+		</connection>
+
+		<connection node2="node56" port2="5@" node1="link111" port1="1@">
+		</connection>
+
+		<node name="link112" class="drcl.inet.Link" posX="985" posY="4125">
+			<property name="propDelay" value="288"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node51" port1="1@" node2="link112" port2="0@">
+		</connection>
+
+		<connection node2="node51" port2="1@" node1="link112" port1="0@">
+		</connection>
+
+		<connection node1="node56" port1="4@" node2="link112" port2="1@">
+		</connection>
+
+		<connection node2="node56" port2="4@" node1="link112" port1="1@">
+		</connection>
+
+		<node name="link113" class="drcl.inet.Link" posX="390" posY="5480">
+			<property name="propDelay" value="491"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node51" port1="0@" node2="link113" port2="0@">
+		</connection>
+
+		<connection node2="node51" port2="0@" node1="link113" port1="0@">
+		</connection>
+
+		<connection node1="node54" port1="6@" node2="link113" port2="1@">
+		</connection>
+
+		<connection node2="node54" port2="6@" node1="link113" port1="1@">
+		</connection>
+
+		<node name="link114" class="drcl.inet.Link" posX="6850" posY="8960">
+			<property name="propDelay" value="171"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node52" port1="2@" node2="link114" port2="0@">
+		</connection>
+
+		<connection node2="node52" port2="2@" node1="link114" port1="0@">
+		</connection>
+
+		<connection node1="node57" port1="3@" node2="link114" port2="1@">
+		</connection>
+
+		<connection node2="node57" port2="3@" node1="link114" port1="1@">
+		</connection>
+
+		<node name="link115" class="drcl.inet.Link" posX="3525" posY="8110">
+			<property name="propDelay" value="554"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node52" port1="1@" node2="link115" port2="0@">
+		</connection>
+
+		<connection node2="node52" port2="1@" node1="link115" port1="0@">
+		</connection>
+
+		<connection node1="node54" port1="5@" node2="link115" port2="1@">
+		</connection>
+
+		<connection node2="node54" port2="5@" node1="link115" port1="1@">
+		</connection>
+
+		<node name="link116" class="drcl.inet.Link" posX="7980" posY="2525">
+			<property name="propDelay" value="258"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node53" port1="2@" node2="link116" port2="0@">
+		</connection>
+
+		<connection node2="node53" port2="2@" node1="link116" port1="0@">
+		</connection>
+
+		<connection node1="node59" port1="6@" node2="link116" port2="1@">
+		</connection>
+
+		<connection node2="node59" port2="6@" node1="link116" port1="1@">
+		</connection>
+
+		<node name="link117" class="drcl.inet.Link" posX="4790" posY="3240">
+			<property name="propDelay" value="690"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node53" port1="1@" node2="link117" port2="0@">
+		</connection>
+
+		<connection node2="node53" port2="1@" node1="link117" port1="0@">
+		</connection>
+
+		<connection node1="node56" port1="3@" node2="link117" port2="1@">
+		</connection>
+
+		<connection node2="node56" port2="3@" node1="link117" port1="1@">
+		</connection>
+
+		<node name="link118" class="drcl.inet.Link" posX="1595" posY="8900">
+			<property name="propDelay" value="259"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node54" port1="4@" node2="link118" port2="0@">
+		</connection>
+
+		<connection node2="node54" port2="4@" node1="link118" port1="0@">
+		</connection>
+
+		<connection node1="node58" port1="3@" node2="link118" port2="1@">
+		</connection>
+
+		<connection node2="node58" port2="3@" node1="link118" port1="1@">
+		</connection>
+
+		<node name="link119" class="drcl.inet.Link" posX="4545" posY="5840">
+			<property name="propDelay" value="862"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node54" port1="3@" node2="link119" port2="0@">
+		</connection>
+
+		<connection node2="node54" port2="3@" node1="link119" port1="0@">
+		</connection>
+
+		<connection node1="node59" port1="5@" node2="link119" port2="1@">
+		</connection>
+
+		<connection node2="node59" port2="5@" node1="link119" port1="1@">
+		</connection>
+
+		<node name="link120" class="drcl.inet.Link" posX="1490" posY="5610">
+			<property name="propDelay" value="160.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node54" port1="2@" node2="link120" port2="0@">
+		</connection>
+
+		<connection node2="node54" port2="2@" node1="link120" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link120" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link120" port1="1@">
+		</connection>
+
+		<node name="link121" class="drcl.inet.Link" posX="7030" posY="4410">
+			<property name="propDelay" value="289"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node55" port1="2@" node2="link121" port2="0@">
+		</connection>
+
+		<connection node2="node55" port2="2@" node1="link121" port1="0@">
+		</connection>
+
+		<connection node1="node59" port1="4@" node2="link121" port2="1@">
+		</connection>
+
+		<connection node2="node59" port2="4@" node1="link121" port1="1@">
+		</connection>
+
+		<node name="link122" class="drcl.inet.Link" posX="4080" posY="7470">
+			<property name="propDelay" value="585"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node55" port1="1@" node2="link122" port2="0@">
+		</connection>
+
+		<connection node2="node55" port2="1@" node1="link122" port1="0@">
+		</connection>
+
+		<connection node1="node58" port1="2@" node2="link122" port2="1@">
+		</connection>
+
+		<connection node2="node58" port2="2@" node1="link122" port1="1@">
+		</connection>
+
+		<node name="link123" class="drcl.inet.Link" posX="1355" posY="6555">
+			<property name="propDelay" value="295"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node56" port1="2@" node2="link123" port2="0@">
+		</connection>
+
+		<connection node2="node56" port2="2@" node1="link123" port1="0@">
+		</connection>
+
+		<connection node1="node54" port1="1@" node2="link123" port2="1@">
+		</connection>
+
+		<connection node2="node54" port2="1@" node1="link123" port1="1@">
+		</connection>
+
+		<node name="link124" class="drcl.inet.Link" posX="5140" posY="4485">
+			<property name="propDelay" value="653"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node56" port1="1@" node2="link124" port2="0@">
+		</connection>
+
+		<connection node2="node56" port2="1@" node1="link124" port1="0@">
+		</connection>
+
+		<connection node1="node59" port1="3@" node2="link124" port2="1@">
+		</connection>
+
+		<connection node2="node59" port2="3@" node1="link124" port1="1@">
+		</connection>
+
+		<node name="link125" class="drcl.inet.Link" posX="4085" posY="8760">
+			<property name="propDelay" value="686"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node57" port1="2@" node2="link125" port2="0@">
+		</connection>
+
+		<connection node2="node57" port2="2@" node1="link125" port1="0@">
+		</connection>
+
+		<connection node1="node54" port1="0@" node2="link125" port2="1@">
+		</connection>
+
+		<connection node2="node54" port2="0@" node1="link125" port1="1@">
+		</connection>
+
+		<node name="link126" class="drcl.inet.Link" posX="6570" posY="7330">
+			<property name="propDelay" value="485"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node57" port1="1@" node2="link126" port2="0@">
+		</connection>
+
+		<connection node2="node57" port2="1@" node1="link126" port1="0@">
+		</connection>
+
+		<connection node1="node55" port1="0@" node2="link126" port2="1@">
+		</connection>
+
+		<connection node2="node55" port2="0@" node1="link126" port1="1@">
+		</connection>
+
+		<node name="link127" class="drcl.inet.Link" posX="5030" posY="5585">
+			<property name="propDelay" value="1005"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node58" port1="1@" node2="link127" port2="0@">
+		</connection>
+
+		<connection node2="node58" port2="1@" node1="link127" port1="0@">
+		</connection>
+
+		<connection node1="node53" port1="0@" node2="link127" port2="1@">
+		</connection>
+
+		<connection node2="node53" port2="0@" node1="link127" port1="1@">
+		</connection>
+
+		<node name="link128" class="drcl.inet.Link" posX="2190" posY="7545">
+			<property name="propDelay" value="471"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node58" port1="0@" node2="link128" port2="0@">
+		</connection>
+
+		<connection node2="node58" port2="0@" node1="link128" port1="0@">
+		</connection>
+
+		<connection node1="node56" port1="0@" node2="link128" port2="1@">
+		</connection>
+
+		<connection node2="node56" port2="0@" node1="link128" port1="1@">
+		</connection>
+
+		<node name="link129" class="drcl.inet.Link" posX="7310" posY="6040">
+			<property name="propDelay" value="497"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node59" port1="2@" node2="link129" port2="0@">
+		</connection>
+
+		<connection node2="node59" port2="2@" node1="link129" port1="0@">
+		</connection>
+
+		<connection node1="node52" port1="0@" node2="link129" port2="1@">
+		</connection>
+
+		<connection node2="node52" port2="0@" node1="link129" port1="1@">
+		</connection>
+
+		<node name="link130" class="drcl.inet.Link" posX="7870" posY="6690">
+			<property name="propDelay" value="591"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node59" port1="1@" node2="link130" port2="0@">
+		</connection>
+
+		<connection node2="node59" port2="1@" node1="link130" port1="0@">
+		</connection>
+
+		<connection node1="node57" port1="0@" node2="link130" port2="1@">
+		</connection>
+
+		<connection node2="node57" port2="0@" node1="link130" port1="1@">
+		</connection>
+
+		<node name="link131" class="drcl.inet.Link" posX="4330" posY="6120">
+			<property name="propDelay" value="309.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node59" port1="0@" node2="link131" port2="0@">
+		</connection>
+
+		<connection node2="node59" port2="0@" node1="link131" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link131" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link131" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network6" class="drcl.inet.Network" posX="9220" posY="7500">
+
+		<node name="node70" class="drcl.inet.Node" posX="9220" posY="7500">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node71" class="drcl.inet.Node" posX="2880" posY="6810">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<node name="node72" class="drcl.inet.Node" posX="1620" posY="3690">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node73" class="drcl.inet.Node" posX="5730" posY="9580">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node74" class="drcl.inet.Node" posX="1370" posY="7250">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node75" class="drcl.inet.Node" posX="1120" posY="6890">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<node name="node76" class="drcl.inet.Node" posX="3380" posY="4400">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node77" class="drcl.inet.Node" posX="4600" posY="5580">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node78" class="drcl.inet.Node" posX="5150" posY="3210">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node79" class="drcl.inet.Node" posX="2530" posY="1130">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link132" class="drcl.inet.Link" posX="7185" posY="5355">
+			<property name="propDelay" value="591"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node60" port1="5@" node2="link132" port2="0@">
+		</connection>
+
+		<connection node2="node60" port2="5@" node1="link132" port1="0@">
+		</connection>
+
+		<connection node1="node68" port1="3@" node2="link132" port2="1@">
+		</connection>
+
+		<connection node2="node68" port2="3@" node1="link132" port1="1@">
+		</connection>
+
+		<node name="link133" class="drcl.inet.Link" posX="7475" posY="8540">
+			<property name="propDelay" value="406"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node60" port1="4@" node2="link133" port2="0@">
+		</connection>
+
+		<connection node2="node60" port2="4@" node1="link133" port1="0@">
+		</connection>
+
+		<connection node1="node63" port1="3@" node2="link133" port2="1@">
+		</connection>
+
+		<connection node2="node63" port2="3@" node1="link133" port1="1@">
+		</connection>
+
+		<node name="link134" class="drcl.inet.Link" posX="5395" posY="5655">
+			<property name="propDelay" value="283.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node60" port1="3@" node2="link134" port2="0@">
+		</connection>
+
+		<connection node2="node60" port2="3@" node1="link134" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link134" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link134" port1="1@">
+		</connection>
+
+		<node name="link135" class="drcl.inet.Link" posX="2125" posY="7030">
+			<property name="propDelay" value="157"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node61" port1="6@" node2="link135" port2="0@">
+		</connection>
+
+		<connection node2="node61" port2="6@" node1="link135" port1="0@">
+		</connection>
+
+		<connection node1="node64" port1="3@" node2="link135" port2="1@">
+		</connection>
+
+		<connection node2="node64" port2="3@" node1="link135" port1="1@">
+		</connection>
+
+		<node name="link136" class="drcl.inet.Link" posX="3740" posY="6195">
+			<property name="propDelay" value="211"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node61" port1="5@" node2="link136" port2="0@">
+		</connection>
+
+		<connection node2="node61" port2="5@" node1="link136" port1="0@">
+		</connection>
+
+		<connection node1="node67" port1="5@" node2="link136" port2="1@">
+		</connection>
+
+		<connection node2="node67" port2="5@" node1="link136" port1="1@">
+		</connection>
+
+		<node name="link137" class="drcl.inet.Link" posX="2075" posY="2410">
+			<property name="propDelay" value="271"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node62" port1="1@" node2="link137" port2="0@">
+		</connection>
+
+		<connection node2="node62" port2="1@" node1="link137" port1="0@">
+		</connection>
+
+		<connection node1="node69" port1="2@" node2="link137" port2="1@">
+		</connection>
+
+		<connection node2="node69" port2="2@" node1="link137" port1="1@">
+		</connection>
+
+		<node name="link138" class="drcl.inet.Link" posX="3385" posY="3450">
+			<property name="propDelay" value="356"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node62" port1="0@" node2="link138" port2="0@">
+		</connection>
+
+		<connection node2="node62" port2="0@" node1="link138" port1="0@">
+		</connection>
+
+		<connection node1="node68" port1="2@" node2="link138" port2="1@">
+		</connection>
+
+		<connection node2="node68" port2="2@" node1="link138" port1="1@">
+		</connection>
+
+		<node name="link139" class="drcl.inet.Link" posX="4305" posY="8195">
+			<property name="propDelay" value="397"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node63" port1="2@" node2="link139" port2="0@">
+		</connection>
+
+		<connection node2="node63" port2="2@" node1="link139" port1="0@">
+		</connection>
+
+		<connection node1="node61" port1="4@" node2="link139" port2="1@">
+		</connection>
+
+		<connection node2="node61" port2="4@" node1="link139" port1="1@">
+		</connection>
+
+		<node name="link140" class="drcl.inet.Link" posX="4555" posY="6990">
+			<property name="propDelay" value="568"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node63" port1="1@" node2="link140" port2="0@">
+		</connection>
+
+		<connection node2="node63" port2="1@" node1="link140" port1="0@">
+		</connection>
+
+		<connection node1="node66" port1="3@" node2="link140" port2="1@">
+		</connection>
+
+		<connection node2="node66" port2="3@" node1="link140" port1="1@">
+		</connection>
+
+		<node name="link141" class="drcl.inet.Link" posX="3550" posY="8415">
+			<property name="propDelay" value="494"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node64" port1="2@" node2="link141" port2="0@">
+		</connection>
+
+		<connection node2="node64" port2="2@" node1="link141" port1="0@">
+		</connection>
+
+		<connection node1="node63" port1="0@" node2="link141" port2="1@">
+		</connection>
+
+		<connection node2="node63" port2="0@" node1="link141" port1="1@">
+		</connection>
+
+		<node name="link142" class="drcl.inet.Link" posX="5295" posY="7375">
+			<property name="propDelay" value="785"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node64" port1="1@" node2="link142" port2="0@">
+		</connection>
+
+		<connection node2="node64" port2="1@" node1="link142" port1="0@">
+		</connection>
+
+		<connection node1="node60" port1="2@" node2="link142" port2="1@">
+		</connection>
+
+		<connection node2="node60" port2="2@" node1="link142" port1="1@">
+		</connection>
+
+		<node name="link143" class="drcl.inet.Link" posX="2000" posY="6850">
+			<property name="propDelay" value="176"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node65" port1="1@" node2="link143" port2="0@">
+		</connection>
+
+		<connection node2="node65" port2="1@" node1="link143" port1="0@">
+		</connection>
+
+		<connection node1="node61" port1="3@" node2="link143" port2="1@">
+		</connection>
+
+		<connection node2="node61" port2="3@" node1="link143" port1="1@">
+		</connection>
+
+		<node name="link144" class="drcl.inet.Link" posX="1245" posY="7070">
+			<property name="propDelay" value="43"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node65" port1="0@" node2="link144" port2="0@">
+		</connection>
+
+		<connection node2="node65" port2="0@" node1="link144" port1="0@">
+		</connection>
+
+		<connection node1="node64" port1="0@" node2="link144" port2="1@">
+		</connection>
+
+		<connection node2="node64" port2="0@" node1="link144" port1="1@">
+		</connection>
+
+		<node name="link145" class="drcl.inet.Link" posX="3130" posY="5605">
+			<property name="propDelay" value="246"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node66" port1="2@" node2="link145" port2="0@">
+		</connection>
+
+		<connection node2="node66" port2="2@" node1="link145" port1="0@">
+		</connection>
+
+		<connection node1="node61" port1="2@" node2="link145" port2="1@">
+		</connection>
+
+		<connection node2="node61" port2="2@" node1="link145" port1="1@">
+		</connection>
+
+		<node name="link146" class="drcl.inet.Link" posX="6300" posY="5950">
+			<property name="propDelay" value="661"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node66" port1="1@" node2="link146" port2="0@">
+		</connection>
+
+		<connection node2="node66" port2="1@" node1="link146" port1="0@">
+		</connection>
+
+		<connection node1="node60" port1="1@" node2="link146" port2="1@">
+		</connection>
+
+		<connection node2="node60" port2="1@" node1="link146" port1="1@">
+		</connection>
+
+		<node name="link147" class="drcl.inet.Link" posX="6910" posY="6540">
+			<property name="propDelay" value="500"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node67" port1="4@" node2="link147" port2="0@">
+		</connection>
+
+		<connection node2="node67" port2="4@" node1="link147" port1="0@">
+		</connection>
+
+		<connection node1="node60" port1="0@" node2="link147" port2="1@">
+		</connection>
+
+		<connection node2="node60" port2="0@" node1="link147" port1="1@">
+		</connection>
+
+		<node name="link148" class="drcl.inet.Link" posX="3990" posY="4990">
+			<property name="propDelay" value="169"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node67" port1="3@" node2="link148" port2="0@">
+		</connection>
+
+		<connection node2="node67" port2="3@" node1="link148" port1="0@">
+		</connection>
+
+		<connection node1="node66" port1="0@" node2="link148" port2="1@">
+		</connection>
+
+		<connection node2="node66" port2="0@" node1="link148" port1="1@">
+		</connection>
+
+		<node name="link149" class="drcl.inet.Link" posX="6640" posY="6960">
+			<property name="propDelay" value="164.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node67" port1="2@" node2="link149" port2="0@">
+		</connection>
+
+		<connection node2="node67" port2="2@" node1="link149" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link149" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link149" port1="1@">
+		</connection>
+
+		<node name="link150" class="drcl.inet.Link" posX="4875" posY="4395">
+			<property name="propDelay" value="243"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node68" port1="1@" node2="link150" port2="0@">
+		</connection>
+
+		<connection node2="node68" port2="1@" node1="link150" port1="0@">
+		</connection>
+
+		<connection node1="node67" port1="1@" node2="link150" port2="1@">
+		</connection>
+
+		<connection node2="node67" port2="1@" node1="link150" port1="1@">
+		</connection>
+
+		<node name="link151" class="drcl.inet.Link" posX="4015" posY="5010">
+			<property name="propDelay" value="425"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node68" port1="0@" node2="link151" port2="0@">
+		</connection>
+
+		<connection node2="node68" port2="0@" node1="link151" port1="0@">
+		</connection>
+
+		<connection node1="node61" port1="1@" node2="link151" port2="1@">
+		</connection>
+
+		<connection node2="node61" port2="1@" node1="link151" port1="1@">
+		</connection>
+
+		<node name="link152" class="drcl.inet.Link" posX="2705" posY="3970">
+			<property name="propDelay" value="569"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node69" port1="1@" node2="link152" port2="0@">
+		</connection>
+
+		<connection node2="node69" port2="1@" node1="link152" port1="0@">
+		</connection>
+
+		<connection node1="node61" port1="0@" node2="link152" port2="1@">
+		</connection>
+
+		<connection node2="node61" port2="0@" node1="link152" port1="1@">
+		</connection>
+
+		<node name="link153" class="drcl.inet.Link" posX="3565" posY="3355">
+			<property name="propDelay" value="490"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node69" port1="0@" node2="link153" port2="0@">
+		</connection>
+
+		<connection node2="node69" port2="0@" node1="link153" port1="0@">
+		</connection>
+
+		<connection node1="node67" port1="0@" node2="link153" port2="1@">
+		</connection>
+
+		<connection node2="node67" port2="0@" node1="link153" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network7" class="drcl.inet.Network" posX="7350" posY="430">
+
+		<node name="node80" class="drcl.inet.Node" posX="7350" posY="430">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node81" class="drcl.inet.Node" posX="5100" posY="5820">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node82" class="drcl.inet.Node" posX="6590" posY="2420">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node83" class="drcl.inet.Node" posX="7340" posY="3030">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+		</node>
+
+		<node name="node84" class="drcl.inet.Node" posX="3460" posY="8170">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node85" class="drcl.inet.Node" posX="1070" posY="5790">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node86" class="drcl.inet.Node" posX="5590" posY="5150">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node87" class="drcl.inet.Node" posX="7830" posY="2140">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node88" class="drcl.inet.Node" posX="5970" posY="8260">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node89" class="drcl.inet.Node" posX="9170" posY="6560">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link21" class="drcl.inet.Link" posX="5630" posY="1135">
+			<property name="propDelay" value="123.66666666666667"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node70" port1="3@" node2="link21" port2="0@">
+		</connection>
+
+		<connection node2="node70" port2="3@" node1="link21" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link21" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link21" port1="1@">
+		</connection>
+
+		<node name="link30" class="drcl.inet.Link" posX="5540" posY="4805">
+			<property name="propDelay" value="173.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node72" port1="4@" node2="link30" port2="0@">
+		</connection>
+
+		<connection node2="node72" port2="4@" node1="link30" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link30" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link30" port1="1@">
+		</connection>
+
+		<node name="link154" class="drcl.inet.Link" posX="5405" posY="4300">
+			<property name="propDelay" value="866"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node70" port1="2@" node2="link154" port2="0@">
+		</connection>
+
+		<connection node2="node70" port2="2@" node1="link154" port1="0@">
+		</connection>
+
+		<connection node1="node74" port1="4@" node2="link154" port2="1@">
+		</connection>
+
+		<connection node2="node74" port2="4@" node1="link154" port1="1@">
+		</connection>
+
+		<node name="link155" class="drcl.inet.Link" posX="7590" posY="1285">
+			<property name="propDelay" value="177"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node70" port1="1@" node2="link155" port2="0@">
+		</connection>
+
+		<connection node2="node70" port2="1@" node1="link155" port1="0@">
+		</connection>
+
+		<connection node1="node77" port1="4@" node2="link155" port2="1@">
+		</connection>
+
+		<connection node2="node77" port2="4@" node1="link155" port1="1@">
+		</connection>
+
+		<node name="link156" class="drcl.inet.Link" posX="5345" posY="5485">
+			<property name="propDelay" value="83"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node71" port1="3@" node2="link156" port2="0@">
+		</connection>
+
+		<connection node2="node71" port2="3@" node1="link156" port1="0@">
+		</connection>
+
+		<connection node1="node76" port1="3@" node2="link156" port2="1@">
+		</connection>
+
+		<connection node2="node76" port2="3@" node1="link156" port1="1@">
+		</connection>
+
+		<node name="link157" class="drcl.inet.Link" posX="3085" posY="5805">
+			<property name="propDelay" value="403"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node71" port1="2@" node2="link157" port2="0@">
+		</connection>
+
+		<connection node2="node71" port2="2@" node1="link157" port1="0@">
+		</connection>
+
+		<connection node1="node75" port1="4@" node2="link157" port2="1@">
+		</connection>
+
+		<connection node2="node75" port2="4@" node1="link157" port1="1@">
+		</connection>
+
+		<node name="link158" class="drcl.inet.Link" posX="6965" posY="2725">
+			<property name="propDelay" value="96"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node72" port1="3@" node2="link158" port2="0@">
+		</connection>
+
+		<connection node2="node72" port2="3@" node1="link158" port1="0@">
+		</connection>
+
+		<connection node1="node73" port1="5@" node2="link158" port2="1@">
+		</connection>
+
+		<connection node2="node73" port2="5@" node1="link158" port1="1@">
+		</connection>
+
+		<node name="link159" class="drcl.inet.Link" posX="6090" posY="3785">
+			<property name="propDelay" value="290"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node72" port1="2@" node2="link159" port2="0@">
+		</connection>
+
+		<connection node2="node72" port2="2@" node1="link159" port1="0@">
+		</connection>
+
+		<connection node1="node76" port1="2@" node2="link159" port2="1@">
+		</connection>
+
+		<connection node2="node76" port2="2@" node1="link159" port1="1@">
+		</connection>
+
+		<node name="link160" class="drcl.inet.Link" posX="7345" posY="1730">
+			<property name="propDelay" value="260"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node73" port1="4@" node2="link160" port2="0@">
+		</connection>
+
+		<connection node2="node73" port2="4@" node1="link160" port1="0@">
+		</connection>
+
+		<connection node1="node70" port1="0@" node2="link160" port2="1@">
+		</connection>
+
+		<connection node2="node70" port2="0@" node1="link160" port1="1@">
+		</connection>
+
+		<node name="link161" class="drcl.inet.Link" posX="7585" posY="2585">
+			<property name="propDelay" value="101"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node73" port1="3@" node2="link161" port2="0@">
+		</connection>
+
+		<connection node2="node73" port2="3@" node1="link161" port1="0@">
+		</connection>
+
+		<connection node1="node77" port1="3@" node2="link161" port2="1@">
+		</connection>
+
+		<connection node2="node77" port2="3@" node1="link161" port1="1@">
+		</connection>
+
+		<node name="link162" class="drcl.inet.Link" posX="3985" posY="2560">
+			<property name="propDelay" value="225.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node73" port1="2@" node2="link162" port2="0@">
+		</connection>
+
+		<connection node2="node73" port2="2@" node1="link162" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link162" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link162" port1="1@">
+		</connection>
+
+		<node name="link163" class="drcl.inet.Link" posX="4280" posY="6995">
+			<property name="propDelay" value="286"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node74" port1="3@" node2="link163" port2="0@">
+		</connection>
+
+		<connection node2="node74" port2="3@" node1="link163" port1="0@">
+		</connection>
+
+		<connection node1="node71" port1="1@" node2="link163" port2="1@">
+		</connection>
+
+		<connection node2="node71" port2="1@" node1="link163" port1="1@">
+		</connection>
+
+		<node name="link164" class="drcl.inet.Link" posX="4715" posY="8215">
+			<property name="propDelay" value="251"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node74" port1="2@" node2="link164" port2="0@">
+		</connection>
+
+		<connection node2="node74" port2="2@" node1="link164" port1="0@">
+		</connection>
+
+		<connection node1="node78" port1="4@" node2="link164" port2="1@">
+		</connection>
+
+		<connection node2="node78" port2="4@" node1="link164" port1="1@">
+		</connection>
+
+		<node name="link165" class="drcl.inet.Link" posX="3830" posY="4105">
+			<property name="propDelay" value="646"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node75" port1="3@" node2="link165" port2="0@">
+		</connection>
+
+		<connection node2="node75" port2="3@" node1="link165" port1="0@">
+		</connection>
+
+		<connection node1="node72" port1="1@" node2="link165" port2="1@">
+		</connection>
+
+		<connection node2="node72" port2="1@" node1="link165" port1="1@">
+		</connection>
+
+		<node name="link166" class="drcl.inet.Link" posX="4205" posY="4410">
+			<property name="propDelay" value="685"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node75" port1="2@" node2="link166" port2="0@">
+		</connection>
+
+		<connection node2="node75" port2="2@" node1="link166" port1="0@">
+		</connection>
+
+		<connection node1="node73" port1="1@" node2="link166" port2="1@">
+		</connection>
+
+		<connection node2="node73" port2="1@" node1="link166" port1="1@">
+		</connection>
+
+		<node name="link167" class="drcl.inet.Link" posX="4525" posY="6660">
+			<property name="propDelay" value="369"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node76" port1="1@" node2="link167" port2="0@">
+		</connection>
+
+		<connection node2="node76" port2="1@" node1="link167" port1="0@">
+		</connection>
+
+		<connection node1="node74" port1="1@" node2="link167" port2="1@">
+		</connection>
+
+		<connection node2="node74" port2="1@" node1="link167" port1="1@">
+		</connection>
+
+		<node name="link168" class="drcl.inet.Link" posX="6710" posY="3645">
+			<property name="propDelay" value="375"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node76" port1="0@" node2="link168" port2="0@">
+		</connection>
+
+		<connection node2="node76" port2="0@" node1="link168" port1="0@">
+		</connection>
+
+		<connection node1="node77" port1="2@" node2="link168" port2="1@">
+		</connection>
+
+		<connection node2="node77" port2="2@" node1="link168" port1="1@">
+		</connection>
+
+		<node name="link169" class="drcl.inet.Link" posX="4450" posY="3965">
+			<property name="propDelay" value="768"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node77" port1="1@" node2="link169" port2="0@">
+		</connection>
+
+		<connection node2="node77" port2="1@" node1="link169" port1="0@">
+		</connection>
+
+		<connection node1="node75" port1="1@" node2="link169" port2="1@">
+		</connection>
+
+		<connection node2="node75" port2="1@" node1="link169" port1="1@">
+		</connection>
+
+		<node name="link170" class="drcl.inet.Link" posX="5645" posY="5155">
+			<property name="propDelay" value="744"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node77" port1="0@" node2="link170" port2="0@">
+		</connection>
+
+		<connection node2="node77" port2="0@" node1="link170" port1="0@">
+		</connection>
+
+		<connection node1="node74" port1="0@" node2="link170" port2="1@">
+		</connection>
+
+		<connection node2="node74" port2="0@" node1="link170" port1="1@">
+		</connection>
+
+		<node name="link171" class="drcl.inet.Link" posX="6280" posY="5340">
+			<property name="propDelay" value="587"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node78" port1="3@" node2="link171" port2="0@">
+		</connection>
+
+		<connection node2="node78" port2="3@" node1="link171" port1="0@">
+		</connection>
+
+		<connection node1="node72" port1="0@" node2="link171" port2="1@">
+		</connection>
+
+		<connection node2="node72" port2="0@" node1="link171" port1="1@">
+		</connection>
+
+		<node name="link172" class="drcl.inet.Link" posX="3520" posY="7025">
+			<property name="propDelay" value="548"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node78" port1="2@" node2="link172" port2="0@">
+		</connection>
+
+		<connection node2="node78" port2="2@" node1="link172" port1="0@">
+		</connection>
+
+		<connection node1="node75" port1="0@" node2="link172" port2="1@">
+		</connection>
+
+		<connection node2="node75" port2="0@" node1="link172" port1="1@">
+		</connection>
+
+		<node name="link173" class="drcl.inet.Link" posX="3560" posY="6225">
+			<property name="propDelay" value="210.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node78" port1="1@" node2="link173" port2="0@">
+		</connection>
+
+		<connection node2="node78" port2="1@" node1="link173" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-2@" node2="link173" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-2@" node1="link173" port1="1@">
+		</connection>
+
+		<node name="link174" class="drcl.inet.Link" posX="8255" posY="4795">
+			<property name="propDelay" value="397"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node79" port1="1@" node2="link174" port2="0@">
+		</connection>
+
+		<connection node2="node79" port2="1@" node1="link174" port1="0@">
+		</connection>
+
+		<connection node1="node73" port1="0@" node2="link174" port2="1@">
+		</connection>
+
+		<connection node2="node73" port2="0@" node1="link174" port1="1@">
+		</connection>
+
+		<node name="link175" class="drcl.inet.Link" posX="7135" posY="6190">
+			<property name="propDelay" value="413"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node79" port1="0@" node2="link175" port2="0@">
+		</connection>
+
+		<connection node2="node79" port2="0@" node1="link175" port1="0@">
+		</connection>
+
+		<connection node1="node71" port1="0@" node2="link175" port2="1@">
+		</connection>
+
+		<connection node2="node71" port2="0@" node1="link175" port1="1@">
+		</connection>
+
+		<node name="link182" class="drcl.inet.Link" posX="4795" posY="6220">
+			<property name="propDelay" value="156.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node78" port1="0@" node2="link182" port2="0@">
+		</connection>
+
+		<connection node2="node78" port2="0@" node1="link182" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-3@" node2="link182" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-3@" node1="link182" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network8" class="drcl.inet.Network" posX="1260" posY="7650">
+
+		<node name="node90" class="drcl.inet.Node" posX="1260" posY="7650">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node91" class="drcl.inet.Node" posX="6030" posY="4500">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node92" class="drcl.inet.Node" posX="3620" posY="4180">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node93" class="drcl.inet.Node" posX="3340" posY="6540">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node94" class="drcl.inet.Node" posX="2090" posY="9840">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node95" class="drcl.inet.Node" posX="9490" posY="9860">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node96" class="drcl.inet.Node" posX="6550" posY="6400">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node97" class="drcl.inet.Node" posX="2960" posY="7290">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<node name="node98" class="drcl.inet.Node" posX="7890" posY="7490">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node99" class="drcl.inet.Node" posX="9720" posY="8310">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link176" class="drcl.inet.Link" posX="2440" posY="5915">
+			<property name="propDelay" value="419"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node80" port1="2@" node2="link176" port2="0@">
+		</connection>
+
+		<connection node2="node80" port2="2@" node1="link176" port1="0@">
+		</connection>
+
+		<connection node1="node82" port1="4@" node2="link176" port2="1@">
+		</connection>
+
+		<connection node2="node82" port2="4@" node1="link176" port1="1@">
+		</connection>
+
+		<node name="link177" class="drcl.inet.Link" posX="1675" posY="8745">
+			<property name="propDelay" value="234"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node80" port1="1@" node2="link177" port2="0@">
+		</connection>
+
+		<connection node2="node80" port2="1@" node1="link177" port1="0@">
+		</connection>
+
+		<connection node1="node84" port1="2@" node2="link177" port2="1@">
+		</connection>
+
+		<connection node2="node84" port2="2@" node1="link177" port1="1@">
+		</connection>
+
+		<node name="link178" class="drcl.inet.Link" posX="6290" posY="5450">
+			<property name="propDelay" value="196"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node81" port1="3@" node2="link178" port2="0@">
+		</connection>
+
+		<connection node2="node81" port2="3@" node1="link178" port1="0@">
+		</connection>
+
+		<connection node1="node86" port1="4@" node2="link178" port2="1@">
+		</connection>
+
+		<connection node2="node86" port2="4@" node1="link178" port1="1@">
+		</connection>
+
+		<node name="link179" class="drcl.inet.Link" posX="4495" posY="5895">
+			<property name="propDelay" value="414"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node81" port1="2@" node2="link179" port2="0@">
+		</connection>
+
+		<connection node2="node81" port2="2@" node1="link179" port1="0@">
+		</connection>
+
+		<connection node1="node87" port1="6@" node2="link179" port2="1@">
+		</connection>
+
+		<connection node2="node87" port2="6@" node1="link179" port1="1@">
+		</connection>
+
+		<node name="link180" class="drcl.inet.Link" posX="5085" posY="5290">
+			<property name="propDelay" value="367"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node82" port1="3@" node2="link180" port2="0@">
+		</connection>
+
+		<connection node2="node82" port2="3@" node1="link180" port1="0@">
+		</connection>
+
+		<connection node1="node86" port1="3@" node2="link180" port2="1@">
+		</connection>
+
+		<connection node2="node86" port2="3@" node1="link180" port1="1@">
+		</connection>
+
+		<node name="link181" class="drcl.inet.Link" posX="3290" posY="5735">
+			<property name="propDelay" value="317"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node82" port1="2@" node2="link181" port2="0@">
+		</connection>
+
+		<connection node2="node82" port2="2@" node1="link181" port1="0@">
+		</connection>
+
+		<connection node1="node87" port1="5@" node2="link181" port2="1@">
+		</connection>
+
+		<connection node2="node87" port2="5@" node1="link181" port1="1@">
+		</connection>
+
+		<node name="link182" class="drcl.inet.Link" posX="4795" posY="6220">
+			<property name="propDelay" value="156.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node82" port1="1@" node2="link182" port2="0@">
+		</connection>
+
+		<connection node2="node82" port2="1@" node1="link182" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link182" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link182" port1="1@">
+		</connection>
+
+		<node name="link183" class="drcl.inet.Link" posX="3150" posY="6915">
+			<property name="propDelay" value="84"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node83" port1="2@" node2="link183" port2="0@">
+		</connection>
+
+		<connection node2="node83" port2="2@" node1="link183" port1="0@">
+		</connection>
+
+		<connection node1="node87" port1="4@" node2="link183" port2="1@">
+		</connection>
+
+		<connection node2="node87" port2="4@" node1="link183" port1="1@">
+		</connection>
+
+		<node name="link184" class="drcl.inet.Link" posX="5615" posY="7015">
+			<property name="propDelay" value="464"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node83" port1="1@" node2="link184" port2="0@">
+		</connection>
+
+		<connection node2="node83" port2="1@" node1="link184" port1="0@">
+		</connection>
+
+		<connection node1="node88" port1="4@" node2="link184" port2="1@">
+		</connection>
+
+		<connection node2="node88" port2="4@" node1="link184" port1="1@">
+		</connection>
+
+		<node name="link185" class="drcl.inet.Link" posX="2525" posY="8565">
+			<property name="propDelay" value="269"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node84" port1="1@" node2="link185" port2="0@">
+		</connection>
+
+		<connection node2="node84" port2="1@" node1="link185" port1="0@">
+		</connection>
+
+		<connection node1="node87" port1="3@" node2="link185" port2="1@">
+		</connection>
+
+		<connection node2="node87" port2="3@" node1="link185" port1="1@">
+		</connection>
+
+		<node name="link186" class="drcl.inet.Link" posX="5790" posY="9850">
+			<property name="propDelay" value="740"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node84" port1="0@" node2="link186" port2="0@">
+		</connection>
+
+		<connection node2="node84" port2="0@" node1="link186" port1="0@">
+		</connection>
+
+		<connection node1="node85" port1="3@" node2="link186" port2="1@">
+		</connection>
+
+		<connection node2="node85" port2="3@" node1="link186" port1="1@">
+		</connection>
+
+		<node name="link187" class="drcl.inet.Link" posX="6415" posY="8200">
+			<property name="propDelay" value="698"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node85" port1="2@" node2="link187" port2="0@">
+		</connection>
+
+		<connection node2="node85" port2="2@" node1="link187" port1="0@">
+		</connection>
+
+		<connection node1="node83" port1="0@" node2="link187" port2="1@">
+		</connection>
+
+		<connection node2="node83" port2="0@" node1="link187" port1="1@">
+		</connection>
+
+		<node name="link188" class="drcl.inet.Link" posX="8690" posY="8675">
+			<property name="propDelay" value="285"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node85" port1="1@" node2="link188" port2="0@">
+		</connection>
+
+		<connection node2="node85" port2="1@" node1="link188" port1="0@">
+		</connection>
+
+		<connection node1="node88" port1="3@" node2="link188" port2="1@">
+		</connection>
+
+		<connection node2="node88" port2="3@" node1="link188" port1="1@">
+		</connection>
+
+		<node name="link189" class="drcl.inet.Link" posX="7220" posY="6945">
+			<property name="propDelay" value="172"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node86" port1="2@" node2="link189" port2="0@">
+		</connection>
+
+		<connection node2="node86" port2="2@" node1="link189" port1="0@">
+		</connection>
+
+		<connection node1="node88" port1="2@" node2="link189" port2="1@">
+		</connection>
+
+		<connection node2="node88" port2="2@" node1="link189" port1="1@">
+		</connection>
+
+		<node name="link190" class="drcl.inet.Link" posX="8135" posY="7355">
+			<property name="propDelay" value="370"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node86" port1="1@" node2="link190" port2="0@">
+		</connection>
+
+		<connection node2="node86" port2="1@" node1="link190" port1="0@">
+		</connection>
+
+		<connection node1="node89" port1="3@" node2="link190" port2="1@">
+		</connection>
+
+		<connection node2="node89" port2="3@" node1="link190" port1="1@">
+		</connection>
+
+		<node name="link191" class="drcl.inet.Link" posX="4755" posY="6845">
+			<property name="propDelay" value="369"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node87" port1="2@" node2="link191" port2="0@">
+		</connection>
+
+		<connection node2="node87" port2="2@" node1="link191" port1="0@">
+		</connection>
+
+		<connection node1="node86" port1="0@" node2="link191" port2="1@">
+		</connection>
+
+		<connection node2="node86" port2="0@" node1="link191" port1="1@">
+		</connection>
+
+		<node name="link192" class="drcl.inet.Link" posX="6340" posY="7800">
+			<property name="propDelay" value="683"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node87" port1="1@" node2="link192" port2="0@">
+		</connection>
+
+		<connection node2="node87" port2="1@" node1="link192" port1="0@">
+		</connection>
+
+		<connection node1="node89" port1="2@" node2="link192" port2="1@">
+		</connection>
+
+		<connection node2="node89" port2="2@" node1="link192" port1="1@">
+		</connection>
+
+		<node name="link193" class="drcl.inet.Link" posX="1795" posY="4690">
+			<property name="propDelay" value="189.66666666666666"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node87" port1="0@" node2="link193" port2="0@">
+		</connection>
+
+		<connection node2="node87" port2="0@" node1="link193" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link193" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link193" port1="1@">
+		</connection>
+
+		<node name="link194" class="drcl.inet.Link" posX="6960" posY="5995">
+			<property name="propDelay" value="352"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node88" port1="1@" node2="link194" port2="0@">
+		</connection>
+
+		<connection node2="node88" port2="1@" node1="link194" port1="0@">
+		</connection>
+
+		<connection node1="node81" port1="1@" node2="link194" port2="1@">
+		</connection>
+
+		<connection node2="node81" port2="1@" node1="link194" port1="1@">
+		</connection>
+
+		<node name="link195" class="drcl.inet.Link" posX="4575" posY="7570">
+			<property name="propDelay" value="663"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node88" port1="0@" node2="link195" port2="0@">
+		</connection>
+
+		<connection node2="node88" port2="0@" node1="link195" port1="0@">
+		</connection>
+
+		<connection node1="node80" port1="0@" node2="link195" port2="1@">
+		</connection>
+
+		<connection node2="node80" port2="0@" node1="link195" port1="1@">
+		</connection>
+
+		<node name="link196" class="drcl.inet.Link" posX="6670" posY="6245">
+			<property name="propDelay" value="736"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node89" port1="1@" node2="link196" port2="0@">
+		</connection>
+
+		<connection node2="node89" port2="1@" node1="link196" port1="0@">
+		</connection>
+
+		<connection node1="node82" port1="0@" node2="link196" port2="1@">
+		</connection>
+
+		<connection node2="node82" port2="0@" node1="link196" port1="1@">
+		</connection>
+
+		<node name="link197" class="drcl.inet.Link" posX="9605" posY="9085">
+			<property name="propDelay" value="156"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node89" port1="0@" node2="link197" port2="0@">
+		</connection>
+
+		<connection node2="node89" port2="0@" node1="link197" port1="0@">
+		</connection>
+
+		<connection node1="node85" port1="0@" node2="link197" port2="1@">
+		</connection>
+
+		<connection node2="node85" port2="0@" node1="link197" port1="1@">
+		</connection>
+
+		<node name="link215" class="drcl.inet.Link" posX="7555" posY="5765">
+			<property name="propDelay" value="132.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node81" port1="0@" node2="link215" port2="0@">
+		</connection>
+
+		<connection node2="node81" port2="0@" node1="link215" port1="0@">
+		</connection>
+
+		<connection node1="." port1="-1@" node2="link215" port2="1@">
+		</connection>
+
+		<connection node2="." port2="-1@" node1="link215" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="network9" class="drcl.inet.Network" posX="3060" posY="8130">
+
+		<node name="node100" class="drcl.inet.Node" posX="3060" posY="8130">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node101" class="drcl.inet.Node" posX="6070" posY="2340">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node102" class="drcl.inet.Node" posX="2650" posY="1030">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+			<port name="5" group=""></port>
+			<port name="6" group=""></port>
+		</node>
+
+		<node name="node103" class="drcl.inet.Node" posX="980" posY="1640">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node104" class="drcl.inet.Node" posX="1490" posY="770">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<node name="node105" class="drcl.inet.Node" posX="1090" posY="460">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node106" class="drcl.inet.Node" posX="60" posY="5410">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+			<port name="4" group=""></port>
+		</node>
+
+		<node name="node107" class="drcl.inet.Node" posX="9080" posY="7030">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node108" class="drcl.inet.Node" posX="5450" posY="30">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+		</node>
+
+		<node name="node109" class="drcl.inet.Node" posX="3330" posY="7370">
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+			<port name="2" group=""></port>
+			<port name="3" group=""></port>
+		</node>
+
+		<port name="0" group=""></port>
+
+		<port name="1" group=""></port>
+
+		<node name="link198" class="drcl.inet.Link" posX="2020" posY="4885">
+			<property name="propDelay" value="681"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node90" port1="3@" node2="link198" port2="0@">
+		</connection>
+
+		<connection node2="node90" port2="3@" node1="link198" port1="0@">
+		</connection>
+
+		<connection node1="node93" port1="3@" node2="link198" port2="1@">
+		</connection>
+
+		<connection node2="node93" port2="3@" node1="link198" port1="1@">
+		</connection>
+
+		<node name="link199" class="drcl.inet.Link" posX="2855" posY="4580">
+			<property name="propDelay" value="711"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node90" port1="2@" node2="link199" port2="0@">
+		</connection>
+
+		<connection node2="node90" port2="2@" node1="link199" port1="0@">
+		</connection>
+
+		<connection node1="node92" port1="6@" node2="link199" port2="1@">
+		</connection>
+
+		<connection node2="node92" port2="6@" node1="link199" port1="1@">
+		</connection>
+
+		<node name="link200" class="drcl.inet.Link" posX="4360" posY="1685">
+			<property name="propDelay" value="366"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node91" port1="4@" node2="link200" port2="0@">
+		</connection>
+
+		<connection node2="node91" port2="4@" node1="link200" port1="0@">
+		</connection>
+
+		<connection node1="node92" port1="5@" node2="link200" port2="1@">
+		</connection>
+
+		<connection node2="node92" port2="5@" node1="link200" port1="1@">
+		</connection>
+
+		<node name="link201" class="drcl.inet.Link" posX="3525" posY="1990">
+			<property name="propDelay" value="513"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node91" port1="3@" node2="link201" port2="0@">
+		</connection>
+
+		<connection node2="node91" port2="3@" node1="link201" port1="0@">
+		</connection>
+
+		<connection node1="node93" port1="2@" node2="link201" port2="1@">
+		</connection>
+
+		<connection node2="node93" port2="2@" node1="link201" port1="1@">
+		</connection>
+
+		<node name="link202" class="drcl.inet.Link" posX="2070" posY="900">
+			<property name="propDelay" value="118"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node92" port1="4@" node2="link202" port2="0@">
+		</connection>
+
+		<connection node2="node92" port2="4@" node1="link202" port1="0@">
+		</connection>
+
+		<connection node1="node94" port1="3@" node2="link202" port2="1@">
+		</connection>
+
+		<connection node2="node94" port2="3@" node1="link202" port1="1@">
+		</connection>
+
+		<node name="link203" class="drcl.inet.Link" posX="1355" posY="3220">
+			<property name="propDelay" value="508"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node92" port1="3@" node2="link203" port2="0@">
+		</connection>
+
+		<connection node2="node92" port2="3@" node1="link203" port1="0@">
+		</connection>
+
+		<connection node1="node96" port1="4@" node2="link203" port2="1@">
+		</connection>
+
+		<connection node2="node96" port2="4@" node1="link203" port1="1@">
+		</connection>
+
+		<node name="link204" class="drcl.inet.Link" posX="1035" posY="1050">
+			<property name="propDelay" value="118"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node93" port1="1@" node2="link204" port2="0@">
+		</connection>
+
+		<connection node2="node93" port2="1@" node1="link204" port1="0@">
+		</connection>
+
+		<connection node1="node95" port1="2@" node2="link204" port2="1@">
+		</connection>
+
+		<connection node2="node95" port2="2@" node1="link204" port1="1@">
+		</connection>
+
+		<node name="link205" class="drcl.inet.Link" posX="2155" posY="4505">
+			<property name="propDelay" value="619"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node93" port1="0@" node2="link205" port2="0@">
+		</connection>
+
+		<connection node2="node93" port2="0@" node1="link205" port1="0@">
+		</connection>
+
+		<connection node1="node99" port1="3@" node2="link205" port2="1@">
+		</connection>
+
+		<connection node2="node99" port2="3@" node1="link205" port1="1@">
+		</connection>
+
+		<node name="link206" class="drcl.inet.Link" posX="3780" posY="1555">
+			<property name="propDelay" value="484"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node94" port1="2@" node2="link206" port2="0@">
+		</connection>
+
+		<connection node2="node94" port2="2@" node1="link206" port1="0@">
+		</connection>
+
+		<connection node1="node91" port1="2@" node2="link206" port2="1@">
+		</connection>
+
+		<connection node2="node91" port2="2@" node1="link206" port1="1@">
+		</connection>
+
+		<node name="link207" class="drcl.inet.Link" posX="775" posY="3090">
+			<property name="propDelay" value="485"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node94" port1="1@" node2="link207" port2="0@">
+		</connection>
+
+		<connection node2="node94" port2="1@" node1="link207" port1="0@">
+		</connection>
+
+		<connection node1="node96" port1="3@" node2="link207" port2="1@">
+		</connection>
+
+		<connection node2="node96" port2="3@" node1="link207" port1="1@">
+		</connection>
+
+		<node name="link208" class="drcl.inet.Link" posX="1870" posY="745">
+			<property name="propDelay" value="166"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node95" port1="1@" node2="link208" port2="0@">
+		</connection>
+
+		<connection node2="node95" port2="1@" node1="link208" port1="0@">
+		</connection>
+
+		<connection node1="node92" port1="2@" node2="link208" port2="1@">
+		</connection>
+
+		<connection node2="node92" port2="2@" node1="link208" port1="1@">
+		</connection>
+
+		<node name="link209" class="drcl.inet.Link" posX="1290" posY="615">
+			<property name="propDelay" value="50"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node95" port1="0@" node2="link209" port2="0@">
+		</connection>
+
+		<connection node2="node95" port2="0@" node1="link209" port1="0@">
+		</connection>
+
+		<connection node1="node94" port1="0@" node2="link209" port2="1@">
+		</connection>
+
+		<connection node2="node94" port2="0@" node1="link209" port1="1@">
+		</connection>
+
+		<node name="link210" class="drcl.inet.Link" posX="1560" posY="6770">
+			<property name="propDelay" value="404"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node96" port1="2@" node2="link210" port2="0@">
+		</connection>
+
+		<connection node2="node96" port2="2@" node1="link210" port1="0@">
+		</connection>
+
+		<connection node1="node90" port1="1@" node2="link210" port2="1@">
+		</connection>
+
+		<connection node2="node90" port2="1@" node1="link210" port1="1@">
+		</connection>
+
+		<node name="link211" class="drcl.inet.Link" posX="3065" posY="3875">
+			<property name="propDelay" value="674"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node96" port1="1@" node2="link211" port2="0@">
+		</connection>
+
+		<connection node2="node96" port2="1@" node1="link211" port1="0@">
+		</connection>
+
+		<connection node1="node91" port1="1@" node2="link211" port2="1@">
+		</connection>
+
+		<connection node2="node91" port2="1@" node1="link211" port1="1@">
+		</connection>
+
+		<node name="link212" class="drcl.inet.Link" posX="4015" posY="6375">
+			<property name="propDelay" value="271.3333333333333"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node96" port1="0@" node2="link212" port2="0@">
+		</connection>
+
+		<connection node2="node96" port2="0@" node1="link212" port1="0@">
+		</connection>
+
+		<connection node1="." port1="1@" node2="link212" port2="1@">
+		</connection>
+
+		<connection node2="." port2="1@" node1="link212" port1="1@">
+		</connection>
+
+		<node name="link213" class="drcl.inet.Link" posX="6205" posY="7200">
+			<property name="propDelay" value="576"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node97" port1="2@" node2="link213" port2="0@">
+		</connection>
+
+		<connection node2="node97" port2="2@" node1="link213" port1="0@">
+		</connection>
+
+		<connection node1="node99" port1="2@" node2="link213" port2="1@">
+		</connection>
+
+		<connection node2="node99" port2="2@" node1="link213" port1="1@">
+		</connection>
+
+		<node name="link214" class="drcl.inet.Link" posX="7265" posY="3530">
+			<property name="propDelay" value="788"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node97" port1="1@" node2="link214" port2="0@">
+		</connection>
+
+		<connection node2="node97" port2="1@" node1="link214" port1="0@">
+		</connection>
+
+		<connection node1="node98" port1="2@" node2="link214" port2="1@">
+		</connection>
+
+		<connection node2="node98" port2="2@" node1="link214" port1="1@">
+		</connection>
+
+		<node name="link215" class="drcl.inet.Link" posX="7555" posY="5765">
+			<property name="propDelay" value="132.0"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node97" port1="0@" node2="link215" port2="0@">
+		</connection>
+
+		<connection node2="node97" port2="0@" node1="link215" port1="0@">
+		</connection>
+
+		<connection node1="." port1="0@" node2="link215" port2="1@">
+		</connection>
+
+		<connection node2="." port2="0@" node1="link215" port1="1@">
+		</connection>
+
+		<node name="link216" class="drcl.inet.Link" posX="5760" posY="1185">
+			<property name="propDelay" value="239"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node98" port1="1@" node2="link216" port2="0@">
+		</connection>
+
+		<connection node2="node98" port2="1@" node1="link216" port1="0@">
+		</connection>
+
+		<connection node1="node91" port1="0@" node2="link216" port2="1@">
+		</connection>
+
+		<connection node2="node91" port2="0@" node1="link216" port1="1@">
+		</connection>
+
+		<node name="link217" class="drcl.inet.Link" posX="4050" posY="530">
+			<property name="propDelay" value="297"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node98" port1="0@" node2="link217" port2="0@">
+		</connection>
+
+		<connection node2="node98" port2="0@" node1="link217" port1="0@">
+		</connection>
+
+		<connection node1="node92" port1="1@" node2="link217" port2="1@">
+		</connection>
+
+		<connection node2="node92" port2="1@" node1="link217" port1="1@">
+		</connection>
+
+		<node name="link218" class="drcl.inet.Link" posX="2990" posY="4200">
+			<property name="propDelay" value="637"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node99" port1="1@" node2="link218" port2="0@">
+		</connection>
+
+		<connection node2="node99" port2="1@" node1="link218" port1="0@">
+		</connection>
+
+		<connection node1="node92" port1="0@" node2="link218" port2="1@">
+		</connection>
+
+		<connection node2="node92" port2="0@" node1="link218" port1="1@">
+		</connection>
+
+		<node name="link219" class="drcl.inet.Link" posX="3195" posY="7750">
+			<property name="propDelay" value="80"></property>
+			<port name="0" group=""></port>
+			<port name="1" group=""></port>
+		</node>
+
+		<connection node1="node99" port1="0@" node2="link219" port2="0@">
+		</connection>
+
+		<connection node2="node99" port2="0@" node1="link219" port1="0@">
+		</connection>
+
+		<connection node1="node90" port1="0@" node2="link219" port2="1@">
+		</connection>
+
+		<connection node2="node90" port2="0@" node1="link219" port1="1@">
+		</connection>
+
+	</node>
+
+	<node name="link4" class="drcl.inet.Link" posX="6105" posY="5205">
+		<property name="propDelay" value="253.33333333333334"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network0" port1="1@" node2="link4" port2="0@">
+	</connection>
+
+	<connection node2="network0" port2="1@" node1="link4" port1="0@">
+	</connection>
+
+	<connection node1="network1" port1="1@" node2="link4" port2="1@">
+	</connection>
+
+	<connection node2="network1" port2="1@" node1="link4" port1="1@">
+	</connection>
+
+	<node name="link21" class="drcl.inet.Link" posX="5630" posY="1135">
+		<property name="propDelay" value="123.66666666666667"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network0" port1="0@" node2="link21" port2="0@">
+	</connection>
+
+	<connection node2="network0" port2="0@" node1="link21" port1="0@">
+	</connection>
+
+	<connection node1="network7" port1="1@" node2="link21" port2="1@">
+	</connection>
+
+	<connection node2="network7" port2="1@" node1="link21" port1="1@">
+	</connection>
+
+	<node name="link30" class="drcl.inet.Link" posX="5540" posY="4805">
+		<property name="propDelay" value="173.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network1" port1="0@" node2="link30" port2="0@">
+	</connection>
+
+	<connection node2="network1" port2="0@" node1="link30" port1="0@">
+	</connection>
+
+	<connection node1="network7" port1="0@" node2="link30" port2="1@">
+	</connection>
+
+	<connection node2="network7" port2="0@" node1="link30" port1="1@">
+	</connection>
+
+	<node name="link41" class="drcl.inet.Link" posX="2070" posY="5230">
+		<property name="propDelay" value="198.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network1" port1="-1@" node2="link41" port2="0@">
+	</connection>
+
+	<connection node2="network1" port2="-1@" node1="link41" port1="0@">
+	</connection>
+
+	<connection node1="network5" port1="1@" node2="link41" port2="1@">
+	</connection>
+
+	<connection node2="network5" port2="1@" node1="link41" port1="1@">
+	</connection>
+
+	<node name="link64" class="drcl.inet.Link" posX="1970" posY="4635">
+		<property name="propDelay" value="89.66666666666667"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network2" port1="1@" node2="link64" port2="0@">
+	</connection>
+
+	<connection node2="network2" port2="1@" node1="link64" port1="0@">
+	</connection>
+
+	<connection node1="network0" port1="-1@" node2="link64" port2="1@">
+	</connection>
+
+	<connection node2="network0" port2="-1@" node1="link64" port1="1@">
+	</connection>
+
+	<node name="link65" class="drcl.inet.Link" posX="3195" posY="7125">
+		<property name="propDelay" value="125.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network2" port1="0@" node2="link65" port2="0@">
+	</connection>
+
+	<connection node2="network2" port2="0@" node1="link65" port1="0@">
+	</connection>
+
+	<connection node1="network1" port1="-2@" node2="link65" port2="1@">
+	</connection>
+
+	<connection node2="network1" port2="-2@" node1="link65" port1="1@">
+	</connection>
+
+	<node name="link72" class="drcl.inet.Link" posX="3735" posY="8485">
+		<property name="propDelay" value="36.333333333333336"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network3" port1="1@" node2="link72" port2="0@">
+	</connection>
+
+	<connection node2="network3" port2="1@" node1="link72" port1="0@">
+	</connection>
+
+	<connection node1="network1" port1="-3@" node2="link72" port2="1@">
+	</connection>
+
+	<connection node2="network1" port2="-3@" node1="link72" port1="1@">
+	</connection>
+
+	<node name="link85" class="drcl.inet.Link" posX="4770" posY="5800">
+		<property name="propDelay" value="346.6666666666667"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network3" port1="0@" node2="link85" port2="0@">
+	</connection>
+
+	<connection node2="network3" port2="0@" node1="link85" port1="0@">
+	</connection>
+
+	<connection node1="network0" port1="-2@" node2="link85" port2="1@">
+	</connection>
+
+	<connection node2="network0" port2="-2@" node1="link85" port1="1@">
+	</connection>
+
+	<node name="link90" class="drcl.inet.Link" posX="8735" posY="4695">
+		<property name="propDelay" value="101.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network4" port1="1@" node2="link90" port2="0@">
+	</connection>
+
+	<connection node2="network4" port2="1@" node1="link90" port1="0@">
+	</connection>
+
+	<connection node1="network0" port1="-3@" node2="link90" port2="1@">
+	</connection>
+
+	<connection node2="network0" port2="-3@" node1="link90" port1="1@">
+	</connection>
+
+	<node name="link95" class="drcl.inet.Link" posX="2240" posY="5865">
+		<property name="propDelay" value="133.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network4" port1="0@" node2="link95" port2="0@">
+	</connection>
+
+	<connection node2="network4" port2="0@" node1="link95" port1="0@">
+	</connection>
+
+	<connection node1="network3" port1="-1@" node2="link95" port2="1@">
+	</connection>
+
+	<connection node2="network3" port2="-1@" node1="link95" port1="1@">
+	</connection>
+
+	<node name="link120" class="drcl.inet.Link" posX="1490" posY="5610">
+		<property name="propDelay" value="160.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network5" port1="0@" node2="link120" port2="0@">
+	</connection>
+
+	<connection node2="network5" port2="0@" node1="link120" port1="0@">
+	</connection>
+
+	<connection node1="network0" port1="-4@" node2="link120" port2="1@">
+	</connection>
+
+	<connection node2="network0" port2="-4@" node1="link120" port1="1@">
+	</connection>
+
+	<node name="link131" class="drcl.inet.Link" posX="4330" posY="6120">
+		<property name="propDelay" value="309.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network5" port1="-1@" node2="link131" port2="0@">
+	</connection>
+
+	<connection node2="network5" port2="-1@" node1="link131" port1="0@">
+	</connection>
+
+	<connection node1="network4" port1="-1@" node2="link131" port2="1@">
+	</connection>
+
+	<connection node2="network4" port2="-1@" node1="link131" port1="1@">
+	</connection>
+
+	<node name="link134" class="drcl.inet.Link" posX="5395" posY="5655">
+		<property name="propDelay" value="283.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network6" port1="1@" node2="link134" port2="0@">
+	</connection>
+
+	<connection node2="network6" port2="1@" node1="link134" port1="0@">
+	</connection>
+
+	<connection node1="network4" port1="-2@" node2="link134" port2="1@">
+	</connection>
+
+	<connection node2="network4" port2="-2@" node1="link134" port1="1@">
+	</connection>
+
+	<node name="link149" class="drcl.inet.Link" posX="6640" posY="6960">
+		<property name="propDelay" value="164.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network6" port1="0@" node2="link149" port2="0@">
+	</connection>
+
+	<connection node2="network6" port2="0@" node1="link149" port1="0@">
+	</connection>
+
+	<connection node1="network3" port1="-2@" node2="link149" port2="1@">
+	</connection>
+
+	<connection node2="network3" port2="-2@" node1="link149" port1="1@">
+	</connection>
+
+	<node name="link162" class="drcl.inet.Link" posX="3985" posY="2560">
+		<property name="propDelay" value="225.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network7" port1="-1@" node2="link162" port2="0@">
+	</connection>
+
+	<connection node2="network7" port2="-1@" node1="link162" port1="0@">
+	</connection>
+
+	<connection node1="network2" port1="-1@" node2="link162" port2="1@">
+	</connection>
+
+	<connection node2="network2" port2="-1@" node1="link162" port1="1@">
+	</connection>
+
+	<node name="link173" class="drcl.inet.Link" posX="3560" posY="6225">
+		<property name="propDelay" value="210.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network7" port1="-2@" node2="link173" port2="0@">
+	</connection>
+
+	<connection node2="network7" port2="-2@" node1="link173" port1="0@">
+	</connection>
+
+	<connection node1="network3" port1="-3@" node2="link173" port2="1@">
+	</connection>
+
+	<connection node2="network3" port2="-3@" node1="link173" port1="1@">
+	</connection>
+
+	<node name="link182" class="drcl.inet.Link" posX="4795" posY="6220">
+		<property name="propDelay" value="156.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network8" port1="1@" node2="link182" port2="0@">
+	</connection>
+
+	<connection node2="network8" port2="1@" node1="link182" port1="0@">
+	</connection>
+
+	<connection node1="network7" port1="-3@" node2="link182" port2="1@">
+	</connection>
+
+	<connection node2="network7" port2="-3@" node1="link182" port1="1@">
+	</connection>
+
+	<node name="link193" class="drcl.inet.Link" posX="1795" posY="4690">
+		<property name="propDelay" value="189.66666666666666"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network8" port1="0@" node2="link193" port2="0@">
+	</connection>
+
+	<connection node2="network8" port2="0@" node1="link193" port1="0@">
+	</connection>
+
+	<connection node1="network2" port1="-2@" node2="link193" port2="1@">
+	</connection>
+
+	<connection node2="network2" port2="-2@" node1="link193" port1="1@">
+	</connection>
+
+	<node name="link212" class="drcl.inet.Link" posX="4015" posY="6375">
+		<property name="propDelay" value="271.3333333333333"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network9" port1="1@" node2="link212" port2="0@">
+	</connection>
+
+	<connection node2="network9" port2="1@" node1="link212" port1="0@">
+	</connection>
+
+	<connection node1="network2" port1="-3@" node2="link212" port2="1@">
+	</connection>
+
+	<connection node2="network2" port2="-3@" node1="link212" port1="1@">
+	</connection>
+
+	<node name="link215" class="drcl.inet.Link" posX="7555" posY="5765">
+		<property name="propDelay" value="132.0"></property>
+		<port name="0" group=""></port>
+		<port name="1" group=""></port>
+	</node>
+
+	<connection node1="network9" port1="0@" node2="link215" port2="0@">
+	</connection>
+
+	<connection node2="network9" port2="0@" node1="link215" port1="0@">
+	</connection>
+
+	<connection node1="network8" port1="-1@" node2="link215" port2="1@">
+	</connection>
+
+	<connection node2="network8" port2="-1@" node1="link215" port1="1@">
+	</connection>
+
+</node>
+

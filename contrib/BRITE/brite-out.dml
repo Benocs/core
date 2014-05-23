@@ -1,0 +1,48 @@
+
+#BRITE topology output to DML
+
+
+_schema [ _find .schemas.Net]
+
+Net [ 
+	frequency 1000000000 	 #1 nanosecond time resolution
+	randomstream [
+	   generator "MersenneTwister"
+	   stream "startseed"
+	   reproducibility_level "timeline"
+	]
+
+	#NOTE:  Interfaces 0-5 are available for custom use.
+
+	Net [ id 0	  _extends .brite-out_networks.dml.as0.Net ]
+	Net [ id 1	  _extends .brite-out_networks.dml.as1.Net ]
+	Net [ id 2	  _extends .brite-out_networks.dml.as2.Net ]
+	Net [ id 3	  _extends .brite-out_networks.dml.as3.Net ]
+	Net [ id 4	  _extends .brite-out_networks.dml.as4.Net ]
+	Net [ id 5	  _extends .brite-out_networks.dml.as5.Net ]
+	Net [ id 6	  _extends .brite-out_networks.dml.as6.Net ]
+	Net [ id 7	  _extends .brite-out_networks.dml.as7.Net ]
+	Net [ id 8	  _extends .brite-out_networks.dml.as8.Net ]
+	Net [ id 9	  _extends .brite-out_networks.dml.as9.Net ]
+	link [ attach 0:11(6)  attach 1:28(6)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 0:19(7)  attach 7:80(6)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 1:23(7)  attach 7:82(7)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 1:28(8)  attach 5:64(6)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 2:39(6)  attach 0:15(8)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 2:39(7)  attach 1:20(9)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 3:42(6)  attach 1:24(10)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 3:48(7)  attach 0:17(9)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 4:50(6)  attach 0:17(10)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 4:52(7)  attach 3:49(8)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 5:64(7)  attach 0:15(11)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 5:69(8)  attach 4:51(8)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 6:70(6)  attach 4:59(9)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 6:77(7)  attach 3:47(9)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 7:83(8)  attach 2:34(8)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 7:88(9)  attach 3:49(10)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 8:92(6)  attach 7:88(10)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 8:97(7)  attach 2:34(9)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 9:106(6)  attach 2:37(10)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+	link [ attach 9:107(7)  attach 8:91(8)  delay 0.0 ]  #_extends .dictionary.Links.InterASLink ]
+
+] #end of net
