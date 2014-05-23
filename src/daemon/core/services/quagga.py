@@ -696,12 +696,6 @@ class Bgp(QuaggaService):
         v6cfg = []
         v6prefixes = []
 
-        # Assume that we want to configure a full-mesh IBGP network.
-        # But, if there is a route reflector within this AS and this node
-        # is not a route reflector, configure it as a route reflector client.
-        configure_full_mesh = True
-        configure_route_reflector = False
-
         if not node.enable_ipv4 and not node.enable_ipv6:
             return ''
 
@@ -725,34 +719,11 @@ class Bgp(QuaggaService):
             cfg += tmpcfg
             v6cfg.extend(tmpv6cfg)
 
-        # determine IBGP configuration
-        if service_flags.BGPRouteReflector in node.services:
-            configure_full_mesh = False
-            configure_route_reflector = True
-            # TODO: how to automatically configure a bgp cluster-id?
-            cfg += '  bgp cluster-id 1\n'
-        else:
-            configure_route_reflector = False
-            # check whether there are any route reflectors in this AS
-            rr_list = []
-            service_helpers.nodewalker(node, node, rr_list,
-                    cls.nodewalker_ibgp_find_route_reflectors_callback)
-            if len(rr_list) > 0:
-                print(('[BGP] IBGP rr_list: %s' % str(rr_list)))
-                configure_full_mesh = False
-        print(('[BGP] IBGP config determination: full_mesh: %s, rr: %s' %
-                (str(configure_full_mesh), str(configure_route_reflector))))
-
         # configure IBGP connections
         confstr_list = [cfg]
         # full mesh
-        if configure_full_mesh:
-            service_helpers.nodewalker(node, node, confstr_list,
-                    cls.nodewalker_ibgp_find_neighbors_callback)
-        # we are a route reflector or a rr-client
-        else:
-            service_helpers.nodewalker(node, node, confstr_list,
-                    cls.nodewalker_ibgp_configure_route_reflector_net_callback)
+        service_helpers.nodewalker(node, node, confstr_list,
+                cls.nodewalker_ibgp_find_neighbors_callback)
         cfg = ''.join(confstr_list)
 
         if node.enable_ipv4 and service_flags.EGP in node.services:
@@ -790,62 +761,6 @@ class Bgp(QuaggaService):
             cfg += '\n  exit-address-family\n'
 
         return cfg
-
-    @staticmethod
-    def nodewalker_ibgp_find_route_reflectors_callback(startnode, currentnode):
-        result = []
-
-        if service_flags.Router in startnode.services and \
-                service_flags.Router in currentnode.services and \
-                not startnode == currentnode and \
-                startnode.netid == currentnode.netid:
-            if (service_flags.BGPRouteReflector in startnode.services and \
-                    not service_flags.BGPRouteReflector in currentnode.services) or \
-                    service_flags.BGPRouteReflector in currentnode.services:
-                result.append(currentnode)
-
-        return result
-
-    @staticmethod
-    def nodewalker_ibgp_configure_route_reflector_net_callback(startnode, currentnode):
-        result = []
-
-        if service_flags.Router in startnode.services and \
-                service_flags.Router in currentnode.services and \
-                not startnode == currentnode and \
-                startnode.netid == currentnode.netid:
-
-            startnode_ipversions = startnode.getIPversions()
-            currentnode_ipversions = currentnode.getIPversions()
-            ipversions = []
-            for ipversion in 4, 6:
-                if ipversion in startnode_ipversions and currentnode_ipversions:
-                    ipversions.append(ipversion)
-
-            for ipversion in ipversions:
-                if ipversion == 4:
-                    startnode_addr = startnode.getLoopbackIPv4()
-                    currentnode_addr = currentnode.getLoopbackIPv4()
-                elif ipversion == 6:
-                    startnode_addr = startnode.getLoopbackIPv6()
-                    currentnode_addr = currentnode.getLoopbackIPv6()
-
-                if (service_flags.BGPRouteReflector in startnode.services and \
-                        not service_flags.BGPRouteReflector in currentnode.services) or \
-                        service_flags.BGPRouteReflector in currentnode.services:
-                    result.extend(['  neighbor %s remote-as %s\n' % \
-                            (str(currentnode_addr), str(currentnode.netid)),
-                            '  neighbor %s update-source %s\n' % \
-                            (str(currentnode_addr), str(startnode_addr))
-                            ])
-
-                if service_flags.BGPRouteReflector in startnode.services and \
-                        not service_flags.BGPRouteReflector in currentnode.services:
-                    result.append('  neighbor %s route-reflector-client\n' % str(currentnode_addr))
-
-                if service_flags.EGP in startnode.services:
-                    result.append('  neighbor %s next-hop-self\n' % str(currentnode_addr))
-        return result
 
     @staticmethod
     def nodewalker_ibgp_find_neighbors_callback(startnode, currentnode):
