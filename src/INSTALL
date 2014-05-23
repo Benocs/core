@@ -11,10 +11,17 @@ su -c "apt-get update; apt-get purge quagga; apt-get install bash bridge-utils e
     tcl8.5 tk8.5 libtk-img gawk snmpd libsnmp-dev \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
     imagemagick help2man unionfs-fuse libpcap-dev \
-    python3 python3-dev dnsmasq bind9 lighttpd \
+    python3 python3-dev bind9 lighttpd \
     tmux" root
 
-daemons="dnsmasq bind9 lighttpd"
+daemons="bind9 lighttpd"
+su -c "(for daemon in $daemons; do \
+            update-rc.d -f \$daemon remove || echo \"error while deactivating \
+            \$daemon\'s \ init script. check output.\"; done)" root
+
+su -c "apt-get install dnsmasq" root
+
+daemons="dnsmasq"
 su -c "(for daemon in $daemons; do \
             update-rc.d -f \$daemon remove || echo \"error while deactivating \
             \$daemon\'s \ init script. check output.\"; done)" root
