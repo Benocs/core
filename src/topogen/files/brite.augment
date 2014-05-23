@@ -1,0 +1,84 @@
+#
+# define types of augmentation here. the order matters as it serves as priority.
+# the augmentations are created from left to right.
+#
+augmentation_types = dns_resolver, dns_as_root_server, dns_root_server, access, server
+
+#
+# define exclude criteria (scope is per AS)
+#
+# one_of: place only one of the specified types per AS
+#
+# when using this, be sure to set min_TYPE_networks_per_as = 0
+#
+one_of = access, server
+
+#
+# place exactly one authoritative AS DNS server in one AS
+#
+# it will serve as an authoritative name server for all hosts in that AS
+#
+dns_as_root_server_class = DNSASServer
+#min_dns_as_root_server_networks_global = 0
+#max_dns_as_root_server_networks_global = 2
+min_dns_as_root_server_networks_per_as = 2
+max_dns_as_root_server_networks_per_as = 2
+create_dns_as_root_server_networks_probability = 1
+min_nodes_per_dns_as_root_server_network = 1
+max_nodes_per_dns_as_root_server_network = 1
+
+#
+# place up to one authoritative DNS ROOT server per AS
+#
+# it will serve as a root name server.
+# each visited core router has a propability of 33% that the DNS root
+# server will be placed adjacent to that router (as long as
+# max_dns_root_server_networks_per_as is not yet reached).
+#
+dns_root_server_class = DNSRootServer
+min_dns_root_server_networks_global = 3
+max_dns_root_server_networks_global = 10
+min_dns_root_server_networks_per_as = 0
+max_dns_root_server_networks_per_as = 1
+create_dns_root_server_networks_probability = 0.005
+min_nodes_per_dns_root_server_network = 1
+max_nodes_per_dns_root_server_network = 1
+
+#
+# place exactly one (caching) DNS server per AS
+#
+# it will serve as a caching and forwarding name server for all hosts in that AS
+#
+dns_resolver_class = DNSServer
+#min_dns_resolver_networks_global = 0
+#max_dns_resolver_networks_global = 2
+min_dns_resolver_networks_per_as = 1
+max_dns_resolver_networks_per_as = 1
+create_dns_resolver_networks_probability = 1
+min_nodes_per_dns_resolver_network = 1
+max_nodes_per_dns_resolver_network = 1
+
+#
+# place up to two access networks per AS with 3 to 5 nodes each
+#
+access_class = AccessNode
+min_access_networks_global = 1
+max_access_networks_global = 5
+min_access_networks_per_as = 0
+max_access_networks_per_as = 5
+create_access_networks_probability = 0.025
+min_nodes_per_access_network = 5
+max_nodes_per_access_network = 10
+
+#
+# place up to two server networks per AS with 3 to 5 nodes each
+#
+server_class = ServerNode
+min_server_networks_global = 1
+max_server_networks_global = 5
+min_server_networks_per_as = 0
+max_server_networks_per_as = 5
+create_server_networks_probability = 0.025
+min_nodes_per_server_network = 5
+max_nodes_per_server_network = 10
+

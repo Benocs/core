@@ -1,0 +1,5 @@
+# IGP: IS-IS
+AS_NODE = egp_node
+RT_NODE = igp_node
+RT_BORDER = egp_node
+

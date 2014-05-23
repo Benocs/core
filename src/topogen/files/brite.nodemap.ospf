@@ -1,0 +1,5 @@
+# IGP: OSPFv2 + OSPFv3
+AS_NODE = egp_ospf_node
+RT_NODE = igp_ospf_node
+RT_BORDER = egp_ospf_node
+
