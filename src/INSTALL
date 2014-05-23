@@ -64,8 +64,7 @@ su -c "( cd ../contrib/quagga && \
     mkdir -p /etc/quagga && \
     cp -v ./debian.conf /etc/quagga/ && \
     cp -v ./quagga /etc/init.d/ && \
-    update-rc.d -f quagga remove || echo \"error while deactivating quagga\'s \
-        init script. check output.\")" root
+    update-rc.d -f quagga remove)" root
 
 su -c "adduser --system --shell /bin/false --no-create-home --group --disabled-password --disabled-login quagga" root
 
