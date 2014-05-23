@@ -28,4 +28,5 @@ __pycache__
 contrib/BENOCS/ifindex/src/ifindex
 contrib/pmacct/pmacct-*/
 contrib/quagga/quagga-*/
+contrib/snmp/net-snmp-*/
 contrib/softflowd/
