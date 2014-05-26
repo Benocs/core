@@ -55,7 +55,7 @@ su -c "(cd ../contrib/snmp && \
         --with-default-snmp-version=\"3\" --with-sys-contact=\"Unknown\" \
         --with-sys-location=\"Unknown\" --with-logfile=\"/var/log/snmpd.log\" \
         --with-persistent-directory=\"/var/net-snmp\" && \
-    make $BUILD_PARALLEL && \
+    make && \
     make install && \
     cd .. && \
     cp -v ./snmpd.init /etc/init.d/ && \
