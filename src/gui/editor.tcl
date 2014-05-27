@@ -734,23 +734,19 @@ proc updateLinkLabel { link } {
     set delstr [getLinkDelayString $link]
     set berstr [getLinkBERString $link]
     set dupstr [getLinkDupString $link]
-    set labelstr "
-"
+    set labelstr ""
     if { "$bwstr" != "" } {
-	set labelstr "$labelstr$bwstr
-"
+	set labelstr "$labelstr$bwstr"
     }
     if { "$delstr" != "" } {
 	set labelstr "$labelstr$delstr
 "
     }
     if { "$berstr" != "" } {
-	set labelstr "$labelstr$berstr
-"
+	set labelstr "$labelstr$berstr"
     }
     if { "$dupstr" != "" } {
-	set labelstr "$labelstr$dupstr
-"
+	set labelstr "$labelstr$dupstr"
     }
     set labelstr \
 	[string range $labelstr 0 [expr {[string length $labelstr] - 2}]]

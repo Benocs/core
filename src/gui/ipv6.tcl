@@ -101,6 +101,7 @@ proc findFreeIPv6Net { quarknode mask } {
 
   for {set j $startv6 } { $j < 65535} { incr j 2 } {
 
+
     # abbruch bei zu vielen subnetzen
     #   mit fehlermeldung in console.
     if { $j > 65534 } {
@@ -317,7 +318,6 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
 
       # decimal j in hex -> treffer von ipnetsv63rds in ls_r speichern als HEX
       set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
-
       # noch nicht vorhanden -> == 0
       if { [llength $ls_r] == 0 } {
 
