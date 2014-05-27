@@ -471,7 +471,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL1"
 		# hier sind addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
@@ -487,7 +486,6 @@ proc autoIPv4addr { node iface } {
 	#puts $node
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
-		#puts "LINKFALL2"
 		# hier sind keine addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
 		setIfcIPv4addr $node $iface "$ipnet/24"
