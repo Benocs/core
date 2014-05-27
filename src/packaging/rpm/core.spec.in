@@ -137,7 +137,6 @@ sed -i 's/emane_realtime = True/emane_realtime = False/' /etc/core/core.conf
 %{_datadir}/%{name}/icons/svg/router_yellow.svg
 %{_datadir}/%{name}/icons/svg/start.svg
 %{_datadir}/%{name}/icons/svg/start2.svg
-%{_datadir}/%{name}/icons/svg/start3.svg
 %{_datadir}/%{name}/icons/svg/tunnel.svg
 %{_datadir}/%{name}/icons/svg/vlan.svg
 %{_datadir}/%{name}/icons/svg/xen.svg
@@ -189,7 +188,6 @@ sed -i 's/emane_realtime = True/emane_realtime = False/' /etc/core/core.conf
 %{_datadir}/%{name}/icons/tiny/stock_disconnect.gif
 %{_datadir}/%{name}/icons/tiny/stop.gif
 %{_datadir}/%{name}/icons/tiny/stop2.gif
-%{_datadir}/%{name}/icons/tiny/stop3.gif
 %{_datadir}/%{name}/icons/tiny/text.gif
 %{_datadir}/%{name}/icons/tiny/trace.gif
 %{_datadir}/%{name}/icons/tiny/tunnel.gif
