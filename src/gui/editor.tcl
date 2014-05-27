@@ -1060,19 +1060,6 @@ proc button3link { c x y } {
     }
 
     #
-    # fuer link - start bei state off und stop bei state on
-    #
-    if { [getLinkState $link] == "off" } {
-      .button3menu add command -label "Start Link" \
-            -command "startLink $link"
-    }
-
-    if { [getLinkState $link] == "on" } {
-      .button3menu add command -label "Stop Link" \
-            -command "stopLink $link"
-    }
-
-    #
     # Split link
     #
     if { $oper_mode != "exec" && [getLinkMirror $link] == "" } {
@@ -1100,22 +1087,6 @@ proc button3link { c x y } {
     tk_popup .button3menu $x $y
 }
 
-
-# startLink
-proc startLink { link } {
-  setLinkState $link "on"
-  puts "startLink in editor.tcl"
-  #TODO
-}
-
-
-
-# stopLink
-proc stopLink { link } {
-  setLinkState $link "off"
-  puts "stopLink in editor.tcl"
-  #TODO
-}
 
 #****f* editor.tcl/movetoCanvas
 # NAME
@@ -1467,42 +1438,12 @@ proc button3node { c x y button } {
     }
 
     #
-    # Contextmenuentry for starting and stoping single nodes 
-    #
-    if { [getNodeState $node] == "off" } {
-      .button3menu add command -label "Start Node" \
-            -command "startNode $node"
-    }
-
-    if { [getNodeState $node] == "on" } {
-      .button3menu add command -label "Stop Node" \
-            -command "stopNode $node"
-    }
-
-
-    #
     # Finally post the popup menu on current pointer position
     #
     set x [winfo pointerx .]
     set y [winfo pointery .]
 
     tk_popup .button3menu $x $y
-}
-
-# startNode
-proc startNode { node } {
-  setNodeState $node "on"
-  puts "startNode in editor.tcl"
-  #TODO
-}
-
-
-
-# stopNode
-proc stopNode { node } {
-  setNodeState $node "off"
-  puts "stopNode in editor.tcl"
-  #TODO
 }
 
 

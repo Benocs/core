@@ -166,32 +166,6 @@ proc removeLink { link } {
     set link_list [lreplace $link_list $i $i]
 }
 
-
-# getLinkState
-proc getLinkState { link } {
-    global $link 
-
-    set entry [lsearch -inline [set $link] "state *"]
-    if { $entry == "" } {
-        return ""
-    } else {
-        return [lindex $entry 1]
-    }
-}
-
-# setLinkState
-proc setLinkState { link state } {
-    global $link
-
-    set i [lsearch [set $link] "state *"]
-    if { $i >= 0 } {
-    	set $link [lreplace [set $link] $i $i "state $state"]
-    } else {
-	set $link [linsert [set $link] 1 "state $state"]
-    }
-}
-
-
 #****f* linkcfg.tcl/getLinkBandwidth
 # NAME
 #   getLinkBandwidth -- get link bandwidth
@@ -826,9 +800,6 @@ proc newLink { lnode1 lnode2 } {
     set link [newObjectId link]
     global $link
     set $link {}
-
-    # set new Link always into state "off"
-    setLinkState $link "off"
 
     # pick new interface names or use names from global hint
     set do_auto_addressing 1

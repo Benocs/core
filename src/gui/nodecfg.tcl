@@ -1338,49 +1338,6 @@ proc setNodeModel { node model } {
 }
 
 
-#****f* nodecfg.tcl/getNodeState
-# NAME
-#   getNodeState -- get node state.
-# SYNOPSIS
-#   set model [getNodeState $node_id]
-# FUNCTION
-#
-# INPUTS
-#   * node_id -- node id
-# RESULT
-#   * state -- can either be "on" or "off"
-#****
-
-proc getNodeState { node } {
-    global $node
-
-    return [lindex [lsearch -inline [set $node] "state *"] 1]
-}
-
-#****f* nodecfg.tcl/setNodeState
-# NAME
-#   setNodeState -- set node state.
-# SYNOPSIS
-#   setNodeState $node_id $state
-# FUNCTION
-#
-# INPUTS
-#   * node_id -- node id
-#   * state   -- can either be "on" or "off"
-#****
-
-proc setNodeState { node state } {
-    global $node
-
-    set i [lsearch [set $node] "state *"]
-    if { $i >= 0 } {
-        set $node [lreplace [set $node] $i $i "state $state"]
-    } else {
-            set $node [linsert [set $node] 1 "state $state"]
-    }
-}
-
-
 #****f* nodecfg.tcl/getNodeNetId
 # NAME
 #   getNodeNetId -- get node routing model.
@@ -1872,10 +1829,6 @@ proc newNode { type } {
 
     global $node
     set $node {}
-
-    # new nodes always get state "off"
-    setNodeState $node "off"
-
     lappend $node "type $type"
     if { $type == "router" } {
 	lappend $node "model $def_router_model"
