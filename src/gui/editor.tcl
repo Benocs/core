@@ -409,8 +409,7 @@ proc drawNode { c node } {
 	set ifc [ifcByPeer $pnode [getNodeMirror $node]]
 	if { $pcanvas != $curcanvas } {
 	    set label [$c create text $x $y -fill blue \
-		-text "[getNodeName $pnode]:$ifc
-@[getCanvasName $pcanvas]" \
+		-text "[getNodeName $pnode]:$ifc@[getCanvasName $pcanvas]" \
 		-tags "nodelabel $node" -justify center]
 	} else {
 	    set label [$c create text $x $y -fill blue \
@@ -591,9 +590,9 @@ proc chooseIfName { lnode1 lnode2 } {
 # RESULT
 #   * l2peers -- new link layer nodes on the same LAN
 #****
-# in welchen faellen kann die l2peers liste mehr als einen node beinhalten
+#TODO in welchen faellen kann die l2peers liste mehr als einen node beinhalten
 # 1. mehrere interfaces
-# 2. ?verkette nicht lanswitch hub wlan? << betrifft uns hier nicht
+# 2. ?verkette nicht lanswitch hub wlan?
 proc listLANnodes { l2node l2peers } {
     lappend l2peers $l2node
     foreach ifc [ifcList $l2node] {
@@ -694,16 +693,13 @@ proc updateIfcLabel { lnode1 lnode2 } {
 	set labelstr ""
     }
     if { $showIfNames } {
-	set labelstr "$labelstr$ifc
-"
+	set labelstr "$labelstr$ifc"
     }
     if { $showIfIPaddrs && $ifipv4addr != "" } {
-	set labelstr "$labelstr$ifipv4addr
-"
+	set labelstr "$labelstr$ifipv4addr"
     }
     if { $showIfIPv6addrs && $ifipv6addr != "" } {
-	set labelstr "$labelstr$ifipv6addr
-"
+	set labelstr "$labelstr$ifipv6addr"
     }
     set labelstr \
 	[string range $labelstr 0 [expr {[string length $labelstr] - 2}]]
@@ -732,20 +728,18 @@ proc updateLinkLabel { link } {
 
     set bwstr  [getLinkBandwidthString $link]
     set delstr [getLinkDelayString $link]
-    set berstr [getLinkBERString $link]
-    set dupstr [getLinkDupString $link]
-    set labelstr ""
-    if { "$bwstr" != "" } {
-	set labelstr "$labelstr$bwstr"
-    }
+    set ber [getLinkBER $link]
+    set dup [getLinkDup $link]
+    set labelstr "$labelstr[getLinkBandwidthString $link]"
     if { "$delstr" != "" } {
-	set labelstr "$labelstr$delstr
-"
+	set labelstr "$labelstr$delstr"
     }
-    if { "$berstr" != "" } {
+    if { "$ber" != "" } {
+	set berstr "loss=$ber%" 
 	set labelstr "$labelstr$berstr"
     }
-    if { "$dupstr" != "" } {
+    if { "$dup" != "" } {
+	set dupstr "dup=$dup%"
 	set labelstr "$labelstr$dupstr"
     }
     set labelstr \

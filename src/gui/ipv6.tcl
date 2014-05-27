@@ -89,7 +89,6 @@ proc findFreeIPv6Net { quarknode mask } {
 
   # asid von quarknode wie bei ipv4
   set i [getASiD $quarknode]
-
   # von zu ASip abhandeln
   if { [info exists tempAS] } {
     if { $tempAS != 999 } {
@@ -101,10 +100,10 @@ proc findFreeIPv6Net { quarknode mask } {
 
   for {set j $startv6 } { $j < 65535} { incr j 2 } {
 
-    # pruefen ob subnet noch nicht vorhanden
-    # hier nur auf 3tes element (4. 16Bit Block) getestet.
-
-    set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
+    # pruefen ob >nicht< schon vorhanden
+    # TODO da hier nur 3tes element getestet sollte noch
+    #    komplette ipv6 auf existenz getestet werden
+    set ls_r [lsearch -all -inline $ipnetsv63rds [expr 0x$j]]
 
     if { [llength $ls_r] == 0 || [llength $ls_r] == 1 } {
       # entweder noch nicht oder erst einmal vorhanden
@@ -285,12 +284,12 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
     for { set j $zahl1 } { $j > 0 } { set j [expr $j - 256] } {
 
       # decimal j in hex -> treffer von ipnetsv63rds in ls_r speichern als HEX
-      set ls_r [lsearch -all -inline $ipnetsv63rds [string toupper [format %x $j]]]
-
+      set ls_r [lsearch -all -inline $ipnetsv63rds [format %x $j]]
       # noch nicht vorhanden -> == 0
       if { [llength $ls_r] == 0 } {
 
         set as [string toupper [format %x $i]]
+        
 
         set subnet [string toupper [format %x $j]]
 
@@ -298,6 +297,7 @@ proc findFreeIPv6NetLink { linkNode mask ip6AmSwitchNetzAddressen} {
         set ipnet "FDAA:$as:AAAA:$subnet:[buildInterfaceID $linkNode]"
 
         return $ipnet
+
       }
 
     }
@@ -346,7 +346,6 @@ proc autoIPv6addr { node iface } {
     set peer_node [logicalPeerByIfc $node $iface]
     # find addresses of NETWORK layer peer nodes
     if { [[typemodel $peer_node].layer] == "LINK" } {
-
 	foreach l2node [listLANnodes $peer_node {}] {
 	    foreach ifc [ifcList $l2node] {
 		set peer [logicalPeerByIfc $l2node $ifc]
@@ -395,6 +394,7 @@ proc autoIPv6addr { node iface } {
 
     # peer has an IPv6 address, allocate a new address on the same network
     if { $peer_ip6addrs != "" } {
+	
         if { [[typemodel $peer_node].layer] == "LINK" } {
                 # hier sind addressen in $peer_ip4addrs
                 set ipnet [findFreeIPv6NetLink $node 24 $peer_ip6addrs]
@@ -406,6 +406,7 @@ proc autoIPv6addr { node iface } {
 
 	set tempAS 999
     } else {
+
         if { [[typemodel $peer_node].layer] == "LINK" } {
                 # hier sind keine addressen in $peer_ip4addrs
                 set ipnet [findFreeIPv6NetLink $node 24 $peer_ip6addrs]
@@ -432,8 +433,7 @@ proc autoIPv6addr { node iface } {
 #   * node_id -- default gateway is provided for this node
 #   * iface -- the interface on witch we search for a new default gateway
 #****
-# schauen ob das mit autoIPv6addr interferiert
-# -> fall tritt nur ein wenn Typ nicht NETWORK und nicht LINK
+#TODO schauen ob das mit autoIPv6addr interferiert
 proc autoIPv6defaultroute { node iface } {
     if { [[typemodel $node].layer] != "NETWORK" } {
 	#
