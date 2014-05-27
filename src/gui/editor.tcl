@@ -537,7 +537,6 @@ proc drawWlanLink { node1 node2 wlan } {
 proc chooseIfName { lnode1 lnode2 } {
     global $lnode1 $lnode2
 
-
     # TODO: just check if layer == NETWORK and return eth, LINK return e
     switch -exact -- [nodeType $lnode1] {
 	pc {
@@ -590,9 +589,7 @@ proc chooseIfName { lnode1 lnode2 } {
 # RESULT
 #   * l2peers -- new link layer nodes on the same LAN
 #****
-#TODO in welchen faellen kann die l2peers liste mehr als einen node beinhalten
-# 1. mehrere interfaces
-# 2. ?verkette nicht lanswitch hub wlan?
+
 proc listLANnodes { l2node l2peers } {
     lappend l2peers $l2node
     foreach ifc [ifcList $l2node] {
@@ -1532,8 +1529,6 @@ proc button1 { c x y button } {
     global wlan g_twoNodeSelect
     global g_view_locked
 
-    global g_prefs
-
     set x [$c canvasx $x]
     set y [$c canvasy $y]
 
@@ -1597,13 +1592,8 @@ proc button1 { c x y button } {
 			rectangle text} $activetool] < 0 } {
 	    if { $g_view_locked == 1 } { return }
 	    if { $activetoolp == "routers" } {
-		#
-		#puts $activetoolp -> linke leiste
-		#puts $activetool -> elemente innerhlab des menues der linken leiste
 		set node [newNode router]
 		setNodeModel $node $activetool
-		# setze fuer jeden neuen node die standard netid
-		setNodeNetId $node $g_prefs(gui_asid_standard)
 	    } else {
 		set node [newNode $activetool]
 	    }

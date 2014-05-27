@@ -595,7 +595,7 @@ proc popupBuildHostsFile { } {
     pack $wi.btm
 
     focus $wi.mid.hosts
-7}
+}
 
 proc popupAddressConfig { } {
     global plugin_img_add plugin_img_del g_prefs
@@ -676,42 +676,6 @@ proc popupAddressConfig { } {
 
     #focus $wi.mid.hosts
 }
-
-
-proc popupASConfig { } {
-
- global g_prefs
-
- set wi .asconfig
-
- catch {destroy $wi}
-
- toplevel $wi
- wm transient $wi .
- wm resizable $wi 1 1
- wm title $wi "Standard ASiD"
-
-
- labelframe $wi.asid -text "Global Standard NetID"
- frame $wi.asid.frame
-
- label $wi.asid.frame.label -text "AS NetID: " -anchor w
- entry $wi.asid.frame.entry -bg white -width 30 -textvariable g_prefs(gui_asid_standard)
- pack $wi.asid.frame.entry -side right
-
- pack $wi.asid.frame -side top -anchor e
- pack $wi.asid -side left
-
- # buttons on the bottom
- frame $wi.btm
- button $wi.btm.apply -text "OK" \
-     -command "destroy $wi"
- button $wi.btm.cancel -text "Cancel" -command "destroy $wi"
- pack $wi.btm.apply $wi.btm.cancel -side left
- pack $wi.btm -side bottom -fill x
-
-}
-
 
 # listbox helper for adding and removing entries, and applying them
 proc addressConfigHelper { wi fam cmd } {
