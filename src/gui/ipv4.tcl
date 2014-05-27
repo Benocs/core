@@ -215,8 +215,8 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
 	#momentan vergabe der 24er
 
-	#puts "findIPLINK"
-	#puts $linkNode
+	puts "findIPLINK"
+	puts $linkNode
 
 
     global g_prefs node_list tempAS
@@ -309,10 +309,10 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 # TODO 24er muessen auch adressbereich der 30 beachten (immer 4er schritte von 0 an)
 #   und nicht die selben adressen nehmen
 
-	#puts "ip4AmSwitchNetzAddressen"
-	#foreach ip4 $ip4AmSwitchNetzAddressen {
-	#	puts $ip4
-	#}
+	puts "ip4AmSwitchNetzAddressen"
+	foreach ip4 $ip4AmSwitchNetzAddressen {
+		puts $ip4
+	}
 
 	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen	
 	if { 0 == [llength $ip4AmSwitchNetzAddressen] } {
@@ -405,19 +405,19 @@ proc autoIPv4addr { node iface } {
 	return
     }
 
-    # setze IP des ifaceses auf dem node ""
+    # setze IP des ifaceses auf dem node "" TODO: problem?
     setIfcIPv4addr $node $iface ""
 
     set peer_node [logicalPeerByIfc $node $iface]
     # find addresses of NETWORK layer peer nodes
-
-
+    # TODO hier verbindung mit beiden richtungen pruefen ob netmask 30 oder 24
+  
     if { [[typemodel $peer_node].layer] == "LINK" } {
-	#puts "FOUND LIIIIIINK NODE"
-	#puts "NODE:"
-	#puts $node
-	#puts "PEER_NODE"
-	#puts $peer_node
+	puts "FOUND LIIIIIINK NODE"
+	puts "NODE:"
+	puts $node
+	puts "PEER_NODE"
+	puts $peer_node
 	foreach l2node [listLANnodes $peer_node {}] {
 	    foreach ifc [ifcList $l2node] {
 		set peer [logicalPeerByIfc $l2node $ifc]
@@ -436,7 +436,7 @@ proc autoIPv4addr { node iface } {
 
     # point-to-point link with another NETWORK layer peer
     } else {
-	#puts "ATTENTION ANOTHER NETWORK LAYER PEER"
+	puts "ATTENTION ANOTHER NETWORK LAYER PEER"
 	set peer_if [ifcByLogicalPeer $peer_node $node]
 	set peer_ip4addr [getIfcIPv4addr $peer_node $peer_if]
 	set peer_ip4addrs [lindex [split $peer_ip4addr /] 0]
@@ -474,6 +474,13 @@ proc autoIPv4addr { node iface } {
 	}
 	default {
 	    set targetbyte 1
+        #       #TODO hier falsch
+	#	set asID [getNodeNetId]
+	#	# groesser 255 und leer wird erstmal 0
+	#	if {$asID > 255 || $asID == ""} {
+	#		set asID 0
+	#	}
+	#	set targetbyte $asID
 	}
     }
 
@@ -481,8 +488,35 @@ proc autoIPv4addr { node iface } {
     # peer has an IPv4 address, allocate a new address on the same network
     if { $peer_ip4addrs != "" } {
 	# behandelt diejenige seite der links an die man hinverbindet
-	#puts "hinverbunden zu"
-	#puts $node
+#	set ipnums [split [lindex $peer_ip4addrs 0] .]
+#	set net "[lindex $ipnums 0].[lindex $ipnums 1].[lindex $ipnums 2]"
+
+	puts "hinverbunden zu"
+	puts $node
+
+#	set ipaddr $net.$targetbyte
+	#set 
+#	while { [lsearch $peer_ip4addrs $ipaddr] >= 0 } {
+	    # testweise wie in findFreeIPv4Net
+	    #if { fmod(($targetbyte + 1),4) == 0 } { incr targetbyte 2 }
+	    #incr targetbyte
+	    #set ipaddr $net.$targetbyte
+	    
+
+#	}
+	# TODO testweise netmaskbits auf 30 im fall nicht link..
+
+        #incr targetbyte
+	#setIfcIPv4addr $node $iface "$net.$targetbyte/$netmaskbits"
+        #incr targetbyte
+	#setIfcIPv4addr $node $iface "$net.$targetbyte/$netmaskbits"
+        #incr targetbyte
+#	setIfcIPv4addr $node $iface "$net.$targetbyte/1234"
+	#setIfcIPv4addr $node $iface "$ipaddr/$netmaskbits"
+	#puts [[typemodel $node].layer]
+	#if { [[typemodel $peer_node].layer] == "LINK" } {
+#		puts "AAAAAAAALARM :)"
+#	}
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
 		# hier sind addressen in $peer_ip4addrs
@@ -492,13 +526,26 @@ proc autoIPv4addr { node iface } {
                 set ipnet [findFreeIPv4Net $node 24]
                 setIfcIPv4addr $node $iface "$ipnet/30"
 	}
+	#if { [[typemodel $node].layer] == "LINK" } {
+		
+	#	set ipnet [findFreeIPv4NetLink $node 24]
+	#	setIfcIPv4addr $node $iface "$ipnet/24"
 
+	#} else {
+#		set ipnet [findFreeIPv4Net $node 24]
+#		setIfcIPv4addr $node $iface "$ipnet/30"
+	#}
 	set tempAS 999
+#	puts "tempAS 999" 
     } else {
 	# behandelt offenbar nur die links von denen man ausgeht
-	#puts "ausgegangen von"
-	#puts $node
-
+	puts "ausgegangen von"
+	puts $node 
+	#set ipnet [findFreeIPv4Net $node 24]
+	#setIfcIPv4addr $node $iface "$ipnet.$targetbyte/$netmaskbits"
+	#setIfcIPv4addr $node $iface "$ipnet/$g_prefs($gui_ipv4_mask_router)"
+	#setIfcIPv4addr $node $iface "$ipnet/30"
+	#puts [[typemodel $node].layer]
 	if { [[typemodel $peer_node].layer] == "LINK" } {
 		# hier sind keine addressen in $peer_ip4addrs
 		set ipnet [findFreeIPv4NetLink $node 24 $peer_ip4addrs]
@@ -511,6 +558,13 @@ proc autoIPv4addr { node iface } {
 	set tempAS [getASiD $node]
 #	puts "tempAS ausgehend"
 #	puts $tempAS 
+        #if { [[typemodel $node].layer] == "LINK" } {
+
+         #       set ipnet [findFreeIPv4NetLink $node 24]
+         #       setIfcIPv4addr $node $iface "$ipnet/24"
+
+        #} else {
+        #}
     }
 }
 

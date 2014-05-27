@@ -57,18 +57,7 @@ proc doStuff1 {} {
   ttk::combobox $wi.top.line1.combo2 -width 15 -exportselection 0 \
     -values $executables -textvariable testing_prefs(gui_brite_top_executables)
 
-#; zurueck_stellen; destroy $wi"
-  button $wi.top.line1.cancel -text "Cancel" -command {
-    # im falle eines abbruchs die bisherigen einstellungen wieder herstellen
-    global testing_prefs testing_prefs_old
-    array set testing_prefs [array get testing_prefs_old]
-    destroy .core_testing
-  }
-
-  button $wi.top.line1.save -text "Save" -command "writeBriteConf"
-  button $wi.top.line1.saveclose -text "Save & Close" -command "writeBriteConf; destroy .core_testing"
-
-  pack $wi.top.line1.label $wi.top.line1.combo $wi.top.line1.label2 $wi.top.line1.combo2 $wi.top.line1.cancel $wi.top.line1.save $wi.top.line1.saveclose -side left
+  pack $wi.top.line1.label $wi.top.line1.combo $wi.top.line1.label2 $wi.top.line1.combo2 -side left
   pack $wi.top.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.top -side top -fill x
 
@@ -371,10 +360,6 @@ proc doStuff1 {} {
   # Buttons unten
   #
 
-  #TODO button save und cancel zusammenbringen nach oben zB
-  # und writeBriteConf auf save legen
-
-
   # Topology Erstellungen Einstellungen
   labelframe $wi.bot2 -borderwidth 4 -text "2nd: Build Topology"
 
@@ -396,13 +381,20 @@ proc doStuff1 {} {
   # unterschied destroy $wi und detroy .core_testing
   #  beides zerstoert das fenster
   button $wi.bot.line1.buildtop -text "Build Cfg" -command "buildCfg"
+#; zurueck_stellen; destroy $wi"
+  button $wi.bot.line1.cancel -text "Cancel" -command {
+    # im falle eines abbruchs die bisherigen einstellungen wieder herstellen 
+    global testing_prefs testing_prefs_old
+    array set testing_prefs [array get testing_prefs_old]
+    destroy .core_testing
+  }
 
   label $wi.bot.line1.text_savedest -text "SaveCfg:"
   entry $wi.bot.line1.entry_savedest -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_savedest)
   label $wi.bot.line1.text_execpath -text "BritePath:"
   entry $wi.bot.line1.entry_execpath -bg white -width 17 -textvariable testing_prefs(gui_brite_bottom_execpath)
 
-  pack $wi.bot.line1.buildtop $wi.bot.line1.entry_savedest $wi.bot.line1.text_savedest $wi.bot.line1.entry_execpath $wi.bot.line1.text_execpath -side right
+  pack $wi.bot.line1.buildtop $wi.bot.line1.cancel $wi.bot.line1.entry_savedest $wi.bot.line1.text_savedest $wi.bot.line1.entry_execpath $wi.bot.line1.text_execpath -side right
   pack $wi.bot.line1 -side top -anchor w -padx 4 -pady 4
   pack $wi.bot -side bottom -fill x
 
@@ -448,8 +440,14 @@ proc doStuff1 {} {
   .core_testing.topdown.line6.buttonleft configure -state disabled
   .core_testing.topdown.line6.buttonright configure -state disabled
 
-  # refresh GUI with new values
-  switched
+
+}
+
+# stellt die Topology auf 1 Level: AS ONLY zurueck wenn eine topology generiert wurde
+proc zurueck_stellen {} {
+  global testing_prefs
+
+  set testing_prefs(gui_brite_top_topotypes) "1 Level: AS ONLY"
 }
 
 proc buildTopology [] {
@@ -1038,7 +1036,11 @@ proc buildCfg {} {
 
   global testing_prefs
 
+
+#  set data $testing_prefs(gui_brite_topdown_iabwd)
+
 #  wie im bsp saveDotfile als speicherdialog BZW anderen mit entry feld.
+
 
 # BSP WERTE ZUWEISUNGEN
 # Name = 1 - 5 | 1:Waxman, 2:Barabasi/Waxman, 3:AS Waxman, 4:AS Barabasi,5:Top Down
@@ -1073,6 +1075,9 @@ proc buildCfg {} {
   append data "BriteConfig\n"
   append data "\n"
 
+  # TODO abfragen mit checkboxen nach was fuer einem model cfg erstellt,
+  #   werden soll noch einfuegen und im Abschnitt BeginOutput auswerten
+ 
  set var_model [.core_testing.top.line1.combo get]
 
  if {[string equal "1 Level: AS ONLY" $var_model]} {
@@ -1092,7 +1097,8 @@ proc buildCfg {} {
     }
 
     # ueberlegen ob besser wenn entry felder ausgelesen oder testing_prefs variable
-    append data "	 N = " $testing_prefs(gui_brite_as_n)\n
+    #    append data "	" N = ".core_testing.as.line2.entry_n\n"
+    append data "	 N = " $testing_prefs(gui_brite_as_n)\n 
     append data "	 HS = " $testing_prefs(gui_brite_as_hs)\n
     append data "	 LS = " $testing_prefs(gui_brite_as_ls)\n
 
@@ -1491,55 +1497,6 @@ proc buildCfg {} {
   puts $fileId $data
   close $fileId
 }
-
-
-proc writeBriteConf { } {
-
-  global CONFDIR testing_prefs
-
-   set briteconfname "$CONFDIR/brite.conf"
-    if { [catch { set britef [open "$briteconfname" w] } ] } {
-        puts "***Warning: could not write brite file: $briteconfname"
-        return
-    }
-
-  set briteheader "# brite.conf for brite configuration stuff"
-  puts $britef $briteheader
-
-  puts $britef "array set testing_prefs {"
-
-
-  # gib alle elemente in testing_prefs / sortiere dict style
-  foreach pref [lsort -dict [array names testing_prefs]] {
-    set value $testing_prefs($pref)
-    set tabs "\t\t"
-    if { [string length $pref] >= 16 } { set tabs "\t" }
-    puts $britef "\t$pref$tabs\"$value\""
-  }
-  puts $britef "}"
-  close $britef
-
-}
-
-
-proc loadBriteConf { } {
-
-  global CONFDIR testing_prefs
-
-  if {[catch {set britef [open "$CONFDIR/brite.conf" r]} ]} return
-  close $britef
-
-
-  #fuehrt die conf datei als quasi script aus und liest die variablen ein
-  if {[catch { source "$CONFDIR/brite.conf" }]} {
-      puts "The $CONFDIR/brite.conf preferences file is invalid, ignoring it."
-      return
-  }
-
-}
-
-# TODO wenn conf noch nicht definiert lade initTestingPrefs--.
-
 
 
 

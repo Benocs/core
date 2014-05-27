@@ -753,10 +753,10 @@ proc newLink { lnode1 lnode2 } {
     global curcanvas
     global systype
 
-	#puts "NODE1"
-	#puts [nodeType $lnode1]
-	#puts "NODE2"
-	#puts [nodeType $lnode2]
+	puts "NODE1"
+	puts [nodeType $lnode1]
+	puts "NODE2"
+	puts [nodeType $lnode2]
 
 
     if { [nodeType $lnode1] == "lanswitch" && \
@@ -872,26 +872,24 @@ proc newLink { lnode1 lnode2 } {
 
     lappend link_list $link
 
-    # hier behandlung von routern 1
     if { [nodeType $lnode2] != "pseudo" &&
 	 [nodeType $lnode1] != "wlan" &&
 	[[typemodel $lnode1].layer] == "NETWORK" } {
 	if { $ipv4_addr1 == "" && $do_auto_addressing } {
-	#puts "1 NETWORK!"
+	puts "1 NETWORK!"
 	    autoIPv4addr $lnode1 $ifname1
 	}
 	if { $ipv6_addr1 == "" && $do_auto_addressing } {
 	    autoIPv6addr $lnode1 $ifname1
 	}
     }
-    # hier behandlung von routern 2
     # assume wlan is always lnode1
     if { [nodeType $lnode1] != "pseudo" &&
 	 [nodeType $lnode1] != "wlan" &&
 	[[typemodel $lnode2].layer] == "NETWORK" } {
 	if { $ipv4_addr2 == "" && $do_auto_addressing } {
-	#puts "2 NETWORK!!!"
-	    autoIPv4addr $lnode2 $ifname2
+	puts "2 NETWORK!!!"
+	    autoIPv4addr $lnode2 $ifname2 
 	}
 	if { $ipv6_addr2 == "" && $do_auto_addressing } {
 	    autoIPv6addr $lnode2 $ifname2
