@@ -146,63 +146,69 @@ proc drawToolbar { mode } {
     #
     set buttons [list start start2 stop2 link]
     foreach b $buttons {
-        if { $mode == "exec"} {
-            destroy .left.$b
+        if { $mode == "exec"} { 
+            destroy .left.$b 
+            puts "destroy1 $b"
         } else {
-            # add buttons when in edit mode
-            set imgf "$CORE_DATA_DIR/icons/tiny/$b.gif"
-            set image [image create photo -file $imgf]
-            catch {
-                radiobutton .left.$b -indicatoron 0 \
-                -variable activetool -value $b -selectcolor $defSelectionColor \
-                -width 32 -height 32 -image $image \
-                -command "popupMenuChoose \"\" $b $imgf"
-                    leftToolTip $b .left
-                    pack .left.$b -side top
-            }
-        }
+	    # add buttons when in edit mode
+	    set imgf "$CORE_DATA_DIR/icons/tiny/$b.gif"
+	    set image [image create photo -file $imgf]
+	    catch {
+	    radiobutton .left.$b -indicatoron 0 \
+		-variable activetool -value $b -selectcolor $defSelectionColor \
+		-width 32 -height 32 -image $image \
+		-command "popupMenuChoose \"\" $b $imgf"
+	        leftToolTip $b .left
+	    	pack .left.$b -side top
+                puts "here1 $b"
+                puts ""
+	    }
+	}
     }
     # popup toolbar buttons have submenus
     set buttons {routers hubs bgobjs}
     foreach b $buttons {
         if { $mode == "exec"} {
              destroy .left.$b
+             puts "destroy2 $b"
         } else {
-            # create buttons for parent items
-            set menubuttons { }
-            if { $b == "routers" } {
-                set menubuttons [getNodeTypeNames]
-            } elseif { $b == "hubs" } {
-                set menubuttons { hub lanswitch wlan rj45 tunnel }
-            } elseif { $b == "bgobjs" } {
-                set menubuttons { marker oval rectangle text }
-            }
-            set firstb [lindex $menubuttons 0]
-            set firstfn "$CORE_DATA_DIR/icons/tiny/$firstb.gif"
-            set image [image create photo -file $firstfn]
-                $image read "$CORE_DATA_DIR/icons/tiny/arrow.gif" -to 27 22
-            # create the parent menu
-            menubutton .left.$b -indicatoron 0 -direction right \
-                        -width 32 -height 32 -image $image \
-                    -padx 0 -pady 0 -relief raised \
-                    -menu .left.${b}.menu
-            set buttonmenu [menu .left.${b}.menu \
-                        -activebackground $defSelectionColor \
-                        -borderwidth 1 -tearoff 0]
-            # create the child menutbuttons
-            drawToolbarSubmenu $b $menubuttons
-            # tooltips for parent and submenu items
-            leftToolTip $b .left
-            bind $buttonmenu <<MenuSelect>> {leftToolTipSubMenu %W}
-            bind $buttonmenu <Leave> {
-                set newlen [expr {[string length %W] - 6}]
-                set w [string range %W 0 $newlen]
-                destroy ${w}.balloon
-            }
-            # set submenu tooltips for user-defined types to type name
-            setLeftTooltips $b $menubuttons
-            pack .left.$b -side top
-        }
+	    # create buttons for parent items
+	    set menubuttons { }
+	    if { $b == "routers" } {
+	    	set menubuttons [getNodeTypeNames]
+	    } elseif { $b == "hubs" } {
+	        set menubuttons { hub lanswitch wlan rj45 tunnel }
+	    } elseif { $b == "bgobjs" } {
+	    	set menubuttons { marker oval rectangle text }
+	    }
+	    set firstb [lindex $menubuttons 0]
+	    set firstfn "$CORE_DATA_DIR/icons/tiny/$firstb.gif"
+	    set image [image create photo -file $firstfn]
+    	    $image read "$CORE_DATA_DIR/icons/tiny/arrow.gif" -to 27 22
+	    # create the parent menu
+	    menubutton .left.$b -indicatoron 0 -direction right \
+	    			-width 32 -height 32 -image $image \
+				-padx 0 -pady 0 -relief raised \
+				-menu .left.${b}.menu
+	    set buttonmenu [menu .left.${b}.menu \
+	    			-activebackground $defSelectionColor \
+	    			-borderwidth 1 -tearoff 0]
+	    # create the child menutbuttons
+	    drawToolbarSubmenu $b $menubuttons
+	    # tooltips for parent and submenu items
+	    leftToolTip $b .left
+	    bind $buttonmenu <<MenuSelect>> {leftToolTipSubMenu %W}
+ 	    bind $buttonmenu <Leave> {
+		set newlen [expr {[string length %W] - 6}]
+		set w [string range %W 0 $newlen]
+		destroy ${w}.balloon
+	    }
+	    # set submenu tooltips for user-defined types to type name
+	    setLeftTooltips $b $menubuttons
+	    pack .left.$b -side top
+            puts "here2 $b"
+            puts ""
+	}
     }
 
     #
@@ -216,37 +222,39 @@ proc drawToolbar { mode } {
 
     # left picture-menu if session started
     foreach b {stop start3 stop3 observe plot marker twonode run } {
-        if { "$mode" != "exec" } {
-                  destroy .left.$b
-            } else {
-                set cmd ""
-                set fn "$CORE_DATA_DIR/icons/tiny/$b.gif"
-                set image [image create photo -file $fn]
-                if { $b == "stop" } {
-                set cmd "startStopButton edit"
-                } elseif { $b == "start3" } {
-                    set cmd "startStopButton2 extraStart"
-                } elseif { $b == "stop3" } {
-                    set cmd "startStopButton2 extraStop"
-                } elseif { $b == "observe" } {
-                    set cmd "popupObserverWidgets"
-                } elseif { $b == "marker" } {
-                    set cmd "markerOptions on"
-                } elseif { $b == "mobility" } {
-                    set cmd "popupMobilityDialog"
-                } elseif { $b == "twonode" } {
-                    set cmd "popupTwoNodeDialog"
-                } elseif { $b == "run" } {
-                    set cmd "popupRunDialog"
-                }
-                # add more cmds here
-                radiobutton .left.$b -indicatoron 0 \
-                -variable activetool -value $b -command $cmd \
-                -selectcolor [.left cget -bg] \
-                -width 32 -height 32 -activebackground gray -image $image
-                leftToolTip $b .left
-                pack .left.$b -side top
-            }
+	if { "$mode" != "exec" } {
+              destroy .left.$b
+        } else {
+	    set cmd ""
+	    set fn "$CORE_DATA_DIR/icons/tiny/$b.gif"
+	    set image [image create photo -file $fn]
+	    if { $b == "stop" } {
+		set cmd "startStopButton edit"
+            } elseif { $b == "start3" } {
+                set cmd "startStopButton2 extraStart"
+	    } elseif { $b == "stop3" } {
+		set cmd "startStopButton2 extraStop"
+	    } elseif { $b == "observe" } {
+	    	set cmd "popupObserverWidgets"
+	    } elseif { $b == "marker" } {
+		set cmd "markerOptions on"
+	    } elseif { $b == "mobility" } {
+		set cmd "popupMobilityDialog"
+	    } elseif { $b == "twonode" } {
+		set cmd "popupTwoNodeDialog"
+	    } elseif { $b == "run" } {
+		set cmd "popupRunDialog"
+	    }
+	    # add more cmds here
+	    radiobutton .left.$b -indicatoron 0 \
+		-variable activetool -value $b -command $cmd \
+		-selectcolor [.left cget -bg] \
+		-width 32 -height 32 -activebackground gray -image $image
+	    leftToolTip $b .left
+	    pack .left.$b -side top
+            puts "here3 $b"
+            puts ""
+	}
     }
     # turn off any existing tooltip
     balloon .left ""
