@@ -5378,8 +5378,6 @@ proc copySelection {} {
     }
 }
 
-# while copied the as number is the same
-#   the ip increments
 proc pasteSelection {} {
     global clipboard
     global node_list link_list annotation_list curcanvas
