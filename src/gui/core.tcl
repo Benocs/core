@@ -92,6 +92,7 @@ source "$LIBDIR/filemgmt.tcl"
 source "$LIBDIR/ns2imunes.tcl"
 
 source "$LIBDIR/brite.tcl"
+source "$LIBDIR/briteBuildTopo.tcl"
 source "$LIBDIR/briteDoStuff3.tcl"
 
 source "$LIBDIR/mobility.tcl"
