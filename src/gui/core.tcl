@@ -91,9 +91,6 @@ source "$LIBDIR/filemgmt.tcl"
 
 source "$LIBDIR/ns2imunes.tcl"
 
-source "$LIBDIR/brite.tcl"
-source "$LIBDIR/briteBuildTopo.tcl"
-source "$LIBDIR/briteDoStuff3.tcl"
 
 source "$LIBDIR/mobility.tcl"
 source "$LIBDIR/api.tcl"
@@ -124,10 +121,6 @@ set mac_byte4 0
 set mac_byte5 0
 set g_mrulist {}
 initDefaultPrefs
-
-# testing vars Prefs
-initTestingPrefs
-
 loadDotFile
 loadPluginsConf
 checkCommandLineAddressPort
