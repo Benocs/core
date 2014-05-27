@@ -212,7 +212,6 @@ proc drawToolbar { mode } {
         .left.stop2 configure -command "startStopButton2 extraStop"
 	.left.start2 configure -command "startStopButton2 extraStart"
 	.left.start configure -command "startStopButton exec"
-	.left.start2 configure -command "startStopButton2 exec"
     }
 
     # left picture-menu if session started

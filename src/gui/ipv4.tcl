@@ -213,6 +213,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     # TODO: effizienter machen wenn so funktional!
     global g_prefs node_list tempAS
 
+
     set ipnets4 {}
     # hier variablen zum test aller vier bytes vorhandener ips
     # alle ips byte 0-3
