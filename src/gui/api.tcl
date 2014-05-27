@@ -3307,7 +3307,7 @@ proc macToString { mac_num } {
     # make sure we have six hex digits
     set num_zeroes [expr 6 - [llength $mac_bytes]]
     while { $num_zeroes > 0 } {
-        lappend mac_bytes 00
+    	lappend mac_bytes 00
 	incr num_zeroes -1
     }
 

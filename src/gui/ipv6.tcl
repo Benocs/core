@@ -695,7 +695,7 @@ proc ipv6ToNet { ip mask } {
 	set ipv6nums [split $ip :]
 	# last remove last to nums of :: num
 	set ipv6parts [lrange $ipv6nums 0 [expr [llength $ipv6nums] - 3]]
-        return [join $ipv6parts :]
+    	return [join $ipv6parts :]
 }
 
 
