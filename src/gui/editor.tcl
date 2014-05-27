@@ -3421,25 +3421,16 @@ proc align2grid {} {
 #   rearranged.
 #****
 proc rearrange { mode } {
-    # globale vars
     global link_list autorearrange_enabled sizex sizey curcanvas zoom activetool
 
-    # select heisst jetzt activetool
     set activetool select
 
-    # ist es enabled wird disabled und aus fkt gesprungen
     if { $autorearrange_enabled } {
 	rearrange_off
 	return
     }
-
-    # autorearrange wird enabled
     set autorearrange_enabled 1
-
-    # statustext ausgabe
     .bottom.mbuf config -text "autorearrange"
-
-    # selected nur die markierten sollen sich bewegen / menu ausgrauen , haken setzen / tagmatch setzen
     if { $mode == "selected" } {
 	.menubar.tools entryconfigure "Auto rearrange all" -state disabled
 	.menubar.tools entryconfigure "Auto rearrange all" -indicatoron off
@@ -3451,54 +3442,29 @@ proc rearrange { mode } {
 	.menubar.tools entryconfigure "Auto rearrange selected" -indicatoron off
 	set tagmatch "node"
     }
-
-    # aktuelle zeit in millisekunden in otime
     set otime [clock clicks -milliseconds]
-
-
-    set intervall 0
-
-    set bla 0
-    # wird solange wie enabled
     while { $autorearrange_enabled } {
-
-        # aktuelle zeit in ntime
 	set ntime [clock clicks -milliseconds]
-
-        # wenn selbe tausendstel (schnell) dann niedriges dt war 0.0001
 	if { $otime == $ntime } {
 	    set dt 0.001
 	} else {
-        # wenn langsam wird dt max 0.2 => 200ms unterschied
 	    set dt [expr {($ntime - $otime) * 0.001}]
 	    if { $dt > 0.2 } {
 		set dt 0.2
 	    }
-            # damalige zeit wird neuere zeit
 	    set otime $ntime
 	}
 
-        # auf canvas wird gesucht in objects gespeichert. "node und markiert" oder "node" (alle)
 	set objects [.c find withtag $tagmatch]
-
-        # peer_objects sind alle nodes
 	set peer_objects [.c find withtag node]
-
-        # alle nodes werden durchlaufen
 	foreach obj $peer_objects {
-	    # ein aktueller node wird gesetzt
 	    set node [lindex [.c gettags $obj] 1]
-            # bekomme die coordinaten vom node
 	    set coords [.c coords $obj]
-            # x und y abhaengig vom zoom setzen
 	    set x [expr {[lindex $coords 0] / $zoom}]
 	    set y [expr {[lindex $coords 1] / $zoom}]
-            # array x_t und y_t werden mit x und y werten befuellt
 	    set x_t($node) $x
 	    set y_t($node) $y
 
-            # nodes werden neu auf canvas gesetzt..(?)
-	    # neue fy und fx werte werden gesetzt..(?)
 	    if { $x > 0 } {
 		set fx [expr {1000 / ($x * $x + 100)}]
 	    } else {
@@ -3526,121 +3492,59 @@ proc rearrange { mode } {
 	    set fy_t($node) $fy
 	}
 
-
-        # wie wird neu ausgerichtet <<<<<
-        # alle markierten nodes bzw alle wenn gewaehlt werden durchlaufen
 	foreach obj $objects {
-            # canvas liefert liste aus tags von node, "1"stes element wird node (?)
 	    set node [lindex [.c gettags $obj] 1]
-            # i werden die "string vergleich gleiche" elemente aus liste peer_objects mit pattern obj
-            #   i ein node bzw nodenamen aus peer_objects
 	    set i [lsearch -exact $peer_objects $obj]
-            # peer_objects liste wird an i'ter stelle abgeschnitten (?)
 	    set peer_objects [lreplace $peer_objects $i $i]
-            # (?) x_t und y_t array mit node bezeichnern und zugehoerigem wert
 	    set x $x_t($node)
 	    set y $y_t($node)
-            # die nun so verkleinerte node-liste peer_objects wird durchlaufen (?)
 	    foreach other_obj $peer_objects {
-                # "1"ste tag von node other_obj kommt in other (ein node ?)
 		set other [lindex [.c gettags $other_obj] 1]
-                # (?)
 		set o_x $x_t($other)
 		set o_y $y_t($other)
-                # (?) x und y entfernung von zwei aufeinanderfolgenden knoten
 		set dx [expr {$x - $o_x}]
 		set dy [expr {$y - $o_y}]
-                # laenge von nicht horizontalem und nicht vertikalen element
-                #    im rechtwinkligen dreieck (satz des pytagoras)
 		set d [expr {hypot($dx, $dy)}]
-                # erg d mal 2 --- >>d^2<<=dx^2*dy^2
 		set d2 [expr {$d * $d}]
-                # (?) werte werden irgendwie skaliert
 		set p_fx [expr {1000.0 * $dx / ($d2 * $d + 100)}]
 		set p_fy [expr {1000.0 * $dy / ($d2 * $d + 100)}]
-                # wenn link verbindung besteht und
-                #   zieht einen kleinen wert von p_fx und p_fy ab
-                #   groeserer wert (.0...) bewirkt schnelleres ordnen und weniger abstaende
-		# anpassung: vorher:                    .0000000005 neu:   .000000002
 		if {[linkByPeers $node $other] != ""} {
-		    set p_fx [expr {$p_fx - $dx * $d2 * .000000002}]
-		    set p_fy [expr {$p_fy - $dy * $d2 * .000000002}]
+		    set p_fx [expr {$p_fx - $dx * $d2 * .0000000005}]
+		    set p_fy [expr {$p_fy - $dy * $d2 * .0000000005}]
 		}
-                # bewirkt entfaltung und zentrierung (?)
 		set fx_t($node) [expr {$fx_t($node) + $p_fx}]
 		set fy_t($node) [expr {$fy_t($node) + $p_fy}]
-                # bewirkt die gleichmaessige verteilung auf canvas und abstaende untereinander (?)
 		set fx_t($other) [expr {$fx_t($other) - $p_fx}]
 		set fy_t($other) [expr {$fy_t($other) - $p_fy}]
 	    }
 
-            # die globale link_list wird durchlaufen
 	    foreach link $link_list {
-                # liefert zwei nodes vom ende eines links in liste
 		set nodes [linkPeers $link]
-                # (?) wenn node nicht im momentanen canvas ist
-                # oder link nicht vorhanden springe ein "nesting level" rauf
 		if { [getNodeCanvas [lindex $nodes 0]] != $curcanvas ||
 		    [getNodeCanvas [lindex $nodes 1]] != $curcanvas ||
 		    [getLinkMirror $link] != "" } {
 		    continue
 		}
-                # beide end nodes vom zu betrachtenden link
 		set peers [linkPeers $link]
-                # hole beide coordinaten der end nodes
 		set coords0 [getNodeCoords [lindex $peers 0]]
 		set coords1 [getNodeCoords [lindex $peers 1]]
-                # jeweils x und y koordinaten mit verschiedener gewichtung
-                #   zusammen rechnen
-		# faktor bewirkt drehung des netztes komplett. hoeher schneller
-		# <0.5 links oben / >0.5rechts unten
 		set o_x \
-		    [expr {([lindex $coords0 0] + [lindex $coords1 0]) * 0.5}]
+		    [expr {([lindex $coords0 0] + [lindex $coords1 0]) * .5}]
 		set o_y \
-		    [expr {([lindex $coords0 1] + [lindex $coords1 1]) * 0.5}]
-                # x u. y wert minus der gewichtung in diffx und diffy
+		    [expr {([lindex $coords0 1] + [lindex $coords1 1]) * .5}]
 		set dx [expr {$x - $o_x}]
 		set dy [expr {$y - $o_y}]
-                # satz des pytagoras
 		set d [expr {hypot($dx, $dy)}]
-                # hypotenuse ohne wurzel berechnung
 		set d2 [expr {$d * $d}]
-                # (?) bewirkt hauptsaechlich horizontale autoausrichtung
 		set fx_t($node) \
 		    [expr {$fx_t($node) + 500.0 * $dx / ($d2 * $d + 100)}]
-                # (?) bewirkt hauptsaechlich vertikale autoausrichtung
 		set fy_t($node) \
 		    [expr {$fy_t($node) + 500.0 * $dy / ($d2 * $d + 100)}]
 	    }
 	}
 
-
-	# hier zaehlvariable null setzen
-        foreach obj $objects {
-
- 		set node [lindex [.c gettags $obj] 1]
-
-		# testweise beschelunigungsfaktor...
-		#if { $bla == 1 } {
-		#
-		#	set ges_x($node) [expr {$ges_x($node) * 10 + 0.0001}]
-                #	set ges_y($node) [expr {$ges_y($node) * 10 + 0.0001}]
-		#	set bla 1
-		#} else {
-			set ges_x($node) 0
-                	set ges_y($node) 0
-		#}
-	}
-
-
-        # was wird neu ausgerichtet <<<<<<<<<
-        # alle markierten nodes werden durchlaufen bzw. alle wenn so im menue gewahlt
 	foreach obj $objects {
-            # node wird erstes (zweites) element aus tags der aktuellen node
 	    set node [lindex [.c gettags $obj] 1]
-
-            # wenn "set v_t($node)" v (?) erfolgreich, dann xy == 0 ansonsten wird vx
-            #   u. vy das 0 od 1 element aus der v_t liste
 	    if { [catch "set v_t($node)" v] } {
 		set vx 0.0
 		set vy 0.0
@@ -3648,87 +3552,35 @@ proc rearrange { mode } {
 		set vx [lindex $v_t($node) 0]
 		set vy [lindex $v_t($node) 1]
 	    }
-
-            # rechnet und speichert in var. zeit faktor dt
 	    set vx [expr {$vx + 1000.0 * $fx_t($node) * $dt}]
 	    set vy [expr {$vy + 1000.0 * $fy_t($node) * $dt}]
-	    # "daempfung" groesserer wert laesst bewegung langsamer ablaufen (?)
-	    # alt 0.5 neu 0.8
-	    set dampk [expr {0.8 + ($vx * $vx + $vy * $vy) * 0.00001}]
+	    set dampk [expr {0.5 + ($vx * $vx + $vy * $vy) * 0.00001}]
 	    set vx [expr {$vx * exp( - $dampk * $dt)}]
 	    set vy [expr {$vy * exp( - $dampk * $dt)}]
 	    set dx [expr {$vx * $dt}]
 	    set dy [expr {$vy * $dt}]
 	    set x [expr {$x_t($node) + $dx}]
 	    set y [expr {$y_t($node) + $dy}]
-            # v_t von aktueller node wird vx vy
 	    set v_t($node) "$vx $vy"
 
-
-            # node und node caption werden gesetzt und im laufe davon auch in dateien (?) geschrieben
-	    #  markierung in rot oder gruen um den node.
 	    setNodeCoords $node "$x $y"
-
-	    # idee fuer jeden node (und alles was dranhaengt) bewegung sammeln und nur in intervallen ausfuehren
 	    set e_dx [expr {$dx * $zoom}]
 	    set e_dy [expr {$dy * $zoom}]
-
-	    set ges_x($node) [expr {$ges_x($node) + $e_dx}]
-	    set ges_y($node) [expr {$ges_y($node) + $e_dy}]
+	    .c move $obj $e_dx $e_dy
+	    set img [.c find withtag "selectmark && $node"]
+	    .c move $img $e_dx $e_dy
+	    set img [.c find withtag "nodelabel && $node"]
+	    .c move $img $e_dx $e_dy
+	    set x [expr {[lindex [.c coords $img] 0] / $zoom}]
+	    set y [expr {[lindex [.c coords $img] 1] / $zoom}]
+	    setNodeLabelCoords $node "$x $y"
+	    .c addtag need_redraw withtag "link && $node"
 	}
-
-	# hier nodes malen
-	foreach obj $objects {
-
-           set node [lindex [.c gettags $obj] 1]
-
-            # alle items in $obj (der aktuell behandelte node) werden an momentane
-           #coordinate + x und y gesetzt. betrifft links, router bilder, netzwerkangaben, widgets(?)
-           .c move $obj $ges_x($node) $ges_y($node)
-
-	   # markierungen von markierten nodes werden gesetzt
-           set img [.c find withtag "selectmark && $node"]
-           .c move $img $ges_x($node) $ges_y($node)
-
-            # node label (namen) wird versetzt
-           set img [.c find withtag "nodelabel && $node"]
-
-           .c move $img $ges_x($node) $ges_y($node)
-            # img enthaelt coordinaten x wird erstes/ zoom . y wird zweites / zoom
-           set x [expr {[lindex [.c coords $img] 0] / $zoom}]
-           set y [expr {[lindex [.c coords $img] 1] / $zoom}]
-            # node label wird gesetzt
-           setNodeLabelCoords $node "$x $y"
-            # jedes item in canvas mit link oder nodenamen erhaelt tag need_redraw
-           .c addtag need_redraw withtag "link && $node"
+	foreach link [.c find withtag "link && need_redraw"] {
+	    redrawLink [lindex [.c gettags $link] 1]
 	}
-
-	incr intervall
-
-	# durch anpassen von $optimier werden links
-	#   unterschiedlich oft aktuallisiert. verhindert ruckeln
-	if {[llength $objects] > 16} {
-		set optimier 3
-	} else {
-		set optimier 30
-	}
-
-	#hier paar ms rausholen durch spaeteres updaten der links
-	if {$intervall > $optimier} {
-        	# alle verbindungen mit dem tag need_redraw werden durchlaufen
-		foreach link [.c find withtag "link && need_redraw"] {
-	    		redrawLink [lindex [.c gettags $link] 1]
-		}
-		set intervall 0
-	}
-
-        # loesche alle need_redraw tags der links auf dem canvas
 	.c dtag link need_redraw
-
-        # dadurch bleibt canvas bedienbar
-
-	  update
-
+	update
     }
 
     rearrange_off
