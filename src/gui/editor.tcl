@@ -725,18 +725,19 @@ proc updateLinkLabel { link } {
 
     set bwstr  [getLinkBandwidthString $link]
     set delstr [getLinkDelayString $link]
-    set ber [getLinkBER $link]
-    set dup [getLinkDup $link]
-    set labelstr "$labelstr[getLinkBandwidthString $link]"
+    set berstr [getLinkBERString $link]
+    set dupstr [getLinkDupString $link]
+    set labelstr ""
+    if { "$bwstr" != "" } {
+	set labelstr "$labelstr$bwstr"
+    }
     if { "$delstr" != "" } {
 	set labelstr "$labelstr$delstr"
     }
-    if { "$ber" != "" } {
-	set berstr "loss=$ber%" 
+    if { "$berstr" != "" } {
 	set labelstr "$labelstr$berstr"
     }
-    if { "$dup" != "" } {
-	set dupstr "dup=$dup%"
+    if { "$dupstr" != "" } {
 	set labelstr "$labelstr$dupstr"
     }
     set labelstr \
@@ -2268,7 +2269,7 @@ proc nodeEnter { c } {
     if { $model != "" } {
 	set line "{$node} $name ($model): netid: $netid"
     } else {
-	set line "{$node} $name: netid: $netid"
+	set line "{$node} $name:  netid: $netid"
     }
     if { $type != "rj45" && $type != "tunnel" } {
 	foreach ifc [ifcList $node] {
@@ -2799,8 +2800,9 @@ proc popupConfigDialog { c } {
 	$spinbox $wi.delay.value -justify right -width 10 \
 	    -validate focus -invalidcommand "focusAndFlash %W"
 	$wi.delay.value insert 0 [getLinkDelay $target]
+	# 274 seconds is maximum netem delay for Linux 3.2.0-60-generic kernel
 	$wi.delay.value configure \
-	    -validatecommand {checkIntRange %P 0 10000000} \
+	    -validatecommand {checkIntRange %P 0 274000000} \
 	    -from 0 -to 10000000 -increment 5
 	pack $wi.delay.value $wi.delay.label -side right
 	pack $wi.delay -side top -anchor e
@@ -2920,6 +2922,114 @@ proc popupConfigDialog { c } {
     pack $wi.butt -side bottom
     bind $wi <Key-Escape> $cancelcmd
 #    bind $wi <Key-Return> "popupConfigApply $wi $object_type $target 0"
+}
+
+
+proc linkConfigUni { wi } {
+    global g_link_config_uni_state
+
+    set capt [lindex [$wi.preset.uni configure -text] 4]
+
+    if { $capt == "  >>  " } {
+	set g_link_config_uni_state "uni"
+	$wi.preset.uni configure -text "  <<  "
+	set txt "Asymmetric effects: downstream  /  upstream"
+	$wi.unilabel.updown configure -text $txt
+
+	set spinbox [getspinbox]
+	if { ![winfo exists $wi.bandwidth.value2] } {
+	    $spinbox $wi.bandwidth.value2 -justify right \
+	    	-width 10 -validate focus -invalidcommand "focusAndFlash %W"
+	    $wi.bandwidth.value2 configure \
+		-validatecommand {checkIntRange %P 0 1000000000} \
+		-from 0 -to 1000000000 -increment 1000000
+	}
+	$wi.bandwidth.value2 delete 0 end
+	$wi.bandwidth.value2 insert 0 [$wi.bandwidth.value get]
+	pack $wi.bandwidth.value2 -side right
+	pack $wi.bandwidth.value2 -before $wi.bandwidth.value
+
+	if { ![winfo exists $wi.delay.value2] } {
+	    $spinbox $wi.delay.value2 -justify right -width 10 \
+		-validate focus -invalidcommand "focusAndFlash %W"
+	    $wi.delay.value2 configure \
+		-validatecommand {checkIntRange %P 0 10000000} \
+		-from 0 -to 10000000 -increment 5
+	}
+	$wi.delay.value2 delete 0 end
+	$wi.delay.value2 insert 0 [$wi.delay.value get]
+	pack $wi.delay.value2 -side right
+	pack $wi.delay.value2 -before $wi.delay.value
+
+	if { ![winfo exists $wi.jitter.value2] } {
+	    $spinbox $wi.jitter.value2 -justify right -width 10 \
+		-validate focus -invalidcommand "focusAndFlash %W"
+	    $wi.jitter.value2 configure \
+		-validatecommand {checkIntRange %P 0 10000000} \
+		-from 0 -to 10000000 -increment 5
+	}
+	$wi.jitter.value2 delete 0 end
+	$wi.jitter.value2 insert 0 [$wi.jitter.value get]
+	pack $wi.jitter.value2 -side right
+	pack $wi.jitter.value2 -before $wi.jitter.value
+
+	if { ![winfo exists $wi.ber.value2] } {
+	    $spinbox $wi.ber.value2 -justify right -width 10 \
+		-validate focus -invalidcommand "focusAndFlash %W"
+	    $wi.ber.value2 configure \
+		-validatecommand "checkFloatRange %P 0.0 100.0" \
+		-from 0.0 -to 100.0 -increment 0.1
+	}
+	$wi.ber.value2 delete 0 end
+	$wi.ber.value2 insert 0 [$wi.ber.value get]
+	pack $wi.ber.value2 -side right
+	pack $wi.ber.value2 -before $wi.ber.value
+
+	if { ![winfo exists $wi.dup.value2] } {
+	    $spinbox $wi.dup.value2 -justify right -width 10 \
+		-validate focus -invalidcommand "focusAndFlash %W"
+	    $wi.dup.value2 configure \
+		-validatecommand {checkFloatRange %P 0 50} \
+		-from 0 -to 50 -increment 1
+	}
+	$wi.dup.value2 delete 0 end
+	$wi.dup.value2 insert 0 [$wi.dup.value get]
+	pack $wi.dup.value2 -side right
+	pack $wi.dup.value2 -before $wi.dup.value
+    } else {
+	set g_link_config_uni_state "bid"
+	$wi.preset.uni configure -text "  >>  "
+	$wi.unilabel.updown configure -text "Symmetric link effects:"
+	pack forget $wi.bandwidth.value2
+	pack forget $wi.delay.value2
+	pack forget $wi.jitter.value2
+	pack forget $wi.ber.value2
+	pack forget $wi.dup.value2
+    }
+}
+
+# unidirectional links are not always supported
+proc isUniSupported { n1 n2 } {
+    set blacklist [list "hub" "lanswitch"]
+    set type1 [nodeType $n1]
+    set type2 [nodeType $n2]
+    # not yet supported for GRE tap device
+    if { $type1 == "tunnel" || $type2 == "tunnel" } {
+	return false
+    }
+    # unidirectional links are supported between two switches/hubs
+    if { [lsearch $blacklist $type1] != -1 && \
+	 [lsearch $blacklist $type2] != -1 } {
+	return true
+    }
+    # unidirectional links not supported between hub/switch and something else
+    if { [lsearch $blacklist $type1] != -1 || \
+	 [lsearch $blacklist $type2] != -1 } {
+	return false
+    }
+    # unidirectional links are supported between routers, rj45s, etc.
+    # WLANs not included here because they have no link dialog
+    return true
 }
 
 # toggle the state of the mac address entry, and insert MAC address template

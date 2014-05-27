@@ -877,7 +877,7 @@ proc newLink { lnode1 lnode2 } {
 	 [nodeType $lnode1] != "wlan" &&
 	[[typemodel $lnode2].layer] == "NETWORK" } {
 	if { $ipv4_addr2 == "" && $do_auto_addressing } {
-	    autoIPv4addr $lnode2 $ifname2 
+	    autoIPv4addr $lnode2 $ifname2
 	}
 	if { $ipv6_addr2 == "" && $do_auto_addressing } {
 	    autoIPv6addr $lnode2 $ifname2

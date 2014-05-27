@@ -53,45 +53,46 @@ proc nexec { node args } {
 # debug output of every command
 #puts "nexec($node): $args"
 #if {[lsearch $args ngctl] != -1 } {
-#   puts "XXX $args"
+#	puts "XXX $args"
 #    set fileId [open "nexec.log" a]
 #    puts $fileId $args
 #    close $fileId
 #}
     # safely exec the given command, printing errors to stdout
     if { $node == "localnode" } { ;# local execution
-        if { [ catch {eval exec $args} e ] } {
-            if { $e == "child process exited abnormally" } { return };# ignore
-            puts "error executing: exec $args ($e)"
-        }
-        return $e
+	if { [ catch {eval exec $args} e ] } {
+	    if { $e == "child process exited abnormally" } { return };# ignore
+	    puts "error executing: exec $args ($e)"
+	}
+	return $e
     } else {
-        puts "error: nexec called with node=$node"
+	puts "error: nexec called with node=$node"
     }
 }
+
 
 proc acquireOperModeLock { mode } {
     global setOperMode_lock oper_mode
 
     if { ![info exists setOperMode_lock] } { set setOperMode_lock 0 }
     if { $oper_mode == "exec" } {
-        # user somehow pressed start while we were still shutting down...
-        if { $mode == "exec" } {
-            set choice [tk_messageBox -type yesno -default no -icon warning \
-                -message "You have selected to start the session while the previous one is still shutting down. Are you sure you want to interrupt the shutdown? (not recommended)"]
-            if { $choice == "no" } {
-                set activetool select
-                return; # return and allow previous setOperMode to finish...
-            }
-        # check if user pressed stop while we were starting up...
-        } elseif { $setOperMode_lock } { ;# mode == "edit"
-            set choice [tk_messageBox -type yesno -default no -icon warning \
-                -message "You are trying to stop the session while it is still starting. Are you sure you want to interrupt the startup? (not recommeded)"]
-            if { $choice == "no" } {
-                set activetool select
-                return; # return and allow previous setOperMode to finish...
-            }
-        }
+	# user somehow pressed start while we were still shutting down...
+	if { $mode == "exec" } {
+	    set choice [tk_messageBox -type yesno -default no -icon warning \
+			-message "You have selected to start the session while the previous one is still shutting down. Are you sure you want to interrupt the shutdown? (not recommended)"]
+	    if { $choice == "no" } {
+		set activetool select
+		return; # return and allow previous setOperMode to finish...
+	    }
+	# check if user pressed stop while we were starting up...
+	} elseif { $setOperMode_lock } { ;# mode == "edit"
+	    set choice [tk_messageBox -type yesno -default no -icon warning \
+			-message "You are trying to stop the session while it is still starting. Are you sure you want to interrupt the startup? (not recommeded)"]
+	    if { $choice == "no" } {
+		set activetool select
+		return; # return and allow previous setOperMode to finish...
+	    }
+	}
     }
 
     set setOperMode_lock 1
@@ -116,20 +117,20 @@ proc checkRJ45s {} {
     }
 
     foreach node $node_list {
-        if { [getNodeLocation $node] != "" } { continue }
+	if { [getNodeLocation $node] != "" } { continue }
         if { [nodeType $node] == "rj45" } {
-            set i [lsearch $extifcs [getNodeName $node]]
-            if { $i >= 0 } { continue }
-            set msg "Error: external interface \"[getNodeName $node]\""
-            set msg "$msg does not exist. Press OK to continue with RJ45s"
-            set msg "$msg disabled. NOTE: this setting can be re-enabled"
-            set msg "$msg through Session > Options..."
-            set choice [tk_messageBox -type okcancel -icon error -message $msg]
-            if { $choice == "cancel" } {
-                return -1
-            }
-            setSessionOptions "" "enablerj45=0"
-            break;
+        set i [lsearch $extifcs [getNodeName $node]]
+        if { $i >= 0 } { continue }
+        set msg "Error: external interface \"[getNodeName $node]\""
+        set msg "$msg does not exist. Press OK to continue with RJ45s"
+        set msg "$msg disabled. NOTE: this setting can be re-enabled"
+        set msg "$msg through Session > Options..."
+        set choice [tk_messageBox -type okcancel -icon error -message $msg]
+        if { $choice == "cancel" } {
+	    return -1
+        }
+	setSessionOptions "" "enablerj45=0"
+        break;
         }
     }
     return 0
@@ -243,48 +244,48 @@ proc drawToolbarSubmenu { b menubuttons } {
     set buttonmenu .left.${b}.menu
 
     if { ![winfo exists $buttonmenu] } {
-        return ;# this may occur in exec mode
+	return ;# this may occur in exec mode
     }
 
     $buttonmenu delete 0 end
 
     foreach menubutton $menubuttons {
-        if { $b == "routers" } {
-            set imgf [getNodeTypeImage $menubutton tiny]
-        } else {
-            set imgf "$CORE_DATA_DIR/icons/tiny/${menubutton}.gif"
-        }
-        if { ![file exists $imgf] } { ;# pop custom filename from list
-            puts "**warning: missing icon $imgf"
-            continue
-        }
-        set img [createImageButton $imgf 0]
-        $buttonmenu add command -image $img -columnbreak 1  \
-            -command "popupMenuChoose $b $menubutton $imgf"
+	if { $b == "routers" } {
+	    set imgf [getNodeTypeImage $menubutton tiny]
+	} else {
+	    set imgf "$CORE_DATA_DIR/icons/tiny/${menubutton}.gif"
+	}
+	if { ![file exists $imgf] } { ;# pop custom filename from list
+	    puts "**warning: missing icon $imgf"
+	    continue
+	}
+	set img [createImageButton $imgf 0]
+	$buttonmenu add command -image $img -columnbreak 1  \
+		-command "popupMenuChoose $b $menubutton $imgf"
     }
     # add an edit button to the end of the row
     if { $b == "routers" } {
-        set imgf "$CORE_DATA_DIR/icons/normal/document-properties.gif"
-        set img [createImageButton $imgf 0]
-        $buttonmenu add command -image $img -columnbreak 1 \
-            -command "popupNodesConfig"
+	set imgf "$CORE_DATA_DIR/icons/normal/document-properties.gif"
+	set img [createImageButton $imgf 0]
+	$buttonmenu add command -image $img -columnbreak 1 \
+		-command "popupNodesConfig"
     }
 }
 
 proc setSessionStartStopMenu { mode } {
     if { $mode == "exec" } {
-        catch   {.menubar.session entryconfigure "Start" \
-            -label "Stop" -command "startStopButton edit"}
+	catch   {.menubar.session entryconfigure "Start" \
+		-label "Stop" -command "startStopButton edit"}
     } else {
-        catch  {.menubar.session entryconfigure "Stop" \
-            -label "Start" -command "startStopButton exec"}
+	catch  {.menubar.session entryconfigure "Stop" \
+	   	-label "Start" -command "startStopButton exec"}
     }
 }
 
 proc updateMenus { mode } {
     set s "normal"
     if { $mode == "exec" } {
-        set s "disabled"
+	set s "disabled"
     }
     .menubar.tools entryconfigure "Auto rearrange all" -state $s
     .menubar.tools entryconfigure "Auto rearrange selected" -state $s
@@ -304,23 +305,23 @@ proc startStopButton { mode } {
     global systype
     set emul_sock 0
     if { $mode == "exec" } {
-        set msg "The CORE daemon must be running and your kernel must support"
-        set msg "$msg virtualization for the emulation to start."
+	set msg "The CORE daemon must be running and your kernel must support"
+	set msg "$msg virtualization for the emulation to start."
     } elseif { $mode == "edit" } {
-        set msg "Communication with daemon was lost."
+	set msg "Communication with daemon was lost."
     } else {
-        puts "unsupported mode: $mode"
-        return
+	puts "unsupported mode: $mode"
+	return
     }
 
     set plugin [lindex [getEmulPlugin "*"] 0]
     set emul_sock [pluginConnect $plugin connect true]
 
     if { $emul_sock == "" || $emul_sock == -1 } {
-        tk_messageBox -type ok -icon warning -message $msg
-        releaseOperModeLock
-        set activetool select
-        return
+	tk_messageBox -type ok -icon warning -message $msg
+	releaseOperModeLock
+	set activetool select
+	return
     }
     setOperMode $mode
 }
@@ -354,11 +355,11 @@ proc setOperMode { mode { type "" } } {
 
     # Verify that links to external interfaces are properly configured
     if { $mode == "exec" && [getSessionOption enablerj45 1]==1 } {
-        if { [checkRJ45s] < 0 } {
-            releaseOperModeLock
-            set activetool select
-            return
-        }
+	if { [checkRJ45s] < 0 } {
+	    releaseOperModeLock
+	    set activetool select
+	    return
+	}
     }
 
     # start/stop menu item
@@ -369,11 +370,11 @@ proc setOperMode { mode { type "" } } {
     #
     drawToolbar $mode
     if { $mode == "edit" } { ;# these are the default bindings
-        .c bind node <Double-1> "popupConfigDialog .c"
-        .c bind nodelabel <Double-1> "popupConfigDialog .c"
+	.c bind node <Double-1> "popupConfigDialog .c"
+	.c bind nodelabel <Double-1> "popupConfigDialog .c"
     } else { ;# double-click to open shell
-        .c bind node <Double-1> "button3node .c %x %y shift"
-        .c bind nodelabel <Double-1> "button3node .c %x %y shift"
+	.c bind node <Double-1> "button3node .c %x %y shift"
+	.c bind nodelabel <Double-1> "button3node .c %x %y shift"
     }
     set activetool select
     .left.select configure -state active
@@ -385,17 +386,17 @@ proc setOperMode { mode { type "" } } {
     #
     ### start button is pressed
     if { "$mode" == "exec" } {
-        rearrange_off
-        set oper_mode exec
-        resetAllNodeCoords save
-        clearExceptions "" ""
-        throwCEL true
+	rearrange_off
+	set oper_mode exec
+	resetAllNodeCoords save
+	clearExceptions "" ""
+	throwCEL true
 
-        # Bind left mouse click to displaying the CPU usage in
-        # a graph format
-        bind .bottom.cpu_load <1> {manageCPUwindow %X %Y 1}
+	# Bind left mouse click to displaying the CPU usage in
+	# a graph format
+	bind .bottom.cpu_load <1> {manageCPUwindow %X %Y 1}
 
-        monitor_loop
+	monitor_loop
         set plugin [lindex [getEmulPlugin "*"] 0]
         set emul_sock [pluginConnect $plugin connect false]
 	if {$type != "connect"} {
@@ -405,18 +406,18 @@ proc setOperMode { mode { type "" } } {
 	mobility_script_loop
     ### stop button is pressed
     } else {
-        if {$oper_mode != "edit"} {
-            set t_start [clock seconds]
-            shutdownSession
-            statgraph off 0
-            set t_elapsed [expr {[clock seconds] - $t_start}]
-            statline "Cleanup completed in $t_elapsed seconds."
-        }
-        clearLinkHighlights
-        catch { destroy .popup }
-        clearWlanLinks ""
-        widgets_stop
-        set oper_mode edit
+	if {$oper_mode != "edit"} {
+	    set t_start [clock seconds]
+	    shutdownSession
+	    statgraph off 0
+	    set t_elapsed [expr {[clock seconds] - $t_start}]
+	    statline "Cleanup completed in $t_elapsed seconds."
+	}
+	clearLinkHighlights
+	catch { destroy .popup }
+	clearWlanLinks ""
+	widgets_stop
+	set oper_mode edit
 
 	# Bind left mouse click to clearing the CPU graph
 	bind .bottom.cpu_load <1> {manageCPUwindow %X %Y 0}
@@ -425,6 +426,7 @@ proc setOperMode { mode { type "" } } {
     .c config -cursor left_ptr
     releaseOperModeLock
 }
+
 
 #****f* exec.tcl/statline
 # NAME
@@ -441,10 +443,10 @@ proc statline {line} {
     global execMode
 
     if {$execMode == "batch" || $execMode == "addons"} {
-        puts $line
+	puts $line
     } else {
-        .bottom.textbox config -text "$line"
-        animateCursor
+	.bottom.textbox config -text "$line"
+	animateCursor
     }
 }
 
@@ -455,11 +457,12 @@ proc getNextMac {} {
     set b [format %.2x $mac_byte5]
     incr mac_byte5
     if { $mac_byte5 >= 255 } {
-        set mac_byte5 0
-        incr mac_byte4
+	set mac_byte5 0
+	incr mac_byte4
     }
     return "00:00:00:aa:$a:$b"
 }
+
 
 #****f* exec.tcl/monitor_loop
 # NAME
@@ -478,70 +481,71 @@ proc monitor_loop {} {
 
 
     if {$oper_mode != "exec"} {
-        .bottom.cpu_load config -text ""
-        .bottom.mbuf config -text ""
-        return
+	.bottom.cpu_load config -text ""
+	.bottom.mbuf config -text ""
+	return
     }
 
     if { [lindex $systype 0] == "Linux" } {
-        set cpuusage [getCPUUsage]
+	set cpuusage [getCPUUsage]
 
-        #TODO: get the cpu usage on all the assigned server
-        # store usage history for each server stored in an array list
-        set assigned_servers [getAssignedRemoteServers]
-        for {set i 0} {$i <= [llength $assigned_servers]} {incr i} {
-            if {$i == [llength $assigned_servers]} {
-                # localhost
-                set ip [getMyIP]
-                set cpuusageforserver [lindex $cpuusage 0]
-            } else {
-                set server [lindex $assigned_servers $i]
+	#TODO: get the cpu usage on all the assigned server
+	# store usage history for each server stored in an array list
+	set assigned_servers [getAssignedRemoteServers]
+	for {set i 0} {$i <= [llength $assigned_servers]} {incr i} {
+	    if {$i == [llength $assigned_servers]} {
+		# localhost
+		set ip [getMyIP]
+		set cpuusageforserver [lindex $cpuusage 0]
+	    } else {
+		set server [lindex $assigned_servers $i]
                 set srv [array get exec_servers $server]
                 if { $srv == "" } { continue }
                 set ip [lindex $srv 0]
-                # TODO: receive CPU usage from other servers
-                set cpuusageforserver 0
-            }
+		# TODO: receive CPU usage from other servers
+		set cpuusageforserver 0
+	    }
 
-            # append the latest cpu value to the end of list and
-            # only keep and display the last 20 values for each server
-            set server_cpuusage($ip) [lappend server_cpuusage($ip) $cpuusageforserver]
-            if { [llength $server_cpuusage($ip)] > 20 } {
-                set server_cpuusage($ip) [lreplace $server_cpuusage($ip) 0 0]
-            }
-        }
+	    # append the latest cpu value to the end of list and
+	    # only keep and display the last 20 values for each server
+	    set server_cpuusage($ip) [lappend server_cpuusage($ip) $cpuusageforserver]
+	    if { [llength $server_cpuusage($ip)] > 20 } {
+		set server_cpuusage($ip) [lreplace $server_cpuusage($ip) 0 0]
+	    }
+	}
 
-        #plot the usage data if cpu windows already opened
-        # for all servers
-        if { [winfo exists .cpu]} {
-            plotCPUusage
-        }
 
-        set cputxt "CPU [lindex $cpuusage 0]% ("
-        set cpuusage [lreplace $cpuusage 0 0]
-        for { set n 0 } { $n < [llength $cpuusage] } { incr n } {
-            if { $n > 0 } { set cputxt "${cputxt}/" }
-            set cputxt "${cputxt}[lindex $cpuusage $n]"
-        }
-        set cputxt "$cputxt)"
-        set cpulen [expr {[string length $cputxt] - 2}]
-        set labellen [.bottom.cpu_load cget -width]
-        if { $cpulen < $labellen } { set cpulen $labellen }
-        set stats [nexec localnode vmstat | tail -n 1 ]
-        set mem_free [lindex $stats 3]
-        set mem_free_mb [expr { $mem_free / 1024 }]
-            .bottom.cpu_load config -text $cputxt -width $cpulen
-        .bottom.mbuf config -text " ${mem_free_mb}M free"
-        after 2000 { monitor_loop }
-        return
+	#plot the usage data if cpu windows already opened
+	# for all servers
+	if { [winfo exists .cpu]} {
+	    plotCPUusage
+	}
+
+	set cputxt "CPU [lindex $cpuusage 0]% ("
+	set cpuusage [lreplace $cpuusage 0 0]
+	for { set n 0 } { $n < [llength $cpuusage] } { incr n } {
+	    if { $n > 0 } { set cputxt "${cputxt}/" }
+	    set cputxt "${cputxt}[lindex $cpuusage $n]"
+	}
+	set cputxt "$cputxt)"
+	set cpulen [expr {[string length $cputxt] - 2}]
+	set labellen [.bottom.cpu_load cget -width]
+	if { $cpulen < $labellen } { set cpulen $labellen }
+	set stats [nexec localnode vmstat | tail -n 1 ]
+	set mem_free [lindex $stats 3]
+	set mem_free_mb [expr { $mem_free / 1024 }]
+        .bottom.cpu_load config -text $cputxt -width $cpulen
+	.bottom.mbuf config -text " ${mem_free_mb}M free"
+	after 2000 { monitor_loop }
+	return
     }
 
     if { $systype == "FreeBSD 4.11-RELEASE" } {
-        set defaultname "default"
-    set cpun 3
+    	set defaultname "default"
+	set cpun 3
     } else {
         set defaultname "."
-    set cpun 4
+	set cpun 4
     }
 
     # CPU usage from `vimage -l`
@@ -562,6 +566,7 @@ proc monitor_loop {} {
 
     after 2000 { monitor_loop }
 }
+
 
 #****f* exec.tcl/execSetLinkParams
 # NAME
@@ -590,33 +595,34 @@ proc popupMenuChoose { parent b imgf } {
 
     # deselect previous item
     if { $activetoolp != "" } {
-        set img [createImageButton $activetool_prev_imgf 1]
-        .left.$activetoolp configure -image $img -relief raised
+	set img [createImageButton $activetool_prev_imgf 1]
+	.left.$activetoolp configure -image $img -relief raised
     }
     if {$activetool_prev == "marker"} { markerOptions off }
 
     # change the active item; we need activetool_prev b/c of radio button
     set activetoolp $parent
     set activetool $b
-    set activetool_prev $b  ;# previously-selected activetool
+    set activetool_prev $b	;# previously-selected activetool
     set activetool_prev_imgf $imgf ;# previously-selected button image file
 
     # hint for topogen
     global g_last_selected_node_type
     if { $activetoolp == "routers" || $activetoolp == "hubs" } {
-        set g_last_selected_node_type [list $parent $b $imgf]
+	set g_last_selected_node_type [list $parent $b $imgf]
     }
 
     # select a new button
     if { $parent != "" } {
-        set img [createImageButton $imgf 2]
-        .left.$parent configure -image $img -relief sunken
+	set img [createImageButton $imgf 2]
+	.left.$parent configure -image $img -relief sunken
     }
 
     if {$activetool == "marker"} { markerOptions on }
 
     # status message
     .bottom.textbox config -text "$b tool selected"
+
 }
 
 #
@@ -626,19 +632,20 @@ proc createImageButton { imgf style } {
     global CORE_DATA_DIR defSelectionColor
 
     if { [catch {set img [image create photo -file $imgf] } e] } {
-        puts "warning: error opening button image $imgf ($e)"
-        set img [image create photo] ;# blank button
+	puts "warning: error opening button image $imgf ($e)"
+	set img [image create photo] ;# blank button
     }
     # add an arrow to the button
     if { $style > 0 } {
-        $img read "$CORE_DATA_DIR/icons/tiny/arrow.gif" -to 27 22
-        if { $style == 2 } { ;# highlight the button
-            set img2 [image create photo]
-            $img2 put [$img data -background $defSelectionColor]
-            set img $img2
-        }
+	$img read "$CORE_DATA_DIR/icons/tiny/arrow.gif" -to 27 22
+	if { $style == 2 } { ;# highlight the button
+	    set img2 [image create photo]
+	    $img2 put [$img data -background $defSelectionColor]
+	    set img $img2
+	}
     }
     return $img
+
 }
 
 # Boeing: status bar graph
@@ -646,36 +653,36 @@ proc statgraph { cmd n } {
     global statgraph_max statgraph_current tk_patchLevel execMode
 
     if { $execMode != "interactive" || ![info exists tk_patchLevel] } {
-        return
+	return
     }
 
     switch -exact $cmd {
-        on {
-            if { $n == 0 } { return } ;# Boeing: prevent div by 0
-            set statgraph_max $n
-            set statgraph_current 0
-            label .bottom.status -relief sunken -bd 1 -anchor w -width 2 \
-                -background green -justify center
-            label .bottom.status2 -relief sunken -bd 1 -anchor w -width 12
-            pack .bottom.status .bottom.status2  -side left \
-                -before .bottom.textbox
-        }
-        off {
-            set statgraph_max 0
-            set statgraph_current 0
-            destroy .bottom.status
-            destroy .bottom.status2
-        }
-        inc {
-            # Boeing: prevent div by 0
-            if { $n == 0 || $statgraph_max == 0 } { return }
-            incr statgraph_current $n
-            set p [expr $statgraph_current.0 / $statgraph_max.0]
-            set width [expr int($p * 15)]
-            .bottom.status config -width $width
-                .bottom.status config -text "  ([expr int($p*100)]%)"
-            .bottom.status2 config -width [expr 15-$width]
-        }
+	on {
+		if { $n == 0 } { return } ;# Boeing: prevent div by 0
+		set statgraph_max $n
+		set statgraph_current 0
+		label .bottom.status -relief sunken -bd 1 -anchor w -width 2 \
+			-background green -justify center
+		label .bottom.status2 -relief sunken -bd 1 -anchor w -width 12
+		pack .bottom.status .bottom.status2  -side left \
+			-before .bottom.textbox
+	}
+	off {
+		set statgraph_max 0
+		set statgraph_current 0
+		destroy .bottom.status
+		destroy .bottom.status2
+	}
+	inc {
+		# Boeing: prevent div by 0
+		if { $n == 0 || $statgraph_max == 0 } { return }
+		incr statgraph_current $n
+		set p [expr $statgraph_current.0 / $statgraph_max.0]
+		set width [expr int($p * 15)]
+		.bottom.status config -width $width
+    		.bottom.status config -text "  ([expr int($p*100)]%)"
+		.bottom.status2 config -width [expr 15-$width]
+	}
     }
 }
 
@@ -698,12 +705,12 @@ proc popupConnectMessage { dst } {
     pack $wi.txt -side top
 
     if { [exec id -u] != 0 } {
-        frame $wi.txt2
-        set longtext "(Note: remote emulation may have been enabled\n"
-        set longtext "$longtext because you are not running as root.)"
-        label $wi.txt2.label2 -text $longtext
-        pack $wi.txt2.label2 -side left -padx 4 -pady 4
-        pack $wi.txt2 -side bottom
+	frame $wi.txt2
+	set longtext "(Note: remote emulation may have been enabled\n"
+	set longtext "$longtext because you are not running as root.)"
+	label $wi.txt2.label2 -text $longtext
+	pack $wi.txt2.label2 -side left -padx 4 -pady 4
+	pack $wi.txt2 -side bottom
     }
 
     after 100 { catch { grab .popupConnectMessage } }
@@ -711,13 +718,13 @@ proc popupConnectMessage { dst } {
 }
 
 proc popdownConnectMessage { } {
-    catch { destroy .popupConnectMessage }
+	catch { destroy .popupConnectMessage }
 }
 
 proc updateConnectMessage { dst } {
     set wi .popupConnectMessage
     catch {
-        $wi.txt.label1 configure -text "Please wait, connecting to $dst..."
+    $wi.txt.label1 configure -text "Please wait, connecting to $dst..."
     }
 }
 
@@ -726,11 +733,11 @@ proc getAssignedRemoteServers {} {
     global node_list
     set servers {}
     foreach node $node_list {
-        set server [getNodeLocation $node]
-        if { $server == "" } { continue }
-        if { [lsearch -exact $servers $server] < 0 } {
-            lappend servers $server
-        }
+	set server [getNodeLocation $node]
+	if { $server == "" } { continue }
+	if { [lsearch -exact $servers $server] < 0 } {
+	    lappend servers $server
+	}
     }
     return $servers
 }
@@ -742,31 +749,31 @@ proc manageCPUwindow {xpos ypos start} {
     global server_cpuusage
 
     if {$start == 1} {
-        if { ![winfo exists .cpu]} {
-                toplevel .cpu
-            wm geometry .cpu 200x210+$xpos+$ypos
-            wm resizable .cpu 0 0
-            wm title .cpu "CPU Usage"
-            canvas .cpu.graph -width 200 -height 210
-            pack .cpu.graph
-        }
+	if { ![winfo exists .cpu]} {
+            toplevel .cpu
+	    wm geometry .cpu 200x210+$xpos+$ypos
+	    wm resizable .cpu 0 0
+	    wm title .cpu "CPU Usage"
+	    canvas .cpu.graph -width 200 -height 210
+	    pack .cpu.graph
+	}
     } else {
-        if { [winfo exists .cpu]} {
-            destroy .cpu
-            set assigned_servers [getAssignedRemoteServers]
+	if { [winfo exists .cpu]} {
+	    destroy .cpu
+	    set assigned_servers [getAssignedRemoteServers]
 
-            for {set i 0} {$i <= [llength $assigned_servers]} {incr i} {
-                if {$i == [llength $assigned_servers]} {
-                    set ip [getMyIP]
-                } else {
-                    set server [lindex $assigned_servers $i]
-                    set srv [array get exec_servers $server]
-                    if { $srv == "" } { continue }
-                    set ip [lindex $srv 0]
-                }
-                set server_cpuusage($ip) [lreplace $server_cpuusage($ip) 0 end]
-            }
-        }
+	    for {set i 0} {$i <= [llength $assigned_servers]} {incr i} {
+		if {$i == [llength $assigned_servers]} {
+		    set ip [getMyIP]
+		} else {
+		    set server [lindex $assigned_servers $i]
+		    set srv [array get exec_servers $server]
+		    if { $srv == "" } { continue }
+		    set ip [lindex $srv 0]
+		}
+		set server_cpuusage($ip) [lreplace $server_cpuusage($ip) 0 end]
+	    }
+	}
     }
 }
 
@@ -778,6 +785,7 @@ proc getMyIP { } {
     set myIP [lindex [fconfigure $theServer -sockname] 0]
     close $theServer
     return $myIP
+
 }
 
 # display all values stored in cpu usage history for each server
@@ -803,54 +811,55 @@ proc plotCPUusage { } {
     # for each server create a plot of cpu usage
     set assigned_servers [getAssignedRemoteServers]
     for {set i 0} {$i <= [llength $assigned_servers]} {incr i} {
-        if {$i == [llength $assigned_servers]} {
-            set ip [getMyIP]
-        } else {
-            set server [lindex $assigned_servers $i]
+	if {$i == [llength $assigned_servers]} {
+	    set ip [getMyIP]
+	} else {
+	    set server [lindex $assigned_servers $i]
             set srv [array get exec_servers $server]
             if { $srv == "" } { continue }
             set ip [lindex $srv 0]
-        }
+	}
 
-        #need to add multiple cpuusgaehistory (array)
-        for { set n 1 } { $n < [llength $server_cpuusage($ip)] } { incr n } {
-            set prevn [expr {$n - 1}]
-            set x1 [expr {$prevn * 10}]
-            set y1 [expr {100 - [lindex $server_cpuusage($ip) $prevn]}]
-            set x2 [expr {$n * 10}]
-            set y2 [expr {100 - [lindex $server_cpuusage($ip) $n]}]
-            if {$i < [llength $cpu_palettes]} {
-                .cpu.graph create line $x1 $y1 $x2 $y2 -fill [lindex $cpu_palettes $i]
-            } else {
-                .cpu.graph create line $x1 $y1 $x2 $y2 -fill [lindex $cpu_palettes end]
+	#need to add multiple cpuusgaehistory (array)
+	for { set n 1 } { $n < [llength $server_cpuusage($ip)] } { incr n } {
+	    set prevn [expr {$n - 1}]
+	    set x1 [expr {$prevn * 10}]
+	    set y1 [expr {100 - [lindex $server_cpuusage($ip) $prevn]}]
+	    set x2 [expr {$n * 10}]
+	    set y2 [expr {100 - [lindex $server_cpuusage($ip) $n]}]
+	    if {$i < [llength $cpu_palettes]} {
+		    .cpu.graph create line $x1 $y1 $x2 $y2 -fill [lindex $cpu_palettes $i]
+		} else {
+		    .cpu.graph create line $x1 $y1 $x2 $y2 -fill [lindex $cpu_palettes end]
 
-            }
-            #debug
-            #puts " cpu $x1 $y1 $x2 $y2"
-        }
+		}
+	    #debug
+	    #puts " cpu $x1 $y1 $x2 $y2"
+	}
 
-        #for each server create a legend (limited to 8)
-        set legendtext $ip
-        append legendtext " " [lindex $server_cpuusage($ip) end] "%"
+	#for each server create a legend (limited to 8)
+	set legendtext $ip
+	append legendtext " " [lindex $server_cpuusage($ip) end] "%"
 
-        set legendy [expr {($i * 10) + 120}]
-        set legendx 10
-        if {$i < [llength $cpu_palettes]} {
-            .cpu.graph create rectangle $legendx $legendy \
-            [expr {$legendx + 8}] [expr {$legendy + 8}] \
-            -fill [lindex $cpu_palettes $i]
-            .cpu.graph create text [expr {$legendx + 15}] [expr {$legendy + 4}]\
-            -text $legendtext -fill [lindex $cpu_palettes $i] \
-            -anchor w -justify left
-        } else {
-            .cpu.graph create rectangle $legendx $legendy \
-            [expr {$legendx + 8}] [expr {$legendy + 8}] \
-            -fill [lindex $cpu_palettes end]
-            .cpu.graph create text [expr {$legendx + 15}] [expr {$legendy + 4}]\
-            -text $legendtext -fill [lindex $cpu_palettes end] \
-            -anchor w -justify left
+	set legendy [expr {($i * 10) + 120}]
+	set legendx 10
+	if {$i < [llength $cpu_palettes]} {
+	    .cpu.graph create rectangle $legendx $legendy \
+		[expr {$legendx + 8}] [expr {$legendy + 8}] \
+		-fill [lindex $cpu_palettes $i]
+	    .cpu.graph create text [expr {$legendx + 15}] [expr {$legendy + 4}]\
+		-text $legendtext -fill [lindex $cpu_palettes $i] \
+		-anchor w -justify left
+	} else {
+	    .cpu.graph create rectangle $legendx $legendy \
+		[expr {$legendx + 8}] [expr {$legendy + 8}] \
+		-fill [lindex $cpu_palettes end]
+	    .cpu.graph create text [expr {$legendx + 15}] [expr {$legendy + 4}]\
+		-text $legendtext -fill [lindex $cpu_palettes end] \
+		-anchor w -justify left
 
-        }
+	}
+
     }
 }
 

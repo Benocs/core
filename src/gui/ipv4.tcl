@@ -49,7 +49,7 @@
 # RESULT
 #   * ipnet -- returns the free IPv4 network address in the form 10.a.b
 #****
- 
+
 proc findFreeIPv4Net { mask } {
     global g_prefs node_list
 
@@ -83,7 +83,7 @@ proc findFreeIPv4Net { mask } {
     }
 }
 
-#****f* ipv4.tcl/autoIPv4addr 
+#****f* ipv4.tcl/autoIPv4addr
 # NAME
 #   autoIPv4addr -- automaticaly assign an IPv4 address
 # SYNOPSIS

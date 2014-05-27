@@ -1326,6 +1326,7 @@ proc getNodeModel { node } {
 #   * node_id -- node id
 #   * model   -- routing model of the specified node
 #****
+
 proc setNodeModel { node model } {
     global $node
 
@@ -1336,7 +1337,6 @@ proc setNodeModel { node model } {
 	set $node [linsert [set $node] 1 "model $model"]
     }
 }
-
 
 #****f* nodecfg.tcl/getNodeNetId
 # NAME
@@ -1376,7 +1376,7 @@ proc setNodeNetId { node netid } {
     if { $i >= 0 } {
         set $node [lreplace [set $node] $i $i "netid $netid"]
     } else {
-	    set $node [linsert [set $node] 1 "netid $netid"]
+       set $node [linsert [set $node] 1 "netid $netid"]
     }
 }
 

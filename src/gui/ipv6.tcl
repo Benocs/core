@@ -49,7 +49,7 @@
 # RESULT
 #   * ipnet -- returns the free IPv6 network address in the form "a $i".
 #****
- 
+
 proc findFreeIPv6Net { mask } {
     global g_prefs node_list
 
@@ -75,7 +75,7 @@ proc findFreeIPv6Net { mask } {
     set endidx [expr {[lsearch $newnet {}] - 1}]
     if {$endidx < 0 } { set endidx end }
     set newnet [lrange $newnet 0 $endidx]
-    
+
     for { set i 0 } { $i <= 9999 } { incr i } {
 	if {[lsearch $ipnets "$newnet $i"] == -1} {
 	    set newnetcolon [join $newnet :]
@@ -85,7 +85,7 @@ proc findFreeIPv6Net { mask } {
     }
 }
 
-#****f* ipv6.tcl/autoIPv6addr 
+#****f* ipv6.tcl/autoIPv6addr
 # NAME
 #   autoIPv6addr -- automaticaly assign an IPv6 address
 # SYNOPSIS
@@ -404,7 +404,7 @@ proc expandIPv6 { ip } {
 # Boeing
 # ***** ipv6.tcl/ipv6ToNet
 # NAME
-#  ipv6ToNet -- convert IPv6 address a.b.c.d to a.b.c 
+#  ipv6ToNet -- convert IPv6 address a.b.c.d to a.b.c
 # ****
 
 proc ipv6ToNet { ip mask } {
@@ -414,7 +414,7 @@ proc ipv6ToNet { ip mask } {
     	return [join $ipv6parts :]
 }
 
-# 
+#
 # Boeing
 # ***** ipv6.tcl/autoIPv6wlanaddr
 # NAME

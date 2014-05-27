@@ -498,9 +498,9 @@ proc loadCfg { cfg } {
 			model {
 			    lappend $object "model $value"
 			}
-			netid {
-			    lappend $object "netid $value"
-			}
+            netid {
+                lappend $object "netid $value"
+            }
 			cpu {
 			    lappend $object "cpu {$value}"
 			}
@@ -1125,7 +1125,7 @@ proc initDefaultPrefs {} {
     array set g_prefs [list gui_canvas_refpt	"$DEFAULT_REFPT"]
     if { $tcl_platform(os) == "FreeBSD" } { set shell "/usr/local/bin/bash"
     } else { set shell "bash" }
-    array set g_prefs [list shell $shell] 
+    array set g_prefs [list shell $shell]
     array set g_prefs [list gui_text_editor	[get_text_editor true]]
     array set g_prefs [list gui_term_prog	[get_term_prog true]]
     setDefaultAddrs ipv4
