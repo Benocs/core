@@ -19,7 +19,7 @@ TCL_FILES	= annotations.tcl api.tcl canvas.tcl cfgparse.tcl \
 		nodes.tcl services.tcl ns2imunes.tcl plugins.tcl \
 		tooltips.tcl topogen.tcl traffic.tcl util.tcl \
 		version.tcl widget.tcl wlan.tcl wlanscript.tcl \
-		exceptions.tcl brite.tcl briteBuildTopo.tcl briteDoStuff3.tcl
+		exceptions.tcl
 
 ADDONS_FILES    = addons/ipsecservice.tcl
 
