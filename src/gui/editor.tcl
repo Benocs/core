@@ -1235,34 +1235,6 @@ proc button3node { c x y button } {
     #
     .button3menu delete 0 end
 
-
-    #
-    # setID 
-    #
-    if { [nodeType $node] == "router" && $oper_mode != "exec" } {
-      .button3menu add command -label "setID" -command "setID"
-      #puts [nodeType $node]
-      
-      # TODO mache feld in config fuer netid.. zugriff ueber setNodeNetId oder so..
-      #setNodeNetId $node 10000
-#      puts [getNodeNetId $node]
- 
-    
-
-      # starte funktion mit eingabewert / extra fkt
-      #foreach lnode [selectedNodes] {
-      #  if { $lnode != "" } {
-      #    puts [nodeType $lnode]
-      #  }
-      #  #set changed 1
-      #}
-
- 
-    } else {
-      # router laeuft und id soll nich geaendert werden
-    }
-
-
     #
     # Configure node
     #
@@ -2760,7 +2732,6 @@ proc popupConfigDialog { c } {
 		bind $ctl <Down> "$wi.ifaces.c yview scroll 1 units"
 	    }
         }
-
     }
     oval {
 	destroy $wi
@@ -2931,24 +2902,6 @@ proc popupConfigDialog { c } {
     }
     } ;# end switch
 
-
-    # netid feld in configure menue
-    # start netid
-    ttk::labelframe $wi.netid -text "NetID"
-    ttk::frame $wi.netid.frame
-
-    ttk::label $wi.netid.frame.label -text "NetID: " -anchor w
-    ttk::entry $wi.netid.frame.entry -width 30
-    $wi.netid.frame.entry insert 0 [getNodeNetId $target]
-    #$wi.netid.frame.entry configure -validatecommand {testFkt %P}
-    pack $wi.netid.frame.entry -side right
-
-    pack $wi.netid.frame -side top -anchor e
-    pack $wi.netid -side left
-    # end netid
-
-
-
     ttk::frame $wi.butt -borderwidth 6
     # NOTE: plugins.tcl:popupCapabilityConfig may read this command option
     ttk::button $wi.butt.apply -text "Apply" -command \
@@ -2967,117 +2920,6 @@ proc popupConfigDialog { c } {
     pack $wi.butt -side bottom
     bind $wi <Key-Escape> $cancelcmd
 #    bind $wi <Key-Return> "popupConfigApply $wi $object_type $target 0"
-}
-
-proc linkConfigUni { wi } {
-    global g_link_config_uni_state
-
-    set capt [lindex [$wi.preset.uni configure -text] 4]
-
-    if { $capt == "  >>  " } {
-   set g_link_config_uni_state "uni"
-   $wi.preset.uni configure -text "  <<  "
-   set txt "Asymmetric effects: downstream  /  upstream"
-   $wi.unilabel.updown configure -text $txt
-
-   set spinbox [getspinbox]
-   if { ![winfo exists $wi.bandwidth.value2] } {
-       $spinbox $wi.bandwidth.value2 -justify right \
-           -width 10 -validate focus -invalidcommand "focusAndFlash %W"
-       $wi.bandwidth.value2 configure \
-       -validatecommand {checkIntRange %P 0 1000000000} \
-       -from 0 -to 1000000000 -increment 1000000
-   }
-   $wi.bandwidth.value2 delete 0 end
-   $wi.bandwidth.value2 insert 0 [$wi.bandwidth.value get]
-   pack $wi.bandwidth.value2 -side right
-   pack $wi.bandwidth.value2 -before $wi.bandwidth.value
-
-   if { ![winfo exists $wi.delay.value2] } {
-       $spinbox $wi.delay.value2 -justify right -width 10 \
-       -validate focus -invalidcommand "focusAndFlash %W"
-       $wi.delay.value2 configure \
-       -validatecommand {checkIntRange %P 0 10000000} \
-       -from 0 -to 10000000 -increment 5
-   }
-   $wi.delay.value2 delete 0 end
-   $wi.delay.value2 insert 0 [$wi.delay.value get]
-   pack $wi.delay.value2 -side right
-   pack $wi.delay.value2 -before $wi.delay.value
-   pack $wi.delay.value2 -side right
-   pack $wi.delay.value2 -before $wi.delay.value
-
-   if { ![winfo exists $wi.jitter.value2] } {
-       $spinbox $wi.jitter.value2 -justify right -width 10 \
-       -validate focus -invalidcommand "focusAndFlash %W"
-       $wi.jitter.value2 configure \
-       -validatecommand {checkIntRange %P 0 10000000} \
-       -from 0 -to 10000000 -increment 5
-   }
-   $wi.jitter.value2 delete 0 end
-   $wi.jitter.value2 insert 0 [$wi.jitter.value get]
-   pack $wi.jitter.value2 -side right
-   pack $wi.jitter.value2 -before $wi.jitter.value
-
-   if { ![winfo exists $wi.ber.value2] } {
-       $spinbox $wi.ber.value2 -justify right -width 10 \
-       -validate focus -invalidcommand "focusAndFlash %W"
-       $wi.ber.value2 configure \
-       -validatecommand "checkFloatRange %P 0.0 100.0" \
-       -from 0.0 -to 100.0 -increment 0.1
-   }
-   $wi.ber.value2 delete 0 end
-   $wi.ber.value2 insert 0 [$wi.ber.value get]
-   pack $wi.ber.value2 -side right
-   pack $wi.ber.value2 -before $wi.ber.value
-
-   if { ![winfo exists $wi.dup.value2] } {
-       $spinbox $wi.dup.value2 -justify right -width 10 \
-       -validate focus -invalidcommand "focusAndFlash %W"
-       $wi.dup.value2 configure \
-       -validatecommand {checkFloatRange %P 0 50} \
-       -from 0 -to 50 -increment 1
-   }
-   $wi.dup.value2 delete 0 end
-   $wi.dup.value2 insert 0 [$wi.dup.value get]
-   pack $wi.dup.value2 -side right
-   pack $wi.dup.value2 -before $wi.dup.value
-   pack $wi.dup.value2 -side right
-   pack $wi.dup.value2 -before $wi.dup.value
-    } else {
-   set g_link_config_uni_state "bid"
-   $wi.preset.uni configure -text "  >>  "
-   $wi.unilabel.updown configure -text "Symmetric link effects:"
-   pack forget $wi.bandwidth.value2
-   pack forget $wi.delay.value2
-   pack forget $wi.jitter.value2
-   pack forget $wi.ber.value2
-   pack forget $wi.dup.value2
-    }
-}
-
-# unidirectional links are not always supported
-proc isUniSupported { n1 n2 } {
-    set blacklist [list "hub" "lanswitch"]
-    set type1 [nodeType $n1]
-    set type2 [nodeType $n2]
-    # not yet supported for GRE tap device
-    if { $type1 == "tunnel" || $type2 == "tunnel" } {
-   return false
-    }
-    # unidirectional links are supported between two switches/hubs
-    if { [lsearch $blacklist $type1] != -1 && \
-    [lsearch $blacklist $type2] != -1 } {
-   return true
-    }
-    # unidirectional links not supported between hub/switch and something else
-    if { [lsearch $blacklist $type1] != -1 || \
-    [lsearch $blacklist $type2] != -1 } {
-   return false
-    }
-    # unidirectional links are supported between routers, rj45s, etc.
-    # WLANs not included here because they have no link dialog
-    return true
 }
 
 # toggle the state of the mac address entry, and insert MAC address template
@@ -3133,10 +2975,6 @@ proc popupConfigApply { wi object_type target phase } {
     # Node
     #
     node {
-        # behandlung von netid
-        set netidvar [$wi.netid.frame.entry get]
-        setNodeNetId $target $netidvar
-
 	set type [nodeType $target]
 	set model [getNodeModel $target]
 	set name [string trim [$wi.ftop.name get]]
