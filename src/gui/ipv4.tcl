@@ -477,7 +477,7 @@ proc autoIPv4addr { node iface } {
 	} else {
                 set ipnet [findFreeIPv4Net $node 24]
                 setIfcIPv4addr $node $iface "$ipnet/30"
-	}
+}
 
 	set tempAS 999
     } else {
