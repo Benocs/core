@@ -373,10 +373,6 @@ proc doStuff1 {} {
   # Buttons unten
   #
 
-  #TODO button save und cancel zusammenbringen nach oben zB
-  # und writeBriteConf auf save legen
-
-
   # Topology Erstellungen Einstellungen
   labelframe $wi.bot2 -borderwidth 4 -text "2nd: Build Topology"
 
@@ -1551,6 +1547,7 @@ proc loadBriteConf { } {
   }
 
 }
+
 
 # variablen definition fuer Testing GUI nach
 # Vorbild in cfgparse.tcl

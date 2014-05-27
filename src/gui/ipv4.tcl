@@ -211,7 +211,6 @@ proc getASiD { nodeGetAS } {
 proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
 
     #momentan vergabe der 24er
-
     global g_prefs node_list tempAS
 
 
@@ -294,15 +293,7 @@ proc findFreeIPv4NetLink { linkNode mask ip4AmSwitchNetzAddressen } {
     set i [getASiD $linkNode]
 
 
-# TODO 24er muessen auch adressbereich der 30 beachten (immer 4er schritte von 0 an)
-#   und nicht die selben adressen nehmen
-
-	#puts "ip4AmSwitchNetzAddressen"
-	#foreach ip4 $ip4AmSwitchNetzAddressen {
-	#	puts $ip4
-	#}
-
-	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen
+	# testen ob switch peerlist leer -> wenn ja neues netz aufmachen	
 	if { 0 == [llength $ip4AmSwitchNetzAddressen] } {
 	 	#fall neues 24er
         	for { set j $c } { $j <= 255 } { incr j } {
@@ -468,7 +459,7 @@ proc autoIPv4addr { node iface } {
 	#   und fall wenn router an schon bestehendes switchnetz
 	#   angeschlossen wird
 	#puts "hinverbunden zu"
-	#puts $node
+	#puts $node 
 
 	if { [[typemodel $peer_node].layer] == "LINK" } {
 		# hier sind addressen in $peer_ip4addrs
@@ -477,6 +468,7 @@ proc autoIPv4addr { node iface } {
 	} else {
                 set ipnet [findFreeIPv4Net $node 24]
                 setIfcIPv4addr $node $iface "$ipnet/30"
+	
 }
 
 	set tempAS 999
@@ -495,8 +487,6 @@ proc autoIPv4addr { node iface } {
 		#setNodeNetId $peer_node [getASiD $node]
 	}
 	set tempAS [getASiD $node]
-#	puts "tempAS ausgehend"
-#	puts $tempAS
     }
 }
 
