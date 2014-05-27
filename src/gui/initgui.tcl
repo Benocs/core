@@ -355,7 +355,8 @@ bind . <Control-f> popupFind
 #
 menu .menubar.benocs -tearoff 0
 .menubar.benocs add command -label "Brite" -command doStuff1
-.menubar.benocs add command -label "Testmenu" -command doStuff3
+.menubar.benocs add command -label "Build Topology with Brite (Deprecated)" -command doStuff2
+.menubar.benocs add command -label "killall java" -command doStuff3
 
 #
 # Canvas
