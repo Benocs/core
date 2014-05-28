@@ -597,6 +597,35 @@ proc popupBuildHostsFile { } {
     focus $wi.mid.hosts
 }
 
+proc popupNetIDConfig { } {
+
+    global g_prefs
+    set wi .asconfig
+    catch {destroy $wi}
+
+    toplevel $wi
+    wm transient $wi .
+    wm resizable $wi 1 1
+    wm title $wi "Set Default NetID"
+
+    labelframe $wi.asid -text "Default NetID for new nodes"
+    frame $wi.asid.frame
+
+    label $wi.asid.frame.label -text "NetID: " -anchor w
+    entry $wi.asid.frame.entry -bg white -width 30 -textvariable g_prefs(gui_default_netid)
+    pack $wi.asid.frame.entry -side right
+    pack $wi.asid.frame -side top -anchor e
+    pack $wi.asid -side left
+
+    # buttons
+    frame $wi.btm
+    button $wi.btm.apply -text "OK" \
+        -command "destroy $wi"
+    button $wi.btm.cancel -text "Cancel" -command "destroy $wi"
+    pack $wi.btm.apply $wi.btm.cancel -side left
+    pack $wi.btm -side bottom -fill x
+}
+
 proc popupAddressConfig { } {
     global plugin_img_add plugin_img_del g_prefs
     set wi .addrconfig

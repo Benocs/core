@@ -411,6 +411,8 @@ menu .menubar.tools -tearoff 0
     -command { align2grid }
 .menubar.tools add separator
 .menubar.tools add command -label "Traffic..." -command popupTrafficDialog
+.menubar.tools add command -label "Default NetID..." -underline 0 \
+    -command { popupNetIDConfig }
 # Boeing
 #
 .menubar.tools add command -label "IP addresses..." -underline 0 \
