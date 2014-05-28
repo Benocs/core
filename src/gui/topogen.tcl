@@ -132,6 +132,9 @@ for { set i 1 } { $i <= 12 } { incr i } {
     }
 }
 
+set m ${TOPOMENUPATH}.internet
+menu $m -tearoff 0
+${TOPOMENUPATH} add command -label "Internet" -command generateInternet
 
 proc newNodes { n } {
     global curcanvas grid sizex sizey activetool activetoolp CORE_DATA_DIR

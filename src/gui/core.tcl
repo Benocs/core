@@ -126,7 +126,6 @@ loadPluginsConf
 checkCommandLineAddressPort
 autoConnectPlugins
 
-
 #
 # Initialization should be complete now, so let's start doing something...
 #
@@ -137,6 +136,7 @@ if {$execMode == "interactive"} {
     source "$LIBDIR/tooltips.tcl"
     source "$LIBDIR/initgui.tcl"
     source "$LIBDIR/topogen.tcl"
+    source "$LIBDIR/topogen_internet.tcl"
     source "$LIBDIR/graph_partitioning.tcl"
     source "$LIBDIR/gpgui.tcl"
     source "$LIBDIR/debug.tcl"
@@ -147,6 +147,8 @@ if {$execMode == "interactive"} {
 	    puts "    $e"
 	}
     }
+    initTopogenInternetPrefs
+    loadTopogenInternetConf
     setOperMode edit
     fileOpenStartUp
     foreach arg $argv {
