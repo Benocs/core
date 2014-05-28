@@ -1528,6 +1528,7 @@ proc button1 { c x y button } {
     global resizemode resizeobj
     global wlan g_twoNodeSelect
     global g_view_locked
+    global g_prefs
 
     set x [$c canvasx $x]
     set y [$c canvasy $y]
@@ -1597,6 +1598,7 @@ proc button1 { c x y button } {
 	    } else {
 		set node [newNode $activetool]
 	    }
+        setNodeNetId $node $g_prefs(gui_default_netid)
 	    setNodeCanvas $node $curcanvas
 	    setNodeCoords $node "[expr {$x / $zoom}] [expr {$y / $zoom}]"
 	    lassign [getDefaultLabelOffsets $activetool] dx dy

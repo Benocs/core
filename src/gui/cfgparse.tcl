@@ -1143,6 +1143,7 @@ proc initDefaultPrefs {} {
 	gui_canvas_scale	150.0
 	gui_num_canvases	1
 	gui_3d_path		"/usr/local/bin/sdt3d.sh"
+    gui_default_netid   1
     }
     # add new preferences above; keep this at the end of the file
 }
