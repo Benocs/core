@@ -2904,6 +2904,16 @@ proc popupConfigDialog { c } {
     }
     } ;# end switch
 
+    # add field to set NetID in configure menu
+    ttk::labelframe $wi.netid -text "NetID"
+    ttk::frame $wi.netid.frame
+    ttk::label $wi.netid.frame.label -text "NetID: " -anchor w
+    ttk::entry $wi.netid.frame.entry -width 30
+    $wi.netid.frame.entry insert 0 [getNodeNetId $target]
+    pack $wi.netid.frame.entry -side right
+    pack $wi.netid.frame -side top -anchor e
+    pack $wi.netid -side left
+
     ttk::frame $wi.butt -borderwidth 6
     # NOTE: plugins.tcl:popupCapabilityConfig may read this command option
     ttk::button $wi.butt.apply -text "Apply" -command \
@@ -3106,6 +3116,9 @@ proc popupConfigApply { wi object_type target phase } {
 	    set changed 1
 	    if { $router_model == "remote" } { set changed_to_remote 1 };#Boeing
 	}
+
+    set netid [$wi.netid.frame.entry get]
+    setNodeNetId $target $netid
 
 # Boeing - added wlan, remote, tunnel, ktunnel items
 	if { $type == "wlan" } {
