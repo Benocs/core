@@ -1352,9 +1352,18 @@ proc setNodeModel { node model } {
 #****
 
 proc getNodeNetId { node } {
+    global g_prefs
     global $node
 
-    return [lindex [lsearch -inline [set $node] "netid *"] 1]
+    set netid [lindex [lsearch -inline [set $node] "netid *"] 1]
+
+    # if node has no netid set yet, assign the default_netid to it
+    if { $netid == "" } {
+        set netid $g_prefs(gui_default_netid)
+        setNodeNetId $node $netid
+    }
+
+    return $netid
 }
 
 #****f* nodecfg.tcl/setNodeNetId
