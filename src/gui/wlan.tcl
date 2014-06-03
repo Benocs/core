@@ -555,7 +555,8 @@ proc wlanConfigDialogHelper { wi target apply } {
 
     # WLAN has not been linked yet, generate addresses here.
     if { [getIfcIPv4addr $target wireless] == "" } {
-        setIfcIPv4addr $target wireless "[findFreeIPv4Net 24].0/32"
+        setIfcIPv4addr $target wireless \
+                "[findFreeIPv4Net [getNodeNetId $peer_node] 24]/32"
     }
     if { [getIfcIPv6addr $target wireless] == "" } {
         setIfcIPv6addr $target wireless "[findFreeIPv6Net 64]::0/128"

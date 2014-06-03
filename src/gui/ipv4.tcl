@@ -50,12 +50,13 @@
 #   Finds a free IPv4 network. Network is concidered to be free
 #   if there are no simulated nodes attached to it.
 # INPUTS
-#   * mask -- this parameter is left unused for now
+#   * mask -- currently only values of 24 or 30 are accepted. defaults to 24
 # RESULT
-#   * ipnet -- returns the free IPv4 network address in the form 10.a.b
+#   * ipnet -- returns the free IPv4 network address in the form a.b.c.d
+#   (form is the normal dotted-IPv4-notation)
 #****
 
-proc findFreeIPv4Net { mask } {
+proc findFreeIPv4Net { netid mask } {
     global g_prefs node_list
 
     set ipnets {}

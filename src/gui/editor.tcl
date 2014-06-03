@@ -5250,7 +5250,8 @@ proc pasteSelection {} {
 	setNodeCanvas $new $curcanvas
 
 	if { [nodeType $new] == "wlan" } {
-	    setIfcIPv4addr $new wireless "[findFreeIPv4Net 24].0/32"
+	    setIfcIPv4addr $new wireless \
+                    "[findFreeIPv4Net [getNodeNetId $peer_node] 24]/32"
 	    setIfcIPv6addr $new wireless "[findFreeIPv6Net 64]::0/128"
 	    continue
 	}

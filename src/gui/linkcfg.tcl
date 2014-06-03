@@ -828,7 +828,8 @@ proc newLink { lnode1 lnode2 } {
 	}
 	set ipv4_addr1 [getIfcIPv4addr $lnode1 wireless]
 	if { $ipv4_addr1 == "" } { ;# allocate WLAN address now
-	    setIfcIPv4addr $lnode1 wireless "[findFreeIPv4Net 32].0/32"
+	    setIfcIPv4addr $lnode1 wireless \
+                "[findFreeIPv4Net [getNodeNetId $peer_node] 32]/32"
 	}
 	set ipv6_addr1 [getIfcIPv6addr $lnode1 wireless]
 	if { $ipv6_addr1 == "" } {
