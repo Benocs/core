@@ -1372,6 +1372,11 @@ proc getNodeNetId { node } {
 proc setNodeNetId { node netid } {
     global $node
 
+    # netid of 0 is not allowed. use 1 instead
+    if { $netid == 0 } {
+        set netid 1
+    }
+
     set i [lsearch [set $node] "netid *"]
     if { $i >= 0 } {
         set $node [lreplace [set $node] $i $i "netid $netid"]
