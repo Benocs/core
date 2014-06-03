@@ -55,20 +55,20 @@ proc findFreeIPv6Net { mask } {
 
     set ipnets {}
     foreach node $node_list {
-	foreach ifc [ifcList $node] {
-	    set ipparts [split [getIfcIPv6addr $node $ifc] :]
-	    set endidx [expr {[lsearch $ipparts {}] - 1}]
-	    if {$endidx < 0 } { set endidx end }
-	    set ipnet [lrange $ipparts 0 $endidx]
-	    if {[lsearch $ipnets $ipnet] == -1} {
-		lappend ipnets $ipnet
-	    }
-	}
+        foreach ifc [ifcList $node] {
+            set ipparts [split [getIfcIPv6addr $node $ifc] :]
+            set endidx [expr {[lsearch $ipparts {}] - 1}]
+            if {$endidx < 0 } { set endidx end }
+            set ipnet [lrange $ipparts 0 $endidx]
+            if {[lsearch $ipnets $ipnet] == -1} {
+                lappend ipnets $ipnet
+            }
+        }
     }
     # include mobility newlinks in search
     foreach newlink [.c find withtag "newlink"] {
         set ipnet [lrange [split [lindex [.c gettags $newlink] 5] :] 0 3]
-	lappend ipnets $ipnet
+        lappend ipnets $ipnet
     }
     if {![info exists g_prefs(gui_ipv6_addr)]} { setDefaultAddrs ipv6 }
     set newnet [split $g_prefs(gui_ipv6_addr) :]
@@ -77,11 +77,11 @@ proc findFreeIPv6Net { mask } {
     set newnet [lrange $newnet 0 $endidx]
 
     for { set i 0 } { $i <= 9999 } { incr i } {
-	if {[lsearch $ipnets "$newnet $i"] == -1} {
-	    set newnetcolon [join $newnet :]
-	    set ipnet "$newnetcolon:$i"
-	    return $ipnet
-	}
+        if {[lsearch $ipnets "$newnet $i"] == -1} {
+            set newnetcolon [join $newnet :]
+            set ipnet "$newnetcolon:$i"
+            return $ipnet
+        }
     }
 }
 
@@ -108,63 +108,63 @@ proc autoIPv6addr { node iface } {
     set peer_node [logicalPeerByIfc $node $iface]
     # find addresses of NETWORK layer peer nodes
     if { [[typemodel $peer_node].layer] == "LINK" } {
-	foreach l2node [listLANnodes $peer_node {}] {
-	    foreach ifc [ifcList $l2node] {
-		set peer [logicalPeerByIfc $l2node $ifc]
-		set peer_if [ifcByLogicalPeer $peer $l2node]
-		set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
-		if { $peer_ip6addr != "" } {
-		    lappend peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
-		    set netmaskbits [lindex [split $peer_ip6addr /] 1]
-		}
-	    }
-	}
+        foreach l2node [listLANnodes $peer_node {}] {
+            foreach ifc [ifcList $l2node] {
+                set peer [logicalPeerByIfc $l2node $ifc]
+                set peer_if [ifcByLogicalPeer $peer $l2node]
+                set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
+                if { $peer_ip6addr != "" } {
+                    lappend peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
+                    set netmaskbits [lindex [split $peer_ip6addr /] 1]
+                }
+            }
+        }
     # point-to-point link with another NETWORK layer peer
     } else {
-	set peer_if [ifcByLogicalPeer $peer_node $node]
-	set peer_ip6addr [getIfcIPv6addr $peer_node $peer_if]
-	set peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
-	if { $peer_ip6addr != "" } {
-	    set netmaskbits [lindex [split $peer_ip6addr /] 1]
-	}
+        set peer_if [ifcByLogicalPeer $peer_node $node]
+        set peer_ip6addr [getIfcIPv6addr $peer_node $peer_if]
+        set peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
+        if { $peer_ip6addr != "" } {
+            set netmaskbits [lindex [split $peer_ip6addr /] 1]
+        }
     }
     # Boeing: first node connected to wlan should use wlan prefix
     if { [nodeType $peer_node] == "wlan" &&
-    	 [llength $peer_ip6addrs] == 0 } {
-	# use the special "wireless" pseudo-interface
-	set peer_ip6addr [getIfcIPv6addr $peer_node wireless]
-	set peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
-	set netmaskbits [lindex [split $peer_ip6addr /] 1]
+         [llength $peer_ip6addrs] == 0 } {
+        # use the special "wireless" pseudo-interface
+        set peer_ip6addr [getIfcIPv6addr $peer_node wireless]
+        set peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
+        set netmaskbits [lindex [split $peer_ip6addr /] 1]
     }
     set nodetype [nodeType $node]
     if { $nodetype == "router" } { set nodetype [getNodeModel $node] }
     switch -exact -- $nodetype {
-	router {
-	    set targetbyte 1
-	}
-	host {
-	    set targetbyte 10
-	}
-	PC -
-	pc {
-	    set targetbyte 20
-	}
-	default {
-	    set targetbyte 1
-	}
+        router {
+            set targetbyte 1
+        }
+        host {
+            set targetbyte 10
+        }
+        PC -
+        pc {
+            set targetbyte 20
+        }
+        default {
+            set targetbyte 1
+        }
     }
     # peer has an IPv6 address, allocate a new address on the same network
     if { $peer_ip6addrs != "" } {
-	set net [ipv6ToNet [lindex $peer_ip6addrs 0] 64]
-	set ipaddr $net\::$targetbyte
-	while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
-	    incr targetbyte
-	    set ipaddr $net\::$targetbyte
-	}
-	setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
+        set net [ipv6ToNet [lindex $peer_ip6addrs 0] 64]
+        set ipaddr $net\::$targetbyte
+        while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
+            incr targetbyte
+            set ipaddr $net\::$targetbyte
+        }
+        setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
     } else {
-	set ipnet [findFreeIPv6Net 64]
-	setIfcIPv6addr $node $iface "${ipnet}::$targetbyte/$netmaskbits"
+        set ipnet [findFreeIPv6Net 64]
+        setIfcIPv6addr $node $iface "${ipnet}::$targetbyte/$netmaskbits"
     }
 }
 
@@ -183,44 +183,44 @@ proc autoIPv6addr { node iface } {
 
 proc autoIPv6defaultroute { node iface } {
     if { [[typemodel $node].layer] != "NETWORK" } {
-	#
-	# Shouldn't get called at all for link-layer nodes
-	#
-	puts "autoIPv6defaultroute called for [[typemodel $node].layer] node"
-	return
+        #
+        # Shouldn't get called at all for link-layer nodes
+        #
+        puts "autoIPv6defaultroute called for [[typemodel $node].layer] node"
+        return
     }
 
     set peer_node [logicalPeerByIfc $node $iface]
 
     if { [[typemodel $peer_node].layer] == "LINK" } {
-	foreach l2node [listLANnodes $peer_node {}] {
-	    foreach ifc [ifcList $l2node] {
-		set peer [logicalPeerByIfc $l2node $ifc]
-		if { [nodeType $peer] != "router" &&
-		     [nodeType $peer] != "ine" } {
-		    continue
-		}
-		set peer_if [ifcByLogicalPeer $peer $l2node]
-		set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
-		if { $peer_ip6addr != "" } {
-		    set gw [lindex [split $peer_ip6addr /] 0]
-		    setStatIPv6routes $node [list "::/0 $gw"]
-		    return
-		}
-	    }
-	}
+        foreach l2node [listLANnodes $peer_node {}] {
+            foreach ifc [ifcList $l2node] {
+                set peer [logicalPeerByIfc $l2node $ifc]
+                if { [nodeType $peer] != "router" &&
+                     [nodeType $peer] != "ine" } {
+                    continue
+                }
+                set peer_if [ifcByLogicalPeer $peer $l2node]
+                set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
+                if { $peer_ip6addr != "" } {
+                    set gw [lindex [split $peer_ip6addr /] 0]
+                    setStatIPv6routes $node [list "::/0 $gw"]
+                    return
+                }
+            }
+        }
     } else {
-	if { [nodeType $peer_node] != "router" &&
-	     [nodeType $peer_node] != "ine" } {
-	    return
-	}
-	set peer_if [ifcByLogicalPeer $peer_node $node]
-	set peer_ip6addr [getIfcIPv6addr $peer_node $peer_if]
-	if { $peer_ip6addr != "" } {
-	    set gw [lindex [split $peer_ip6addr /] 0]
-	    setStatIPv6routes $node [list "::/0 $gw"]
-	    return
-	}
+        if { [nodeType $peer_node] != "router" &&
+             [nodeType $peer_node] != "ine" } {
+            return
+        }
+        set peer_if [ifcByLogicalPeer $peer_node $node]
+        set peer_ip6addr [getIfcIPv6addr $peer_node $peer_if]
+        if { $peer_ip6addr != "" } {
+            set gw [lindex [split $peer_ip6addr /] 0]
+            setStatIPv6routes $node [list "::/0 $gw"]
+            return
+        }
     }
 }
 
@@ -243,32 +243,32 @@ proc checkIPv6Addr { str } {
     set wordlist [split $str :]
     set wordcnt [expr [llength $wordlist] - 1]
     if { $wordcnt < 2 || $wordcnt > 7 } {
-	return 0
+        return 0
     }
     if { [lindex $wordlist 0] == "" } {
-	set wordlist [lreplace $wordlist 0 0 0]
+        set wordlist [lreplace $wordlist 0 0 0]
     }
     if { [lindex $wordlist $wordcnt] == "" } {
-	set wordlist [lreplace $wordlist $wordcnt $wordcnt 0]
+        set wordlist [lreplace $wordlist $wordcnt $wordcnt 0]
     }
     for { set i 0 } { $i <= $wordcnt } { incr i } {
-	set word [lindex $wordlist $i]
-	if { $word == "" } {
-	    if { $doublec == "true" } {
-		return 0
-	    }
-	    set doublec true
-	}
-	if { [string length $word] > 4 } {
-	    if { $i == $wordcnt } {
-		return [checkIPv4Addr $word]
-	    } else {
-		return 0
-	    }
-	}
-	if { [string is xdigit $word] == 0 } {
-	    return 0
-	}
+        set word [lindex $wordlist $i]
+        if { $word == "" } {
+            if { $doublec == "true" } {
+                return 0
+            }
+            set doublec true
+        }
+        if { [string length $word] > 4 } {
+            if { $i == $wordcnt } {
+                return [checkIPv4Addr $word]
+            } else {
+                return 0
+            }
+        }
+        if { [string is xdigit $word] == 0 } {
+            return 0
+        }
     }
     return 1
 }
@@ -289,14 +289,14 @@ proc checkIPv6Addr { str } {
 
 proc checkIPv6Net { str } {
     if { $str == "" } {
-	return 1
+        return 1
     }
     if { ![checkIPv6Addr [lindex [split $str /] 0]]} {
-	return 0
+        return 0
     }
     set net [string trim [lindex [split $str /] 1]]
     if { [string length $net] == 0 } {
-	return 0
+        return 0
     }
     return [checkIntRange $net 0 128]
 }
@@ -316,35 +316,35 @@ proc ipv6ToString { ip } {
     set prevword ""
     set have_double_colon 0
     foreach byte $ip {
-	# group bytes into two-byte hex words
-	set hexbyte [format "%x" [expr $byte & 0xFF]]
-	if { $prevbyte == "" } {
-	    set prevbyte $hexbyte
-	} else {
-	    if { $prevbyte == 0 } { ;# compress zeroes
-		set prevbyte ""
-		set hexbyte [format "%x" 0x$hexbyte]
-	    } else {
-		set hexbyte [format "%02x" 0x$hexbyte]
-	    }
-	    set twobytes "$prevbyte$hexbyte"
-	    set prevbyte ""
+        # group bytes into two-byte hex words
+        set hexbyte [format "%x" [expr $byte & 0xFF]]
+        if { $prevbyte == "" } {
+            set prevbyte $hexbyte
+        } else {
+            if { $prevbyte == 0 } { ;# compress zeroes
+                set prevbyte ""
+                set hexbyte [format "%x" 0x$hexbyte]
+            } else {
+                set hexbyte [format "%02x" 0x$hexbyte]
+            }
+            set twobytes "$prevbyte$hexbyte"
+            set prevbyte ""
 
-	    # compress subsequent zeroes into ::, but only once
-	    if { $twobytes == 0 } {
-	        if { !$have_double_colon && $prevword == 0} {
-		    # replace last 0 with :
-		    set ipv6nums [lreplace $ipv6nums end end ""]
-		    set have_double_colon 1
-		    set prevword ":"
-		    continue ;# don't add current 0 word to list
-		} elseif { $prevword == ":" } {
-		    continue ;# another zero word, skip it
-		}
-	    }
-	    set prevword $twobytes
-    	    lappend ipv6nums $twobytes
-	}
+            # compress subsequent zeroes into ::, but only once
+            if { $twobytes == 0 } {
+                if { !$have_double_colon && $prevword == 0} {
+                    # replace last 0 with :
+                    set ipv6nums [lreplace $ipv6nums end end ""]
+                    set have_double_colon 1
+                    set prevword ":"
+                    continue ;# don't add current 0 word to list
+                } elseif { $prevword == ":" } {
+                    continue ;# another zero word, skip it
+                }
+            }
+            set prevword $twobytes
+            lappend ipv6nums $twobytes
+        }
     }
     return [join $ipv6nums :]
 }
@@ -364,9 +364,9 @@ proc stringToIPv6 { ip } {
     set bin ""
 
     foreach part $parts {
-	scan $part "%x" num; # convert hex to number
-	set binpart [binary format i $num]
-	set bin ${bin}${binpart}
+        scan $part "%x" num; # convert hex to number
+        set binpart [binary format i $num]
+        set bin ${bin}${binpart}
     }
 
     return $bin
@@ -379,23 +379,23 @@ proc expandIPv6 { ip } {
     set expand {}
     set num_zeros 0
     while { [llength $parts] > 0 } {
-	set part [lindex $parts 0]; 	# pop off first element
-	set parts [lreplace $parts 0 0]
+        set part [lindex $parts 0];     # pop off first element
+        set parts [lreplace $parts 0 0]
 
-	if {$part == ""} { ; # this is the :: part of the address
-	    set num_parts_remain [llength $parts]
-	    if { $num_zeros > 0 } { ; # another empty element, another zero
-		lappend expand 0
-		continue
-	    }
-	    set num_zeros [expr { 8 - ($partnum + $num_parts_remain) }]
-	    for { set i 0 } { $i < $num_zeros } { incr i } {
-		lappend expand 0
-	    }
-	    continue;
-	}
-	lappend expand $part
-	incr partnum
+        if {$part == ""} { ; # this is the :: part of the address
+            set num_parts_remain [llength $parts]
+            if { $num_zeros > 0 } { ; # another empty element, another zero
+                lappend expand 0
+                continue
+            }
+            set num_zeros [expr { 8 - ($partnum + $num_parts_remain) }]
+            for { set i 0 } { $i < $num_zeros } { incr i } {
+                lappend expand 0
+            }
+            continue;
+        }
+        lappend expand $part
+        incr partnum
     }
     return [join $expand :]
 }
@@ -408,10 +408,10 @@ proc expandIPv6 { ip } {
 # ****
 
 proc ipv6ToNet { ip mask } {
-	set ipv6nums [split $ip :]
-	# last remove last to nums of :: num
-	set ipv6parts [lrange $ipv6nums 0 [expr [llength $ipv6nums] - 3]]
-    	return [join $ipv6parts :]
+        set ipv6nums [split $ip :]
+        # last remove last to nums of :: num
+        set ipv6parts [lrange $ipv6nums 0 [expr [llength $ipv6nums] - 3]]
+        return [join $ipv6parts :]
 }
 
 #
@@ -423,30 +423,30 @@ proc ipv6ToNet { ip mask } {
 # ****
 proc autoIPv6wlanaddr { node } {
 
-	# search wlan node for peers, collect IP address into list
-	set peer_ip6addrs ""
+        # search wlan node for peers, collect IP address into list
+        set peer_ip6addrs ""
         foreach ifc [ifcList $node] {
-		set peer [logicalPeerByIfc $node $ifc]
-		set peer_if [ifcByLogicalPeer $peer $node]
-		set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
-		if { $peer_ip6addr != "" } {
-		    lappend peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
-		}
-	}
-	if { $peer_ip6addrs != "" } {
+                set peer [logicalPeerByIfc $node $ifc]
+                set peer_if [ifcByLogicalPeer $peer $node]
+                set peer_ip6addr [getIfcIPv6addr $peer $peer_if]
+                if { $peer_ip6addr != "" } {
+                    lappend peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
+                }
+        }
+        if { $peer_ip6addrs != "" } {
             set ipnums [split [lindex $peer_ip6addrs 0] :]
             set net "[lindex $ipnums 0]:[lindex $ipnums 1]"
-	    set targetbyte 1
+            set targetbyte 1
             set ipaddr $net\::$targetbyte
             while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
                 incr targetbyte
                 set ipaddr $net\::$targetbyte
             }
-	} else {
-	    set ipnums [split [getIfcIPv6addr $node wireless] :]
+        } else {
+            set ipnums [split [getIfcIPv6addr $node wireless] :]
             set net "[lindex $ipnums 0]:[lindex $ipnums 1]"
-	    set ipaddr $net\::1
-	}
+            set ipaddr $net\::1
+        }
         return "$ipaddr/64"
 }
 
@@ -458,13 +458,13 @@ proc getDefaultIPv6Addrs { } {
 proc ipv6List { node wantmask } {
     set r ""
     foreach ifc [ifcList $node] {
-	foreach ip [getIfcIPv6addr $node $ifc] {
-	    if { $wantmask } {
-		lappend r $ip
-	    } else {
-		lappend r [lindex [split $ip /] 0]
-	    }
-	}
+        foreach ip [getIfcIPv6addr $node $ifc] {
+            if { $wantmask } {
+                lappend r $ip
+            } else {
+                lappend r [lindex [split $ip /] 0]
+            }
+        }
     }
     return $r
 }
