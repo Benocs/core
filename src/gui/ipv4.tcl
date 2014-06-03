@@ -59,34 +59,83 @@
 proc findFreeIPv4Net { netid mask } {
     global g_prefs node_list
 
-    set ipnets {}
+    # TODO(robert): add missing check if /24 and /30 subnets overlap
+
+    if { $mask != 24 && $mask != 30 } {
+        puts "netmask is neither 24 nor 30, but: $mask. setting it to 24."
+        set mask 24
+    }
+
+    set ipnets_24 {}
+    set ipnets_30 {}
     foreach node $node_list {
         foreach ifc [ifcList $node] {
-            set ipnet [lrange [split [getIfcIPv4addr $node $ifc] .] 0 2]
-            if {[lsearch $ipnets $ipnet] == -1} {
-                lappend ipnets $ipnet
+            set ip [lindex [split [getIfcIPv4addr $node $ifc] /] 0]
+            set ip_splitted [lrange [split $ip .] 0 3]
+            set netmaskbits [lindex [split [getIfcIPv4addr $node $ifc] /] 1]
+
+            if { $netmaskbits == 24 || $netmaskbits == 32 } {
+                set ipnet [lrange [split [getIfcIPv4addr $node $ifc] .] 0 2]
+                if {[lsearch $ipnets_24 $ipnet] == -1} {
+                    lappend ipnets_24 $ipnet
+                }
+            } elseif { $netmaskbits == 30 } {
+                set ip_byte_4 [lindex $ip_splitted 3]
+                if { [expr $ip_byte_4 % 2 == 0] } {
+                    set ip_byte_4 [expr $ip_byte_4 - 1]
+                }
+
+                set ipnet [lrange $ip_splitted 0 2]
+                lappend ipnet $ip_byte_4
+                if {[lsearch $ipnets_30 $ipnet] == -1} {
+                    lappend ipnets_30 $ipnet
+                }
             }
         }
     }
     # include mobility newlinks in search
     foreach newlink [.c find withtag "newlink"] {
         set ipnet [lrange [split [lindex [.c gettags $newlink] 4] .] 0 2]
-        lappend ipnets $ipnet
+        lappend ipnets_24 $ipnet
     }
-    if {![info exists g_prefs(gui_ipv4_addr)]} { setDefaultAddrs ipv4 }
-    set abc [split $g_prefs(gui_ipv4_addr) .]
-    set a [lindex $abc 0]
-    set b [lindex $abc 1]
-    set c [lindex $abc 2]
 
-    for { set i $b } { $i <= 255 } { incr i } {
-        for { set j $c } { $j <= 255 } { incr j } {
-            if {[lsearch $ipnets "$a $i $j"] == -1} {
-                set ipnet "$a.$i.$j"
+    if {![info exists g_prefs(gui_ipv4_addr)]} { setDefaultAddrs ipv4 }
+    set default_ipaddr_bytes [split $g_prefs(gui_ipv4_addr) .]
+
+    set default_ipaddr_byte_1 [lindex $default_ipaddr_bytes 0]
+    set default_ipaddr_byte_2 [lindex $default_ipaddr_bytes 1]
+    set default_ipaddr_byte_3 [lindex $default_ipaddr_bytes 2]
+    set default_ipaddr_byte_4 1
+
+    set ipaddr_byte_1 $default_ipaddr_byte_1
+    # TODO(robert): implement netid<-->ipnetwork mapping
+    set ipaddr_byte_2 [expr ($netid - 1) % 256]
+    set ipaddr_byte_4 $default_ipaddr_byte_4
+
+    if { $mask == 24 } {
+        for { set ipaddr_byte_3 255 } { $ipaddr_byte_3 > 0 } \
+                { set ipaddr_byte_3 [expr {$ipaddr_byte_3 - 1}] } {
+            if {[lsearch $ipnets_24 "$default_ipaddr_byte_1 $ipaddr_byte_2 $ipaddr_byte_3"] == -1} {
+                set ipnet "$ipaddr_byte_1.$ipaddr_byte_2.$ipaddr_byte_3.$ipaddr_byte_4"
                 return $ipnet
             }
         }
+    } elseif { $mask == 30 } {
+        for { set ipaddr_byte_3 $default_ipaddr_byte_3 } \
+                { $ipaddr_byte_3 <= 255 } { incr ipaddr_byte_3 } {
+            for { set ipaddr_byte_4 $default_ipaddr_byte_4 } { $ipaddr_byte_4 <= 255 } \
+                    { set ipaddr_byte_4 [expr {$ipaddr_byte_4 + 4}] } {
+                if {[lsearch $ipnets_30 "$default_ipaddr_byte_1 $ipaddr_byte_2 $ipaddr_byte_3 $ipaddr_byte_4"] == -1} {
+                    set ipnet "$ipaddr_byte_1.$ipaddr_byte_2.$ipaddr_byte_3.$ipaddr_byte_4"
+                    return $ipnet
+                }
+            }
+        }
+    } else {
+        puts "mask not 30 and not 24"
     }
+
+    tk_messageBox -message "Error. Cannot assign interface addresses. No free subnet could found. All available subnets have been assigned." -type ok -icon error
 }
 
 #****f* ipv4.tcl/autoIPv4addr
@@ -148,37 +197,35 @@ proc autoIPv4addr { node iface } {
         set peer_ip4addrs [lindex [split $peer_ip4addr /] 0]
         set netmaskbits [lindex [split $peer_ip4addr /] 1]
     }
-    set nodetype [nodeType $node]
-    if { $nodetype == "router" } { set nodetype [getNodeModel $node] }
-    switch -exact -- $nodetype {
-        router {
-            set targetbyte 1
-        }
-        host {
-            set targetbyte 10
-        }
-        PC -
-        pc {
-            set targetbyte 20
-        }
-        default {
-            set targetbyte 1
-        }
+
+    # get netid of source node (the one where the link originates)
+    set netid [getNodeNetId $node]
+
+    if { [[typemodel $peer_node].layer] == "LINK" } {
+        set netmaskbits 24
+    } else {
+        set netmaskbits 30
     }
+
     # peer has an IPv4 address, allocate a new address on the same network
     if { $peer_ip4addrs != "" } {
         set ipnums [split [lindex $peer_ip4addrs 0] .]
-        set net "[lindex $ipnums 0].[lindex $ipnums 1].[lindex $ipnums 2]"
-        set ipaddr $net.$targetbyte
+        set net_3bytes "[lindex $ipnums 0].[lindex $ipnums 1].[lindex $ipnums 2]"
+
+        # overwrite targetbyte
+        set targetbyte [expr [lindex $ipnums 3] + 1]
+
+        set ipaddr $net_3bytes.$targetbyte
         while { [lsearch $peer_ip4addrs $ipaddr] >= 0 } {
             incr targetbyte
-            set ipaddr $net.$targetbyte
+            set ipaddr $net_3bytes.$targetbyte
         }
-        setIfcIPv4addr $node $iface "$ipaddr/$netmaskbits"
     } else {
-        set ipnet [findFreeIPv4Net 24]
-        setIfcIPv4addr $node $iface "$ipnet.$targetbyte/$netmaskbits"
+        set ipaddr [findFreeIPv4Net [getNodeNetId $node] $netmaskbits]
     }
+
+    puts "setting IPv4addr for: $node.$iface: $ipaddr/$netmaskbits"
+    setIfcIPv4addr $node $iface "$ipaddr/$netmaskbits"
 }
 
 
