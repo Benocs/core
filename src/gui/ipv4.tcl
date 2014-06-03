@@ -1,4 +1,9 @@
 #
+# Copyright 2014 Benocs GmbH <robert@benocs.com>
+# See the LICENSE file included in this distribution.
+#
+
+#
 # Copyright 2005-2013 the Boeing Company.
 # See the LICENSE file included in this distribution.
 #
