@@ -197,10 +197,10 @@ proc autoIPv6addr { node iface } {
         set net [ipv6ToNet [lindex $peer_ip6addrs 0] $netmaskbits]
         set targetbyte 1
 
-        set ipaddr $net\::$targetbyte
+        set ipaddr $net\::[format %X ${targetbyte}]
         while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
             incr targetbyte
-            set ipaddr $net\::$targetbyte
+            set ipaddr $net\::[format %X ${targetbyte}]
         }
     } else {
         set ipaddr [findFreeIPv6Net [getNodeNetId $node] $netmaskbits]
