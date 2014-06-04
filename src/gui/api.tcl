@@ -708,7 +708,7 @@ proc parseLinkMessage { data len flags } {
 	set v6addr $vals(if2ipv6)
 	if { $v6addr != -1 } {
 	    set v6net [ipv6ToNet $v6addr $vals(if2ipv6mask)]
-	    setIfcIPv6addr $node1 wireless "${v6net}::0/$vals(if2ipv6mask)"
+	    setIfcIPv6addr $node1 wireless "${v6net}/$vals(if2ipv6mask)"
 	}
     }
 

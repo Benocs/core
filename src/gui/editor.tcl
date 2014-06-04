@@ -5253,7 +5253,7 @@ proc pasteSelection {} {
 	    setIfcIPv4addr $new wireless \
                     "[findFreeIPv4Net [getNodeNetId $peer_node] 24]/32"
 	    setIfcIPv6addr $new wireless \
-                    "[findFreeIPv6Net [getNodeNetId $peer_node] 64]::0/128"
+                    "[findFreeIPv6Net [getNodeNetId $peer_node] 64]/128"
 	    continue
 	}
 

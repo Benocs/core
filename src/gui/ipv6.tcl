@@ -53,43 +53,93 @@
 #   * netid -- the netid for which a free network is to be found
 #   * mask -- currently only values of 64 or 54 are accepted. defaults to 64
 # RESULT
-#   * ipnet -- returns the free IPv6 network address in the form "a $i".
+#   * ipnet -- returns the free IPv6 network address in RFC5952 format.
 #****
 
 proc findFreeIPv6Net { netid mask } {
     global g_prefs node_list
 
-    set ipnets {}
+    # TODO(robert): add missing check if /64 and /54 subnets overlap
+
+    if { $mask != 64 && $mask != 54 } {
+        puts "netmask is neither 64 nor 54, but: $mask. setting it to 64."
+        set mask 64
+    }
+
+    set ipnets_54 {}
+    set ipnets_64 {}
+
     foreach node $node_list {
         foreach ifc [ifcList $node] {
+            # split addr by ':'; the '::' will result in an empty item: '{}'
             set ipparts [split [getIfcIPv6addr $node $ifc] :]
+            puts "v6addr: [getIfcIPv6addr $node $ifc]"
+            puts "ipparts: $ipparts"
+            # find empty item: '{}' and set endidx to point one field before it
             set endidx [expr {[lsearch $ipparts {}] - 1}]
+            puts "endidx: $endidx"
+            # if no empty item was found, set endidx to the end of the
+            # addr-string-list
             if {$endidx < 0 } { set endidx end }
+            # cp all parts before endidx to ipnet
             set ipnet [lrange $ipparts 0 $endidx]
-            if {[lsearch $ipnets $ipnet] == -1} {
-                lappend ipnets $ipnet
+            puts "saving ipnet: $ipnet"
+
+            if { $mask == 64 } {
+                # add ipnet to list of known /64-ipnets
+                if {[lsearch $ipnets_64 $ipnet] == -1} {
+                    lappend ipnets_64 $ipnet
+                }
+            } elseif { $mask == 54 } {
+                # add ipnet to list of known /54-ipnets
+                if {[lsearch $ipnets_54 $ipnet] == -1} {
+                    lappend ipnets_54 $ipnet
+                }
             }
         }
     }
     # include mobility newlinks in search
     foreach newlink [.c find withtag "newlink"] {
         set ipnet [lrange [split [lindex [.c gettags $newlink] 5] :] 0 3]
-        lappend ipnets $ipnet
+        lappend ipnets_64 $ipnet
     }
+
+    # split default base IPv6 address as above; save result into newnet
     if {![info exists g_prefs(gui_ipv6_addr)]} { setDefaultAddrs ipv6 }
     set newnet [split $g_prefs(gui_ipv6_addr) :]
     set endidx [expr {[lsearch $newnet {}] - 1}]
     if {$endidx < 0 } { set endidx end }
     set newnet [lrange $newnet 0 $endidx]
+    # newnet now consists of the first two bytes of the final address
+    puts "newnet: $newnet"
 
-    for { set i 0 } { $i <= 9999 } { incr i } {
-        if {[lsearch $ipnets "$newnet $i"] == -1} {
-            set newnetcolon [join $newnet :]
-            set ipnet "$newnetcolon:$i"
-            puts "returning IPv6-net: $ipnet"
-            return $ipnet
+    # set netid as the fourth byte - leaving the third byte as 0
+    # TODO(robert): implement netid<-->ipnetwork mapping
+    lappend newnet [expr ($netid - 1) % 256]
+
+    puts "ipnets_54: $ipnets_54"
+    puts "ipnets_64: $ipnets_64"
+
+    if { $mask == 64 } {
+        for { set i 0 } { $i <= 0xFFFF } { incr i } {
+            if {[lsearch $ipnets_64 "$newnet $i"] == -1} {
+                set newnetcolon [join $newnet :]
+                set ipnet "${newnetcolon}:${i}::0"
+                puts "returning IPv6-net: $ipnet"
+                return $ipnet
+            }
+        }
+    } elseif { $mask == 54 } {
+        for { set i 0xFFFF } { $i > 0 } { set i [expr {$i - 1}] } {
+            if {[lsearch $ipnets_54 "$newnet $i"] == -1} {
+                set newnetcolon [join $newnet :]
+                set ipnet "${newnetcolon}:${i}::0"
+                puts "returning IPv6-net: $ipnet"
+                return $ipnet
+            }
         }
     }
+    tk_messageBox -message "Error. Cannot assign interface IPv6 addresses. No free subnet could found. All available subnets have been assigned." -type ok -icon error
 }
 
 #****f* ipv6.tcl/autoIPv6addr
@@ -143,26 +193,12 @@ proc autoIPv6addr { node iface } {
         set peer_ip6addrs [lindex [split $peer_ip6addr /] 0]
         set netmaskbits [lindex [split $peer_ip6addr /] 1]
     }
-    set nodetype [nodeType $node]
-    if { $nodetype == "router" } { set nodetype [getNodeModel $node] }
-    switch -exact -- $nodetype {
-        router {
-            set targetbyte 1
-        }
-        host {
-            set targetbyte 10
-        }
-        PC -
-        pc {
-            set targetbyte 20
-        }
-        default {
-            set targetbyte 1
-        }
-    }
+
     # peer has an IPv6 address, allocate a new address on the same network
     if { $peer_ip6addrs != "" } {
         set net [ipv6ToNet [lindex $peer_ip6addrs 0] 64]
+        set targetbyte 1
+
         set ipaddr $net\::$targetbyte
         while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
             incr targetbyte
@@ -171,7 +207,7 @@ proc autoIPv6addr { node iface } {
         setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
     } else {
         set ipnet [findFreeIPv6Net [getNodeNetId $node] 64]
-        setIfcIPv6addr $node $iface "${ipnet}::$targetbyte/$netmaskbits"
+        setIfcIPv6addr $node $iface "${ipnet}/$netmaskbits"
     }
 }
 

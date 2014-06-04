@@ -834,7 +834,7 @@ proc newLink { lnode1 lnode2 } {
 	set ipv6_addr1 [getIfcIPv6addr $lnode1 wireless]
 	if { $ipv6_addr1 == "" } {
 	    setIfcIPv6addr $lnode1 wireless \
-                "[findFreeIPv6Net [getNodeNetId $peer_node] 128]::0/128"
+                "[findFreeIPv6Net [getNodeNetId $peer_node] 128]/128"
 	}
 	if { [string range $model 0 6] == "coreapi" } {
 	    set delay 0; # delay controlled by wireless module
