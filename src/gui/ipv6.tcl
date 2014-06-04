@@ -447,7 +447,7 @@ proc expandIPv6 { ip } {
 # Boeing
 # ***** ipv6.tcl/ipv6ToNet
 # NAME
-#  ipv6ToNet -- convert IPv6 address a.b.c.d to a.b.c
+#  ipv6ToNet -- convert IPv6 address a:b:c::d to a:b:c
 # ****
 
 proc ipv6ToNet { ip mask } {
