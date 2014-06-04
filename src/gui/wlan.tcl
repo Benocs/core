@@ -559,7 +559,8 @@ proc wlanConfigDialogHelper { wi target apply } {
                 "[findFreeIPv4Net [getNodeNetId $peer_node] 24]/32"
     }
     if { [getIfcIPv6addr $target wireless] == "" } {
-        setIfcIPv6addr $target wireless "[findFreeIPv6Net 64]::0/128"
+        setIfcIPv6addr $target wireless \
+                "[findFreeIPv6Net [getNodeNetId $peer_node] 64]::0/128"
     }
 
     frame $wi.bottom -padx 4 -pady 4

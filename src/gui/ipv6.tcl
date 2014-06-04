@@ -45,17 +45,18 @@
 # NAME
 #   findFreeIPv6Net -- find free IPv6 network
 # SYNOPSIS
-#   set ipnet [findFreeIPv4Net $mask]
+#   set ipnet [findFreeIPv6Net $netid $mask]
 # FUNCTION
 #   Finds a free IPv6 network. Network is concidered to be free
 #   if there are no simulated nodes attached to it.
 # INPUTS
-#   * mask -- this parameter is left unused for now
+#   * netid -- the netid for which a free network is to be found
+#   * mask -- currently only values of 64 or 54 are accepted. defaults to 64
 # RESULT
 #   * ipnet -- returns the free IPv6 network address in the form "a $i".
 #****
 
-proc findFreeIPv6Net { mask } {
+proc findFreeIPv6Net { netid mask } {
     global g_prefs node_list
 
     set ipnets {}
@@ -85,6 +86,7 @@ proc findFreeIPv6Net { mask } {
         if {[lsearch $ipnets "$newnet $i"] == -1} {
             set newnetcolon [join $newnet :]
             set ipnet "$newnetcolon:$i"
+            puts "returning IPv6-net: $ipnet"
             return $ipnet
         }
     }
@@ -168,7 +170,7 @@ proc autoIPv6addr { node iface } {
         }
         setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
     } else {
-        set ipnet [findFreeIPv6Net 64]
+        set ipnet [findFreeIPv6Net [getNodeNetId $node] 64]
         setIfcIPv6addr $node $iface "${ipnet}::$targetbyte/$netmaskbits"
     }
 }
