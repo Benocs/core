@@ -113,16 +113,18 @@ proc findFreeIPv6Net { netid mask } {
     lappend newnet [expr ($netid - 1) % 256]
 
     if { $mask == 64 } {
-        for { set i 0 } { $i <= 0xFFFF } { incr i } {
-            if {[lsearch $ipnets_64 "$newnet $i"] == -1} {
+        # tcl/tk does not know anything about hex. use decimal instead m(
+        for { set i 0 } { $i <= 65535 } { incr i } {
+            if {[lsearch $ipnets_64 "$newnet [format %X ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
                 set ipnet "${newnetcolon}:[format %X ${i}]::0"
                 return $ipnet
             }
         }
     } elseif { $mask == 54 } {
-        for { set i 0xFFFF } { $i > 0 } { set i [expr {$i - 1}] } {
-            if {[lsearch $ipnets_54 "$newnet $i"] == -1} {
+        # tcl/tk does not know anything about hex. use decimal instead m(
+        for { set i 65535 } { $i > 0 } { set i [expr {$i - 1}] } {
+            if {[lsearch $ipnets_54 "$newnet [format %X ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
                 set ipnet "${newnetcolon}:[format %X ${i}]::0"
                 return $ipnet
