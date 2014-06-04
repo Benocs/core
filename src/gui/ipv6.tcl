@@ -73,17 +73,13 @@ proc findFreeIPv6Net { netid mask } {
         foreach ifc [ifcList $node] {
             # split addr by ':'; the '::' will result in an empty item: '{}'
             set ipparts [split [getIfcIPv6addr $node $ifc] :]
-            puts "v6addr: [getIfcIPv6addr $node $ifc]"
-            puts "ipparts: $ipparts"
             # find empty item: '{}' and set endidx to point one field before it
             set endidx [expr {[lsearch $ipparts {}] - 1}]
-            puts "endidx: $endidx"
             # if no empty item was found, set endidx to the end of the
             # addr-string-list
             if {$endidx < 0 } { set endidx end }
             # cp all parts before endidx to ipnet
             set ipnet [lrange $ipparts 0 $endidx]
-            puts "saving ipnet: $ipnet"
 
             if { $mask == 64 } {
                 # add ipnet to list of known /64-ipnets
@@ -109,23 +105,18 @@ proc findFreeIPv6Net { netid mask } {
     set newnet [split $g_prefs(gui_ipv6_addr) :]
     set endidx [expr {[lsearch $newnet {}] - 1}]
     if {$endidx < 0 } { set endidx end }
-    set newnet [lrange $newnet 0 $endidx]
     # newnet now consists of the first two bytes of the final address
-    puts "newnet: $newnet"
+    set newnet [lrange $newnet 0 $endidx]
 
     # set netid as the fourth byte - leaving the third byte as 0
     # TODO(robert): implement netid<-->ipnetwork mapping
     lappend newnet [expr ($netid - 1) % 256]
 
-    puts "ipnets_54: $ipnets_54"
-    puts "ipnets_64: $ipnets_64"
-
     if { $mask == 64 } {
         for { set i 0 } { $i <= 0xFFFF } { incr i } {
             if {[lsearch $ipnets_64 "$newnet $i"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:${i}::0"
-                puts "returning IPv6-net: $ipnet"
+                set ipnet "${newnetcolon}:[format %X ${i}]::0"
                 return $ipnet
             }
         }
@@ -133,8 +124,7 @@ proc findFreeIPv6Net { netid mask } {
         for { set i 0xFFFF } { $i > 0 } { set i [expr {$i - 1}] } {
             if {[lsearch $ipnets_54 "$newnet $i"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:${i}::0"
-                puts "returning IPv6-net: $ipnet"
+                set ipnet "${newnetcolon}:[format %X ${i}]::0"
                 return $ipnet
             }
         }
