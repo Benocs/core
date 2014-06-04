@@ -136,7 +136,7 @@ proc findFreeIPv4Net { netid mask } {
         puts "mask not 30 and not 24"
     }
 
-    tk_messageBox -message "Error. Cannot assign interface addresses. No free subnet could found. All available subnets have been assigned." -type ok -icon error
+    tk_messageBox -message "Error. Cannot assign interface IPv4 addresses. No free subnet could found. All available subnets have been assigned." -type ok -icon error
 }
 
 #****f* ipv4.tcl/autoIPv4addr
