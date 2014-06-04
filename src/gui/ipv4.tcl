@@ -45,11 +45,12 @@
 # NAME
 #   findFreeIPv4Net -- find free IPv4 network
 # SYNOPSIS
-#   set ipnet [findFreeIPv4Net $mask]
+#   set ipnet [findFreeIPv4Net $netid $mask]
 # FUNCTION
 #   Finds a free IPv4 network. Network is concidered to be free
 #   if there are no simulated nodes attached to it.
 # INPUTS
+#   * netid -- the netid for which a free network is to be found
 #   * mask -- currently only values of 24 or 30 are accepted. defaults to 24
 # RESULT
 #   * ipnet -- returns the free IPv4 network address in the form a.b.c.d
