@@ -186,9 +186,15 @@ proc autoIPv6addr { node iface } {
         set netmaskbits [lindex [split $peer_ip6addr /] 1]
     }
 
+    if { [[typemodel $peer_node].layer] == "LINK" } {
+        set netmaskbits 54
+    } else {
+        set netmaskbits 64
+    }
+
     # peer has an IPv6 address, allocate a new address on the same network
     if { $peer_ip6addrs != "" } {
-        set net [ipv6ToNet [lindex $peer_ip6addrs 0] 64]
+        set net [ipv6ToNet [lindex $peer_ip6addrs 0] $netmaskbits]
         set targetbyte 1
 
         set ipaddr $net\::$targetbyte
@@ -196,11 +202,10 @@ proc autoIPv6addr { node iface } {
             incr targetbyte
             set ipaddr $net\::$targetbyte
         }
-        setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
     } else {
-        set ipnet [findFreeIPv6Net [getNodeNetId $node] 64]
-        setIfcIPv6addr $node $iface "${ipnet}/$netmaskbits"
+        set ipaddr [findFreeIPv6Net [getNodeNetId $node] $netmaskbits]
     }
+    setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
 }
 
 #****f* ipv6.tcl/autoIPv6defaultroute
