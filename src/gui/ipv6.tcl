@@ -205,6 +205,8 @@ proc autoIPv6addr { node iface } {
     } else {
         set ipaddr [findFreeIPv6Net [getNodeNetId $node] $netmaskbits]
     }
+
+    puts "setting IPv6addr for: $node.$iface: $ipaddr/$netmaskbits"
     setIfcIPv6addr $node $iface "$ipaddr/$netmaskbits"
 }
 
