@@ -431,16 +431,13 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
 
             # add services to a node, either from its services TLV or
             # through the configured defaults for this node type
-            if nodetype == coreapi.CORE_NODE_DEF or \
-               nodetype == coreapi.CORE_NODE_PHYS or \
-               nodetype == coreapi.CORE_NODE_XEN:
-                if model is None:
-                    # TODO: default model from conf file?
-                    model = "router"
-                n.type = model
-                services_str = msg.gettlv(coreapi.CORE_TLV_NODE_SERVICES)
-                self.session.services.addservicestonode(n, model, services_str,
-                                                        self.verbose)
+            if model is None:
+                # TODO: default model from conf file?
+                model = "router"
+            n.type = model
+            services_str = msg.gettlv(coreapi.CORE_TLV_NODE_SERVICES)
+            self.session.services.addservicestonode(n, model, services_str,
+                                                    self.verbose)
             # boot nodes if they are added after runtime (like session.bootnodes())
             if self.session.getstate() == coreapi.CORE_EVENT_RUNTIME_STATE:
                 if isinstance(n, pycore.nodes.PyCoreNode) and \
