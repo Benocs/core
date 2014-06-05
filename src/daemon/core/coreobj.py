@@ -81,6 +81,7 @@ class PyCoreObj(object):
                 self.enable_ipv6 = False
             elif self.session.options.enableipv6 == '1':
                 self.enable_ipv6 = True
+        self.services = []
 
     def __str__(self):
         return "%s: id: %s, name: %s" % (str(self.__class__), str(self.objid),
@@ -105,6 +106,10 @@ class PyCoreObj(object):
         ''' Return an (x,y,z) tuple representing this object's position.
         '''
         return self.position.get()
+
+    def addservice(self,  service):
+        if service is not None:
+            self.services.append(service)
 
     def ifindex(self, ifname):
         ''' Returns the interface named ifname, if found.
@@ -247,17 +252,12 @@ class PyCoreNode(PyCoreObj):
         '''
         PyCoreObj.__init__(self,  session,  objid,  name, verbose=verbose,
                            start=start)
-        self.services = []
         if not hasattr(self, "type"):
             self.type = None
         self.nodedir = None
 
     def nodeid(self):
         return self.objid
-
-    def addservice(self,  service):
-        if service is not None:
-            self.services.append(service)
 
     def getIPversions(self):
         ipversions = []
