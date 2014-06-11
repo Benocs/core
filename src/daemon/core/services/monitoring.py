@@ -384,12 +384,24 @@ bash ./icmp_probe_lo.sh &
 
 set -e
 
+# from: http://unix.stackexchange.com/a/19616
+validIP4 ()
+{
+    result=1
+    IFS='.' read na nb nc nd;
+    for n in "$na" "$nb" "$nc" "$nd"; do
+        [[ ${#n} -le 3 ]] && [[ "${n//[^0-9]/}" = "$n" ]] && [[ $n -lt 256 ]] || result=0 && break
+    done
+    echo "$result"
+}
+
 error=0
 now=$(date +%Y%m%d-%H%M)
 mkdir -p icmp_probe
 out=icmp_probe/icmp_probe_lo.result.${now}
 
-cmd="nice -n19 ping -c1 -w3 "
+cmd4="nice -n19 ping -n -c1 -w3 "
+cmd6="nice -n19 ping6 -n -c1 -w3 "
 
 function abort {
   echo "error at host: $host" >> ${out}
@@ -400,7 +412,13 @@ if [ \! -e /tmp/icmp_probe_lo.stop ]; then
     > ${out}
 
     for host in $(cat icmp_probe_lo.hosts); do
-        $cmd $host || $cmd $host || $cmd $host || abort
+        isIPv4_res=$(echo $host | validIP4)
+
+        if [ "$isIPv4_res" == "1" ]; then
+            $cmd4 $host || $cmd4 $host || $cmd4 $host || abort
+        else
+            $cmd6 $host || $cmd6 $host || $cmd6 $host || abort
+        fi
     done
 
     [ $error -eq 0 ] && echo "all ok" > ${out}
@@ -422,8 +440,8 @@ fi
     @staticmethod
     def nodewalker_lo_callback(startnode, currentnode):
         result = []
-        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
-        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            result.extend([str(currentnode.getLoopbackIPv6()), '\n'])
         if currentnode.enable_ipv4 and startnode.enable_ipv4:
             result.extend([str(currentnode.getLoopbackIPv4()), '\n'])
         return result
@@ -431,8 +449,9 @@ fi
     @staticmethod
     def nodewalker_lo_verbose_callback(startnode, currentnode):
         result = []
-        #if currentnode.enable_ipv6 and startnode.enable_ipv6:
-        #    result.append(str(currentnode.getLoopbackIPv6()))
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            result.extend([str(currentnode.getLoopbackIPv6()),
+                    ' ', currentnode.name, '\n'])
         if currentnode.enable_ipv4 and startnode.enable_ipv4:
             result.extend([str(currentnode.getLoopbackIPv4()),
                     ' ', currentnode.name, '\n'])
@@ -456,23 +475,41 @@ bash ./icmp_probe_if.sh &
 
 set -e
 
+# from: http://unix.stackexchange.com/a/19616
+validIP4 ()
+{
+    result=1
+    IFS='.' read na nb nc nd;
+    for n in "$na" "$nb" "$nc" "$nd"; do
+        [[ ${#n} -le 3 ]] && [[ "${n//[^0-9]/}" = "$n" ]] && [[ $n -lt 256 ]] || result=0 && break
+    done
+    echo "$result"
+}
+
 error=0
 now=$(date +%Y%m%d-%H%M)
 mkdir -p icmp_probe
 out=icmp_probe/icmp_probe_if.result.${now}
 
-cmd="nice -n19 ping -c1 -w3 "
+cmd4="nice -n19 ping -n -c1 -w3 "
+cmd6="nice -n19 ping6 -n -c1 -w3 "
 
 function abort {
   echo "error at host: $host" >> ${out}
   error=1
 }
 
-if [ \! -e /tmp/icmp_probe_lo.stop ]; then
+if [ \! -e /tmp/icmp_probe_if.stop ]; then
     > ${out}
 
     for host in $(cat icmp_probe_if.hosts); do
-        $cmd $host || $cmd $host || $cmd $host || abort
+        isIPv4_res=$(echo $host | validIP4)
+
+        if [ "$isIPv4_res" == "1" ]; then
+            $cmd4 $host || $cmd4 $host || $cmd4 $host || abort
+        else
+            $cmd6 $host || $cmd6 $host || $cmd6 $host || abort
+        fi
     done
 
     [ $error -eq 0 ] && echo "all ok" > ${out}
@@ -503,6 +540,13 @@ fi
                 for addr in intf.addrlist:
                     if isIPv4Address(addr):
                         result.extend([addr.partition('/')[0], '\n'])
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            for intf in currentnode._netif.values():
+                if hasattr(intf, 'control') and intf.control == True:
+                    continue
+                for addr in intf.addrlist:
+                    if isIPv6Address(addr):
+                        result.extend([addr.partition('/')[0], '\n'])
         return result
 
     @staticmethod
@@ -514,6 +558,12 @@ fi
             for intf in currentnode._netif.values():
                 for addr in intf.addrlist:
                     if isIPv4Address(addr):
+                        result.extend([addr.partition('/')[0],
+                        ' ', currentnode.name, '\n'])
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            for intf in currentnode._netif.values():
+                for addr in intf.addrlist:
+                    if isIPv6Address(addr):
                         result.extend([addr.partition('/')[0],
                         ' ', currentnode.name, '\n'])
         return result
