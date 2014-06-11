@@ -505,7 +505,7 @@ class Ospfv3(QuaggaService):
                     if not isIPv6Address(a):
                         continue
                     cfg.append('  area 0.0.0.0 range %s\n' % a)
-        cfg.append('  interface lo area 0.0.0.0\n')
+
         cfg.append('  area 0.0.0.0 range %s/128\n' % node.getLoopbackIPv6())
         return cfg
 
@@ -550,10 +550,6 @@ class Ospfv3(QuaggaService):
             return ''
 
         cfg = ''
-        cfg += 'interface lo\n'
-        cfg += '  ipv6 address %s' % node.getLoopbackIPv4()
-        cfg += '  ipv6 ospf6 instance-id 0\n'
-        cfg += '!\n'
 
         return cfg
 
