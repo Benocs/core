@@ -75,6 +75,7 @@ class Zebra(CoreService):
         '''
         cfg = []
 
+        cfg.append('log file /tmp/quagga-zebra-%s.log\n' % node.name)
         cfg.append('hostname %s\n' % node.name)
         cfg.append('agentx\n')
         cfg.append('interface lo\n')
@@ -402,6 +403,7 @@ class Ospfv2(QuaggaService):
             cfg += '!\n'
 
         cfg = '!\n! OSPFv2 (for IPv4) configuration\n!\n'
+        cfg += 'log file /tmp/quagga-ospf-%s.log\n' % node.name
         cfg += 'router ospf\n'
         cfg += '  router-id %s\n' % cls.routerid(node)
         cfg += '  redistribute connected\n'
@@ -523,6 +525,7 @@ class Ospfv3(QuaggaService):
             cfg += '\n'
             cfg += '!\n'
 
+        cfg += 'log file /tmp/quagga-ospf6-%s.log\n' % node.name
         cfg += 'router ospf6\n'
         rtrid = cls.routerid(node)
         cfg += '  router-id %s\n' % rtrid
@@ -700,6 +703,7 @@ class Bgp(QuaggaService):
             return ''
 
         cfg = '!\n! BGP configuration\n!\n'
+        cfg += 'log file /tmp/quagga-bgp-%s.log\n' % node.name
         cfg += 'router bgp %s\n' % node.netid
         cfg += '  bgp router-id %s\n' % cls.routerid(node)
         cfg += '  redistribute kernel\n'
@@ -844,13 +848,14 @@ class Rip(QuaggaService):
     @classmethod
     def generatequaggaconfig(cls,  node):
         cfg = '''\
+log file /tmp/quagga-ospf-%s.log
 router rip
   redistribute static
   redistribute connected
   redistribute ospf
   network 0.0.0.0/0
 !
-'''
+''' % node.name
         return cfg
 
 addservice(Rip)
@@ -869,13 +874,14 @@ class Ripng(QuaggaService):
     @classmethod
     def generatequaggaconfig(cls,  node):
         cfg = '''\
+log file /tmp/quagga-ospf-%s.log
 router ripng
   redistribute static
   redistribute connected
   redistribute ospf6
   network ::/0
 !
-'''
+''' % node.name
         return cfg
 
 addservice(Ripng)
@@ -894,6 +900,7 @@ class Babel(QuaggaService):
 
     @classmethod
     def generatequaggaconfig(cls,  node):
+        cfg += 'log file /tmp/quagga-babel-%s.log\n' % node.name
         cfg = 'router babel\n'
         for ifc in node.netifs():
             if hasattr(ifc, 'control') and ifc.control == True:
@@ -1050,6 +1057,7 @@ class ISIS(QuaggaService):
         cfg += '! ISIS configuration\n'
 
         if node.enable_ipv4 or node.enable_ipv6:
+            cfg += 'log file /tmp/quagga-isis-%s.log\n' % node.name
             cfg += 'router isis 1\n'
             cfg += '  net %s\n' % cls.get_ISIS_ID(cls.routerid(node), str(node.netid))
             cfg += '  metric-style wide\n'
