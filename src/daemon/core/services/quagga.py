@@ -525,10 +525,6 @@ class Ospfv3(QuaggaService):
 
             cfg += 'interface %s\n' % ifc.name
             cfg += cls.generatequaggaifcconfig(node, ifc)
-            ipv6list = [x for x in ifc.addrlist if isIPv6Address(x)]
-            cfg += '  '
-            cfg += '\n  '.join(map(cls.addrstr, ipv6list))
-            cfg += '\n'
             cfg += '!\n'
 
         cfg += 'log file /tmp/quagga-ospf6-%s.log\n' % node.name
@@ -536,8 +532,6 @@ class Ospfv3(QuaggaService):
         rtrid = cls.routerid(node)
         cfg += '  router-id %s\n' % rtrid
         cfg += '  redistribute connected\n'
-        cfg += '  redistribute kernel\n'
-        cfg += '  redistribute static\n'
         cfg += '!\n'
         cfg += ''.join(set(cls.interface_iterator(node,
                 cls.generate_area_statement)))
@@ -582,8 +576,9 @@ class Ospfv3(QuaggaService):
 
                 # found the same AS, enable IGP/OSPF
                 if node.netid == net_netif.node.netid:
-                    if service_flags.Router in net_netif.node.services:
-                        cfg += '  ipv6 ospf6 instance-id 0\n'
+                    if not service_flags.Router in net_netif.node.services:
+                        # other end of link is not router. don't send hellos
+                        cfg += '  ipv6 ospf6 passive\n'
                         break
         return cfg
 
