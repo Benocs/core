@@ -96,8 +96,8 @@ class SimpleLxcNode(PyCoreNode):
         self.vnodeclient = vnodeclient.VnodeClient(self.name,
                                                    self.ctrlchnlname)
         self.info("bringing up loopback interface")
+        self.cmd([IP_BIN, "link", "set", "lo", "up"])
         if self.enable_ipv4:
-            self.cmd([IP_BIN, "link", "set", "lo", "up"])
             self.info("adding IPv4 loopback address: %s/32" % \
                     str(self.getLoopbackIPv4()))
             self.cmd([IP_BIN, "addr", "add", "%s/32" % str(self.getLoopbackIPv4()),
