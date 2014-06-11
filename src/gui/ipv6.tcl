@@ -117,7 +117,7 @@ proc findFreeIPv6Net { netid mask } {
         for { set i 0 } { $i <= 65535 } { incr i } {
             if {[lsearch $ipnets_64 "$newnet [format %X ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:[format %X ${i}]::0"
+                set ipnet "${newnetcolon}:[format %X ${i}]::1"
                 return $ipnet
             }
         }
@@ -126,7 +126,7 @@ proc findFreeIPv6Net { netid mask } {
         for { set i 65535 } { $i > 0 } { set i [expr {$i - 1}] } {
             if {[lsearch $ipnets_54 "$newnet [format %X ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:[format %X ${i}]::0"
+                set ipnet "${newnetcolon}:[format %X ${i}]::1"
                 return $ipnet
             }
         }
