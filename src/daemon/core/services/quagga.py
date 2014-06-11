@@ -369,6 +369,9 @@ class Ospfv2(QuaggaService):
             # skip our own interface
             if ifc == net_netif:
                 continue
+            # skip control interface
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
 
             # found the same AS, enable IGP/OSPF
             if node.netid == net_netif.node.netid:
@@ -490,6 +493,9 @@ class Ospfv3(QuaggaService):
             # skip our own interface
             if ifc == net_netif:
                 continue
+            # skip control interface
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
 
             # found the same AS, enable IGP/OSPF
             if node.netid == net_netif.node.netid:
@@ -573,6 +579,9 @@ class Ospfv3(QuaggaService):
 
                 # skip our own interface
                 if ifc == net_netif:
+                    continue
+                # skip control interface
+                if hasattr(ifc, 'control') and ifc.control == True:
                     continue
 
                 # found the same AS, enable IGP/OSPF
@@ -822,6 +831,9 @@ class Bgp(QuaggaService):
                 # skip our own interface
                 if ifc == net_netif:
                     continue
+                # skip control interface
+                if hasattr(ifc, 'control') and ifc.control == True:
+                    continue
 
                 # found the same AS, collect loopback addresses
                 if node.netid == net_netif.node.netid:
@@ -956,6 +968,9 @@ class ISIS(QuaggaService):
 
             # skip our own interface
             if ifc == net_netif:
+                continue
+            # skip control interface
+            if hasattr(ifc, 'control') and ifc.control == True:
                 continue
 
             # found the same AS, enable IGP/ISIS
