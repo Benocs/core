@@ -744,10 +744,8 @@ class Bgp(QuaggaService):
                     cls.nodewalker_ibgp_find_neighbor_addrs_v6_callback)
             cfg += '  address-family ipv6\n'
             # activate IBGP neighbors
-            cfg += ''.join([('    neighbor %s activate\n'
-                    '    neighbor %s next-hop-self\n') % \
-                    (str(remote_addr).split('/')[0],
-                    str(remote_addr).split('/')[0]) \
+            cfg += ''.join([('    neighbor %s activate\n') % \
+                    (str(remote_addr).split('/')[0]) \
                     for local_addr, remote_addr in v6_ibgp_neighbor_list])
             # activate EBGP neighbors
             cfg += ''.join(v6cfg)
