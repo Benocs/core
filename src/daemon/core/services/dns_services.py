@@ -1035,14 +1035,6 @@ class Bind9ForwarderAndServer(Bind9):
                     cls.nodewalker_find_root_and_as_dns_callback,
                     cls.nodewalker_root_dns_find_all_auth_servers_callback)
 
-            # add reverse lookup PTR records
-            ptrzones = cls.getAndGeneratePTRZones(cls, node)
-            print(('[DEBUG] getAndGeneratePTRZones() returned ptrzones: %s' % ptrzones))
-            for ptrzone in ptrzones:
-                print(('[DEBUG] adding ptrzone: %s' % ptrzone))
-                ptrzonefname = ptrzone.rstrip('.')
-                cls.cfg_add_item(cfgitems, 'zone "%s"' % ptrzone, 'type master;')
-                cls.cfg_add_item(cfgitems, 'zone "%s"' % ptrzone, 'file "/etc/bind/db.%s";' % ptrzonefname)
         else:
             # create root zone db with hints
             cls.generateDBClientFile(cls, node, '.',
@@ -1063,6 +1055,8 @@ class Bind9ForwarderAndServer(Bind9):
                     None,
                     cls.nodewalker_asroot_dns_find_hosts_in_as_callback)
 
+        if service_flags.DNSRootServer in node.services or \
+                service_flags.DNSASRootServer in node.services:
             # add reverse lookup PTR records
             ptrzones = cls.getAndGeneratePTRZones(cls, node)
             print(('[DEBUG] getAndGeneratePTRZones() returned ptrzones: %s' % ptrzones))
