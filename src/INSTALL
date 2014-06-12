@@ -66,6 +66,7 @@ su -c "( cd ../contrib/quagga && \
     tar -xzf quagga-0.99.22.4.tar.gz && \
     cd quagga-0.99.22.4 && \
     patch -p1 < ../000-vtysh.patch && \
+    patch -p1 < ../001-isis_pdu_iih.patch && \
     ./configure --prefix= \
         --enable-snmp \
         --enable-isisd \
@@ -112,7 +113,6 @@ cd ../contrib/BENOCS/ifindex/src
 g++ -o ifindex ifindex.cpp
 su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
 )
-
 
 echo "Installing BRITE dependencies.."
 su -c "apt-get install default-jre python-pydot" root
