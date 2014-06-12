@@ -257,7 +257,7 @@ class Bind9(DNSServices):
             service_helpers.nodewalker(node, node, delegation_servers,
                     delegation_servers_cb)
             delegation_servers_map = {}
-            for servername, addr, server_zone in delegation_servers:
+            for server, addr, server_zone in delegation_servers:
                 if server_zone == '.':
                     servername = ('%s.' % server)
                 else:
@@ -806,7 +806,7 @@ class Bind9(DNSServices):
 
         for servername, zones in seen_server_names.items():
             for zone in zones.keys():
-                nameserverlist.extend([zone, ' IN NS ', server_name, '\n'])
+                nameserverlist.extend([zone, ' IN NS ', servername, '\n'])
 
         nameserverlist.extend(tmpnameserverlist)
 
