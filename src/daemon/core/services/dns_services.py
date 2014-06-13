@@ -136,7 +136,7 @@ class Bind9(DNSServices):
 
     @staticmethod
     def generateSOAHeader(cls, auth_nameservers, zone,
-            serial = 20140101000000,
+            serial = 2014010123,
             ttl = 900, refresh = 900, retry = 450,
             expire = 3600000, negcache = 900):
         """ auth_nameservers is expected to be a list of
