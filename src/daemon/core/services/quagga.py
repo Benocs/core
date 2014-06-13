@@ -83,10 +83,24 @@ class Zebra(CoreService):
             cfg.append('  ip address %s/32\n' % node.getLoopbackIPv4())
         if node.enable_ipv6:
             cfg.append('  ipv6 address %s/128\n' % node.getLoopbackIPv6())
+
+        for ifc in node.netifs():
+            # do not ever include control interfaces in anything
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
+
+            cfg.append('interface %s\n' % ifc.name)
+            for a in ifc.addrlist:
+                if isIPv4Address(a):
+                    cfg.append('  ip  address %s\n' % a)
+                if isIPv6Address(a):
+                    cfg.append('  ipv6  address %s\n' % a)
+            cfg.append('!\n')
+
         if node.enable_ipv4:
-            cfg += 'ip forwarding\n'
+            cfg.append('ip forwarding\n')
         if node.enable_ipv6:
-            cfg += 'ipv6 forwarding\n'
+            cfg.append('ipv6 forwarding\n')
 
         for s in services:
             if cls._name not in s._depends:
@@ -501,12 +515,7 @@ class Ospfv3(QuaggaService):
             if node.netid == net_netif.node.netid:
                 if service_flags.Router in net_netif.node.services:
                     cfg.append('  interface %s area 0.0.0.0\n' % ifc.name)
-                for a in ifc.addrlist:
-                    if not isIPv6Address(a):
-                        continue
-                    cfg.append('  area 0.0.0.0 range %s\n' % a)
 
-        cfg.append('  area 0.0.0.0 range %s/128\n' % node.getLoopbackIPv6())
         return cfg
 
     @classmethod
