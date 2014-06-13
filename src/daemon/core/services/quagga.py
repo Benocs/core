@@ -83,6 +83,20 @@ class Zebra(CoreService):
             cfg.append('  ip address %s/32\n' % node.getLoopbackIPv4())
         if node.enable_ipv6:
             cfg.append('  ipv6 address %s/128\n' % node.getLoopbackIPv6())
+
+        for ifc in node.netifs():
+            # do not ever include control interfaces in anything
+            if hasattr(ifc, 'control') and ifc.control == True:
+                continue
+
+            cfg.append('interface %s\n' % ifc.name)
+            for a in ifc.addrlist:
+                if isIPv4Address(a):
+                    cfg.append('  ip  address %s\n' % a)
+                if isIPv6Address(a):
+                    cfg.append('  ipv6  address %s\n' % a)
+            cfg.append('!\n')
+
         if node.enable_ipv4:
             cfg.append('ip forwarding\n')
         if node.enable_ipv6:
