@@ -345,7 +345,7 @@ class ICMPProbeService(MonitoringService):
     _shutdown = ("> /tmp/icmp_probe_lo.stop", "> /tmp/icmp_probe_if.stop",)
     _validate = ()
     # TODO: wait for IGP to converge before starting to scan
-    #_starttime = 300
+    _starttime = 120
 
     @classmethod
     def generateconfig(cls, node, filename, services):
@@ -640,3 +640,147 @@ agentXSocket    tcp:localhost:705
 
 addservice(SNMPDService)
 
+class DNSProbeService(MonitoringService):
+    _name = "DNSProbe"
+    _depends = ("Cron",)
+    _configs = (
+            'start_dns_probe.sh',
+            'dns_probe.sh',
+            'dns_probe.hosts',
+            )
+    _dirs = ()
+    _startup = (
+            "rm -f /tmp/dns_probe.stop",
+            "bash start_dns_probe.sh",
+            )
+    _shutdown = ("> /tmp/dns_probe.stop", "> /tmp/dns_probe_if.stop",)
+    _validate = ()
+    # TODO: wait for IGP to converge before starting to scan
+    _starttime = 120
+
+    @classmethod
+    def generateconfig(cls, node, filename, services):
+        if filename == 'start_dns_probe.sh':
+            return cls.generateStart(node)
+        elif filename == 'dns_probe.sh':
+            return cls.generateConf(node)
+        elif filename == 'dns_probe.hosts':
+            return cls.generateHosts(node)
+
+    @staticmethod
+    def generateStart(node):
+        confstr =  """\
+#!/bin/bash
+
+grep -v "dns_probe.sh" /etc/crontab && echo "*/5 * * * * root (cd $(pwd); bash $(pwd)/dns_probe.sh)" >> /etc/crontab
+
+bash ./dns_probe.sh &
+"""
+        return confstr
+
+    @staticmethod
+    def generateConf(node):
+        confstr =  """\
+#!/bin/bash
+
+set -e
+
+error=0
+now=$(date +%Y%m%d-%H%M)
+mkdir -p dns_probe
+out=dns_probe/dns_probe.result.${now}
+
+cmd="nice -n19 dig "
+cmd_suffix="+short"
+
+abort() {
+    echo "ERROR"
+    echo "error with query: $query - type: $recordtype" >> ${out}
+    error=1
+}
+
+toLower()
+{
+    echo "$1" | tr '[:upper:]' '[:lower:]'
+}
+
+if [ \! -e /tmp/dns_probe.stop ]; then
+    > ${out}
+fi
+
+while IFS= read -r line; do
+    set -- $line
+    query=$1
+    recordtype=$2
+    answer=$3
+    echo -n "query: $recordtype $query... "
+    result=$($cmd $recordtype $query $cmd_suffix)
+    [ -z $result ] && abort
+    if [ \! "$answer" == "$result" ]; then
+        abort
+    else
+        echo "OK."
+    fi
+done < <(cat dns_probe.hosts)
+
+[ $error -eq 0 ] && echo "all ok" > ${out}
+
+
+"""
+        return confstr
+
+    @staticmethod
+    def generateHosts(node):
+        confstr_list =  []
+        service_helpers.nodewalker(node, node, confstr_list,
+                DNSProbeService.nodewalker_callback)
+        return ''.join(confstr_list)
+
+    @staticmethod
+    def nodewalker_callback(startnode, currentnode):
+        result = []
+
+        hostname = '%s.AS%s.virtual' % (currentnode.name,
+                str(currentnode.netid))
+
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            result.extend([hostname, ' AAAA ',
+                    str(currentnode.getLoopbackIPv6()), '\n'])
+            # TODO: in order to check PTR records, convert IP addr to PTR-style
+            #result.extend([str(currentnode.getLoopbackIPv6()), ' PTR ',
+            #        hostname, '\n'])
+
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            result.extend([hostname, ' A ',
+                    str(currentnode.getLoopbackIPv4()), '\n'])
+            # TODO: in order to check PTR records, convert IP addr to PTR-style
+            #result.extend([str(currentnode.getLoopbackIPv4()), ' PTR ',
+            #        hostname, '\n'])
+
+        if currentnode.enable_ipv4 and startnode.enable_ipv4:
+            for intf in currentnode._netif.values():
+                if hasattr(intf, 'control') and intf.control == True:
+                    continue
+                for addr in intf.addrlist:
+                    if isIPv4Address(addr):
+                        result.extend(['%s.%s' % (intf.name, hostname), ' A ',
+                                addr.partition('/')[0], '\n'])
+                        # TODO: in order to check PTR records, convert IP addr to PTR-style
+                        #result.extend([addr.partition('/')[0], ' PTR ',
+                        #        '%s.%s' % (intf.name, hostname), '\n'])
+
+        if currentnode.enable_ipv6 and startnode.enable_ipv6:
+            for intf in currentnode._netif.values():
+                if hasattr(intf, 'control') and intf.control == True:
+                    continue
+                for addr in intf.addrlist:
+                    if isIPv6Address(addr):
+                        result.extend(['%s.%s' % (intf.name, hostname),
+                                ' AAAA ', addr.partition('/')[0], '\n'])
+                        # TODO: in order to check PTR records, convert IP addr to PTR-style
+                        #result.extend([addr.partition('/')[0], ' PTR ',
+                        #        '%s.%s' % (intf.name, hostname), '\n'])
+
+        return result
+
+addservice(DNSProbeService)
