@@ -515,12 +515,7 @@ class Ospfv3(QuaggaService):
             if node.netid == net_netif.node.netid:
                 if service_flags.Router in net_netif.node.services:
                     cfg.append('  interface %s area 0.0.0.0\n' % ifc.name)
-                for a in ifc.addrlist:
-                    if not isIPv6Address(a):
-                        continue
-                    cfg.append('  area 0.0.0.0 range %s\n' % a)
 
-        cfg.append('  area 0.0.0.0 range %s/128\n' % node.getLoopbackIPv6())
         return cfg
 
     @classmethod
