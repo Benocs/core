@@ -84,9 +84,9 @@ class Zebra(CoreService):
         if node.enable_ipv6:
             cfg.append('  ipv6 address %s/128\n' % node.getLoopbackIPv6())
         if node.enable_ipv4:
-            cfg += 'ip forwarding\n'
+            cfg.append('ip forwarding\n')
         if node.enable_ipv6:
-            cfg += 'ipv6 forwarding\n'
+            cfg.append('ipv6 forwarding\n')
 
         for s in services:
             if cls._name not in s._depends:
