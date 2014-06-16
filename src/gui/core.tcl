@@ -108,6 +108,11 @@ source "$LIBDIR/exceptions.tcl"
 #
 set node_list {}
 set link_list {}
+# this sets: arrayName(key)
+set netid_subnet_map_max_subnets_ipv4 256
+set netid_subnet_map_max_subnets_ipv6 4096
+array set netid_subnet_map_ipv4 {}
+array set netid_subnet_map_ipv6 {}
 set annotation_list {}
 set canvas_list {}
 set eid e0
