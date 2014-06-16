@@ -25,6 +25,7 @@ import ipaddress
 
 from core.constants import *
 from core.misc.netid import NetIDNodeMap
+from core.misc.netid import NetIDSubnetMap
 
 AF_INET = socket.AF_INET
 AF_INET6 = socket.AF_INET6
@@ -339,8 +340,10 @@ class Interface():
         global_interface_prefix = Interface.getInterfaceNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_interface_prefix).split('/')
 
+        subnet_id = NetIDSubnetMap.register_netid(netid, ipversion)
+
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
-        target_network_baseaddr = baseprefix.minaddr() + ((netid - 1) * (baseprefix.numaddr() + 2))
+        target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
         target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
         return target_network_prefix
 
@@ -403,8 +406,10 @@ class Loopback():
         global_loopback_prefix = Loopback.getLoopbackNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_loopback_prefix).split('/')
 
+        subnet_id = NetIDSubnetMap.register_netid(netid, ipversion)
+
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
-        target_network_baseaddr = baseprefix.minaddr() + ((netid - 1) * (baseprefix.numaddr() + 2))
+        target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
         target_network_prefix = ipprefix_cls('%s/%d' % (target_network_baseaddr, local_prefixlen))
         return target_network_prefix
 
