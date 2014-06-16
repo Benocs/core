@@ -58,6 +58,7 @@
 
 proc findFreeIPv6Net { netid mask } {
     global g_prefs node_list
+    global netid_subnet_map_max_subnets_ipv6 netid_subnet_map_ipv6
 
     # TODO(robert): add missing check if /64 and /54 subnets overlap
 
@@ -108,10 +109,28 @@ proc findFreeIPv6Net { netid mask } {
     # newnet now consists of the first two bytes of the final address
     set newnet [lrange $newnet 0 $endidx]
 
-    # set netid as the fourth byte - leaving the third byte as 0
-    # TODO(robert): implement netid<-->ipnetwork mapping
+    #
+    # netid<-->subnet mapping
+    #
+    set net_candidate [expr $netid % $netid_subnet_map_max_subnets_ipv6]
+    set cnt 0
+
+    while { [info exists netid_subnet_map_ipv6($net_candidate)] &&
+            $netid_subnet_map_ipv6($net_candidate) != $netid &&
+            $cnt < $netid_subnet_map_max_subnets_ipv6} {
+        set net_candidate [expr ($net_candidate + 1) % $netid_subnet_map_max_subnets_ipv6]
+        incr cnt
+    }
+
+    if { $cnt == $netid_subnet_map_max_subnets_ipv6 } {
+        tk_messageBox -message "Error. Cannot assign an IPv6 subnet for netid: $netid. All available subnets have been assigned." -type ok -icon error
+        return 1
+    }
+
+    set netid_subnet_map_ipv6($net_candidate) $netid
+
+    set subnet $net_candidate
     # tcl/tk does not know anything about hex. use decimal instead m(
-    set subnet [expr ($netid - 1) % 256]
     lappend newnet [format %x ${subnet}]
 
     if { $mask == 64 } {
