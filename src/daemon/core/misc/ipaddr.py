@@ -36,6 +36,7 @@ import random
 import ipaddress
 
 from core.constants import *
+from core.misc.netid import NetIDNodeMap
 
 AF_INET = socket.AF_INET
 AF_INET6 = socket.AF_INET6
@@ -284,23 +285,6 @@ def isIPv6Address(addrstr):
     if isinstance(addrstr, IPAddr):
         addrstr = str(addrstr)
     return isIPAddress(AF_INET6, addrstr)
-
-class NetIDNodeMap():
-    # key: netid (as int) - value: current node count of that netid.
-    # first node is assigned id 1
-    mapping = {}
-
-    @staticmethod
-    def register_node(nodeid, netid):
-        if not netid in NetIDNodeMap.mapping:
-            NetIDNodeMap.mapping[netid] = {}
-        if not nodeid in NetIDNodeMap.mapping[netid]:
-            if len(list(NetIDNodeMap.mapping[netid].values())) == 0:
-                NetIDNodeMap.mapping[netid][nodeid] = 1
-            else:
-                NetIDNodeMap.mapping[netid][nodeid] = max(NetIDNodeMap.mapping[netid].values()) + 1
-
-        return NetIDNodeMap.mapping[netid][nodeid]
 
 class Interface():
     @staticmethod

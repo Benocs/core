@@ -20,7 +20,7 @@ from core.misc.ipaddr import IPPrefix, isIPAddress
 from core.misc.ipaddr import IPv4Addr, IPv4Prefix, isIPv4Address
 from core.misc.ipaddr import IPv6Addr, IPv6Prefix, isIPv6Address
 from core.misc.ipaddr import Loopback, Interface
-from core.misc.ipaddr import NetIDNodeMap
+from core.misc.netid import NetIDNodeMap
 from core.api import coreapi
 from core.constants import *
 
