@@ -117,18 +117,18 @@ proc findFreeIPv6Net { netid mask } {
     if { $mask == 64 } {
         # tcl/tk does not know anything about hex. use decimal instead m(
         for { set i 0 } { $i <= 65535 } { incr i } {
-            if {[lsearch $ipnets_64 "$newnet [format %X ${i}]"] == -1} {
+            if {[lsearch $ipnets_64 "$newnet [format %x ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:[format %X ${i}]::1"
+                set ipnet "${newnetcolon}:[format %x ${i}]::1"
                 return $ipnet
             }
         }
     } elseif { $mask == 54 } {
         # tcl/tk does not know anything about hex. use decimal instead m(
         for { set i 65535 } { $i > 0 } { set i [expr {$i - 1}] } {
-            if {[lsearch $ipnets_54 "$newnet [format %X ${i}]"] == -1} {
+            if {[lsearch $ipnets_54 "$newnet [format %x ${i}]"] == -1} {
                 set newnetcolon [join $newnet :]
-                set ipnet "${newnetcolon}:[format %X ${i}]::1"
+                set ipnet "${newnetcolon}:[format %x ${i}]::1"
                 return $ipnet
             }
         }
@@ -199,10 +199,10 @@ proc autoIPv6addr { node iface } {
         set net [ipv6ToNet [lindex $peer_ip6addrs 0] $netmaskbits]
         set targetbyte 1
 
-        set ipaddr $net\::[format %X ${targetbyte}]
+        set ipaddr $net\::[format %x ${targetbyte}]
         while { [lsearch $peer_ip6addrs $ipaddr] >= 0 } {
             incr targetbyte
-            set ipaddr $net\::[format %X ${targetbyte}]
+            set ipaddr $net\::[format %x ${targetbyte}]
         }
     } else {
         set ipaddr [findFreeIPv6Net [getNodeNetId $node] $netmaskbits]
