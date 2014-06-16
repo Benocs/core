@@ -87,6 +87,7 @@ proc dumpputs {method dest string} {
 
 proc dumpCfg {method dest} {
     global node_list plot_list link_list canvas_list annotation_list
+    global netid_subnet_map_ipv4
 
     global g_comments
     if { [info exists g_comments] && $g_comments != "" } {
@@ -211,6 +212,15 @@ proc dumpCfg {method dest} {
     # session options
     dumpputs $method $dest "option session \{"
     foreach kv [getSessionOptionsList] { dumpputs $method $dest "    $kv" }
+    dumpputs $method $dest "\}"
+    dumpputs $method $dest ""
+
+    # netid_subnet_map_ipv4
+    dumpputs $method $dest "option netid_subnet_map_ipv4 \{"
+    foreach name [array names netid_subnet_map_ipv4] {
+        # prints "netid subnet"
+        dumpputs $method $dest "    $netid_subnet_map_ipv4($name) $name"
+    }
     dumpputs $method $dest "\}"
     dumpputs $method $dest ""
 }
