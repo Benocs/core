@@ -139,8 +139,8 @@ class Topology():
             base_addr = IPv6Addr(str(self.__ipaddrs__['ipv6_interface_net'].prefix.network_address))
 
             # calculate base addr for this AS
-            as_base_addr = IPv6Addr(base_addr.addr + (base_prefix.prefix.num_addresses * max(0, (asn -
-                1))))
+            as_base_prefix = ipaddr.Interface.getInterfaceNet_per_net(asn, 6)
+            as_base_addr = IPv6Addr(as_base_prefix.prefix.network_address)
 
             as_prefix = IPv6Prefix('%s/%s' % (str(as_base_addr),
                 self.__ipaddrs__['ipv6_interface_net_per_netid']))
@@ -207,8 +207,8 @@ class Topology():
             base_addr = IPv4Addr(str(self.__ipaddrs__['ipv4_interface_net'].prefix.network_address))
 
             # calculate base addr for this AS
-            as_base_addr = IPv4Addr(base_addr.addr + (base_prefix.prefix.num_addresses * max(0, (asn -
-                1))))
+            as_base_prefix = ipaddr.Interface.getInterfaceNet_per_net(asn, 4)
+            as_base_addr = IPv4Addr(as_base_prefix.prefix.network_address)
             #print('[DEBUG] base prefix: %s' % str(base_prefix))
             #print('[DEBUG] base prefix num addr: %s' % str(base_prefix.prefix.num_addresses))
             #print('[DEBUG] ASN - 1: %d' % (asn - 1))
