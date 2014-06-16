@@ -59,6 +59,7 @@
 
 proc findFreeIPv4Net { netid mask } {
     global g_prefs node_list
+    global netid_subnet_map_max_subnets_ipv4 netid_subnet_map_ipv4
 
     # TODO(robert): add missing check if /24 and /30 subnets overlap
 
@@ -109,8 +110,28 @@ proc findFreeIPv4Net { netid mask } {
     set default_ipaddr_byte_4 1
 
     set ipaddr_byte_1 $default_ipaddr_byte_1
-    # TODO(robert): implement netid<-->ipnetwork mapping
-    set ipaddr_byte_2 [expr ($netid - 1) % 256]
+
+    #
+    # netid<-->subnet mapping
+    #
+    set net_candidate [expr $netid % $netid_subnet_map_max_subnets_ipv4]
+    set cnt 0
+
+    while { [info exists netid_subnet_map_ipv4($net_candidate)] &&
+            $netid_subnet_map_ipv4($net_candidate) != $netid &&
+            $cnt < $netid_subnet_map_max_subnets_ipv4} {
+        set net_candidate [expr ($net_candidate + 1) % $netid_subnet_map_max_subnets_ipv4]
+        incr cnt
+    }
+
+    if { $cnt == $netid_subnet_map_max_subnets_ipv4 } {
+        tk_messageBox -message "Error. Cannot assign an IPv4 subnet for netid: $netid. All available subnets have been assigned." -type ok -icon error
+        return 1
+    }
+
+    set netid_subnet_map_ipv4($net_candidate) $netid
+
+    set ipaddr_byte_2 $net_candidate
     set ipaddr_byte_4 $default_ipaddr_byte_4
 
     if { $mask == 24 } {
