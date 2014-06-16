@@ -1,29 +1,17 @@
 #
 # CORE
 #
-# based on:
-#
 # Copyright (c)2010-2012 the Boeing Company.
-# See the LICENSE-BOEING file included in this distribution.
+# See the LICENSE.BOEING file included in this distribution.
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
-# Copyright (C) 2014 Robert Wuttke <robert@benocs.com>
+# Copyright (C) 2014 Benocs GmbH
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# author: Robert Wuttke <robert@benocs.com>
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
+# See the LICENSE file included in this distribution.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
 
 '''
 ipaddr.py: helper objects for dealing with IPv4/v6 addresses.
