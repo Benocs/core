@@ -110,7 +110,9 @@ proc findFreeIPv6Net { netid mask } {
 
     # set netid as the fourth byte - leaving the third byte as 0
     # TODO(robert): implement netid<-->ipnetwork mapping
-    lappend newnet [expr ($netid - 1) % 256]
+    # tcl/tk does not know anything about hex. use decimal instead m(
+    set subnet [expr ($netid - 1) % 256]
+    lappend newnet [format %x ${subnet}]
 
     if { $mask == 64 } {
         # tcl/tk does not know anything about hex. use decimal instead m(
