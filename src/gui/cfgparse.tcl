@@ -390,12 +390,15 @@ proc setGlobalOption { field value } {
 # reset global vars when opening a new file
 proc cleanupGUIState {} {
     global node_list link_list plot_list canvas_list annotation_list
+    global netid_subnet_map_ipv4 netid_subnet_map_ipv6
     global mac_addr_start g_comments
     global g_traffic_flows g_traffic_start_opt g_hook_scripts
     global g_view_locked
 
     set node_list {}
     set link_list {}
+    array set netid_subnet_map_ipv4 {}
+    array set netid_subnet_map_ipv6 {}
     set annotation_list {}
     set plot_list {}
     set canvas_list {}
