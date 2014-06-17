@@ -62,3 +62,14 @@ class NetIDSubnetMap():
         NetIDSubnetMap.__mapping__[ipfam][net_candidate] = netid
 
         return net_candidate
+
+    @staticmethod
+    def __repr__():
+        outlist = []
+        for ipfam in 4, 6:
+            outlist.append('netid_subnet_map %d {\n' % ipfam)
+            for subnet, netid in  NetIDSubnetMap.__mapping__[ipfam].items():
+                outlist.append('    %d %d\n' % (netid, subnet))
+            outlist.append('}\n\n')
+
+        return ''.join(outlist)
