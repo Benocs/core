@@ -424,6 +424,7 @@ proc cleanupGUIState {} {
 
 proc loadCfg { cfg } {
     global node_list plot_list link_list canvas_list annotation_list
+    global netid_subnet_map_ipv4 netid_subnet_map_ipv6
     global g_traffic_flows g_traffic_start_opt g_hook_scripts
     global g_view_locked
     global g_comments
@@ -454,6 +455,8 @@ proc loadCfg { cfg } {
 		lappend plot_list $object
             } elseif {"$class" == "option"} {
 		# do nothing
+            } elseif {"$class" == "netid_subnet_map"} {
+                # do nothing here
 	    } elseif {"$class" == "traffic"} { ;# save traffic flows
 		set g_traffic_flows [split [string trim $object] "\n"]
 		set class ""; set object ""; continue
@@ -506,7 +509,17 @@ proc loadCfg { cfg } {
 		set value [lindex $line 1]
 		set line [lreplace $line 0 1]
 
-		if {"$class" == "node"} {
+		if {"$class" == "netid_subnet_map"} {
+                    puts "class: $class -- object: $object -- netid: $field -- subnet: $value"
+		    switch -exact -- $object {
+                        4 {
+                            set netid_subnet_map_ipv4($value) $field
+                        }
+                        6 {
+                            set netid_subnet_map_ipv6($value) $field
+                        }
+                    }
+                } elseif {"$class" == "node"} {
 		    switch -exact -- $field {
 			type {
 			    lappend $object "type $value"
