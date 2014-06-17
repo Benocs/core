@@ -171,6 +171,13 @@ class TopologyWriterImune(TopologyWriter):
                         localinterface.get_name(), remotenode.nodeid))
 
     @staticmethod
+    def __write_netid_subnet_map__(fd, topology=None):
+        if topology is None:
+            raise ValueError('refusing to write a topology without any topology')
+
+        fd.write(topology.netid_subnet_map.__repr__())
+
+    @staticmethod
     def __write_nodes__(fd, nodes=None, links=None):
         if nodes is None:
             raise ValueError('refusing to write a topology without any nodes')
@@ -219,6 +226,7 @@ class TopologyWriterImune(TopologyWriter):
         filename = '%s.%s' % (filename, TopologyWriterImune.FILE_EXTENSION)
 
         with open(filename, 'w') as fd:
+            TopologyWriterImune.__write_netid_subnet_map__(fd, topology)
             TopologyWriterImune.__write_nodes__(fd, topology.get_nodes(),
                     topology.get_links())
             TopologyWriterImune.__write_links__(fd, topology.get_links())
