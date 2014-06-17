@@ -510,7 +510,6 @@ proc loadCfg { cfg } {
 		set line [lreplace $line 0 1]
 
 		if {"$class" == "netid_subnet_map"} {
-                    puts "class: $class -- object: $object -- netid: $field -- subnet: $value"
 		    switch -exact -- $object {
                         4 {
                             set netid_subnet_map_ipv4($value) $field
