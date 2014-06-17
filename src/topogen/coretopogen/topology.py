@@ -18,6 +18,7 @@ from core.misc.ipaddr import IPPrefix, IPv4Prefix, IPv6Prefix
 from core.misc.ipaddr import isIPAddress, isIPv4Address, isIPv6Address
 
 from core.misc import ipaddr
+from core.misc.netid import NetIDSubnetMap
 
 from coretopogen.nodes import *
 
@@ -28,6 +29,9 @@ class Topology():
 
     __bookkeeping__ = None
     __nodes_augmentations__ = None
+
+
+    netid_subnet_map = NetIDSubnetMap
 
     # set node-model to match model in nodes.conf - this specifies defaults
     __nodemodel_map__ = {
