@@ -397,8 +397,8 @@ proc cleanupGUIState {} {
 
     set node_list {}
     set link_list {}
-    array set netid_subnet_map_ipv4 {}
-    array set netid_subnet_map_ipv6 {}
+    array unset netid_subnet_map_ipv4
+    array unset netid_subnet_map_ipv6
     set annotation_list {}
     set plot_list {}
     set canvas_list {}
