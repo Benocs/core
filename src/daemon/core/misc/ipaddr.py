@@ -76,7 +76,8 @@ class IPAddr(object):
             else:
                 raise ValueError("invalid af/addr")
         except:
-            raise ValueError("invalid af/addr")
+            raise ValueError("invalid af/addr: \"%s\", \"%s\"" % (str(af),
+                    str(addr)))
 
         self.af = af
         self.addr = tmp
