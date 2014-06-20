@@ -69,6 +69,21 @@ class NetIDSubnetMap():
         return net_candidate
 
     @staticmethod
+    def get_map_string(session):
+        if not session in NetIDSubnetMap.__mapping__:
+            raise ValueError(('session: "%s" not found in NetIDSubnetMap' %
+                    str(session)))
+        outlist = []
+
+        for ipfam in 4, 6:
+            outlist.append(('netid_subnet_map %d {\n' % (ipfam)))
+            for subnet, netid in NetIDSubnetMap.__mapping__[session][ipfam].items():
+                outlist.append('    %d %d\n' % (netid, subnet))
+            outlist.append('}\n\n')
+
+        return ''.join(outlist)
+
+    @staticmethod
     def __repr__():
         outlist = []
         for session, sessionmap in NetIDSubnetMap.__mapping__.items():
