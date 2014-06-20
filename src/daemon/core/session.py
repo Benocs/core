@@ -29,6 +29,7 @@ from core.location import CoreLocation
 from core.service import CoreServices
 from core.broker import CoreBroker
 from core.mobility import MobilityManager
+from core.netidsubnetmap import NetIDSubnetMapManager
 from core.sdt import Sdt
 from core.misc.ipaddr import MacAddr
 from core.misc.event import EventLoop
@@ -86,6 +87,7 @@ class Session(object):
         self.broker = CoreBroker(session=self, verbose=True)
         self.location = CoreLocation(self)
         self.mobility = MobilityManager(self)
+        self.netidmanager = NetIDSubnetMapManager(self)
         self.services = CoreServices(self)
         self.emane = emane.Emane(self)
         self.xen = xenconfig.XenConfigManager(self)
@@ -908,6 +910,11 @@ class Session(object):
         replies = []
         nn = 0
         ni = 0
+        # send NetIDSubnetMap
+        msgs = self.netidmanager.toconfmsgs(flags=0, nodenum=-1,
+                typeflags=coreapi.CONF_TYPE_FLAGS_UPDATE)
+        replies.extend(msgs)
+
         # send node messages for node and network objects
         with self._objslock:
             for obj in self.objs():
