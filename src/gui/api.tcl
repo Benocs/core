@@ -2691,6 +2691,34 @@ proc shutdownSession {} {
     sendEmulationServerInfo $sock 1
 }
 
+proc sendNetidSubnetMap { sock } {
+    global netid_subnet_map_ipv4 netid_subnet_map_ipv6
+
+    set obj "netid_subnet_map_ipv4"
+    set types {}
+    set values {}
+
+    foreach subnet [array names netid_subnet_map_ipv4] {
+        lappend types 3
+        lappend types 3
+        lappend values $subnet
+        lappend values $netid_subnet_map_ipv4($subnet)
+    }
+    sendConfReplyMessage $sock -1 $obj $types $values ""
+
+    set obj "netid_subnet_map_ipv6"
+    set types {}
+    set values {}
+
+    foreach subnet [array names netid_subnet_map_ipv6] {
+        lappend types 3
+        lappend types 3
+        lappend values $subnet
+        lappend values $netid_subnet_map_ipv6($subnet)
+    }
+    sendConfReplyMessage $sock -1 $obj $types $values ""
+}
+
 # inform the CORE services about the canvas information to support
 # conversion between X,Y and lat/long coordinates
 proc sendCanvasInfo { sock } {
