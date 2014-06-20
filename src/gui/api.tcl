@@ -2410,7 +2410,14 @@ proc sendConfReplyMessage { channel node model types values opaque } {
     # types (16-bit values) and values
     set n 0
     set type_len [expr {[llength $types] * 2} ]
-    set type_data [binary format cc 4 $type_len]
+
+    if { $type_len > 255 } {
+        set type_data [binary format ccS 4 0 $type_len]
+        set type_hdr_len 4
+    } else {
+        set type_data [binary format cc 4 $type_len]
+        set type_hdr_len 2
+    }
     set value_data ""
     foreach type $types {
 	set t [binary format S $type]
@@ -2447,7 +2454,7 @@ proc sendConfReplyMessage { channel node model types values opaque } {
     }
     if { $opaque_len > 0 } { incr len $opaque_len }
     # types TLV, values TLV
-    incr len [expr {2 + $type_len + $type_pad_len + $value_len}]
+    incr len [expr {$type_hdr_len + $type_len + $type_pad_len + $value_len}]
 
     # header, node node number, node model header
     set msgh [binary format c2S {5 0} $len ]
