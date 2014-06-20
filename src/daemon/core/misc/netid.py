@@ -11,16 +11,19 @@ class NetIDNodeMap():
     mapping = {}
 
     @staticmethod
-    def register_node(nodeid, netid):
-        if not netid in NetIDNodeMap.mapping:
-            NetIDNodeMap.mapping[netid] = {}
-        if not nodeid in NetIDNodeMap.mapping[netid]:
-            if len(list(NetIDNodeMap.mapping[netid].values())) == 0:
-                NetIDNodeMap.mapping[netid][nodeid] = 1
+    def register_node(session, nodeid, netid):
+        if not session in NetIDNodeMap.mapping:
+            NetIDNodeMap.mapping[session] = {}
+        if not netid in NetIDNodeMap.mapping[session]:
+            NetIDNodeMap.mapping[session][netid] = {}
+        if not nodeid in NetIDNodeMap.mapping[session][netid]:
+            if len(list(NetIDNodeMap.mapping[session][netid].values())) == 0:
+                NetIDNodeMap.mapping[session][netid][nodeid] = 1
             else:
-                NetIDNodeMap.mapping[netid][nodeid] = max(NetIDNodeMap.mapping[netid].values()) + 1
+                NetIDNodeMap.mapping[session][netid][nodeid] = \
+                        max(NetIDNodeMap.mapping[session][netid].values()) + 1
 
-        return NetIDNodeMap.mapping[netid][nodeid]
+        return NetIDNodeMap.mapping[session][netid][nodeid]
 
 class NetIDSubnetMap():
     """
@@ -33,12 +36,15 @@ class NetIDSubnetMap():
     __max_subnets_ipv4__ = 0x100
     __max_subnets_ipv6__ = 0x10000
 
-    __mapping__ = {4:{}, 6:{}}
+    __mapping__ = {}
 
     @staticmethod
-    def register_netid(netid, ipfam=4):
+    def register_netid(session, netid, ipfam=4):
         if not ipfam == 4 and not ipfam == 6:
             raise ValueError("Invalid IP version: '%s'" % ipfam)
+
+        if not session in NetIDSubnetMap.__mapping__:
+            NetIDSubnetMap.__mapping__[session] = {4:{}, 6:{}}
 
         if ipfam == 4:
             max_subnets = NetIDSubnetMap.__max_subnets_ipv4__
@@ -47,10 +53,9 @@ class NetIDSubnetMap():
 
         net_candidate = netid % max_subnets
 
-
         cnt = 0
-        while net_candidate in NetIDSubnetMap.__mapping__[ipfam] and \
-                not NetIDSubnetMap.__mapping__[ipfam][net_candidate] == netid:
+        while net_candidate in NetIDSubnetMap.__mapping__[session][ipfam] and \
+                not NetIDSubnetMap.__mapping__[session][ipfam][net_candidate] == netid:
             net_candidate = ((net_candidate + 1) % max_subnets)
 
             # failsafe switch in case no more subnets can be assigned
@@ -59,17 +64,19 @@ class NetIDSubnetMap():
                 raise ValueError('There are no more free subnets available')
 
         # if we reach this, then no errors were encountered
-        NetIDSubnetMap.__mapping__[ipfam][net_candidate] = netid
+        NetIDSubnetMap.__mapping__[session][ipfam][net_candidate] = netid
 
         return net_candidate
 
     @staticmethod
     def __repr__():
         outlist = []
-        for ipfam in 4, 6:
-            outlist.append('netid_subnet_map %d {\n' % ipfam)
-            for subnet, netid in  NetIDSubnetMap.__mapping__[ipfam].items():
-                outlist.append('    %d %d\n' % (netid, subnet))
-            outlist.append('}\n\n')
+        for session, sessionmap in NetIDSubnetMap.__mapping__.items():
+            for ipfam in 4, 6:
+                outlist.append(('netid_subnet_map session: %d %d {\n' %
+                    (ipfam, session)))
+                for subnet, netid in sessionmap[ipfam].items():
+                    outlist.append('    %d %d\n' % (netid, subnet))
+                outlist.append('}\n\n')
 
         return ''.join(outlist)
