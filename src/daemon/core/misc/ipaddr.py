@@ -278,7 +278,7 @@ def isIPv6Address(addrstr):
 
 class Interface():
     @staticmethod
-    def cfg_sanitation_checks(ipversion=4):
+    def cfg_sanitation_checks(ipversion):
         interface_net = 'ipv%d_interface_net' % ipversion
         interface_net_per_netid = 'ipv%d_interface_net_per_netid' % ipversion
         interface_net_per_ptp_link = 'ipv%d_interface_net_per_ptp_link' % \
@@ -295,7 +295,7 @@ class Interface():
             raise ValueError('Could not read ipaddrs.conf')
 
     @staticmethod
-    def getInterfaceNet(ipversion=4):
+    def getInterfaceNet(ipversion):
         Interface.cfg_sanitation_checks(ipversion=ipversion)
 
         interface_net = 'ipv%d_interface_net' % ipversion
@@ -319,7 +319,7 @@ class Interface():
         return global_interface_prefix
 
     @staticmethod
-    def getInterfaceNet_per_net(session, netid, ipversion=4):
+    def getInterfaceNet_per_net(session, netid, ipversion):
         Interface.cfg_sanitation_checks(ipversion=ipversion)
 
         interface_net = 'ipv%d_interface_net' % ipversion
@@ -350,7 +350,7 @@ class Interface():
 
 class Loopback():
     @staticmethod
-    def cfg_sanitation_checks(ipversion=4):
+    def cfg_sanitation_checks(ipversion):
         loopback_net = 'ipv%d_loopback_net' % ipversion
         loopback_net_per_netid = 'ipv%d_loopback_net_per_netid' % ipversion
 
@@ -361,7 +361,7 @@ class Loopback():
             raise ValueError('Could not read ipaddrs.conf')
 
     @staticmethod
-    def getLoopbackNet(ipversion=4):
+    def getLoopbackNet(ipversion):
         Loopback.cfg_sanitation_checks(ipversion=ipversion)
 
         loopback_net = 'ipv%d_loopback_net' % ipversion
@@ -385,7 +385,7 @@ class Loopback():
         return global_loopback_prefix
 
     @staticmethod
-    def getLoopbackNet_per_net(session, netid, ipversion=4):
+    def getLoopbackNet_per_net(session, netid, ipversion):
         Loopback.cfg_sanitation_checks(ipversion=ipversion)
 
         loopback_net = 'ipv%d_loopback_net' % ipversion
@@ -415,7 +415,7 @@ class Loopback():
         return target_network_prefix
 
     @staticmethod
-    def getLoopback(node, ipversion=4):
+    def getLoopback(node, ipversion):
         Loopback.cfg_sanitation_checks(ipversion=ipversion)
 
         if hasattr(node, 'netid') and not node.netid is None:
