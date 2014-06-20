@@ -318,7 +318,7 @@ class Interface():
         return global_interface_prefix
 
     @staticmethod
-    def getInterfaceNet_per_net(netid, ipversion=4):
+    def getInterfaceNet_per_net(session, netid, ipversion=4):
         Interface.cfg_sanitation_checks(ipversion=ipversion)
 
         interface_net = 'ipv%d_interface_net' % ipversion
@@ -340,7 +340,7 @@ class Interface():
         global_interface_prefix = Interface.getInterfaceNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_interface_prefix).split('/')
 
-        subnet_id = NetIDSubnetMap.register_netid(netid, ipversion)
+        subnet_id = NetIDSubnetMap.register_netid(session, netid, ipversion)
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
         target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
@@ -384,7 +384,7 @@ class Loopback():
         return global_loopback_prefix
 
     @staticmethod
-    def getLoopbackNet_per_net(netid, ipversion=4):
+    def getLoopbackNet_per_net(session, netid, ipversion=4):
         Loopback.cfg_sanitation_checks(ipversion=ipversion)
 
         loopback_net = 'ipv%d_loopback_net' % ipversion
@@ -406,7 +406,7 @@ class Loopback():
         global_loopback_prefix = Loopback.getLoopbackNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_loopback_prefix).split('/')
 
-        subnet_id = NetIDSubnetMap.register_netid(netid, ipversion)
+        subnet_id = NetIDSubnetMap.register_netid(session, netid, ipversion)
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
         target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
@@ -426,7 +426,8 @@ class Loopback():
 
         target_network_prefix =  Loopback.getLoopbackNet_per_net(netid, ipversion)
 
-        nodeid = NetIDNodeMap.register_node(node.nodeid(), netid)
+        nodeid = NetIDNodeMap.register_node(node.session.sessionid,
+                node.nodeid(), netid)
         addr = target_network_prefix.addr(nodeid)
         #node.info('[LOOPBACK] generated addr for node: %s: %s' % (node.name, str(addr)))
 

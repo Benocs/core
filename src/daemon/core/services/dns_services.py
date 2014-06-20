@@ -409,7 +409,7 @@ class Bind9(DNSServices):
             print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
 
             # get all deployed ASN's
-            asns = list(NetIDNodeMap.mapping.keys())
+            asns = list(NetIDNodeMap.mapping[node.session.sessionid].keys())
             print(('[DEBUG] deployed ASN\'s: %s' % asns))
             for net in loopback_net, interface_net:
                 zonename = cls.getPTRZoneNameFromPrefix(cls, net)
@@ -423,9 +423,11 @@ class Bind9(DNSServices):
                 for asn in asns:
                     # get AS address space
                     if net == loopback_net:
-                        asn_net = Loopback.getLoopbackNet_per_net(asn, ipversion)
+                        asn_net = Loopback.getLoopbackNet_per_net(\
+                                node.session.sessionid, asn, ipversion)
                     elif net == interface_net:
-                        asn_net = Interface.getInterfaceNet_per_net(asn, ipversion)
+                        asn_net = Interface.getInterfaceNet_per_net(\
+                                node.session.sessionid, asn, ipversion)
 
                     # find authoritative AS dns servers
                     # zone == "AS%s.virtual." % str(netid)
@@ -524,11 +526,13 @@ class Bind9(DNSServices):
 
         for ipversion in node.getIPversions():
             # collect loopback address space
-            loopback_net = Loopback.getLoopbackNet_per_net(netid, ipversion)
+            loopback_net = Loopback.getLoopbackNet_per_net(\
+                    node.session.sessionid, netid, ipversion)
             print(('[DEBUG] loopback_net IPv%d: %s' % (ipversion, loopback_net)))
 
             # collect interface address space
-            interface_net = Interface.getInterfaceNet_per_net(netid, ipversion)
+            interface_net = Interface.getInterfaceNet_per_net(\
+                    node.session.sessionid, netid, ipversion)
             print(('[DEBUG] interface_net IPv%d: %s' % (ipversion, interface_net)))
 
             if ipversion == 4:

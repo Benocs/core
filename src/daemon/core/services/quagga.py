@@ -740,8 +740,10 @@ class Bgp(QuaggaService):
         cfg = ''.join(confstr_list)
 
         if node.enable_ipv4 and service_flags.EGP in node.services:
-            interface_net = Interface.getInterfaceNet_per_net(netid, 4)
-            loopback_net = Loopback.getLoopbackNet_per_net(netid, 4)
+            interface_net = Interface.getInterfaceNet_per_net(\
+                    node.session.sessionid, netid, 4)
+            loopback_net = Loopback.getLoopbackNet_per_net(\
+                    node.session.sessionid, netid, 4)
             cfg += '  network %s\n' % str(loopback_net)
             cfg += '  network %s\n' % str(interface_net)
             cfg += '  aggregate-address %s summary-only\n' % str(loopback_net)
@@ -760,8 +762,10 @@ class Bgp(QuaggaService):
             cfg += ''.join(v6cfg)
             if service_flags.EGP in node.services:
                 # announce networks
-                interface_net = Interface.getInterfaceNet_per_net(netid, 6)
-                loopback_net = Loopback.getLoopbackNet_per_net(netid, 6)
+                interface_net = Interface.getInterfaceNet_per_net(\
+                        node.session.sessionid, netid, 6)
+                loopback_net = Loopback.getLoopbackNet_per_net(\
+                        node.session.sessionid, netid, 6)
                 cfg += '    network %s\n' % str(loopback_net)
                 cfg += '    network %s\n' % str(interface_net)
                 cfg += '    aggregate-address %s summary-only\n' % str(loopback_net)
