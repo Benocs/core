@@ -54,6 +54,10 @@ class TopologyReaderDotOut(TopologyReader):
             #print(('[TopologyReaderDotOut] node pos: (%s, %s) -> (%s, %s)' %
             #        (str(node.get_position()[0]), str(node.get_position()[1]),
             #        str(x_pos), str(y_pos))))
-            node.set_position(x_pos, y_pos)
+            if not node is None:
+                node.set_position(x_pos, y_pos)
+            else:
+                print(('[TopologyReaderDotOut] cannot find a node with '
+                        'hostname: %s' % (str(hostname))))
 
         return True, existing_topology
