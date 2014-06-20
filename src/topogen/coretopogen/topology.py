@@ -43,18 +43,14 @@ class Topology():
     # read ipaddrs.conf, set mapping
     __ipaddrs__ = {
             'ipv4_loopback_net': ipaddr.Loopback.getLoopbackNet(4),
-            'ipv4_loopback_net_per_netid': ipaddr.Loopback.getLoopbackNet_per_net(0, 4).prefixlen,
             'ipv4_interface_net': ipaddr.Interface.getInterfaceNet(4),
-            'ipv4_interface_net_per_netid': ipaddr.Interface.getInterfaceNet_per_net(0, 4).prefixlen,
             # default
             'ipv4_interface_net_per_ptp_link': 30,
             # default
             'ipv4_interface_net_per_brdcst_link': 24,
 
             'ipv6_loopback_net': ipaddr.Loopback.getLoopbackNet(4),
-            'ipv6_loopback_net_per_netid': ipaddr.Loopback.getLoopbackNet_per_net(0, 6).prefixlen,
             'ipv6_interface_net': ipaddr.Interface.getInterfaceNet(6),
-            'ipv6_interface_net_per_netid': ipaddr.Interface.getInterfaceNet_per_net(0, 6).prefixlen,
             # default
             'ipv6_interface_net_per_ptp_link': 63,
             #default
@@ -138,25 +134,11 @@ class Topology():
         #raise NotImplementedError
 
         def get_as_addrs(asn):
-            base_prefix = IPv6Prefix('%s/%s' % (str(self.__ipaddrs__['ipv6_interface_net'].prefix.network_address),
-                str(self.__ipaddrs__['ipv6_interface_net_per_netid'])))
-            base_addr = IPv6Addr(str(self.__ipaddrs__['ipv6_interface_net'].prefix.network_address))
-
             # calculate base addr for this AS
-            as_base_prefix = ipaddr.Interface.getInterfaceNet_per_net(asn, 6)
-            as_base_addr = IPv6Addr(as_base_prefix.prefix.network_address)
-
-            as_prefix = IPv6Prefix('%s/%s' % (str(as_base_addr),
-                self.__ipaddrs__['ipv6_interface_net_per_netid']))
+            as_prefix = ipaddr.Interface.getInterfaceNet_per_net(-1, asn, 6)
+            as_base_addr = IPv6Addr(as_prefix.prefix.network_address)
             as_upper_addr = IPv6Addr(as_prefix.prefix.broadcast_address)
 
-            #print('[DEBUG] base prefix: %s' % str(base_prefix))
-            #print('[DEBUG] base prefix num addr: %s' % str(base_prefix.prefix.num_addresses))
-            #print('[DEBUG] ASN - 1: %d' % (asn - 1))
-            #rint('[DEBUG] AS base addr: %s' % str(as_base_addr))
-            #print('[DEBUG] as_prefix: %s' % str(as_prefix))
-            #print('[DEBUG] base addr: %s' % str(base_addr))
-            #print('[DEBUG] AS upper addr: %s' % str(as_upper_addr))
             return as_prefix, as_base_addr, as_upper_addr
 
         def get_next_as_link_number(asn, ptp):
@@ -206,24 +188,11 @@ class Topology():
     def __as_get_next_link_ipv4_prefix__(self, asn=1, ptp=True):
 
         def get_as_addrs(asn):
-            base_prefix = IPv4Prefix('%s/%s' % (str(self.__ipaddrs__['ipv4_interface_net'].prefix.network_address),
-                str(self.__ipaddrs__['ipv4_interface_net_per_netid'])))
-            base_addr = IPv4Addr(str(self.__ipaddrs__['ipv4_interface_net'].prefix.network_address))
-
             # calculate base addr for this AS
-            as_base_prefix = ipaddr.Interface.getInterfaceNet_per_net(asn, 4)
-            as_base_addr = IPv4Addr(as_base_prefix.prefix.network_address)
-            #print('[DEBUG] base prefix: %s' % str(base_prefix))
-            #print('[DEBUG] base prefix num addr: %s' % str(base_prefix.prefix.num_addresses))
-            #print('[DEBUG] ASN - 1: %d' % (asn - 1))
-            #print('[DEBUG] base addr: %s' % str(base_addr))
-            #print('[DEBUG] AS base addr: %s' % str(as_base_addr))
-
-            as_prefix = IPv4Prefix('%s/%s' % (str(as_base_addr),
-                self.__ipaddrs__['ipv4_interface_net_per_netid']))
-            #print('[DEBUG] as_prefix: %s' % str(as_prefix))
+            as_prefix = ipaddr.Interface.getInterfaceNet_per_net(-1, asn, 4)
+            as_base_addr = IPv4Addr(as_prefix.prefix.network_address)
             as_upper_addr = IPv4Addr(as_prefix.prefix.broadcast_address)
-            #print('[DEBUG] AS upper addr: %s' % str(as_upper_addr))
+
             return as_prefix, as_base_addr, as_upper_addr
 
         def get_next_as_link_number(asn, ptp):
