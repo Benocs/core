@@ -2572,6 +2572,7 @@ proc deployCfgAPI { sock } {
     sendNodeTypeInfo $sock 0
     # send any custom service info before the node messages
     sendNodeCustomServices $sock
+    sendNetidSubnetMap $sock
 
     # send Node add messages for all emulation nodes
     foreach node $node_list {
