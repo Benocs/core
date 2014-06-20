@@ -175,7 +175,7 @@ class TopologyWriterImune(TopologyWriter):
         if topology is None:
             raise ValueError('refusing to write a topology without any topology')
 
-        fd.write(topology.netid_subnet_map.__repr__())
+        fd.write(topology.netid_subnet_map.get_map_string(-1))
 
     @staticmethod
     def __write_nodes__(fd, nodes=None, links=None):
