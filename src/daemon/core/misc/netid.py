@@ -11,19 +11,19 @@ class NetIDNodeMap():
     mapping = {}
 
     @staticmethod
-    def register_node(session, nodeid, netid):
-        if not session in NetIDNodeMap.mapping:
-            NetIDNodeMap.mapping[session] = {}
-        if not netid in NetIDNodeMap.mapping[session]:
-            NetIDNodeMap.mapping[session][netid] = {}
-        if not nodeid in NetIDNodeMap.mapping[session][netid]:
-            if len(list(NetIDNodeMap.mapping[session][netid].values())) == 0:
-                NetIDNodeMap.mapping[session][netid][nodeid] = 1
+    def register_node(sessionid, nodeid, netid):
+        if not sessionid in NetIDNodeMap.mapping:
+            NetIDNodeMap.mapping[sessionid] = {}
+        if not netid in NetIDNodeMap.mapping[sessionid]:
+            NetIDNodeMap.mapping[sessionid][netid] = {}
+        if not nodeid in NetIDNodeMap.mapping[sessionid][netid]:
+            if len(list(NetIDNodeMap.mapping[sessionid][netid].values())) == 0:
+                NetIDNodeMap.mapping[sessionid][netid][nodeid] = 1
             else:
-                NetIDNodeMap.mapping[session][netid][nodeid] = \
-                        max(NetIDNodeMap.mapping[session][netid].values()) + 1
+                NetIDNodeMap.mapping[sessionid][netid][nodeid] = \
+                        max(NetIDNodeMap.mapping[sessionid][netid].values()) + 1
 
-        return NetIDNodeMap.mapping[session][netid][nodeid]
+        return NetIDNodeMap.mapping[sessionid][netid][nodeid]
 
 class NetIDSubnetMap():
     """
@@ -39,12 +39,12 @@ class NetIDSubnetMap():
     __mapping__ = {}
 
     @staticmethod
-    def register_netid(session, netid, ipfam=4):
+    def register_netid(sessionid, netid, ipfam=4):
         if not ipfam == 4 and not ipfam == 6:
             raise ValueError("Invalid IP version: '%s'" % ipfam)
 
-        if not session in NetIDSubnetMap.__mapping__:
-            NetIDSubnetMap.__mapping__[session] = {4:{}, 6:{}}
+        if not sessionid in NetIDSubnetMap.__mapping__:
+            NetIDSubnetMap.__mapping__[sessionid] = {4:{}, 6:{}}
 
         if ipfam == 4:
             max_subnets = NetIDSubnetMap.__max_subnets_ipv4__
@@ -54,8 +54,8 @@ class NetIDSubnetMap():
         net_candidate = netid % max_subnets
 
         cnt = 0
-        while net_candidate in NetIDSubnetMap.__mapping__[session][ipfam] and \
-                not NetIDSubnetMap.__mapping__[session][ipfam][net_candidate] == netid:
+        while net_candidate in NetIDSubnetMap.__mapping__[sessionid][ipfam] and \
+                not NetIDSubnetMap.__mapping__[sessionid][ipfam][net_candidate] == netid:
             net_candidate = ((net_candidate + 1) % max_subnets)
 
             # failsafe switch in case no more subnets can be assigned
@@ -64,20 +64,20 @@ class NetIDSubnetMap():
                 raise ValueError('There are no more free subnets available')
 
         # if we reach this, then no errors were encountered
-        NetIDSubnetMap.__mapping__[session][ipfam][net_candidate] = netid
+        NetIDSubnetMap.__mapping__[sessionid][ipfam][net_candidate] = netid
 
         return net_candidate
 
     @staticmethod
-    def get_map_string(session):
-        if not session in NetIDSubnetMap.__mapping__:
-            raise ValueError(('session: "%s" not found in NetIDSubnetMap' %
-                    str(session)))
+    def get_map_string(sessionid):
+        if not sessionid in NetIDSubnetMap.__mapping__:
+            raise ValueError(('sessionid: "%s" not found in NetIDSubnetMap' %
+                    str(sessionid)))
         outlist = []
 
         for ipfam in 4, 6:
             outlist.append(('netid_subnet_map %d {\n' % (ipfam)))
-            for subnet, netid in NetIDSubnetMap.__mapping__[session][ipfam].items():
+            for subnet, netid in NetIDSubnetMap.__mapping__[sessionid][ipfam].items():
                 outlist.append('    %d %d\n' % (netid, subnet))
             outlist.append('}\n\n')
 
@@ -86,10 +86,10 @@ class NetIDSubnetMap():
     @staticmethod
     def __repr__():
         outlist = []
-        for session, sessionmap in NetIDSubnetMap.__mapping__.items():
+        for sessionid, sessionmap in NetIDSubnetMap.__mapping__.items():
             for ipfam in 4, 6:
-                outlist.append(('netid_subnet_map session: %d %d {\n' %
-                    (ipfam, session)))
+                outlist.append(('netid_subnet_map sessionid: %d %d {\n' %
+                    (ipfam, sessionid)))
                 for subnet, netid in sessionmap[ipfam].items():
                     outlist.append('    %d %d\n' % (netid, subnet))
                 outlist.append('}\n\n')
