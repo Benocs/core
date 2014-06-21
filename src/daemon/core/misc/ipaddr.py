@@ -385,7 +385,7 @@ class Loopback():
         return global_loopback_prefix
 
     @staticmethod
-    def getLoopbackNet_per_net(session, netid, ipversion):
+    def getLoopbackNet_per_net(sessionid, netid, ipversion):
         Loopback.cfg_sanitation_checks(ipversion=ipversion)
 
         loopback_net = 'ipv%d_loopback_net' % ipversion
@@ -407,7 +407,7 @@ class Loopback():
         global_loopback_prefix = Loopback.getLoopbackNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_loopback_prefix).split('/')
 
-        subnet_id = NetIDSubnetMap.register_netid(session, netid, ipversion)
+        subnet_id = NetIDSubnetMap.register_netid(sessionid, netid, ipversion)
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
         target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
