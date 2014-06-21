@@ -56,11 +56,8 @@ class BaseNetIDSubnetMap(Configurable):
         super().__init__(self, session, objid)
         self.verbose = verbose
 
-        print(('[%s] values: %s' % (self._name, str(values))))
-
     @classmethod
     def cfg_callback(cls, session, msg):
-        print(('[%s] msg: %s' % (cls._name, str(msg))))
         values_str = msg.gettlv(coreapi.CORE_TLV_CONF_VALUES)
         if not values_str is None:
             if not session in NetIDSubnetMap.__mapping__:
@@ -72,13 +69,10 @@ class BaseNetIDSubnetMap(Configurable):
                 NetIDSubnetMap.__mapping__[session][cls.__ipversion__] = {}
 
             values = values_str.split('|')
-            print(('[%s] values: %s' % (cls._name, str(values))))
             idx = 0
             while (idx+1) < len(values):
                 subnet = int(values[idx])
                 netid = int(values[idx+1])
-                print(('[%d] subnet: %d -- netid: %d' % (cls._name, subnet,
-                        netid)))
                 NetIDSubnetMap.__mapping__[session][cls.__ipversion__][subnet] = netid
                 idx += 2
 
