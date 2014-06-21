@@ -425,7 +425,8 @@ class Loopback():
             node.warn('[LOOPBACK] no ASN found. falling back to default (0)')
             netid = 0
 
-        target_network_prefix =  Loopback.getLoopbackNet_per_net(netid, ipversion)
+        target_network_prefix =  Loopback.getLoopbackNet_per_net(
+                node.session.sessionid, netid, ipversion)
 
         nodeid = NetIDNodeMap.register_node(node.session.sessionid,
                 node.nodeid(), netid)
