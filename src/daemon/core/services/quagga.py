@@ -100,11 +100,6 @@ class Zebra(CoreService):
         if node.enable_ipv6:
             cfg.append('ipv6 forwarding\n')
 
-        for s in services:
-            if cls._name not in s._depends:
-                continue
-            #    cfg += s.generatequaggaloconfig(node)
-            s.generateQuaggaConf(node, services)
         return ''.join(cfg)
 
     @classmethod
@@ -164,7 +159,7 @@ class QuaggaService(CoreService):
 
     @classmethod
     def generateconfig(cls,  node, filename, services):
-        return ''
+        return cls.generatequaggaconfig(node)
 
     @classmethod
     def generatequaggaloconfig(cls, node):
@@ -190,23 +185,6 @@ class QuaggaService(CoreService):
                 result.extend(callback(node, ifc))
         return result
 
-    @classmethod
-    def generateQuaggaConf(cls, node, services):
-        ''' Returns configuration file text. Other services that depend on zebra
-           will have generatequaggaifcconfig() and generatequaggaconfig()
-           hooks that are invoked here.
-        '''
-        cfg = ''
-
-        #for s in services:
-        #    if cls._name not in s._depends:
-        #        continue
-        cfg = cls.generatequaggaconfig(node)
-        #node.nodefile('/etc/%s.conf' % cls._daemonname, cfg)
-        node.nodefile('/etc/quagga/%s.conf' % cls._daemonname, cfg)
-        node.cmd(['ln', '-s', '/etc/quagga/%s.conf' % cls._daemonname,
-                '/etc/%s.conf' % cls._daemonname])
-
     @staticmethod
     def addrstr(x):
         ''' helper for mapping IP addresses to zebra config statements
@@ -228,6 +206,7 @@ class Ospfv2(QuaggaService):
     _daemonname = 'ospfd'
     #_startup = ('sh quaggaboot.sh ospfd',)
     #_shutdown = ('killall ospfd', )
+    _configs = ('/etc/quagga/ospfd.conf',)
     _validate = ('pidof ospfd', )
     _ipv4_routing = True
     #_starttime = 10
@@ -355,6 +334,7 @@ class Ospfv3(QuaggaService):
     _daemonname = 'ospf6d'
     #_startup = ('sh quaggaboot.sh ospf6d',)
     #_shutdown = ('killall ospf6d', )
+    _configs = ('/etc/quagga/ospf6d.conf',)
     _validate = ('pidof ospf6d', )
     _ipv4_routing = True
     _ipv6_routing = True
@@ -521,6 +501,7 @@ class Bgp(QuaggaService):
     _daemonname = 'bgpd'
     #_startup = ('sh quaggaboot.sh bgpd',)
     #_shutdown = ('killall bgpd', )
+    _configs = ('/etc/quagga/bgpd.conf',)
     _validate = ('pidof bgpd', )
     _custom_needed = False
     _ipv4_routing = True
@@ -741,6 +722,7 @@ class Rip(QuaggaService):
     _daemonname = 'ripd'
     #_startup = ('sh quaggaboot.sh ripd',)
     #_shutdown = ('killall ripd', )
+    _configs = ('/etc/quagga/ripd.conf',)
     _validate = ('pidof ripd', )
     _ipv4_routing = True
     #_starttime = 10
@@ -767,6 +749,7 @@ class Ripng(QuaggaService):
     _daemonname = 'ripngd'
     #_startup = ('sh quaggaboot.sh ripngd',)
     #_shutdown = ('killall ripngd', )
+    _configs = ('/etc/quagga/ripngd.conf',)
     _validate = ('pidof ripngd', )
     _ipv6_routing = True
     #_starttime = 10
@@ -794,6 +777,7 @@ class Babel(QuaggaService):
     _daemonname = 'babeld'
     #_startup = ('sh quaggaboot.sh babeld',)
     #_shutdown = ('killall babeld', )
+    _configs = ('/etc/quagga/babeld.conf',)
     _validate = ('pidof babeld', )
     _ipv6_routing = True
     #_starttime = 10
@@ -826,6 +810,7 @@ class ISIS(QuaggaService):
     _daemonname = 'isisd'
     #_startup = ('sh quaggaboot.sh isisd',)
     #_shutdown = ('killall isisd', )
+    _configs = ('/etc/quagga/isisd.conf',)
     _validate = ('pidof isisd', )
     _ipv4_routing = True
     _ipv6_routing = True
@@ -1005,6 +990,7 @@ class Vtysh(CoreService):
     #_startup = ('sh quaggaboot.sh vtysh',)
     _shutdown = ()
     #_starttime = 30
+    _configs = ('/etc/quagga/vtysh.conf',)
 
     @classmethod
     def generateconfig(cls, node, filename, services):
