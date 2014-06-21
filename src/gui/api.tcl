@@ -1803,7 +1803,7 @@ proc sendNodeAddMessage { channel node } {
     }
 
     # services
-    set svc [getNodeServices $node false]
+    set svc [getNodeServices $node true]
     set svc [join $svc "|"]
     set svc_len [string length $svc]
     set svc_pad_len [pad_32bit $svc_len]
