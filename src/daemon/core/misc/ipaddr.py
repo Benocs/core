@@ -319,7 +319,7 @@ class Interface():
         return global_interface_prefix
 
     @staticmethod
-    def getInterfaceNet_per_net(session, netid, ipversion):
+    def getInterfaceNet_per_net(sessionid, netid, ipversion):
         Interface.cfg_sanitation_checks(ipversion=ipversion)
 
         interface_net = 'ipv%d_interface_net' % ipversion
@@ -341,7 +341,7 @@ class Interface():
         global_interface_prefix = Interface.getInterfaceNet(ipversion)
         global_prefixbase, global_prefixlen = str(global_interface_prefix).split('/')
 
-        subnet_id = NetIDSubnetMap.register_netid(session, netid, ipversion)
+        subnet_id = NetIDSubnetMap.register_netid(sessionid, netid, ipversion)
 
         baseprefix = ipprefix_cls('%s/%d' % (global_prefixbase, local_prefixlen))
         target_network_baseaddr = baseprefix.minaddr() + ((subnet_id) * (baseprefix.numaddr() + 2))
