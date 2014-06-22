@@ -2935,6 +2935,7 @@ proc sendNodeLinkDefinitions { sock } {
     global node_list link_list annotation_list canvas_list eventtypes
     global g_comments
     #sendEventMessage $sock $eventtypes(definition_state) -1 "" "" 0
+    sendNetidSubnetMap $sock
     foreach node $node_list {
 	sendNodeAddMessage $sock $node
 	pluginCapsInitialize $node "mobmodel"
