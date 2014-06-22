@@ -950,9 +950,10 @@ class Bind9(DNSServices):
             # add plain hostname
             server_name = currentnode.name
             for ipversion in currentnode.getIPversions():
-                server_addr = currentnode.getLoopback(ipversion)
-                server_addr = str(server_addr).partition('/')[0]
-                hosts.append((server_name, server_addr, zone))
+                if ipversion in startnode.getIPversions():
+                    server_addr = currentnode.getLoopback(ipversion)
+                    server_addr = str(server_addr).partition('/')[0]
+                    hosts.append((server_name, server_addr, zone))
 
             # add all interface names
             for intf in list(currentnode._netif.values()):
@@ -969,9 +970,11 @@ class Bind9(DNSServices):
                     if v6addr is None and isIPv6Address(addr):
                         v6addr = addr
 
-                if not v4addr is None:
+                if not v4addr is None and 4 in currentnode.getIPversions() and \
+                        4 in startnode.getIPversions():
                     hosts.append((server_name, v4addr, zone))
-                if not v6addr is None:
+                if not v6addr is None and 6 in currentnode.getIPversions() and \
+                        6 in startnode.getIPversions():
                     hosts.append((server_name, v6addr, zone))
 
         return hosts
