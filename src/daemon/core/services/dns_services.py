@@ -641,26 +641,6 @@ class Bind9(DNSServices):
         cls.cfg_add_item(cfgitems, ['options', 'listen-on-v6'], 'any;')
         cls.cfg_add_item(cfgitems, ['options', 'allow-query'], 'any;')
 
-        cls.cfg_add_item(cfgitems, 'logging')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                'file "/var/log/named.log" size 10m;')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                '//                      stderr;')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                'severity info;')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                'print-time yes;')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                'print-severity yes;')
-        cls.cfg_add_item(cfgitems, ['logging', 'channel default_file'],
-                'print-category yes;')
-        cls.cfg_add_item(cfgitems, ['logging', 'category default'],
-                'default_file;')
-        cls.cfg_add_item(cfgitems, ['logging', 'category queries'],
-                'default_file;')
-        cls.cfg_add_item(cfgitems, ['logging', 'category resolver'],
-                'default_file;')
-
         return cfgitems
 
     @staticmethod
