@@ -1,7 +1,7 @@
 #
 # topology_writer_dot - writes a topology in DOT format
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

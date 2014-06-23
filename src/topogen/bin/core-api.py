@@ -2,9 +2,9 @@
 
 # core-api - a CORE api wrapper
 #
-# Copyright (C) 2014 Robert Wuttke <flash@jpod.cc>
+# Copyright (c) 2014 Robert Wuttke <flash@jpod.cc>
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

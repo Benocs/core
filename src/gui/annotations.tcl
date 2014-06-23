@@ -28,6 +28,14 @@
 # SUCH DAMAGE.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 #****h* imunes/annotations.tcl
 # NAME
 #  annotations.tcl -- oval, rectangle, text, background, ...

@@ -5,6 +5,14 @@
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 quagga.py: helper class for generating Quagga configuration.
 '''

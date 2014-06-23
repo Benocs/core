@@ -1,9 +1,4 @@
 #
-# Copyright 2014 Benocs GmbH <robert@benocs.com>
-# See the LICENSE file included in this distribution.
-#
-
-#
 # Copyright 2005-2013 the Boeing Company.
 # See the LICENSE file included in this distribution.
 #
@@ -34,6 +29,14 @@
 #
 # This work was supported in part by Croatian Ministry of Science
 # and Technology through the research contract #IP-2003-143.
+#
+
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
 #
 
 #****h* imunes/ipv4.tcl

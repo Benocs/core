@@ -5,6 +5,12 @@
 #
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 ''' PhysicalNode class for including real systems in the emulated network.
 '''
 import os, threading, subprocess

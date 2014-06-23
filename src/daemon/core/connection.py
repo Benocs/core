@@ -1,10 +1,11 @@
 #
 # helper classes for clients to interact with CORE via its API
 #
-# Copyright (C) 2014 Benocs GmbH.
-# See the LICENSE file included in this distribution.
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
 #
 
 import sys

@@ -1,7 +1,7 @@
 #
 # topology_writer_imune - writes a topology in IMUNE format
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

@@ -1,7 +1,7 @@
 #
 # topology_readwriter - base classes for parsing and writing network topologies
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

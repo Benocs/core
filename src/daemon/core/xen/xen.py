@@ -3,6 +3,12 @@
 # Copyright (c)2011-2012 the Boeing Company.
 # See the LICENSE file included in this distribution.
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 '''
 xen.py: implementation of the XenNode and XenVEth classes that support 
 generating Xen domUs based on an ISO image and persistent configuration area

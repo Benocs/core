@@ -1,7 +1,7 @@
 #
 # topology_writer_as_info - writes a list of AS's and their nodes of a topology
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

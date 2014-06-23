@@ -1,7 +1,7 @@
 #
 # topology_generator - classes for building network topologies
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

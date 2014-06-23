@@ -7,6 +7,14 @@
 # Support for managing CORE plugins from the GUI.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 # possible types of plugins, indicating messaging type
 array set g_plugin_types {
 	0 "none"

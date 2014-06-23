@@ -6,6 +6,14 @@
 # authors: Tom Goff <thomas.goff@boeing.com>
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 coreapi.py: uses coreapi_data for Message and TLV types, and defines TLV data
 types and objects used for parsing and building CORE API messages.

@@ -31,6 +31,15 @@
 # and Technology through the research contract #IP-2003-143.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# authors: Robert Wuttke <robert@benocs.com>
+#          Jonathan Weber <jweber@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 #****h* imunes/editor.tcl
 # NAME
 #  editor.tcl -- file used for defining functions that can be used in

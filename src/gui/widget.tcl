@@ -4,6 +4,14 @@
 #
 
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
+#
 # Widgets are defined in this array.
 # widget array: name, {config, init, periodic, move}
 #

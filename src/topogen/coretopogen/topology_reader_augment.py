@@ -1,7 +1,7 @@
 #
 # topology_reader_augment - classes that augment a given topology with new nodes
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

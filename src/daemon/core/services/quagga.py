@@ -5,6 +5,14 @@
 #
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 quagga.py: defines routing services provided by Quagga.
 '''

@@ -1,5 +1,10 @@
 # Copyright (c)2010-2012 the Boeing Company.
 # See the LICENSE file included in this distribution.
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# See the LICENSE file included in this distribution.
+#
 
 """core
 

@@ -31,6 +31,14 @@
 # and Technology through the research contract #IP-2003-143.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 #****h* imunes/cfgparse.tcl
 # NAME
 #  cfgparse.tcl -- file used for parsing the configuration

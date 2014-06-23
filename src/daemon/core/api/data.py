@@ -5,22 +5,14 @@
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
-# Copyright (C) 2014 Robert Wuttke <robert@benocs.com>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# Copyright (c) 2014 Benocs GmbH
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
+# author: Robert Wuttke <robert@benocs.com>
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# See the LICENSE file included in this distribution.
 #
+
 '''
 data.py: constant definitions for the CORE API, enumerating the
 different message and TLV types (these constants are also found in coreapi.h)

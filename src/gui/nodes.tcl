@@ -7,6 +7,14 @@
 # GUI support for node types and profiles.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 global execMode
 if { $execMode == "interactive" } {
     package require Ttk

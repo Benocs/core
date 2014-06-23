@@ -5,6 +5,13 @@
 #
 # author:	Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 
 # version of the API document that is used
 set CORE_API_VERSION 1.22

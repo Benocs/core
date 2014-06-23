@@ -5,6 +5,13 @@
 #
 # authors: core-dev@pf.itd.nrl.navy.mil 
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 netgraph.py: Netgraph helper functions; for now these are wrappers around
 ngctl commands.

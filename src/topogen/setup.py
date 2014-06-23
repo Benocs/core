@@ -1,4 +1,10 @@
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
 # See the LICENSE file included in this distribution.
+#
 
 import os, glob
 from distutils.core import setup

@@ -2,7 +2,7 @@
 # nodes - classes for managing network nodes
 #         without needing to have a connection to a core-session
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

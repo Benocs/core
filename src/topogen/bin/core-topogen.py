@@ -3,7 +3,7 @@
 #
 # brite2core - an ad-hoc topology converter and enhancer from BRITE to CORE
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

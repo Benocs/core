@@ -1,7 +1,7 @@
 #
 # topology_writer_dot - writes a list of edges of a topology
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

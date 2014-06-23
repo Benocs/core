@@ -31,6 +31,14 @@
 # and Technology through the research contract #IP-2003-143.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 #****h* imunes/linkcfg.tcl
 # NAME
 #  linkcfg.tcl -- file used for manipultaion with links in IMUNES

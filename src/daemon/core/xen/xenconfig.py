@@ -5,6 +5,12 @@
 #
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 '''
 xenconfig.py: Implementation of the XenConfigManager class for managing
 configurable items for XenNodes.

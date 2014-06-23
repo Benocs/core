@@ -31,6 +31,14 @@
 # and Technology through the research contract #IP-2003-143.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 if {[lindex $argv 0] == "-b" || [lindex $argv 0] == "--batch"} {
     set argv [lrange $argv 1 end]
     set execMode batch

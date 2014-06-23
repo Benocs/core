@@ -6,7 +6,7 @@
 #
 # author: Tom Goff <thomas.goff@boeing.com>
 #
-# Copyright (C) 2014 Benocs GmbH
+# Copyright (c) 2014 Benocs GmbH
 #
 # author: Robert Wuttke <robert@benocs.com>
 #

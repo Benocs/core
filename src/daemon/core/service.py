@@ -5,6 +5,14 @@
 #
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 service.py: definition of CoreService class that is subclassed to define
 startup services and routing for nodes. A service is typically a daemon

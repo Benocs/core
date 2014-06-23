@@ -5,6 +5,7 @@
 #
 # authors: Tom Goff <thomas.goff@boeing.com>
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
+#          Robert Wuttke <robert@benocs.com>
 #
 '''
 coreobj.py: defines the basic objects for emulation: the PyCoreObj base class,

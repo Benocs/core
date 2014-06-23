@@ -5,6 +5,12 @@
 #
 # author: Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 '''
 broker.py: definition of CoreBroker class that is part of the
 pycore session object. Handles distributing parts of the emulation out to

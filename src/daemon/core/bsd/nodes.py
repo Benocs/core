@@ -5,6 +5,13 @@
 #
 # author: core-dev@pf.itd.nrl.navy.mil
 #
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
 
 '''
 nodes.py: definition of CoreNode classes and other node classes that inherit

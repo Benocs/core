@@ -3,6 +3,14 @@
 # See the LICENSE file included in this distribution.
 #
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 set g_imageFileTypes {{"images" {.gif}} {"images" {.jpg}} {"images" {.png}}
 			{"images" {.bmp}} {"images" {.pcx}} {"images" {.tga}}
 			{"images" {.tif}} {"images" {.ps}} {"images" {.ppm}}
