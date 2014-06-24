@@ -69,6 +69,15 @@ class NetIDSubnetMap():
         return net_candidate
 
     @staticmethod
+    def clear_map(sessionid):
+        if not sessionid in NetIDSubnetMap.__mapping__:
+            raise ValueError(('sessionid: "%s" not found in NetIDSubnetMap' %
+                    str(sessionid)))
+        for key in NetIDSubnetMap.__mapping__[sessionid].keys():
+            del(NetIDSubnetMap.__mapping__[sessionid][key])
+        del(NetIDSubnetMap.__mapping__[sessionid])
+
+    @staticmethod
     def get_map_string(sessionid):
         if not sessionid in NetIDSubnetMap.__mapping__:
             raise ValueError(('sessionid: "%s" not found in NetIDSubnetMap' %
