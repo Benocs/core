@@ -67,20 +67,22 @@ class BaseNetIDSubnetMap(Configurable):
     def cfg_callback(cls, session, msg):
         values_str = msg.gettlv(coreapi.CORE_TLV_CONF_VALUES)
         if not values_str is None:
-            if not session in NetIDSubnetMap.__mapping__:
-                NetIDSubnetMap.__mapping__[session] = {}
-                NetIDSubnetMap.__mapping__[session][4] = {}
-                NetIDSubnetMap.__mapping__[session][6] = {}
+            if not session.sessionid in NetIDSubnetMap.__mapping__:
+                NetIDSubnetMap.__mapping__[session.sessionid] = {}
+                NetIDSubnetMap.__mapping__[session.sessionid][4] = {}
+                NetIDSubnetMap.__mapping__[session.sessionid][6] = {}
             # clear old map
             else:
-                NetIDSubnetMap.__mapping__[session][cls.__ipversion__] = {}
+                NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__] = {}
 
             values = values_str.split('|')
             idx = 0
             while (idx+1) < len(values):
                 subnet = int(values[idx])
                 netid = int(values[idx+1])
-                NetIDSubnetMap.__mapping__[session][cls.__ipversion__][subnet] = netid
+                print(('[%s] subnet: %d -- netid: %d' % (cls._name, subnet,
+                        netid)))
+                NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__][subnet] = netid
                 idx += 2
 
     @classmethod
@@ -95,7 +97,7 @@ class BaseNetIDSubnetMap(Configurable):
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_TYPE,
                 typeflags)
         datatypes = tuple(cls.__data_type__
-                for x in NetIDSubnetMap.__mapping__[session][cls.__ipversion__])
+                for x in NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__])
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_DATA_TYPES,
                 datatypes)
         values_str = '|'.join(str(x) for x in d.values())
