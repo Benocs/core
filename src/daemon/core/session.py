@@ -133,6 +133,7 @@ class Session(object):
         self.broker.shutdown()
         self.sdt.shutdown()
         self.delobjs()
+        self.netidmanager.clear()
         preserve = False
         if hasattr(self.options, 'preservedir'):
             if self.options.preservedir == '1':
