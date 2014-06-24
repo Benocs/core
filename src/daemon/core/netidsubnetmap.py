@@ -80,8 +80,6 @@ class BaseNetIDSubnetMap(Configurable):
             while (idx+1) < len(values):
                 subnet = int(values[idx])
                 netid = int(values[idx+1])
-                print(('[%s] subnet: %d -- netid: %d' % (cls._name, subnet,
-                        netid)))
                 NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__][subnet] = netid
                 idx += 2
 
