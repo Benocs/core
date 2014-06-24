@@ -27,6 +27,12 @@ class NetIDSubnetMapManager(ConfigurableManager):
             self.session.addconfobj(m._name, m._type, m.cfg_callback)
 
     @classmethod
+    def clear(cls):
+        models = [NetIDSubnetMapIPv4, NetIDSubnetMapIPv6]
+        for m in models:
+            m.clear_session(cls.session)
+
+    @classmethod
     def toconfmsg(cls, flags, nodenum, typeflags, values):
         raise NotImplementedError("use toconfmsgs() instead")
 
@@ -76,6 +82,10 @@ class BaseNetIDSubnetMap(Configurable):
                 netid = int(values[idx+1])
                 NetIDSubnetMap.__mapping__[session][cls.__ipversion__][subnet] = netid
                 idx += 2
+
+    @classmethod
+    def clear_session(cls, session):
+        NetIDSubnetMap.clear_map(session.sessionid)
 
     @classmethod
     def toconfmsg(cls, flags, nodenum, typeflags, values, session):
