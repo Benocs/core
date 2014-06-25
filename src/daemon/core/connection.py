@@ -231,10 +231,10 @@ class CoreConnection():
     requested_session = None
     requested_session_connected = None
 
-    def __init__(self, persistent = True):
+    def __init__(self, persistent = False):
         self.session = pycore.Session(persistent = persistent)
-        self.session.verbose = True
-        self.session.broker.verbose = True
+        self.session.verbose = False
+        self.session.broker.verbose = False
         # TODO: mv to config-file
         self.session.cfg['clientlogfile'] = '/var/log/core-client.log'
 
