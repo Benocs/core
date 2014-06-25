@@ -1023,7 +1023,8 @@ proc connectShutdownSession { cmd channel sid fn } {
 
     switch -exact -- $cmd {
 	connect {
-	    newFile
+            # newFile disconnects, reconnects to the daemon
+	    set channel [newFile]
 	    # start a new session and return
 	    if { $sid == 0 } {
 		return
