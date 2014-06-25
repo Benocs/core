@@ -49,6 +49,7 @@ class Session(object):
     # sessions that get automatically shutdown when the process
     # terminates normally
     __sessions = set()
+    verbose = False
 
     ''' CORE session manager.
     '''
@@ -91,7 +92,7 @@ class Session(object):
         if not persistent:
             self.addsession(self)
         self.master = False
-        self.broker = CoreBroker(session=self, verbose=True)
+        self.broker = CoreBroker(session=self, verbose=self.verbose)
         self.location = CoreLocation(self)
         self.mobility = MobilityManager(self)
         self.netidmanager = NetIDSubnetMapManager(self)
@@ -118,8 +119,9 @@ class Session(object):
     def atexit(cls):
         while cls.__sessions:
             s = cls.__sessions.pop()
-            print(("WARNING: automatically shutting down " \
-                "non-persistent session %s" % s.sessionid), file = sys.stderr)
+            if cls.verbose:
+                print(("WARNING: automatically shutting down " \
+                    "non-persistent session %s" % s.sessionid), file = sys.stderr)
             s.shutdown()
 
     def __del__(self):
