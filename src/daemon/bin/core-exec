@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+
+# core-exec - execute commands within a virtual node
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
+import optparse
+import os
+import random
+import sys
+import time
+
+from core.api import coreapi
+from core.connection import CoreConnection
+from core.connection import msg_types
+from core.connection import TLVHelper
+from core.misc.utils import hexdump
+
+class ExecManager():
+
+    __MAX_SEQNO__ = 0xffffffff
+    __open_requests__ = None
+    __last_request__ = None
+
+    def __init__(self, opt):
+        self.__open_requests__ = {}
+        self.__last_request__ = -1
+
+        self.verbose = opt.verbose
+
+        self.connection = CoreConnection()
+        self.connection.set_server(opt.host, opt.port)
+        try:
+            self.connection.connect()
+        except Exception as exc:
+            print("[ERROR] Could not connect to server: %s" % exc)
+            sys.exit(2)
+
+        self.connection.msg_handler.set_msg_callback(coreapi.CORE_API_EXEC_MSG,
+                self.exec_callback)
+        self.connectSession(str(opt.session))
+
+    def registerExecRequest(self, cmd):
+        self.__last_request__ = int((self.__last_request__ * time.time() *
+                random.randint(0, 1000)) % self.__MAX_SEQNO__)
+        self.__open_requests__[self.__last_request__] = cmd
+        return self.__last_request__
+
+    def getCmdForNum(self, num):
+        if num in self.__open_requests__:
+            return self.__open_requests__.pop(num)
+        else:
+            return None
+
+    def pendingRequests(self):
+        if len(self.__open_requests__) > 0:
+            return True
+        else:
+            return False
+
+    def executeCmd(self, node, args):
+        data = (['execute', 'flags=txt', 'num',
+                str(self.registerExecRequest(' '.join(args))),
+                'node', node, 'cmd', ' '.join(args)])
+
+        result, msg_cls, flags, tlv_data = \
+                TLVHelper.parse_tlv_stringlist(data)
+        msg = msg_cls.pack(flags, tlv_data)
+        self.connection.socket.sendall(msg)
+
+    def exec_callback(self, msg):
+        cmd_num = int(msg.gettlv(coreapi.CORE_TLV_EXEC_NUM))
+        cmd_result = msg.gettlv(coreapi.CORE_TLV_EXEC_RESULT)
+        cmd = self.getCmdForNum(cmd_num)
+        if not cmd is None:
+            if self.verbose:
+                print('$ %s' % cmd)
+            if cmd_result.endswith('\n'):
+                print(cmd_result, end='')
+            else:
+                print(cmd_result)
+
+    def connectSession(self, sessionid):
+        data = "session flags=add number %s" % str(sessionid)
+        result, msg_cls, flags, tlv_data = \
+                TLVHelper.parse_tlv_stringlist(data.split())
+        msg = msg_cls.pack(flags, tlv_data)
+        self.connection.socket.sendall(msg)
+
+if __name__ == "__main__" or __name__ == "__builtin__":
+
+    def usage(umsg=None, err=0):
+        sys.stdout.write("\n")
+        if umsg:
+            sys.stdout.write("%s\n" % (str(umsg)))
+        parser.print_help()
+        sys.exit(err)
+
+    usagestr = ("usage: %prog [-h|--help] [options] [--] <cmd [cmd args]>")
+    parser = optparse.OptionParser(usage=usagestr)
+    parser.set_defaults(port=coreapi.CORE_API_PORT,
+                                            host="localhost",
+                                            session=None,
+                                            interval=0,
+                                            timeout=10,
+                                            verbose=False)
+
+    parser.add_option("-p", "--port", dest="port", type=int,
+            help="port to connect to, default: %d" % parser.defaults['port'])
+    parser.add_option("-a", "--host", dest="host", type=str,
+            help="Host to connect to, default: %s" % parser.defaults['host'])
+    parser.add_option("-s", "--session", dest="session", type=str,
+            help=("Session to join"))
+    parser.add_option("-n", "--node", dest="node", type=int,
+            help=("Node number to send cmd to."))
+    parser.add_option("-i", "--interval", dest="interval", type=int,
+            help=("Repeat cmd executions every N seconds."))
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
+            help=("be verbose"))
+    parser.add_option("-t", "--timeout", dest="timeout", type=int,
+            help=("Maximum time in seconds to wait for cmd result, "
+            "default: %d" % parser.defaults['timeout']))
+
+    # parse command line opt
+    (opt, args) = parser.parse_args()
+    if len(args) == 0:
+        usage(err=1)
+
+    # check if ENV is set. ENV will overwrite command-line switches
+    opt.host = os.getenv('CEX_HOST', opt.host)
+    opt.port = int(os.getenv('CEX_PORT', opt.port))
+    opt.session = os.getenv('CEX_SESSION', opt.session)
+    opt.node = int(os.getenv('CEX_NODE', opt.node))
+    opt.interval = int(os.getenv('CEX_INTERVAL', opt.interval))
+    opt.timeout = int(os.getenv('CEX_TIMEOUT', opt.timeout))
+
+    execmgr = ExecManager(opt)
+
+    # execute only once if no interval is specified
+    if opt.interval == 0:
+        execmgr.executeCmd(str(opt.node), args)
+        starttime = time.time()
+        while execmgr.pendingRequests() and \
+                time.time() < starttime + opt.timeout:
+            try:
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                print("CTRL+C pressed")
+                sys.exit(0)
+
+        if  execmgr.pendingRequests() and \
+                time.time() >= starttime + opt.timeout:
+            print('[WARNING] reached timeout. do not rely on any output')
+
+    # repeat, if repeat is enabled
+    while opt.interval > 0:
+        try:
+            execmgr.executeCmd(str(opt.node), args)
+            time.sleep(opt.interval)
+        except KeyboardInterrupt:
+            print("CTRL+C pressed")
+            sys.exit(0)
+
+    sys.exit(0)
