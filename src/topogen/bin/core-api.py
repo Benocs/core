@@ -84,7 +84,7 @@ if __name__ == "__main__" or __name__ == "__builtin__":
         sys.exit(2)
 
     if len(args) > 0:
-        usage(1)
+        usage(err=1)
 
     # serve forever (or until CTRL+C is pressed)
     while True:
