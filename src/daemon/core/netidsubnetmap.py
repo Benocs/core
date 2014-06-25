@@ -92,11 +92,13 @@ class BaseNetIDSubnetMap(Configurable):
                 cls._name)
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_TYPE,
                 typeflags)
-        datatypes = tuple(cls.__data_type__
+
+        datatypes = 2*tuple(cls.__data_type__
                 for x in NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__])
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_DATA_TYPES,
                 datatypes)
-        values_str = '|'.join(str(x) for x in d.values())
+        values_str = '|'.join('%s|%s' % (str(k), str(v)) for k, v in \
+                NetIDSubnetMap.__mapping__[session.sessionid][cls.__ipversion__].items())
         tlvdata += coreapi.CoreConfTlv.pack(coreapi.CORE_TLV_CONF_VALUES,
                 values_str)
 
