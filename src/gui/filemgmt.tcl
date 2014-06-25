@@ -135,9 +135,10 @@ proc newFile {} {
     # disconnect and get a new session number
     if { $name != "" } {
 	pluginConnect $name disconnect 1
-	pluginConnect $name connect 1
+	set channel [pluginConnect $name connect 1]
     }
     setGuiTitle ""
+    return $channel
 }
 
 
