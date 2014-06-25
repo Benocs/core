@@ -35,7 +35,6 @@ msg_types = {
         'exception': (10, coreapi.CORE_API_EXCP_MSG, 'EXCP')
         }
 
-
 class MsgHandler():
 
     master = None
@@ -121,22 +120,8 @@ class MsgHandler():
         self.recv_msg(msg)
 
     def recv_msg(self, msg):
-        print('rawmsg(%d): %s' % (len(str(msg)), str(msg)), end='\n', file=sys.stderr, flush = True)
         msg = self.decode_message(msg)
 
-        # TODO: move printing of incoming messages to it's own handler
-        print(msg, end='\n', file=sys.stdout, flush = True)
-        #print(msg, end='\n', file=sys.stderr, flush = True)
-        sys.stdout.flush()
-        sys.stderr.flush()
-        spaces = []
-        for i in range(10000):
-            spaces.append(" ")
-        print("".join(spaces), file=sys.stdout, flush = True)
-        print("".join(spaces), file=sys.stdout, flush = True)
-        sys.stdout.flush()
-
-        """
         if msg.msgtype in self.handled_msg_types:
             if not self.handled_msg_types[msg.msgtype]['handler'] is None:
                 self.handled_msg_types[msg.msgtype]['handler'](msg)
@@ -145,7 +130,6 @@ class MsgHandler():
         else:
             print('[ERROR] message type not supported: %d: %s' %
                     (msg.type, msg.typestr()))
-        """
 
 class TLVHelper():
 
@@ -218,15 +202,11 @@ class TLVHelper():
 
             # pop flags from arg list
             args.pop(0)
-        #print('flags: 0x%x' % flags)
 
         tlv_data_list = []
         while len(args) >= 2:
             tlv_type_raw = args.pop(0)
             tlv_value = args.pop(0)
-
-            #print('fetching next tlv_type and tlv_value: %s, %s' %
-            #       (tlv_type_raw, tlv_value))
 
             tlv_name = TLVHelper.str_to_tlvname(msg_types[msg_type][2], tlv_type_raw)
             tlv_type = TLVHelper.tlvname_to_num(tlv_cls, tlv_name)
@@ -234,11 +214,9 @@ class TLVHelper():
                 print("[ERROR] Unknown TLV: '%s' / %s:%s" % (tlv_type_raw, tlv_name, str(args)))
                 return (False, None, 0, None)
 
-            #print('tlv_name: %s, tlv_value: %s' % (tlv_name, tlv_value))
             tlv_data_list.append(tlv_cls.packstring(tlv_type, tlv_value))
 
         tlv_data = b''.join(tlv_data_list)
-        #print('tlvdata: %s' % str(tlv_data))
 
         return (True, msg_cls, flags, tlv_data)
 
@@ -267,8 +245,6 @@ class CoreConnection():
         self.socket = None
 
         self.set_message_handler()
-        #self.msg_handler.set_msg_callback(coreapi.CORE_API_SESS_MSG,
-        #       self.__connect_to_session_callback__)
 
         self.requested_session = None
         self.requested_session_connected = False
