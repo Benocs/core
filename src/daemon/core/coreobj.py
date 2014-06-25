@@ -5,8 +5,15 @@
 #
 # authors: Tom Goff <thomas.goff@boeing.com>
 #          Jeff Ahrenholz <jeffrey.m.ahrenholz@boeing.com>
-#          Robert Wuttke <robert@benocs.com>
+
 #
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 '''
 coreobj.py: defines the basic objects for emulation: the PyCoreObj base class,
 along with PyCoreNode, PyCoreNet, and PyCoreNetIf
