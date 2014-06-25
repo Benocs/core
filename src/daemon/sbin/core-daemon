@@ -869,9 +869,6 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
         # build common TLV items for reply
         tlvdata = b""
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NODE, nodenum)
-        if nodenum is not None:
-            tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NODE,
-                    nodenum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_NUM, execnum)
         tlvdata += coreapi.CoreExecTlv.pack(coreapi.CORE_TLV_EXEC_CMD, cmd)
 
