@@ -1,6 +1,14 @@
 # Copyright (c)2010-2012 the Boeing Company.
 # See the LICENSE file included in this distribution.
 
+#
+# Copyright (c) 2014 Benocs GmbH
+#
+# author: Robert Wuttke <robert@benocs.com>
+#
+# See the LICENSE file included in this distribution.
+#
+
 import os, glob
 from distutils.core import setup
 from core.constants import COREDPY_VERSION
@@ -39,9 +47,9 @@ setup(name = "core-python",
                      glob.glob("examples/myservices/*")),
                     ],
       description = "Python components of CORE",
-      url = "http://cs.itd.nrl.navy.mil/work/core/",
-      author = "Boeing Research & Technology",
-      author_email = "core-dev@pf.itd.nrl.navy.mil",
+      url = "https://github.com/Benocs/core/",
+      author = "Benocs",
+      author_email = "core-dev@benocs.com",
       license = "BSD",
       long_description="Python scripts and modules for building virtual " \
           "emulated networks.")
