@@ -1518,6 +1518,36 @@ proc setSessionOption { key value notify } {
     if { $notify } { sendSessionOptions -1 }
 }
 
+# netid_subnet_map received
+proc setNetidSubnetMapIPv4 { types vals } {
+    global netid_subnet_map_ipv4
+
+    array set netid_subnet_map_ipv4 {}
+
+    set idx 0
+    while {[expr $idx + 1] < [llength $vals]} {
+        set subnet [lindex $vals $idx]
+        set netid [lindex $vals [expr $idx + 1]]
+        array set netid_subnet_map_ipv4 [list $subnet $netid]
+        incr idx 2
+    }
+}
+
+# netid_subnet_map received
+proc setNetidSubnetMapIPv6 { types vals } {
+    global netid_subnet_map_ipv6
+
+    array set netid_subnet_map_ipv6 {}
+
+    set idx 0
+    while {[expr $idx + 1] < [llength $vals]} {
+        set subnet [lindex $vals $idx]
+        set netid [lindex $vals [expr $idx + 1]]
+        array set netid_subnet_map_ipv6 [list $subnet $netid]
+        incr idx 2
+    }
+}
+
 # split value input whether it has 'key=value' format or just 'value'
 # return a list of the key (if any) and value.
 proc splitKeyValue { keyvalue } {
