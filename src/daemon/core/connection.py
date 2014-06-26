@@ -313,7 +313,7 @@ class CoreConnection():
         self.socket = None
         self.localport = None
         self.msg_handler.set_socket(None)
-        self.msg_handler.set_localport(None)
+        self.msg_handler.set_local_port(None)
 
     def set_message_handler(self, callback = None):
         if callback is None:
