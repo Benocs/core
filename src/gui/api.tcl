@@ -1226,7 +1226,7 @@ proc parseConfMessage { data len flags channel } {
 
     if { $prmsg == 1 } { puts ") "}
 
-    set objs_ok [concat "services session metadata emane" $MACHINE_TYPES]
+    set objs_ok [concat "services session metadata emane netid_subnet_map_ipv4 netid_subnet_map_ipv6" $MACHINE_TYPES]
     if { $nodenum > -1 } {
 	set node "n$nodenum"
     } else {
@@ -1269,6 +1269,14 @@ proc parseConfMessage { data len flags channel } {
     # session options received upon XML file load
     } elseif { $obj == "session" && $tflags & 0x2 } {
 	setSessionOptions $types $values
+	return
+    # netid_subnet_map received
+    } elseif { $obj == "netid_subnet_map_ipv4" && $tflags & 0x2 } {
+	setNetidSubnetMapIPv4 $types $values
+	return
+    # netid_subnet_map received
+    } elseif { $obj == "netid_subnet_map_ipv6" && $tflags & 0x2 } {
+	setNetidSubnetMapIPv6 $types $values
 	return
     }
     # handle node machine-type profile
