@@ -21,10 +21,10 @@
 #
 # this defines the CORE version number, must be static for AC_INIT
 #
-AC_INIT(core, 4.6svn5, core-dev@pf.itd.nrl.navy.mil)
+AC_INIT(core, 20140714, "core-dev@benocs.com")
 VERSION=$PACKAGE_VERSION
 CORE_VERSION=$PACKAGE_VERSION
-CORE_VERSION_DATE=20140115
+CORE_VERSION_DATE=20140714
 COREDPY_VERSION=$PACKAGE_VERSION
 
 #
