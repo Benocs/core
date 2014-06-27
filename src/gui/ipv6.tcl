@@ -518,7 +518,7 @@ proc autoIPv6wlanaddr { node } {
 
 proc getDefaultIPv6Addrs { } {
     global g_prefs
-    return [list "2001::" "2002::" "a::"]
+    return [list "fd1f::" "2001::" "2002::" "a::"]
 }
 
 proc ipv6List { node wantmask } {
