@@ -1,5 +1,6 @@
-.. This file is part of the CORE Manual
+.. CORE documentation master file
    (c)2012 the Boeing Company
+   (c)2014 Benocs
 
 .. only:: html or latex
 
