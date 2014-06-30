@@ -30,3 +30,4 @@ contrib/pmacct/pmacct-*/
 contrib/quagga/quagga-*/
 contrib/snmp/net-snmp-*/
 contrib/softflowd/
+_build/
