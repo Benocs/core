@@ -20,6 +20,7 @@ Contents:
    ns3
    performance
    devguide
+   index-python-doc
    credits
 
 Indices and tables
@@ -28,5 +29,6 @@ Indices and tables
 .. only:: html
 
    * :ref:`genindex`
+   * :ref:`modindex`
    * :ref:`search`
 
