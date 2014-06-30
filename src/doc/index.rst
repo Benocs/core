@@ -2,8 +2,6 @@
    (c)2012 the Boeing Company
    (c)2014 Benocs
 
-.. only:: html or latex
-
 CORE Manual
 ===========
 
