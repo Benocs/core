@@ -17,6 +17,17 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../daemon/core/addons'))
+sys.path.insert(0, os.path.abspath('../daemon/core/api'))
+sys.path.insert(0, os.path.abspath('../daemon/core/bsd'))
+sys.path.insert(0, os.path.abspath('../daemon/core/emane'))
+sys.path.insert(0, os.path.abspath('../daemon/core/misc'))
+sys.path.insert(0, os.path.abspath('../daemon/core/netns'))
+sys.path.insert(0, os.path.abspath('../daemon/core/phys'))
+sys.path.insert(0, os.path.abspath('../daemon/core/services'))
+sys.path.insert(0, os.path.abspath('../daemon/core/xen'))
+sys.path.insert(0, os.path.abspath('../daemon/core'))
+sys.path.insert(0, os.path.abspath('../daemon'))
 
 # -- General configuration -----------------------------------------------------
 
