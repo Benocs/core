@@ -5,6 +5,7 @@
 CORE Manual
 ===========
 
+Contents:
 
 .. toctree::
    :maxdepth: 2
