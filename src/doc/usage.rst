@@ -93,7 +93,7 @@ as root in order to start an emulation.
 The GUI can be connected to a different address or TCP port using
 the ``--address`` and/or ``--port`` options. The defaults are shown below.
 ::
-           core-gui --address 127.0.0.1 --port 4038
+          core-gui --address 127.0.0.1 --port 4038
 
 .. _Toolbar:
 
