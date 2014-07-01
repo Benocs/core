@@ -9,6 +9,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 3
+   :glob:
    :numbered:
 
    intro
@@ -21,6 +22,7 @@ Contents:
    performance
    devguide
    index-python-doc
+   core*
    credits
 
 Indices and tables
