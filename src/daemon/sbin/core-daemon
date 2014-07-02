@@ -425,11 +425,12 @@ class CoreRequestHandler(socketserver.BaseRequestHandler):
             if netid is not None:
                 n.netid = netid
 
-            # initialize loopback address(es)
-            for ipversion in n.getIPversions():
-                print('[PyCoreNode] initializing ipversion: %s' %
-                        str(ipversion))
-                n.getLoopback(ipversion=ipversion)
+            if hasattr(n, 'getIPversions'):
+                # initialize loopback address(es)
+                for ipversion in n.getIPversions():
+                    print('[PyCoreNode] initializing ipversion: %s' %
+                            str(ipversion))
+                    n.getLoopback(ipversion=ipversion)
 
             if self.session.getstate() > coreapi.CORE_EVENT_DEFINITION_STATE:
                 start = True
