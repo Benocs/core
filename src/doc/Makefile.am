@@ -13,7 +13,7 @@ SUBDIRS 	= man figures
 # extra cruft to remove
 DISTCLEANFILES	= conf.py Makefile.in stamp-vti core.*.rst modules_generated.flag
 
-all:	modules_generated.flag
+doc:	modules_generated.flag
 
 modules_generated.flag:
 	sphinx-apidoc -o . ../daemon/core/
