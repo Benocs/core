@@ -21,7 +21,7 @@
 #
 # this defines the CORE version number, must be static for AC_INIT
 #
-AC_INIT(core, 20140714, "core-dev@benocs.com")
+AC_INIT(core, 20140714, "core-dev")
 VERSION=$PACKAGE_VERSION
 CORE_VERSION=$PACKAGE_VERSION
 CORE_VERSION_DATE=20140714
@@ -331,8 +331,6 @@ AC_CONFIG_FILES([Makefile
 		daemon/core/constants.py
 		daemon/ns3/Makefile
 		daemon/ns3/corens3/constants.py
-		daemon/doc/Makefile
-		daemon/doc/conf.py
 		packaging/deb/core-daemon.install
 		packaging/deb/core-gui.install
 		packaging/rpm/core.spec],)
