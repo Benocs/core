@@ -21,7 +21,7 @@
 #
 # this defines the CORE version number, must be static for AC_INIT
 #
-AC_INIT(core, 20140714, 0)
+AC_INIT(core, 20140714, dev)
 VERSION=$PACKAGE_VERSION
 CORE_VERSION=$PACKAGE_VERSION
 CORE_VERSION_DATE=20140714
