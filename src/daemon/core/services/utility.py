@@ -771,8 +771,30 @@ addservice(AtdService)
 class CronService(UtilService):
     _name = "Cron"
     _dirs = (('/etc', 'union'), ('/var/spool/cron', 'bind'), ('/run', 'bind'))
-    #_configs = ('/etc/crontab',)
+    _configs = ('/etc/crontab',)
     _startup = ("/usr/sbin/cron",)
+
+    @classmethod
+    def generateconfig(cls, node, filename, services):
+        return """# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# deactivated hourly, daily, weekly, monthly cronjobs by default,
+# as it unclear (as of network-configure-time) which files reside inside
+# their respective directories
+# m h dom mon dow user  command
+#17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+#25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+#47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+#52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+"""
 
 addservice(CronService)
 
