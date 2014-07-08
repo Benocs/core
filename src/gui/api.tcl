@@ -297,11 +297,6 @@ proc parseNodeMessage { data len flags } {
 	    break
 	}
 	set length [expr {$length & 0xFF}]; # convert signed to unsigned
-	if { $length == 0 } {; # prevent endless looping
-	    if { $type == 0 } { puts -nonewline "(extra padding)"; break
-	    } else { puts "Found zero-length TLV for type=$type, dropping.";
-	        break }
-	}
 	set pad [pad_32bit $length]
 	# verbose debugging
 	#puts "tlv type=$type length=$length pad=$pad current=$current"
