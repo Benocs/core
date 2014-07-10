@@ -20,13 +20,6 @@ su -c "(for daemon in $daemons; do \
             update-rc.d -f \$daemon remove || echo \"error while deactivating \
             \$daemon\'s \ init script. check output.\"; done)" root
 
-su -c "apt-get install dnsmasq" root
-
-daemons="dnsmasq"
-su -c "(for daemon in $daemons; do \
-            update-rc.d -f \$daemon remove || echo \"error while deactivating \
-            \$daemon\'s \ init script. check output.\"; done)" root
-
 ./bootstrap.sh
 ./configure --prefix=/usr
 
