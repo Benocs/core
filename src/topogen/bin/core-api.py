@@ -15,11 +15,25 @@ import optparse
 import sys
 import time
 
-
 from core.api import coreapi
 from core.connection import CoreConnection
 from core.connection import msg_types
 from core.connection import TLVHelper
+
+once = True
+got_answer = False
+
+def msg_callback(msg):
+    global got_answer
+    got_answer = True
+    print(msg, flush=True)
+
+def connectSession(connection, sessionid):
+    data = "session flags=add number %s" % str(sessionid)
+    result, msg_cls, flags, tlv_data = \
+            TLVHelper.parse_tlv_stringlist(data.split())
+    msg = msg_cls.pack(flags, tlv_data)
+    connection.socket.sendall(msg)
 
 if __name__ == "__main__" or __name__ == "__builtin__":
 
@@ -37,7 +51,8 @@ if __name__ == "__main__" or __name__ == "__builtin__":
                                             listen=True,
                                             session=None,
                                             tcp=True,
-                                            tlv_help=False)
+                                            tlv_help=False,
+                                            once=False)
 
     parser.add_option("-l", "--listen", dest="listen", action="store_true",
                                         help=("Listen for a response message"
@@ -60,6 +75,8 @@ if __name__ == "__main__" or __name__ == "__builtin__":
     parser.add_option("-H", "--tlv-help", dest="tlv_help", action="store_true",
                                         help=("List available Message Types "
                                             "and their resp. TLVs"))
+    parser.add_option("-1", "--once", dest="once", action="store_true",
+                                        help=("Wait for one reply, then exit."))
 
     # parse command line opt
     (opt, args) = parser.parse_args()
@@ -86,18 +103,28 @@ if __name__ == "__main__" or __name__ == "__builtin__":
     if len(args) > 0:
         usage(err=1)
 
+    for msg_type in connection.msg_handler.handled_msg_types:
+        connection.msg_handler.set_msg_callback(msg_type, msg_callback)
+
+    if not opt.session is None:
+        connectSession(connection, str(opt.session))
+
     # serve forever (or until CTRL+C is pressed)
     while True:
         try:
             data = sys.stdin.readline().split()
             if len(data) == 0:
-                break
+                if opt.once and got_answer:
+                    time.sleep(0.1)
+                    break
+                time.sleep(0.1)
+                continue
             result, msg_cls, flags, tlv_data = \
                     TLVHelper.parse_tlv_stringlist(data)
             if result:
                 msg = msg_cls.pack(flags, tlv_data)
-                print('%s: sending data: %s' % (str(time.time()), str(msg)),
-                    file=sys.stderr)
+                #print('%s: sending data: %s' % (str(time.time()), str(msg)),
+                #    file=sys.stderr)
                 connection.socket.sendall(msg)
         except KeyboardInterrupt:
             print("CTRL+C pressed")
