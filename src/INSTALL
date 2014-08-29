@@ -42,6 +42,7 @@ su -c "make install && \
 
 echo "building and installing netsnmp..."
 su -c "(cd ../contrib/snmp && \
+    rm -rf net-snmp-5.7.2.1 && \
     tar -xzvf net-snmp-5.7.2.1.tar.gz && \
     cd net-snmp-5.7.2.1 && \
     ./configure --prefix=\"/usr\" --enable-new-features --enable-ipv6 \
