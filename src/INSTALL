@@ -6,6 +6,8 @@ BUILD_PARALLEL="-j2"
 CORECFG="/etc/core"
 PYTHON=python3
 
+QUAGGA_VERSION=0.99.23.1
+
 export PYTHON
 su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
     apt-get install bash bridge-utils ebtables iproute libev-dev python \
@@ -57,10 +59,9 @@ su -c "(cd ../contrib/snmp && \
 
 echo "building and installing quagga..."
 su -c "( cd ../contrib/quagga && \
-    tar -xzf quagga-0.99.22.4.tar.gz && \
-    cd quagga-0.99.22.4 && \
-    patch -p1 < ../000-vtysh.patch && \
-    patch -p1 < ../001-isis_pdu_iih.patch && \
+    wget -O quagga-${QUAGGA_VERSION}.tar.gz http://download.savannah.gnu.org/releases/quagga/quagga-${QUAGGA_VERSION}.tar.gz && \
+    tar -xzf quagga-${QUAGGA_VERSION}.tar.gz && \
+    cd quagga-${QUAGGA_VERSION} && \
     ./configure --prefix= \
         --enable-snmp \
         --enable-isisd \
