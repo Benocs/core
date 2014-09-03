@@ -7,6 +7,8 @@ CORECFG="/etc/core"
 PYTHON=python3
 PREFIX="/usr/local"
 
+QUAGGA_VERSION=0.99.23.1
+
 export PYTHON
 su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
     apt-get install bash bridge-utils ebtables iproute libev-dev python \
@@ -43,6 +45,7 @@ su -c "make install && \
 
 echo "building and installing netsnmp..."
 su -c "(cd ../contrib/snmp && \
+    rm -rf net-snmp-5.7.2.1 && \
     tar -xzvf net-snmp-5.7.2.1.tar.gz && \
     cd net-snmp-5.7.2.1 && \
     ./configure --prefix=\"/usr\" --enable-new-features --enable-ipv6 \
@@ -57,10 +60,9 @@ su -c "(cd ../contrib/snmp && \
 
 echo "building and installing quagga..."
 su -c "( cd ../contrib/quagga && \
-    tar -xzf quagga-0.99.22.4.tar.gz && \
-    cd quagga-0.99.22.4 && \
-    patch -p1 < ../000-vtysh.patch && \
-    patch -p1 < ../001-isis_pdu_iih.patch && \
+    wget -O quagga-${QUAGGA_VERSION}.tar.gz http://download.savannah.gnu.org/releases/quagga/quagga-${QUAGGA_VERSION}.tar.gz && \
+    tar -xzf quagga-${QUAGGA_VERSION}.tar.gz && \
+    cd quagga-${QUAGGA_VERSION} && \
     ./configure --prefix= \
         --enable-snmp \
         --enable-isisd \
