@@ -5,6 +5,7 @@ set -e
 BUILD_PARALLEL="-j2"
 CORECFG="/etc/core"
 PYTHON=python3
+PREFIX="/usr/local"
 
 export PYTHON
 su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
@@ -21,7 +22,7 @@ su -c "(for daemon in $daemons; do \
             \$daemon\'s \ init script. check output.\"; done)" root
 
 ./bootstrap.sh
-./configure --prefix=/usr
+./configure --prefix=${PREFIX}
 
 make $BUILD_PARALLEL
 #TODO: chmod -R 775 "$CORECFG" && \
@@ -114,16 +115,8 @@ britedir=/usr/lib/brite
 echo "Installing BRITE to ${britedir}.."
 su -c "cp -ax ../contrib/BRITE ${britedir}" root
 
-PYTHON=python3
-PYTHON_MINOR=$(python3 -V 2>&1 | awk '{print $2}' | cut -d"." -f2)
-DESTDIR="/usr"
-pythondir="/lib/${PYTHON}.${PYTHON_MINOR}/dist-packages"
-pyexecdir="/lib/${PYTHON}.${PYTHON_MINOR}/dist-packages"
-
 echo "Installing core-topogen.."
-su -c "(cd topogen && ${PYTHON} ./setup.py install --prefix=${DESTDIR} \
-    --install-purelib=${DESTDIR}/${pythondir} \
-    --install-platlib=${DESTDIR}/${pyexecdir})" root
+su -c "(cd topogen && ${PYTHON} ./setup.py install --prefix=${PREFIX})" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
