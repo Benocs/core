@@ -60,6 +60,8 @@ if __name__ == "__main__" or __name__ == "__builtin__":
 
     topology_generator.add_source_file(infile, 'node_layout')
 
+    topology_generator.add_destination_file(outfile, 'json')
+
     # profiling foo..
     start = datetime.datetime.now()
 
