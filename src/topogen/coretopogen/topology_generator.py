@@ -18,6 +18,7 @@ from coretopogen.topology_writer_as_info import TopologyWriterASInfo
 from coretopogen.topology_writer_dot import TopologyWriterDot
 from coretopogen.topology_writer_edges import TopologyWriterEdges
 from coretopogen.topology_writer_imune import TopologyWriterImune
+from coretopogen.topology_writer_json import TopologyWriterJson
 
 class TopologyGenerator():
     __in_fnames__ = None
@@ -39,6 +40,7 @@ class TopologyGenerator():
 
         self.__supported_output_types__ = {
                 'imune': TopologyWriterImune(),
+                'json': TopologyWriterJson(),
                 'dot': TopologyWriterDot(),
                 'edges': TopologyWriterEdges(),
                 'as_info': TopologyWriterASInfo(),
