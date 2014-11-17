@@ -158,6 +158,10 @@ collector=$2
 [ -z "$1" ] && exit 1
 [ -z "$2" ] && exit 1
 
+# do SNAT to ensure sendinf from src-ip
+[ \! -z "$3" ] && \
+    iptables -t nat -A POSTROUTING -p udp --dport 2055 -j SNAT --to-source $3
+
 failure_sleep=3
 started=0
 collector_probe_cmd="ping -c1 -w1 -n $collector"
@@ -264,7 +268,10 @@ done
                     # TODO: make this work when multiple collectors are present
                     if len(collectors) > 0:
                         config_list.extend(['bash startprobe.sh ', '"', ''.join(base_sflowd_argv),
-                                ''.join(sflowd_argv), '" ', collectors[0], ' &', '\n'])
+                                ''.join(sflowd_argv), '" ', collectors[0], ' ',
+                                str(node.getLoopbackIPv4()), ' &', '\n'])
+                        #config_list.extend(['bash startprobe.sh ', '"', ''.join(base_sflowd_argv),
+                        #        ''.join(sflowd_argv), '" ', collectors[0], ' &', '\n'])
 
                     # skip checking of other nodes on this link. they wouldn't
                     # change any behavior, anyway. continue with next local
