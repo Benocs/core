@@ -7,7 +7,7 @@ CORECFG="/etc/core"
 PYTHON=python3
 PREFIX="/usr/local"
 
-QUAGGA_VERSION=0.99.23.1
+QUAGGA_VERSION=1.1.0
 
 export PYTHON
 su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
@@ -64,9 +64,9 @@ su -c "( cd ../contrib/quagga && \
     tar -xzf quagga-${QUAGGA_VERSION}.tar.gz && \
     cd quagga-${QUAGGA_VERSION} && \
     ./configure --prefix= \
-        --enable-snmp \
         --enable-isisd \
-        --enable-multipath=1 \
+        --enable-isis-topology \
+        --enable-multipath=0 \
         --sysconfdir=/etc/quagga \
         --enable-vtysh \
         --localstatedir=/var/run/quagga && \
