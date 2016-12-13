@@ -10,7 +10,7 @@ PREFIX="/usr/local"
 QUAGGA_VERSION=1.1.0
 
 export PYTHON
-su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
+sudo su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
     apt-get install bash bridge-utils ebtables iproute libev-dev python \
     tcl8.5 tk8.5 libtk-img gawk libperl-dev \
     autoconf automake gcc libev-dev make libreadline-dev pkg-config \
@@ -19,7 +19,7 @@ su -c "apt-get update; apt-get purge quagga snmpd libsnmp-dev; \
     tmux texinfo" root
 
 daemons="bind9 lighttpd"
-su -c "(for daemon in $daemons; do \
+sudo su -c "(for daemon in $daemons; do \
             update-rc.d -f \$daemon remove || echo \"error while deactivating \
             \$daemon\'s \ init script. check output.\"; done)" root
 
@@ -28,7 +28,7 @@ su -c "(for daemon in $daemons; do \
 
 make $BUILD_PARALLEL
 #TODO: chmod -R 775 "$CORECFG" && \
-su -c "make install && \
+sudo su -c "make install && \
     mkdir -p "$CORECFG" && \
     chmod -R 777 "$CORECFG" && \
     addgroup core || echo \"group \\\"core\\\" already exists. this can be ignored\" && \
@@ -59,7 +59,7 @@ su -c "(cd ../contrib/snmp && \
     update-rc.d -f snmpd remove)" root
 
 echo "building and installing quagga..."
-su -c "( cd ../contrib/quagga && \
+sudo su -c "( cd ../contrib/quagga && \
     wget -O quagga-${QUAGGA_VERSION}.tar.gz http://download.savannah.gnu.org/releases/quagga/quagga-${QUAGGA_VERSION}.tar.gz && \
     tar -xzf quagga-${QUAGGA_VERSION}.tar.gz && \
     cd quagga-${QUAGGA_VERSION} && \
@@ -107,18 +107,18 @@ echo "building and installing BENOCS ifindex"
 (
 cd ../contrib/BENOCS/ifindex/src
 g++ -o ifindex ifindex.cpp
-su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
+sudo su -c "mkdir -p /opt/BENOCS/bin && cp ifindex /opt/BENOCS/bin/ifindex" root
 )
 
 echo "Installing BRITE dependencies.."
-su -c "apt-get install default-jre python-pydot" root
+sudo su -c "apt-get install default-jre python-pydot" root
 
 britedir=/usr/lib/brite
 echo "Installing BRITE to ${britedir}.."
-su -c "cp -ax ../contrib/BRITE ${britedir}" root
+sudo su -c "cp -ax ../contrib/BRITE ${britedir}" root
 
 echo "Installing core-topogen.."
-su -c "(cd topogen && ${PYTHON} ./setup.py install --prefix=${PREFIX})" root
+sudo su -c "(cd topogen && ${PYTHON} ./setup.py install --prefix=${PREFIX})" root
 
 echo "done. now for each user using core, create a symlink pointing from \"$HOME/.core\" -> \"$CORECFG\""
 
