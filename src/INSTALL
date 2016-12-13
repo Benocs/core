@@ -43,20 +43,20 @@ sudo su -c "make install && \
         echo \"creating link in \"\$i\"\"; ln -s \"$CORECFG\" \"\$i/.core\" || \
         echo \"link already exists. this can be ignored\"; done)" root
 
-echo "building and installing netsnmp..."
-su -c "(cd ../contrib/snmp && \
-    rm -rf net-snmp-5.7.2.1 && \
-    tar -xzvf net-snmp-5.7.2.1.tar.gz && \
-    cd net-snmp-5.7.2.1 && \
-    ./configure --prefix=\"/usr\" --enable-new-features --enable-ipv6 \
-        --with-default-snmp-version=\"3\" --with-sys-contact=\"Unknown\" \
-        --with-sys-location=\"Unknown\" --with-logfile=\"/var/log/snmpd.log\" \
-        --with-persistent-directory=\"/var/net-snmp\" && \
-    make && \
-    make install && \
-    cd .. && \
-    cp -v ./snmpd.init /etc/init.d/ && \
-    update-rc.d -f snmpd remove)" root
+#echo "building and installing netsnmp..."
+#sudo su -c "(cd ../contrib/snmp && \
+#    rm -rf net-snmp-5.7.2.1 && \
+#    tar -xzvf net-snmp-5.7.2.1.tar.gz && \
+#    cd net-snmp-5.7.2.1 && \
+#    ./configure --prefix=\"/usr\" --enable-new-features --enable-ipv6 \
+#        --with-default-snmp-version=\"3\" --with-sys-contact=\"Unknown\" \
+#        --with-sys-location=\"Unknown\" --with-logfile=\"/var/log/snmpd.log\" \
+#        --with-persistent-directory=\"/var/net-snmp\" && \
+#    make && \
+#    make install && \
+#    cd .. && \
+#    cp -v ./snmpd.init /etc/init.d/ && \
+#    update-rc.d -f snmpd remove)" root
 
 echo "building and installing quagga..."
 sudo su -c "( cd ../contrib/quagga && \
@@ -78,30 +78,30 @@ sudo su -c "( cd ../contrib/quagga && \
     cp -v ./quagga.init /etc/init.d/quagga && \
     update-rc.d -f quagga remove)" root
 
-su -c "adduser --system --shell /bin/false --no-create-home --group --disabled-password --disabled-login quagga" root
+sudo su -c "adduser --system --shell /bin/false --no-create-home --group --disabled-password --disabled-login quagga" root
 
-echo "building and installing pmacct..."
-(
-cd ../contrib/pmacct
-tar -xzf pmacct-1.5.0rc3.tar.gz
-cd pmacct-1.5.0rc3
-./configure --enable-l2 --enable-ipv6 --enable-plabel --enable-v4-mapped --enable-64bit --enable-threads --enable-ulog
-make
-su -c "make install" root
-)
-
-echo "building and installing softflowd"
-(
-cd ../contrib/
-tar -xzf softflowd-80aac3b2fec3.tgz
-cd softflowd
-aclocal
-autoheader
-autoconf
-./configure
-make
-su -c "make install" root
-)
+#echo "building and installing pmacct..."
+#(
+#cd ../contrib/pmacct
+#tar -xzf pmacct-1.5.0rc3.tar.gz
+#cd pmacct-1.5.0rc3
+#./configure --enable-l2 --enable-ipv6 --enable-plabel --enable-v4-mapped --enable-64bit --enable-threads --enable-ulog
+#make
+#sudo su -c "make install" root
+#)
+#
+#echo "building and installing softflowd"
+#(
+#cd ../contrib/
+#tar -xzf softflowd-80aac3b2fec3.tgz
+#cd softflowd
+#aclocal
+#autoheader
+#autoconf
+#./configure
+#make
+#sudo su -c "make install" root
+#)
 
 echo "building and installing BENOCS ifindex"
 (
